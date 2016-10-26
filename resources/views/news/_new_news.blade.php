@@ -34,7 +34,7 @@
     <div class="col m4 s12">
         <p style="margin-top: 2em">
             {!! Form::hidden('send_email', 0) !!}
-            <input type="checkbox" name="send_email" value=1 class="filled-in" checked id="send_email" />
+            <input type="checkbox" name="send_email" value=1 class="filled-in" id="send_email" @if($submit == 'Update' && $news->send_email) checked @endif />
             <label for="send_email">Email news on publish date</label>
         </p>
     </div>    
