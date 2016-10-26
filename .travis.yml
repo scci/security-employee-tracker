@@ -7,7 +7,6 @@ before_install: phpenv config-add travis-composer-php.ini
 
 before_script:
   - composer install --no-interaction
-  - php artisan key:generate
   - touch storage/database.sqlite
   - php artisan migrate
 
