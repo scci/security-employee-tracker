@@ -25,7 +25,7 @@
             <table class="bordered">
                 <thead>
                 <tr>
-                    <th>{{ ucfirst(rtrim($duty->cycle, 'ly')) }}</th>
+                    <th>{{ $duty->cycle == "daily" ? "Day" : ucfirst(rtrim($duty->cycle, 'ly')) }}</th>
                     <th>Employee</th>
                     @can('edit')
                         <th class="center-align hide-on-print">Swap
