@@ -5,4 +5,4 @@ php:
   - hhvm
 
 before_script:
-  - composer install --dev -prefer-source --no-interaction
+  - composer install --dev --prefer-source --no-interaction
