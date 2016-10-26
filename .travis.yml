@@ -2,9 +2,16 @@ language: php
 php:
   - '5.6'
   - '7.0'
-  - hhvm
-
-before_script:
-  - composer install --prefer-source --no-interaction
 
 before_install: phpenv config-add travis-composer-php.ini
+
+before_script:
+  - cp .env.travis .env
+  - composer self-update
+  - composer install --no-interaction
+  - php artisan key:generate
+  - touch storage/database.sqlite
+  - php artisan migrate
+
+script:
+  - vendor/bin/phpunit
