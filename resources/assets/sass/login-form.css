@@ -1,0 +1,110 @@
+
+/***********************
+
+****** Login Form ******
+
+***********************/
+
+.flex {
+    display:flex;
+    flex-direction:row-reverse;
+}
+
+.flex > .card:last-child {
+    flex-shrink: 1;
+    flex-grow: 1;
+    flex-basis: auto;
+}
+
+@media(max-width: 760px){
+    .flex {
+        flex-wrap: wrap;
+    }
+    .card-container.card {
+        flex-grow: 1;
+        margin: 25px auto 0;
+    }
+}
+
+.card-container.card {
+    flex-basis: auto;
+    min-width:250px;
+    flex-grow:0;
+}
+
+.form-signin .btn {
+    font-weight: 700;
+    height: 36px;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    user-select: none;
+    cursor: default;
+}
+
+/*
+ * Card component
+ */
+.card {
+    background-color: #fff;
+    /* just in case there no content*/
+    padding: 20px 25px 30px;
+    margin: 50px 25px 0;
+    /* shadows and rounded borders */
+    -moz-border-radius: 4px;
+    -webkit-border-radius: 4px;
+    border-radius: 4px;
+    border: solid 1px #aaa;
+}
+
+.profile-img-card {
+    height: 96px;
+    margin: 0 auto 10px;
+    display: block;
+}
+
+/*
+ * Form styles
+ */
+.profile-name-card {
+    font-size: 15px;
+    font-weight: bold;
+    text-align: center;
+    margin: 10px 0;
+    min-height: 1em;
+    color: #286090;
+}
+
+.reauth-email {
+    display: block;
+    color: #404040;
+    line-height: 2;
+    margin-bottom: 10px;
+    font-size: 14px;
+    text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    -moz-box-sizing: border-box;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+}
+
+/*.form-signin #inputEmail, .form-signin #inputPassword {*/
+    /*direction: ltr;*/
+    /*height: 44px;*/
+    /*margin-bottom: 15px;*/
+    /*font-size: 16px;*/
+/*}*/
+
+/*.form-signin input[type=email], .form-signin input[type=password], .form-signin input[type=text], .form-signin button {*/
+    /*width: 100%;*/
+    /*display: block;*/
+    /*margin-bottom: 10px;*/
+    /*z-index: 1;*/
+    /*position: relative;*/
+    /*-moz-box-sizing: border-box;*/
+    /*-webkit-box-sizing: border-box;*/
+    /*box-sizing: border-box;*/
+/*}*/
+
+/* end login form */

@@ -1,0 +1,14 @@
+{
+  "private": true,
+  "devDependencies": {
+    "grunt": "^1.0.1",
+    "gulp": "^3.8.8",
+    "gulp-notify": "^2.2.0",
+    "gulp-phpunit": "^0.20.0",
+    "load-grunt-tasks": "^3.5.0"
+  },
+  "dependencies": {
+    "laravel-elixir": "^3.0.0",
+    "bootstrap-sass": "^3.0.0"
+  }
+}

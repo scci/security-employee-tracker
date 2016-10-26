@@ -1,0 +1,118 @@
+<!-- end add user button row fix -->
+
+<div class="row">
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="first_name_field">
+            {!! Form::label('first_name', 'First Name:') !!}
+            {!! Form::text('first_name', null, ['class' => 'validate']) !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="nickname_field">
+            {!! Form::label('nickname', 'Nickname:') !!}
+            {!! Form::text('nickname', null, ['class' => 'validate']) !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="last_name_field">
+            {!! Form::label('last_name', 'Last Name:') !!}
+            {!! Form::text('last_name', null, ['class' => 'validate']) !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="email_field">
+            {!! Form::label('email', 'Email:') !!}
+            {!! Form::text('email', null, ['class' => 'validate']) !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="username_field">
+            {!! Form::label('username', 'Username:') !!}
+            {!! Form::text('username', null, ['class' => 'validate']) !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="phone_field">
+            {!! Form::label('phone', 'Phone:') !!}
+            {!! Form::text('phone', null, ['class' => 'validate']) !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="emp_num_field">
+            {!! Form::label('emp_num', 'Employee ID:') !!}
+            {!! Form::text('emp_num', null, ['class' => 'validate']) !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="supervisor_field">
+            {!! Form::select('supervisor_id', array(null=>'None') + $supervisors, null, ['class' => 'validate']) !!}
+            {!! Form::label('supervisor_id', 'Supervisor:') !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="clearance_field">
+            {!! Form::select('access_level', [null => 'None', 'S' => 'Secret', 'TS' => 'Top Secret'], null, ['class' => 'validate']) !!}
+            {!! Form::label('access_level', 'Access Level:') !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="clearance_field">
+            {!! Form::select('clearance', [null => 'None', 'Int S' => 'Interim Secret', 'S' => 'Secret', 'SCI' => 'SCI', 'TS' => 'Top Secret'], null, ['class' => 'validate']) !!}
+            {!! Form::label('clearance', 'JPAS Clearance:') !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4" id="elig_date_field">
+        {!! Form::label('elig_date', 'JPAS Eligibility Date:') !!}
+        {!! Form::date('elig_date', null, ['class' => 'datepicker']) !!}
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="inv_field">
+            {!! Form::label('inv', 'JPAS Investigation:') !!}
+            {!! Form::text('inv', null, ['class' => 'validate']) !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4" id="inv_close_field">
+        {!! Form::label('inv_close', 'JPAS Investigation Date:') !!}
+        {!! Form::date('inv_close', null, ['class' => 'datepicker']) !!}
+    </div>
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="groups_field">
+            <select name='groups[]' id="_new_user_groups_field" multiple>
+                <option value="" disabled selected>Choose Group(s)</option>
+                @foreach($groups as $group)
+                    <option data-closed-area="{{ $group->closed_area }}" value="{{ $group->id }}"
+                        @if($submit == 'Update' && $user->groups->where('id', $group->id)->first())
+                            selected
+                        @endif
+                    >{{ $group->name }}</option>
+                @endforeach
+            </select>
+            {!! Form::label('groups[]', 'Groups:') !!}
+        </div>
+    </div>
+    @if($submit == 'Update')
+        @foreach($groups as $group)
+            @if($group->closed_area)
+                <?php $userHasGroup = $user->groups->where('id', $group->id)->first(); ?>
+                <div class="col s12 m6 l4 closed-area" id="access-{{ $group->id }}" style="@unless($userHasGroup)display:none; @endunless">
+                    <div class="input-field">
+                        {!! Form::select("access[$group->id]", [null => 'None', 'Unrestricted' => 'Unrestricted', 'Working Hours' => 'Working Hours'], ($userHasGroup ? $userHasGroup->pivot->access : null), ['class' => 'validate']) !!}
+                        {!! Form::label("access[$group->id]", "$group->name Closed Area:") !!}
+                    </div>
+                </div>
+            @endif
+        @endforeach
+    @endif
+    <div class="col s12 m6 l4">
+        <div class="input-field" id="status_field">
+            {!! Form::select('status', ['active' => 'Active', 'separated' => 'Separated', 'destroyed' => 'Destroyed'], null, ['class' => 'validate']) !!}
+            {!! Form::label('status', 'Status:') !!}
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col s12 right-align">
+        {!! Form::reset('Reset', array('class' => 'btn-flat waves-effect waves-indigo')) !!}
+        {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
+    </div>
+</div>
