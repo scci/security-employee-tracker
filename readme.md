@@ -21,6 +21,7 @@ The application currently utilizes the PHP Laravel 5 framework. It also currentl
 - Mbstring PHP Extension
 - Tokenizer PHP Extension
 - XML PHP Extension
+- LDAP PHP Extension
 - [Composer](https://getcomposer.org/)
 
 To view all the various options including cache, database, settings, email, etc..., view the [Laravel Documentation.](https://laravel.com/docs/master)
