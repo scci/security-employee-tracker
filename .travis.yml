@@ -6,6 +6,7 @@ php:
 before_install: phpenv config-add travis-composer-php.ini
 
 before_script:
+  - touch boostrap/cache/services.php
   - composer self-update
   - composer install --no-interaction
   - php artisan key:generate
