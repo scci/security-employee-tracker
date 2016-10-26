@@ -30,12 +30,16 @@ To view all the various options including cache, database, settings, email, etc.
 
 ## Installation
 
-1. Upload your files to your server so that the public directory is what the browser loads when accessing the application.
-2. Utilize a .env file or edit the various files in the config folder to setup your application settings. The .env file will take presidence.
-  * Update the `config/adldap.php` file to reflect your LDAP settings. 
-3. In your command line/SSH, navigate to the application root folder and run: `composer install`
-4. Generate a secure application key: `php artisan key:generate`. Ensure that this key is added to your .env or your `config/app.php` file.
-5. Edit `config/auth.php` and add your username to the `admin` section. Also change the `guards => web => provider` (line 39) value to `adldap` (currently set to users for testing)
+1. Upload your files to your server so that the `public` directory is hit when loading the site/application.
+2. Update the files in the `config` directory.
+  * `config/adldap.php` - your LDAP settings.
+  * `config/auth.php` - Change the `guards => web => provider` (line 39) value to `adldap` (currently set to users for testing/validation)
+  * `config/auth.php` - (line 111) Set the username for the admin/FSO.
+3. Rename `.env.example` to `.env` and add your database and email settings.  
+4. In your command line/SSH, navigate to the application root folder and run: 
+   * `php artisan key:generate`
+   * `composer install`
+   * `php artisan migrate --force`
 6. Load the application in your browser.
 
 ## Tests
@@ -49,8 +53,3 @@ If you wish to submit enhancements, bug fixes and other changes, please submit a
 ### License
 
 The SET application is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
-
-### Current main tasks
-
-- Implement ability to create users and reset passwords via the users table and not require LDAP
-- Finish adding all missing test cases.
