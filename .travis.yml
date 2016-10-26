@@ -8,7 +8,7 @@ before_install: phpenv config-add travis-composer-php.ini
 before_script:
   - composer install --no-interaction
   - touch storage/database.sqlite
-  - php artisan migrate
+  - php artisan migrate --force
 
 script:
   - vendor/bin/phpunit
