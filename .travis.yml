@@ -6,11 +6,11 @@ php:
 before_install: phpenv config-add travis-composer-php.ini
 
 before_script:
-  - touch boostrap/cache/services.php
+  - touch /home/travis/build/shawndibble/security-employee-tracker/bootstrap/cache/services.php
   - composer self-update
   - composer install --no-interaction
   - php artisan key:generate
-  - touch storage/database.sqlite
+  - touch /home/travis/build/shawndibble/security-employee-tracker/storage/database.sqlite
   - php artisan migrate
 
 script:
