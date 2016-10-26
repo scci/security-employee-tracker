@@ -1,5 +1,7 @@
 ## Security Employee Tracker
 
+[![Build Status](https://travis-ci.org/scci/security-employee-tracker.svg?branch=master)](https://travis-ci.org/scci/security-employee-tracker)
+
 SET is for FSO and security officers of DoD companies to manage their employees. This includes the following:
 - storing employee files
 - tracking training (including renewal requirements)
