@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         // If the save() function is used on the User model, we will generate a new log note.
-        User::updating(function ($user) {
+        User::updating(function($user) {
             $this->createUserLog($user);
         });
     }
@@ -51,7 +51,7 @@ class AppServiceProvider extends ServiceProvider
 
             $log['author_id'] = Auth::user() ? Auth::user()->id : 1;
             $log['user_id'] = $user->id;
-            if( !empty($log['comment']) ) {
+            if (!empty($log['comment'])) {
                 Log::create($log);
             }
         }
@@ -60,7 +60,7 @@ class AppServiceProvider extends ServiceProvider
 
     /**
      * @param $user
-     * @param $ignoreList
+     * @param string[] $ignoreList
      * @param $log
      */
     private function buildLogComment($user, $ignoreList, $log)

@@ -17,5 +17,5 @@ class Setting extends Model
     public $incrementing = false;
     protected $primaryKey = 'name';
 
-    protected $fillable = array('name','primary','secondary');
+    protected $fillable = array('name', 'primary', 'secondary');
 }

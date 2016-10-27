@@ -66,9 +66,9 @@ class ProcessMonday extends Command
 
         //update end of day list for both building and lab. Retrieve list
         $duties = Duty::all();
-        $this->dutyLists = $duties->map(function ($item, $key) {
+        $this->dutyLists = $duties->map(function($item, $key) {
             $userDateArray = (new DutyList($item))->emailOutput();
-            $userDateArray->put('duty',$item);
+            $userDateArray->put('duty', $item);
             return $userDateArray;
         });
 
@@ -93,7 +93,7 @@ class ProcessMonday extends Command
             'monday'    => Carbon::now()->startOfWeek(),
             'dutyLists' => $this->dutyLists,
             'destroyed' => $this->destroyed,
-        ], function ($m) use ($reportAddress) {
+        ], function($m) use ($reportAddress) {
             $m->to($reportAddress->secondary, $reportAddress->primary)
                 ->subject('Weekly Report');
         });

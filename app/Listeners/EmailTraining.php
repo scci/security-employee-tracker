@@ -59,7 +59,7 @@ class EmailTraining implements ShouldQueue
         Mail::send(
             'emails.training',
             ['user' => $user, 'training' => $training, 'due_date' => $dueDate, 'trainingUser' => $trainingUser],
-            function ($m) use ($user, $training) {
+            function($m) use ($user, $training) {
                 $m->to($user->email, $user->userFullName)->subject($training->name . " was assigned to you.");
 
                 //ATTACH FILES

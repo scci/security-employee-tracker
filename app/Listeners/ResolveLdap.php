@@ -27,7 +27,7 @@ class ResolveLdap implements ShouldQueue
      */
     public function handle()
     {
-        if(config('auth.guards.web.provider') == 'adldap') {
+        if (config('auth.guards.web.provider') == 'adldap') {
             $this->addMissingUsers();
         }
     }

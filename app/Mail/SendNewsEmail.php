@@ -16,17 +16,17 @@ class SendNewsEmail extends Mailable
     /**
      * Create a new message instance.
      *
-     * @return void
+     * @return Mailable
      */
     public function __construct(News $news)
     {
-       $this->news = $news;
+        $this->news = $news;
     }
 
     /**
      * Build the message.
      *
-     * @return Illuminate\Mail\Mailable
+     * @return SendNewsEmail
      */
     public function build()
     {

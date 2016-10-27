@@ -32,7 +32,7 @@ class UpdateDuty extends Command
 
     /**
      * Execute the console command.
-     * @return mixed
+     * @return UpdateDuty
      */
     public function handle()
     {
@@ -47,8 +47,8 @@ class UpdateDuty extends Command
 
     private function processEmailList($emailList, $duty)
     {
-        foreach($emailList as $usersDateArray) {
-            if ($usersDateArray['date'] == Carbon::today()->format('Y-m-d')){
+        foreach ($emailList as $usersDateArray) {
+            if ($usersDateArray['date'] == Carbon::today()->format('Y-m-d')) {
                 foreach ($usersDateArray['users'] as $user) {
                     $this->sendTodaysNotification($user, $duty);
                 }
@@ -71,7 +71,7 @@ class UpdateDuty extends Command
         Mail::send('emails.duty_today', [
             'user' => $user,
             'duty' => $duty
-        ], function ($m) use ($user, $duty) {
+        ], function($m) use ($user, $duty) {
             $m->to($user->email, $user->userFullName)
                 ->subject('Reminder: You have ' . $duty->name . ' security check today.');
         });
@@ -84,9 +84,9 @@ class UpdateDuty extends Command
             'user' => $user,
             'date' => $date,
             'duty' => $duty
-        ], function ($m) use ($user, $duty, $date) {
+        ], function($m) use ($user, $duty, $date) {
 
-            $filename = $this->generateICS($duty, Carbon::createFromFormat('Y-m-d',$date));
+            $filename = $this->generateICS($duty, Carbon::createFromFormat('Y-m-d', $date));
 
             if ($duty->cycle = 'daily') {
                 $subject = "You have $duty->name security check on $date.";
@@ -106,13 +106,13 @@ class UpdateDuty extends Command
      */
     private function isReadyForNotification($duty, $usersDateArray)
     {
-        return ( $duty->cycle == 'weekly' && $usersDateArray['date'] == Carbon::today()->addWeeks(2)->format('Y-m-d') )
-            || ( $duty->cycle == 'daily'  && $usersDateArray['date'] == Carbon::today()->addWeeks(1)->format('Y-m-d') );
+        return ($duty->cycle == 'weekly' && $usersDateArray['date'] == Carbon::today()->addWeeks(2)->format('Y-m-d'))
+            || ($duty->cycle == 'daily' && $usersDateArray['date'] == Carbon::today()->addWeeks(1)->format('Y-m-d'));
     }
 
     /**
      * @param $duty
-     * @param $date
+     * @param Carbon $date
      * @return string
      */
     private function generateICS($duty, $date)
@@ -168,7 +168,7 @@ class UpdateDuty extends Command
     /**
      * @param $duty
      * @param $usersDateArray
-     * @return mixed
+     * @return UpdateDuty
      */
     private function sendUsersUpcomingEmailNotification($duty, $usersDateArray)
     {

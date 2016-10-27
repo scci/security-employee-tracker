@@ -39,7 +39,7 @@ class LoginController extends Controller
     {
         $this->middleware('guest', ['except' => 'logout']);
 
-        if(config('auth.guards.web.provider') == 'adldap') {
+        if (config('auth.guards.web.provider') == 'adldap') {
             Adldap::connect();
         }
     }

@@ -185,13 +185,13 @@ class TrainingController extends Controller
     /**
      * Send out a reminder that the training is due
      * @param $trainingUserId
-     * @return mixed
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function sendReminder($trainingUserId)
     {
         $trainingUser = TrainingUser::with('user')->find($trainingUserId);
         Event::fire(new TrainingAssigned($trainingUser));
-        Notification::container()->success('Reminder sent to '. $trainingUser->user->userFullName);
+        Notification::container()->success('Reminder sent to ' . $trainingUser->user->userFullName);
         return redirect()->back();
     }
 
@@ -211,7 +211,7 @@ class TrainingController extends Controller
 
         //If we have groups, let's get the user ids.
         if (isset($data['groups'])) {
-            $groupUsers = User::whereHas('groups', function ($q) use ($data) {
+            $groupUsers = User::whereHas('groups', function($q) use ($data) {
                 $q->where('id', $data['groups']);
             })->get();
 
