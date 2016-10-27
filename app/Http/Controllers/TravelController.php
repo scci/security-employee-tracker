@@ -60,7 +60,7 @@ class TravelController extends Controller
     public function destroy($userID, $travelID)
     {
         Travel::findOrFail($travelID)->delete();
-        Storage::deleteDirectory('travel_'.$travelID);
+        Storage::deleteDirectory('travel_' . $travelID);
 
         return Redirect::back();
     }

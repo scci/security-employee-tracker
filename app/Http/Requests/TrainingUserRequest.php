@@ -5,7 +5,7 @@ namespace SET\Http\Requests;
 class TrainingUserRequest extends Request
 {
 
-	/**
+    /**
      * Determine if the user is authorized to make this request.
      *
      * @return bool
@@ -23,12 +23,12 @@ class TrainingUserRequest extends Request
     public function rules()
     {
         return [
-			'training_id' => 'required|integer',
+            'training_id' => 'required|integer',
             'due_date' => 'required'
         ];
     }
 	
-	/**
+    /**
      * Get the error messages for the defined validation rules.
      *
      * @return array

@@ -16,7 +16,7 @@ class DutySwapController extends Controller
         $type = 'SET\\' . $data['type'];
         $dutyID = intval($data['duty']);
 
-        ( new DutyList($dutyID) )->processSwapRequest($dates, $IDs, $type);
+        (new DutyList($dutyID))->processSwapRequest($dates, $IDs, $type);
 
         return redirect()->action('DutyController@show', $dutyID);
 

@@ -40,9 +40,9 @@ class DutyDates
     {
         if ($cycle == 'monthly') {
             return Carbon::now()->startOfMonth();
-        }else if($cycle == 'weekly') {
+        } else if ($cycle == 'weekly') {
             return Carbon::now()->startOfWeek();
-        }else if($cycle == 'daily') {
+        } else if ($cycle == 'daily') {
             return Carbon::now()->startOfDay();
         } else {
             Log::error('Duty has an invalid cycle name. Must use monthly, weekly or daily');
@@ -54,9 +54,9 @@ class DutyDates
     {
         if ($cycle == 'monthly') {
             return $date->addMonth();
-        }else if($cycle == 'weekly') {
+        } else if ($cycle == 'weekly') {
             return $date->addWeek();
-        }else if($cycle == 'daily') {
+        } else if ($cycle == 'daily') {
             return $date->addDay();
         } else {
             Log::error('Duty has an invalid cycle name. Must use monthly, weekly or daily');

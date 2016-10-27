@@ -23,7 +23,7 @@ class NewsRequest extends Request
     public function rules()
     {
         return [
-	        'title' => 'required',
+            'title' => 'required',
             'description' => 'required',
             'publish_date' => 'required',
             'expire_date' => 'after:publish_date'

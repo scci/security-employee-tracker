@@ -62,7 +62,7 @@ class NoteController extends Controller
     {
         
         Note::find($noteId)->delete();
-        Storage::deleteDirectory('note_'.$noteId);
+        Storage::deleteDirectory('note_' . $noteId);
 
         return back();
     }

@@ -30,7 +30,7 @@ class GroupController extends Controller
         $this->authorize('view');
 
         $groups = Group::with([
-            'users' => function ($q) {
+            'users' => function($q) {
                 $q->orderBy('last_name');
             },
             'trainings'
@@ -122,7 +122,7 @@ class GroupController extends Controller
             return "nothing sent.";
         }
 
-        return User::whereHas('groups', function ($query) use ($request) {
+        return User::whereHas('groups', function($query) use ($request) {
             $query->whereIn('id', $request['groups']);
         })->pluck('id');
     }
