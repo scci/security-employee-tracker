@@ -107,7 +107,7 @@ class ActionItemsComposer
      * @param $user
      * @param $builtUser
      */
-    private function buildUserArray($calculatedDays, Array $builtUser, User $user)
+    private function buildUserArray($calculatedDays, Collection $builtUser, User $user)
     {
         if ($calculatedDays <= 90) {
             $builtUser->push([
