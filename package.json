@@ -4,11 +4,12 @@
     "grunt": "^1.0.1",
     "gulp": "^3.8.8",
     "gulp-notify": "^2.2.0",
-    "gulp-phpunit": "^0.20.0",
+    "gulp-phpunit": "^0.21.4",
+    "laravel-elixir-stylelint": "^5.0.0-5",
     "load-grunt-tasks": "^3.5.0"
   },
   "dependencies": {
-    "laravel-elixir": "^3.0.0",
+    "laravel-elixir": "^6.0.0-11",
     "bootstrap-sass": "^3.0.0"
   }
 }

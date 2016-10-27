@@ -8,7 +8,7 @@
         "php": ">=5.5.9",
         "laravel/framework": "5.3.*",
         "laravelcollective/html": "5.3.*",
-        "adldap2/adldap2-laravel": "1.4.*",
+        "adldap2/adldap2-laravel": "~2.1",
         "maatwebsite/excel": "~2.0",
         "edvinaskrucas/notification": "5.*",
         "predis/predis": "~1.0",
@@ -20,8 +20,7 @@
         "symfony/css-selector": "~3.0",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
-        "phpunit/phpunit": "~4.0",
-        "phpspec/phpspec": "~2.1",
+        "phpunit/phpunit": "~5.0",
         "laracasts/generators": "~1.1",
         "phpmd/phpmd" : "@stable",
         "barryvdh/laravel-debugbar": "^2.1"
