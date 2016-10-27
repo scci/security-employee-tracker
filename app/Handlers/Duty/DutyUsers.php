@@ -25,8 +25,8 @@ class DutyUsers extends DutyHelper
         $newCollection = new Collection();
 
         foreach ($this->list as $entry) {
-            if(Gate::allows('view')) {
-                $rowvalue = "<a href='" . url( 'user', $entry['user']->id ) . "'>". $entry['user']->userFullName ."</a>";
+            if (Gate::allows('view')) {
+                $rowvalue = "<a href='" . url('user', $entry['user']->id) . "'>" . $entry['user']->userFullName . "</a>";
             } else {
                 $rowvalue = $entry['user']->userFullName;
             }

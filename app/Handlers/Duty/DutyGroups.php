@@ -115,7 +115,7 @@ class DutyGroups extends DutyHelper
     {
         $row = '';
         foreach ($entry['group'] as $user) {
-            if(Gate::allows('view')) {
+            if (Gate::allows('view')) {
                 $row .= "<a href='" . url('user', $user->id) . "'>" . $user->userFullName . "</a> & ";
             } else {
                 $row .= $user->userFullName . " & ";
