@@ -30,7 +30,7 @@ To view all the various options including cache, database, settings, email, etc.
 
 ## Installation
 
-1. Upload your files to your server so that the `public` directory is hit when loading the site/application.
+1. In your command line/ssh, navigate to your site's root directory and execute `git clone https://github.com/scci/security-employee-tracker.git`. 
 2. Update the files in the `config` directory.
   * `config/adldap.php` - your LDAP settings.
   * `config/auth.php` - Change the `guards => web => provider` (line 39) value to `adldap` (currently set to users for testing/validation)
@@ -40,7 +40,12 @@ To view all the various options including cache, database, settings, email, etc.
    * `php artisan key:generate`
    * `composer install`
    * `php artisan migrate --force`
+5. Point your domain/subdomain to the application's `public` folder.
 6. Load the application in your browser.
+
+## Updating
+
+* Execute `git pull`. 
 
 ## Tests
 
