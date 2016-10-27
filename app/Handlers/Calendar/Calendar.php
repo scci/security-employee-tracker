@@ -88,10 +88,9 @@ class Calendar
         //check if format is YYYY-MM-DD
         if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$date)) {
             return $date;
-        }else if (get_class($date) == 'Carbon\Carbon') {
-            //dd($date->format('Y-m-d'));
+        } else if (get_class($date) == 'Carbon\Carbon') {
             return $date->format('Y-m-d');
-        }else {
+        } else {
             return "Something went horribly wrong with testForCarbonObject.";
         }
     }

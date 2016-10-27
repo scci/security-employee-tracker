@@ -76,6 +76,6 @@ class AppServiceProvider extends ServiceProvider
 
     private function nullToEmptyString($oldValue, $newValue)
     {
-        return $oldValue == null && $newValue == '';
+        return $oldValue === null && $newValue == '';
     }
 }

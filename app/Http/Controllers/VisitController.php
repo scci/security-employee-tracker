@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Auth;
 use Krucas\Notification\Facades\Notification;
-use SET\Http\Requests;
 use SET\Visit;
 use SET\User;
 

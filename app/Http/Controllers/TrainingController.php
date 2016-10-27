@@ -13,7 +13,6 @@ use SET\Handlers\Excel\CompletedTrainingExport;
 use SET\Http\Requests\AssignTrainingRequest;
 use SET\Http\Requests\StoreTrainingRequest;
 use SET\Training;
-use SET\Note;
 use SET\TrainingUser;
 use SET\User;
 
@@ -167,21 +166,6 @@ class TrainingController extends Controller
 
         return redirect()->action('TrainingController@show', $trainingID);
     }
-
-//    public function reassign(Request $request)
-//    {
-//        $this->authorize('edit');
-//
-//        $data = $request->all();
-//        $note = Note::find($data['id']);
-//        $trainingId = $data['training_id'];
-//        $note->update($data);
-//
-//        Notification::container()->success("Record was updated.");
-//
-//        //just return anything.
-//        return redirect()->action('TrainingController@show', $trainingId);
-//    }
 
     /**
      * Generate Excel file with user/training table with date of completion.

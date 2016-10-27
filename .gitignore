@@ -14,7 +14,5 @@ storage/app/
 # Rocketeer PHP task runner and deployment package. https://github.com/rocketeers/rocketeer
 .rocketeer/
 
-# PHPStorm
-.idea/
 .svn/
 storage/database.sqlite

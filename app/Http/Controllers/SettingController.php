@@ -5,7 +5,6 @@ namespace SET\Http\Controllers;
 use Illuminate\Http\Request;
 
 use Illuminate\Support\Facades\Config;
-use SET\Http\Requests;
 use SET\Setting;
 use SET\User;
 

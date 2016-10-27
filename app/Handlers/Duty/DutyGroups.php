@@ -68,10 +68,10 @@ class DutyGroups extends DutyHelper
     public function combineListWithDates()
     {
         $dates = (new DutyDates($this->duty))->getDates();
+        $newList = new Collection();
+        $count = $this->list->count();
 
-        $newList = $newEntry = new Collection();
-
-        for ($i = 0; $i < $this->list->count(); $i++)
+        for ($i = 0; $i < $count ; $i++)
         {
             $newList->push([
                 'date' => $dates[$i],

@@ -2,14 +2,12 @@
 
 namespace SET\Http\Controllers;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Krucas\Notification\Facades\Notification;
 use SET\Http\Requests\TravelRequest;
 use SET\Attachment;
-use SET\Http\Requests;
 use SET\User;
 use SET\Travel;
 

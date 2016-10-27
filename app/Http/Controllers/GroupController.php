@@ -2,7 +2,6 @@
 
 namespace SET\Http\Controllers;
 
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use SET\Events\TrainingAssigned;
@@ -140,7 +139,7 @@ class GroupController extends Controller
     public function assignTraining($group, $users)
     {
         //If users is empty, then we don't need to do any more.
-        if ($users == null) {
+        if ($users === null) {
             return;
         }
 

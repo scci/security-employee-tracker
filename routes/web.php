@@ -25,7 +25,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/search', 'HomeController@search');
     Route::get('training/{trainingID}/assign', ['as' => 'training.assignForm', 'uses' => 'TrainingController@assignForm']);
     Route::post('training/{trainingID}/assign', ['as' => 'training.assign', 'uses' => 'TrainingController@assign']);
-//    Route::put('training/{trainingID}/assign', ['as' => 'training.reassign', 'uses' => 'TrainingController@reassign']);
     Route::get('/training/completed', ['uses' => 'TrainingController@showCompleted']);
     Route::get('/training/reminder/{noteID}', ['uses' => 'TrainingController@sendReminder']);
     Route::resource('user', 'UserController');
@@ -43,6 +42,5 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('duty', 'DutyController');
     Route::resource('duty-swap', 'DutySwapController');
     Route::resource('news', 'NewsController');
-
     Route::get('logout', 'Auth\LoginController@logout');
 });

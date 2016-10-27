@@ -2,7 +2,6 @@
 
 namespace SET\Http\Controllers;
 
-use Illuminate\Http\Request;
 use SET\Duty;
 use SET\Group;
 use SET\Handlers\Duty\DutyList;

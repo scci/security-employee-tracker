@@ -1,11 +1,10 @@
 <?php
 
 namespace SET\Providers;
-use Carbon\Carbon;
 
+use Carbon\Carbon;
 use Illuminate\Contracts\Auth\Access\Gate as GateContract;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use SET\Note;
 
@@ -35,10 +34,6 @@ class AuthServiceProvider extends ServiceProvider
         //user can edit this. AKA, they are an admin.
         $gate->define('edit', function ($user) {
             return $this->isAdmin($user);
-        });
-
-        $gate->define('edit_jpas', function ($user) {
-            return $this->isAdmin($user) && Config::get('auth.editable_jpas');
         });
 
         //user has view rights

@@ -4,10 +4,7 @@ namespace SET\Http\Controllers;
 
 use Illuminate\Http\Request;
 
-use SET\Duty;
-use SET\DutySwap;
 use SET\Handlers\Duty\DutyList;
-use SET\Http\Requests;
 
 class DutySwapController extends Controller
 {

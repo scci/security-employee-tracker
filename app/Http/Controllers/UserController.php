@@ -4,14 +4,11 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
-use SET\Attachment;
 use SET\Duty;
 use SET\Group;
 use SET\Handlers\Excel\JpasImport;
-use SET\Http\Requests\Request;
 use SET\Http\Requests\StoreUserRequest;
 use SET\User;
-use SET\Training;
 use Carbon\Carbon;
 use Krucas\Notification\Facades\Notification;
 

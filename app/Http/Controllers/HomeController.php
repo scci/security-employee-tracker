@@ -7,7 +7,6 @@ use SET\Duty;
 use SET\Handlers\Calendar\Calendar;
 use SET\Log;
 use SET\TrainingUser;
-use SET\Travel;
 use SET\User;
 use SET\Training;
 use Carbon\Carbon;

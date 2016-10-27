@@ -11,14 +11,6 @@ class ActionItemsComposer
 {
 
     /**
-     * Create a new profile composer.
-     */
-    public function __construct()
-    {
-        //$this->user = User::with('notes')->get();
-    }
-
-    /**
      * Bind data to the view.
      *
      * @param  View  $view
@@ -115,7 +107,7 @@ class ActionItemsComposer
      * @param $user
      * @param $builtUser
      */
-    private function buildUserArray($calculatedDays, $builtUser, $user)
+    private function buildUserArray($calculatedDays, Array $builtUser, User $user)
     {
         if ($calculatedDays <= 90) {
             $builtUser->push([
