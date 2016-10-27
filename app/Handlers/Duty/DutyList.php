@@ -40,7 +40,7 @@ class DutyList
     /**
      * @param array $dateArray
      * @param array $IDArray
-     * @param $type
+     * @param string $type
      */
     public function processSwapRequest(array $dateArray, array $IDArray, $type)
     {

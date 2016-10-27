@@ -86,7 +86,7 @@ class JpasImportHandler implements ImportHandler
                 foreach ($userGroup as $userId => $changesGroup) {
                     $user = User::find($userId);
                     foreach ($changesGroup as $field => $newValue) {
-                        if ($newValue != "0"){
+                        if ($newValue != "0") {
                             $user[$field] = $newValue;
                         }
                     }
@@ -112,7 +112,7 @@ class JpasImportHandler implements ImportHandler
      */
     private function getUserChanges($user)
     {
-        if($user->isDirty()) {
+        if ($user->isDirty()) {
             foreach ($user->getDirty() as $attribute => $newValue) {
                 $this->changes->push([
                     'user' => $user,

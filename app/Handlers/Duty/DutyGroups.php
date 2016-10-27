@@ -13,7 +13,7 @@ class DutyGroups extends DutyHelper
 
     public function __construct(Duty $duty)
     {
-        parent::__construct($duty);;
+        parent::__construct($duty); ;
     }
 
     public function HTMLOutput()
@@ -36,7 +36,7 @@ class DutyGroups extends DutyHelper
 
     public function emailOutput()
     {
-        $collection = $this->list->map(function ($value, $key) {
+        $collection = $this->list->map(function($value, $key) {
             return [
                 'users' => $value['group'],
                 'date' => $value['date']
@@ -71,7 +71,7 @@ class DutyGroups extends DutyHelper
         $newList = new Collection();
         $count = $this->list->count();
 
-        for ($i = 0; $i < $count ; $i++)
+        for ($i = 0; $i < $count; $i++)
         {
             $newList->push([
                 'date' => $dates[$i],
@@ -92,9 +92,9 @@ class DutyGroups extends DutyHelper
             ->orderBy('date', 'ASC')
             ->get();
 
-        foreach($dutySwaps as $swap)
+        foreach ($dutySwaps as $swap)
         {
-            foreach($this->list as $key => $entry)
+            foreach ($this->list as $key => $entry)
             {
                 if ($swap->date == $entry['date']) {
                     $this->list[$key] = [
@@ -115,11 +115,11 @@ class DutyGroups extends DutyHelper
     {
         $row = '';
         foreach ($entry['group'] as $user) {
-			if(Gate::allows('view')) {
-				$row .= "<a href='" . url('user', $user->id) . "'>" . $user->userFullName . "</a> & ";
-			} else {
-				$row .= $user->userFullName . " & ";
-			}
+            if(Gate::allows('view')) {
+                $row .= "<a href='" . url('user', $user->id) . "'>" . $user->userFullName . "</a> & ";
+            } else {
+                $row .= $user->userFullName . " & ";
+            }
         }
         $row = rtrim($row, '& ');
         return $row;

@@ -29,7 +29,7 @@ class TrainingUserController extends Controller
 
     public function store(TrainingUserRequest $request, User $user)
     {
-		$data = $request->all();
+        $data = $request->all();
         $data['author_id'] = Auth::user()->id;
         $data['user_id'] = $user->id;
         
@@ -51,7 +51,9 @@ class TrainingUserController extends Controller
         $trainingUser = TrainingUser::with('training')->findOrFail($trainingID);
         $this->authorize('show_user', $user);
 
-        if (isset($trainingUser->completed_date)) return redirect()->action('UserController@show', $user->id);
+        if (isset($trainingUser->completed_date)) {
+            return redirect()->action('UserController@show', $user->id);
+        }
         return view('traininguser.show', compact('trainingUser', 'user'));
     }
 
@@ -62,7 +64,7 @@ class TrainingUserController extends Controller
         $trainingUser = TrainingUser::findOrFail($trainingUserID);
 
         //disable the due by field unless admin.
-        if(Gate::denies('edit')) {
+        if (Gate::denies('edit')) {
             $disabled = 'disabled';
         } else {
             $disabled = '';
@@ -89,7 +91,7 @@ class TrainingUserController extends Controller
     public function destroy($userID, $trainingUserID)
     {
         TrainingUser::findOrFail($trainingUserID)->delete();
-        Storage::deleteDirectory('traininguser_'.$trainingUserID);
+        Storage::deleteDirectory('traininguser_' . $trainingUserID);
 
         return Redirect::back();
     }

@@ -115,7 +115,7 @@ class NewsController extends Controller
     {
         $this->authorize('edit');
         
-        Storage::deleteDirectory('news_'.$news->id);
+        Storage::deleteDirectory('news_' . $news->id);
         $news->delete();
     }
     
@@ -130,7 +130,7 @@ class NewsController extends Controller
         if ($news->send_email && $publishDate->eq(Carbon::now())) {            
             $allUsers = User::skipSystem()->active()->get();
             foreach ($allUsers as $user) {
-                 Mail::to($user->email)->send(new SendNewsEmail($news));                      
+                    Mail::to($user->email)->send(new SendNewsEmail($news));                      
             }
         }        
     }

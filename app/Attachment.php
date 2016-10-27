@@ -40,8 +40,9 @@ class Attachment extends Model
 
     private static function encryptFileContents($file, $encrypt)
     {
-        if ($encrypt)
-            return encrypt(File::get($file));
+        if ($encrypt) {
+                    return encrypt(File::get($file));
+        }
         return File::get($file);
     }
 }

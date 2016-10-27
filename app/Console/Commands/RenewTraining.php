@@ -129,8 +129,8 @@ class RenewTraining extends Command
 
     /**
      * @param $trainingUser
-     * @param $dueDate
-     * @return static
+     * @param Carbon $dueDate
+     * @return TrainingUser
      */
     private function createRecord($trainingUser, $dueDate)
     {

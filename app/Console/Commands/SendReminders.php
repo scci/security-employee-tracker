@@ -70,16 +70,16 @@ class SendReminders extends Command
 
             $newNotes = new Collection();
 
-            $this->trainingUsers->each( function( $item, $key ) use ($supervisor, $newNotes) {
-                if ( $item->user->supervisor_id == $supervisor->id ) {
+            $this->trainingUsers->each(function($item, $key) use ($supervisor, $newNotes) {
+                if ($item->user->supervisor_id == $supervisor->id) {
                     $newNotes->push($item);
                 }
             });
 
             if (!$newNotes->isEmpty()) {
-                Mail::send('emails.supervisor_reminder', ['notes' => $newNotes], function ($m) use ($supervisor) {
+                Mail::send('emails.supervisor_reminder', ['notes' => $newNotes], function($m) use ($supervisor) {
                     $m->to($supervisor->email, $supervisor->userFullName)
-                        ->subject($supervisor->email.' Training that your employees need to complete.');
+                        ->subject($supervisor->email . ' Training that your employees need to complete.');
                 });
             }
 
@@ -135,7 +135,7 @@ class SendReminders extends Command
 
     /**
      * Take a list of notes and return a list of supervisors related to those notes.
-     * @return static
+     * @return Collection
      */
     private function getSupervisors()
     {

@@ -33,13 +33,13 @@ class ActionItemsComposer
     private function getDueTraining()
     {
 
-        return Training::with(['users', 'assignedUsers' => function ($query) {
+        return Training::with(['users', 'assignedUsers' => function($query) {
             //filter the assignedusers we get back
             $query->ActiveUsers()
                 ->whereNull('completed_date')
                 ->where('due_date', '<=', Carbon::now());
             }])
-            ->whereHas('assignedUsers', function ($q) {
+            ->whereHas('assignedUsers', function($q) {
                 //filter the training we get.
                 $q->ActiveUsers()
                     ->whereNull('completed_date')
@@ -53,9 +53,9 @@ class ActionItemsComposer
      */
     private function getExpiringVisits()
     {
-        return User::with(['visits' => function ($query) {
+        return User::with(['visits' => function($query) {
             $query->whereBetween('expiration_date', [Carbon::now(), Carbon::now()->addWeek()]);
-        }])->whereHas('visits', function ($q) {
+        }])->whereHas('visits', function($q) {
             $q->whereBetween('expiration_date', [Carbon::now(), Carbon::now()->addWeek()]);
         })->Active()->get();
     }
@@ -90,7 +90,7 @@ class ActionItemsComposer
             $years = 5;
         } else if ($user->access_level == 'S' || $user->clearance == 'S') {
             $years = 10;
-        } else if($user->clearance = 'TS') {
+        } else if ($user->clearance = 'TS') {
             $years = 5;
         }
 
@@ -103,7 +103,7 @@ class ActionItemsComposer
 
 
     /**
-     * @param $calculatedDays
+     * @param integer $calculatedDays
      * @param $user
      * @param $builtUser
      */

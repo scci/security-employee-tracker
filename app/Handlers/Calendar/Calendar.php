@@ -16,7 +16,7 @@ class Calendar
     public function __construct()
     {
         $this->start = Carbon::today()->subWeeks(1);
-        $this->end =  Carbon::today()->addMonths(2);
+        $this->end = Carbon::today()->addMonths(2);
         $this->calendarArray = [];
 
         $this->generateCalendarItems();
@@ -44,12 +44,12 @@ class Calendar
             $currentDate = $date->format('Y-m-d');
 
             $separatedArray = $this->pushToArray($separatedList, ['destroyed_date'], $currentDate);
-            $travelsArray = $this->pushToArray($travelList, ['leave_date','return_date'], $currentDate);
+            $travelsArray = $this->pushToArray($travelList, ['leave_date', 'return_date'], $currentDate);
             $trainingUsersArray = $this->pushToArray($trainingUsersList, ['due_date'], $currentDate);
             $newUserArray = $this->pushToArray($newUserList, ['created_at'], $currentDate);
             $trainingUsersArray = $this->groupUsersForTraining($trainingUsersArray);
 
-            if ( (!empty($separatedArray) || !empty($travelsArray) || !empty($trainingUsersArray) || !empty($newUserArray)) || $currentDate == Carbon::today()->format('Y-m-d') ) {
+            if ((!empty($separatedArray) || !empty($travelsArray) || !empty($trainingUsersArray) || !empty($newUserArray)) || $currentDate == Carbon::today()->format('Y-m-d')) {
                 $this->calendarArray[$i]['date'] = $currentDate;
                 $this->calendarArray[$i]['separated'] = $separatedArray;
                 $this->calendarArray[$i]['travel'] = $travelsArray;
@@ -62,12 +62,15 @@ class Calendar
         }
     }
 
+    /**
+     * @param string $date
+     */
     private function pushToArray($list, array $columnName, $date) {
         $array = [];
 
 
 
-        foreach($list as $item) {
+        foreach ($list as $item) {
             foreach ($columnName as $column) {
                 $dbDate = $this->testForCarbonObject($item[$column]);
                 if ($date == $dbDate) {
@@ -86,7 +89,7 @@ class Calendar
     private function testForCarbonObject($date)
     {
         //check if format is YYYY-MM-DD
-        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/",$date)) {
+        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $date)) {
             return $date;
         } else if (get_class($date) == 'Carbon\Carbon') {
             return $date->format('Y-m-d');
@@ -98,14 +101,14 @@ class Calendar
     private function groupUsersForTraining($trainingUsers)
     {
         $array = array();
-        foreach($trainingUsers as $key => $item) {
+        foreach ($trainingUsers as $key => $item) {
             $array[$item['training_id']][$key] = $item;
         }
         ksort($array, SORT_NUMERIC);
 
-        foreach($array as $training) {
-            foreach($training as $trainingUser) {
-                $trainingUser['userLink'] = "<a href='" . url('user', $trainingUser->user_id) ."'>". $trainingUser->user->userFullName ."</a>";
+        foreach ($array as $training) {
+            foreach ($training as $trainingUser) {
+                $trainingUser['userLink'] = "<a href='" . url('user', $trainingUser->user_id) . "'>" . $trainingUser->user->userFullName . "</a>";
             }
         }
 
@@ -117,10 +120,10 @@ class Calendar
      */
     private function separatedList()
     {
-        return User::where( function ($q) {
+        return User::where(function($q) {
                 $q->where('status', 'separated')->orWhere('status', 'destroyed');
             })
-            ->whereBetween('destroyed_date', [$this->start,$this->end])
+            ->whereBetween('destroyed_date', [$this->start, $this->end])
             ->get();
     }
 
@@ -130,7 +133,7 @@ class Calendar
     private function travelsList()
     {
         return Travel::with('user')
-            ->where(function ($query) {
+            ->where(function($query) {
                 $query->whereBetween('leave_date', [$this->start, $this->end])
                     ->orWhereBetween('return_date', [$this->start, $this->end]);
             })

@@ -15,18 +15,18 @@ class AttachmentController extends Controller
     /**
      * Currently only called from the Training page via the sidebar upload.
      * @param $request
-     * @return Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function store(Request $request) {
         $data = $request->all();
 
         $encrypt = false;
 
-        if( array_key_exists('encrypt', $data)) {
+        if (array_key_exists('encrypt', $data)) {
             $encrypt = $data['encrypt'];
         }
 
-        if ($data['type'] == 'training'){
+        if ($data['type'] == 'training') {
             $model = Training::findOrFail($data['id']);
         } else if ($data['type'] == 'user') {
             $model = User::findOrFail($data['id']);
@@ -46,7 +46,7 @@ class AttachmentController extends Controller
     /**
      * Let the browser download the file.
      * @param $fileId
-     * @return mixed
+     * @return Response
      */
     public function show($fileId)
     {
@@ -56,7 +56,7 @@ class AttachmentController extends Controller
 
         $file = $modelName . "_" . $entry->imageable_id . '/' . $entry->filename;
 
-        if($entry->encrypted) {
+        if ($entry->encrypted) {
             try {
                 $fileContent = decrypt(Storage::get($file));
             } catch (DecryptException $e) {
@@ -76,7 +76,7 @@ class AttachmentController extends Controller
     /**
      * Remove the specified resource from storage.
      * @param  $fileId
-     * @return Response
+     * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($fileId)
     {

@@ -34,7 +34,7 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     /**
      * @var array
      */
-    protected $hidden = array('username','password');
+    protected $hidden = array('username', 'password');
 
     public function supervisor()
     {

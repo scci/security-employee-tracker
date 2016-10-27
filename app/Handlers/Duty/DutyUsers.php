@@ -25,11 +25,11 @@ class DutyUsers extends DutyHelper
         $newCollection = new Collection();
 
         foreach ($this->list as $entry) {
-			if(Gate::allows('view')) {
-				$rowvalue = "<a href='" . url( 'user', $entry['user']->id ) . "'>". $entry['user']->userFullName ."</a>";
-			} else {
-				$rowvalue = $entry['user']->userFullName;
-			}
+            if(Gate::allows('view')) {
+                $rowvalue = "<a href='" . url( 'user', $entry['user']->id ) . "'>". $entry['user']->userFullName ."</a>";
+            } else {
+                $rowvalue = $entry['user']->userFullName;
+            }
             $newCollection->push([
                 'row' => $rowvalue,
                 'id' => $entry['user']->id,
@@ -42,11 +42,11 @@ class DutyUsers extends DutyHelper
 
     /**
      * Generate a collection to be used for emails. View is either emails.duty_future or emails.duty_today
-     * @return mixed
+     * @return \Illuminate\Support\Collection
      */
     public function emailOutput()
     {
-        $collection = $this->list->map(function ($value, $key) {
+        $collection = $this->list->map(function($value, $key) {
             return [
                 'users' => new Collection([$value['user']]),
                 'date' => $value['date'],
@@ -58,7 +58,7 @@ class DutyUsers extends DutyHelper
 
     /**
      * Get function for the list. List is stored on the helper class.
-     * @return mixed
+     * @return Collection
      */
     public function getList()
     {
@@ -76,7 +76,7 @@ class DutyUsers extends DutyHelper
 
     /**
      * Get the current user in our database who is working the duty roster
-     * @return mixed
+     * @return DutyUsers
      */
     public function getLastWorked()
     {
@@ -87,7 +87,7 @@ class DutyUsers extends DutyHelper
 
     /**
      * Get a list of all users for a specific duty sorted by the user's last name
-     * @return mixed
+     * @return DutyUsers
      */
     public function queryList()
     {
@@ -97,7 +97,7 @@ class DutyUsers extends DutyHelper
 
     /**
      * Take our list of users and merge them with dates so that each user is assigned a duty date.
-     * @return Collection
+     * @return DutyUsers
      */
     public function combineListWithDates()
     {
@@ -127,9 +127,9 @@ class DutyUsers extends DutyHelper
             ->orderBy('date', 'ASC')
             ->get();
 
-        foreach($dutySwaps as $swap)
+        foreach ($dutySwaps as $swap)
         {
-            foreach($this->list as $key => $entry)
+            foreach ($this->list as $key => $entry)
             {
                 if ($swap->date == $entry['date']) {
                     $this->list[$key] = [

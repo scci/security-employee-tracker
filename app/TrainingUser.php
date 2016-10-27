@@ -49,7 +49,7 @@ class TrainingUser extends Model
      */
     public function scopeActiveUsers($query)
     {
-        return $query->whereHas('user', function ($q) {
+        return $query->whereHas('user', function($q) {
             $q->where('status', 'active');
         });
     }

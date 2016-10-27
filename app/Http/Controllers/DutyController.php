@@ -30,9 +30,9 @@ class DutyController extends Controller
         $data = $request->all();
         $duty = Duty::create($data);
         
-        if ( isset($data['has_groups']) && isset($data['groups'])) {
+        if (isset($data['has_groups']) && isset($data['groups'])) {
             $duty->groups()->attach($data['groups']);
-        } else if( isset($data['users'])) {
+        } else if (isset($data['users'])) {
             $duty->users()->attach($data['users']);
         }
         

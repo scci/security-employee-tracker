@@ -27,7 +27,7 @@ class UserController extends Controller
         $this->authorize('view');
 
         $users = User::with([
-            'assignedTrainings' => function ($q) {
+            'assignedTrainings' => function($q) {
                 $q->whereNull('completed_date')
                     ->whereBetween('due_date', [Carbon::now()->subYear(), Carbon::now()->addWeeks(4)]);
             },
@@ -60,7 +60,7 @@ class UserController extends Controller
         $data['status'] = 'active';
         $user = User::create($data);
 
-        if( array_key_exists('groups', $data)) {
+        if (array_key_exists('groups', $data)) {
             settype($data['groups'], "array");
             $user->groups()->sync($data['groups']);
         }
@@ -74,7 +74,7 @@ class UserController extends Controller
      */
     public function show($userId)
     {
-        $user = User::with(['subordinates' => function ($query) {
+        $user = User::with(['subordinates' => function($query) {
             $query->active();
         }, 'supervisor', 'groups', 'duties', 'attachments'])
             ->findOrFail($userId);
@@ -91,14 +91,14 @@ class UserController extends Controller
         $travels = $user->travels()->with('author', 'attachments')->get();
 
         $logs = [];
-        if(Gate::allows('view')) {
+        if (Gate::allows('view')) {
             $logs = $user->logs()->orderBy('created_at', 'desc')->get();
         }
 
         $this->previousAndNextUsers($user, $previous, $next);
 
         //This mess is just so that we can output the Security Check list or show none. Mainly just to show none.
-        $duties = Duty::whereHas('users', function ($q) use ($userId){
+        $duties = Duty::whereHas('users', function($q) use ($userId){
             $q->where('id', $userId);
         })->orWhereHas('groups.users', function($q) use ($userId) {
             $q->where('id', $userId);
@@ -136,14 +136,14 @@ class UserController extends Controller
         $user->update($data);
 
         //Handle user groups
-        if( !array_key_exists('groups', $data)) {
+        if (!array_key_exists('groups', $data)) {
             $data['groups'] = [];
         }
         $user->groups()->sync($data['groups']);
 
         //Handled closed area access (MUST come AFTER syncing groups).
-        if( array_key_exists('access', $data)) {
-            foreach($data['access'] as $group_id => $accessLevel) {
+        if (array_key_exists('access', $data)) {
+            foreach ($data['access'] as $group_id => $accessLevel) {
                 $user->groups()->updateExistingPivot($group_id, ['access' => $accessLevel]);
             }
         }
@@ -158,7 +158,7 @@ class UserController extends Controller
      */
     public function destroy($userId)
     {
-        Storage::deleteDirectory('user_'.$userId);
+        Storage::deleteDirectory('user_' . $userId);
         User::findOrFail($userId)->delete();
 
         return "success";
