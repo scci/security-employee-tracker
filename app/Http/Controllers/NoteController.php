@@ -1,14 +1,12 @@
 <?php namespace SET\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Request;
 use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
 use SET\Http\Requests\UpdateNoteRequest;
 use SET\Http\Requests\StoreNoteRequest;
 use SET\Note;
-use SET\Setting;
 use SET\User;
 use Illuminate\Support\Facades\Storage;
 

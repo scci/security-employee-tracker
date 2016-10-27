@@ -115,7 +115,7 @@ class UpdateDuty extends Command
      * @param $date
      * @return string
      */
-    function generateICS($duty, $date)
+    private function generateICS($duty, $date)
     {
         $reportAddress = Setting::where('name', 'report_address')->first();
 

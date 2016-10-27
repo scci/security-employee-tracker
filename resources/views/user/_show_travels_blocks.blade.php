@@ -59,4 +59,3 @@
         </li>
     @endcan
 </ul>
-

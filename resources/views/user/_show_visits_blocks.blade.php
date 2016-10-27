@@ -42,4 +42,3 @@
         </li>
     @endcan
 </ul>
-

@@ -80,5 +80,4 @@
     <strong>Making edits</strong>
     <p>You may attach and remove files via the file button on the left. Changes to the name, description and review dates (along with adding more attachments) MUST be done via editing the training (edit icon next to the training name).</p>
 
-
 @stop

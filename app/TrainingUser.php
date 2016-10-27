@@ -69,5 +69,4 @@ class TrainingUser extends Model
         return parent::setAttribute($key, $value);
     }
 
-
 }

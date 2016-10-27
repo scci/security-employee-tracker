@@ -81,5 +81,4 @@ class DutyList
             'date' => $date
         ]);
     }
-
 }

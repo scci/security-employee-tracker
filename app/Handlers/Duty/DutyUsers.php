@@ -142,6 +142,4 @@ class DutyUsers extends DutyHelper
 
         return $this;
     }
-
-
 }

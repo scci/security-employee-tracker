@@ -70,5 +70,4 @@ class DutyHelper
         }
         return $this;
     }
-
 }

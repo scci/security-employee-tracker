@@ -42,5 +42,4 @@
 
     <h3>Assigning Training to a User.</h3>
 
-
 @stop
