@@ -10,6 +10,8 @@ class DutySwapController extends Controller
 {
     public function store(Request $request)
     {
+        $this->authorize('edit');
+
         $data = $request->all();
         $dates = explode(',', $data['date']);
         $IDs = explode(',', $data['id']);
