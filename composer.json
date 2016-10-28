@@ -13,7 +13,8 @@
         "edvinaskrucas/notification": "5.*",
         "predis/predis": "~1.0",
         "doctrine/dbal": "^2.5",
-        "pusher/pusher-php-server": "^2.6"
+        "pusher/pusher-php-server": "^2.6",
+        "rachidlaasri/laravel-installer": "~1.4"
     },
     "require-dev": {
         "symfony/dom-crawler": "~3.0",

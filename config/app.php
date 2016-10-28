@@ -162,6 +162,7 @@ return [
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Krucas\Notification\NotificationServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
+        RachidLaasri\LaravelInstaller\Providers\LaravelInstallerServiceProvider::class,
     ],
 
     /*
