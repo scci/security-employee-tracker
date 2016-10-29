@@ -44,3 +44,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('news', 'NewsController');
     Route::get('logout', 'Auth\LoginController@logout');
 });
+Route::group(['middleware' => 'canInstall'], function () {
+    Route::get('install/user', ['as' => 'installAdmin', 'uses' => 'InstallController@createUser']);
+    Route::post('install/user', 'InstallController@storeUser');
+});
