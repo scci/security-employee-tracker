@@ -1,6 +1,8 @@
 vendor/
+!resources/views/vendor/
 node_modules/
 .env
 .svn/
 storage/database.sqlite
 storage/installed
+composer.lock

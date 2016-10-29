@@ -14,7 +14,7 @@
         "predis/predis": "~1.0",
         "doctrine/dbal": "^2.5",
         "pusher/pusher-php-server": "^2.6",
-        "rachidlaasri/laravel-installer": "~1.4"
+        "rachidlaasri/laravel-installer": "dev-master"
     },
     "require-dev": {
         "symfony/dom-crawler": "~3.0",

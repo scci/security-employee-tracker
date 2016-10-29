@@ -30,22 +30,38 @@ To view all the various options including cache, database, settings, email, etc.
 
 ## Installation
 
-1. In your command line/ssh, navigate to your site's root directory and execute `git clone https://github.com/scci/security-employee-tracker.git`. 
-2. Update the files in the `config` directory.
-  * `config/adldap.php` - your LDAP settings.
-  * `config/auth.php` - Change the `guards => web => provider` (line 39) value to `adldap` (currently set to users for testing/validation)
-  * `config/auth.php` - (line 111) Set the username for the admin/FSO.
-3. Rename `.env.example` to `.env` and add your database and email settings.  
-4. In your command line/SSH, navigate to the application root folder and run: 
-   * `php artisan key:generate`
-   * `composer install`
-   * `php artisan migrate --force`
-5. Point your domain/subdomain to the application's `public` folder.
-6. Load the application in your browser.
+1. From SSH, execute `git clone https://github.com/scci/security-employee-tracker.git` in your web root directory.
+2. Set your domain to point to the `public` directory.
+3. From SSH, execute `composer install`.
+4. Navigate to your site/install. IE: http://set.company.com/install
+5. Follow the on screen prompts. (Default env settings should function for you).
+6. Recommended/Optional: From SSH, execute `php artisan generate:key` - while you already have a secure encryption key, if you wish to have one unique to you (heightened security), then run this.
 
 ## Updating
 
 * Execute `git pull`. 
+
+## FAQs
+
+**Error Installing Database**
+
+1. Change the PHP max execution time to a higher value such as 60 seconds.
+2. Set the .env file to `APP_ENV=local` until after the installation is complete.
+3. From SSH, execute `php artisan migrate --force` and then go to your URL/install/user. IE: http://set.company.com/install/user
+4. Review the log contents: /storage/logs/laravel.log
+
+**Using LDAP**
+
+* `config/adldap.php` - input your ldap credentials. This file should have enough comments to help you.
+* `config/auth.php` - look for the array guards => web => providers and change the value on line 39 to `adldap`.
+
+**Hard coding Admins**
+
+* `config/auth.php` - line 111, set each username, you may have multiples. 
+
+**Additional Customization**
+
+* Review each file in the config directory. This application is also built on the [Laravel](https://laravel.com/docs/master/) framework. You may also review their documentation for additional settings to use.
 
 ## Tests
 
@@ -54,7 +70,3 @@ You may run tests via executing the following in the application's root folder: 
 ## Contribute
 
 If you wish to submit enhancements, bug fixes and other changes, please submit a pull request. Pull request must have all changes for a single feature **and test cases**.
-
-### License
-
-The SET application is open-sourced software licensed under the [MIT license](http://opensource.org/licenses/MIT)
