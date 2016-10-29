@@ -63,6 +63,10 @@ To view all the various options including cache, database, settings, email, etc.
 
 * Review each file in the config directory. This application is also built on the [Laravel](https://laravel.com/docs/master/) framework. You may also review their documentation for additional settings to use.
 
+**What do I do on each page?**
+
+* At the top of each page is a clickable question mark. Click that and the page help will display explaining how to utilize the page.
+
 ## Tests
 
 You may run tests via executing the following in the application's root folder: `phpunit`
