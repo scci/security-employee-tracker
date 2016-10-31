@@ -110,16 +110,4 @@ return [
 
     'admin' => ['your-ldap-username'],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Edit JPAS data
-    |--------------------------------------------------------------------------
-    |
-    | Boolean value. Set this if you wish for an admin/edit rights to be able
-    | to edit JPAS fields inline like you do with all other user fields in the
-    | sidebar.
-    |
-    */
-
-    'editable_jpas' => false,
 ];

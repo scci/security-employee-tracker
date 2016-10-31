@@ -42,19 +42,21 @@ class DutyHelper
     {
         $today = Carbon::today()->format('Y-m-d');
 
+        if ($today == $this->lastWorked->pivot->last_worked){
+            return;
+        }
+
         switch ($this->duty->cycle) {
             case 'daily':
-                if ($today != $this->lastWorked) {
-                    $this->recordNextEntry();
-                }
+                $this->recordNextEntry();
                 break;
             case 'weekly':
-                if (Carbon::today()->startOfWeek()->format('Y-m-d') == $today && $today != $this->lastWorked->pivot->last_worked) {
+                if (Carbon::today()->startOfWeek()->format('Y-m-d') == $today) {
                     $this->recordNextEntry();
                 }
                 break;
             case 'monthly':
-                if (Carbon::today()->startOfMonth()->format('Y-m-d') == $today && $today != $this->lastWorked->pivot->last_worked) {
+                if (Carbon::today()->startOfMonth()->format('Y-m-d') == $today) {
                     $this->recordNextEntry();
                 }
                 break;

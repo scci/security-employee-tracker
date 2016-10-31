@@ -83,24 +83,10 @@ class JpasImportHandler implements ImportHandler
     {
         foreach ($data as $jpasName => $userGroup) {
             if ($jpasName == 'approve') {
-                foreach ($userGroup as $userId => $changesGroup) {
-                    $user = User::find($userId);
-                    foreach ($changesGroup as $field => $newValue) {
-                        if ($newValue != "0") {
-                            $user[$field] = $newValue;
-                        }
-                    }
-                    $this->updateAndLogUser($user);
-                }
+                $this->updateUserData($userGroup);
 
             } else if ($userGroup != '' && is_numeric($userGroup)) {
-                $user = User::find($userGroup);
-                foreach ($excel as $row) {
-                    $row->name = preg_replace('/(,\s|\s)/', '_', $row->name);
-                    if ($row->name == $jpasName) {
-                        $this->updateAndLogUser($this->mapJpasToUser($user, $row));
-                    }
-                }
+                $this->importNewData($excel, $userGroup, $jpasName);
             }
         }
     }
@@ -182,5 +168,38 @@ class JpasImportHandler implements ImportHandler
 
         //Otherwise store null for the date.
         return null;
+    }
+
+    /**
+     * @param $excel
+     * @param $userGroup
+     * @param $jpasName
+     * @return mixed
+     */
+    private function importNewData($excel, $userGroup, $jpasName)
+    {
+        $user = User::find($userGroup);
+        foreach ($excel as $row) {
+            $row->name = preg_replace('/(,\s|\s)/', '_', $row->name);
+            if ($row->name == $jpasName) {
+                $this->updateAndLogUser($this->mapJpasToUser($user, $row));
+            }
+        }
+    }
+
+    /**
+     * @param $userGroup
+     */
+    private function updateUserData($userGroup)
+    {
+        foreach ($userGroup as $userId => $changesGroup) {
+            $user = User::find($userId);
+            foreach ($changesGroup as $field => $newValue) {
+                if ($newValue != "0") {
+                    $user[$field] = $newValue;
+                }
+            }
+            $this->updateAndLogUser($user);
+        }
     }
 }
