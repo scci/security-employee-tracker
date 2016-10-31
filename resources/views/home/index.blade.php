@@ -4,10 +4,6 @@
 
 @section('content')
 
-    @if ( Session::has('last_logon') )
-        @include('home._last_login')
-    @endif
-
     <div class="col s12 m12 l6">
         <ul class="collection with-header calendar z-depth-1">
                 <li class="collection-header">Calendar</li>
@@ -76,6 +72,10 @@
     </div>
 
     <div class="col s12 m12 l6">
+
+        @if ( Session::has('last_logon') )
+            @include('home._last_login')
+        @endif
 
         <div class="card">
             <div class="card-content">
