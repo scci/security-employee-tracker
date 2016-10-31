@@ -30,11 +30,9 @@ class DutyController extends Controller
         $data = $request->all();
         $duty = Duty::create($data);
         
-        if (isset($data['has_groups']) && isset($data['groups'])) {
-            $duty->groups()->attach($data['groups']);
-        } else if (isset($data['users'])) {
-            $duty->users()->attach($data['users']);
-        }
+        isset($data['groups'])
+            ? $duty->groups()->attach($data['groups'])
+            : $duty->users()->attach($data['users']);
         
         return redirect()->action('DutyController@index');
     }
@@ -64,11 +62,9 @@ class DutyController extends Controller
         $duty = Duty::findOrFail($dutyID);
         $duty->update($data);
 
-        if ($data['has_groups']) {
-            $duty->groups()->sync($data['groups']);
-        } else {
-            $duty->users()->sync($data['users']);
-        } 
+        isset($data['groups'])
+            ? $duty->groups()->sync($data['groups'])
+            : $duty->users()->sync($data['users']);
         
         return redirect()->action('DutyController@index');
     }

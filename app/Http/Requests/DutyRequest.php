@@ -26,16 +26,16 @@ class DutyRequest extends FormRequest
     {
         return [
             'name' => 'required|max:255',
-            'users' => 'required_unless:has_groups,1',
-            'groups' => 'required_if:has_groups,1'
+            'users' => 'required_without:groups',
+            'groups' => 'required_without:users,has_groups'
         ];
     }
 
     public function messages()
     {
         return [
-            'users.required_unless' => 'You must have at least one user.',
-            'groups.required_if' => 'You must have at least one group.'
+            'users.required_without' => 'You must have at least one user.',
+            'groups.required_without' => 'You must have at least one group.'
         ];
     }
 }
