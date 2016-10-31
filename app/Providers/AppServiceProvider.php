@@ -45,6 +45,7 @@ class AppServiceProvider extends ServiceProvider
     {
         $ignoreList = ['password', 'last_logon', 'remember_token'];
 
+        $log = array();
         $log['comment'] = '';
         if ($user->isDirty()) {
             $log = $this->buildLogComment($user, $ignoreList, $log);

@@ -20,7 +20,7 @@ class DutySwapController extends Controller
 
         (new DutyList($dutyID))->processSwapRequest($dates, $IDs, $type);
 
-        return redirect()->action('DutyController@show', $dutyID);
+        return redirect()->action('DutyController@show', ['id' => $dutyID]);
 
     }
 

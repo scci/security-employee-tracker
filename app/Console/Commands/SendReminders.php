@@ -70,7 +70,7 @@ class SendReminders extends Command
 
             $newNotes = new Collection();
 
-            $this->trainingUsers->each(function($item, $key) use ($supervisor, $newNotes) {
+            $this->trainingUsers->each(function($item) use ($supervisor, $newNotes) {
                 if ($item->user->supervisor_id == $supervisor->id) {
                     $newNotes->push($item);
                 }

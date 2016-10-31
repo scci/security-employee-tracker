@@ -42,11 +42,8 @@ class DutyDates
             return Carbon::now()->startOfMonth();
         } else if ($cycle == 'weekly') {
             return Carbon::now()->startOfWeek();
-        } else if ($cycle == 'daily') {
-            return Carbon::now()->startOfDay();
         } else {
-            Log::error('Duty has an invalid cycle name. Must use monthly, weekly or daily');
-            return null;
+            return Carbon::now()->startOfDay();
         }
     }
 

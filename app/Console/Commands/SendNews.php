@@ -24,11 +24,6 @@ class SendNews extends Command
      */
     protected $description = 'Send News Emails on Published Date';
 
-    /**
-     * Create a new command instance.
-     *
-     * @return void
-     */
     public function __construct()
     {
         parent::__construct();

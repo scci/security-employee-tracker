@@ -66,7 +66,7 @@ class ProcessMonday extends Command
 
         //update end of day list for both building and lab. Retrieve list
         $duties = Duty::all();
-        $this->dutyLists = $duties->map(function($item, $key) {
+        $this->dutyLists = $duties->map(function($item) {
             $userDateArray = (new DutyList($item))->emailOutput();
             $userDateArray->put('duty', $item);
             return $userDateArray;

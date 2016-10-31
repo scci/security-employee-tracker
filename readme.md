@@ -33,8 +33,8 @@ To view all the various options including cache, database, settings, email, etc.
 1. From SSH, execute `git clone https://github.com/scci/security-employee-tracker.git` in your web root directory.
 2. Set your domain to point to the `public` directory.
 3. From SSH, execute `composer install`.
-4. Navigate to your site/install. IE: http://set.company.com/install
-5. Follow the on screen prompts. (Default env settings should function for you).
+4. Navigate to your site/install. IE: http://set.company.com/install or http://localhost/security-employee-tracker/public/install
+5. Follow the on screen prompts. Update your .env file as needed.
 6. Recommended/Optional: From SSH, execute `php artisan generate:key` - while you already have a secure encryption key, if you wish to have one unique to you (heightened security), then run this.
 
 ## Updating

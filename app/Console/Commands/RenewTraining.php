@@ -88,11 +88,7 @@ class RenewTraining extends Command
             ->where('due_date', '>', Carbon::today())
             ->get();
 
-        if ($trainingRecord->isEmpty()) {
-            return false;
-        }
-
-        return true;
+        return !$trainingRecord->isEmpty();
     }
 
     /**

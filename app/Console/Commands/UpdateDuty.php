@@ -137,6 +137,7 @@ class UpdateDuty extends Command
         $organizer = "MAILTO:" . $reportAddress->secondary;
 
         // ICS
+        $mail = array();
         $mail[0] = "BEGIN:VCALENDAR";
         $mail[1] = "PRODID:-//Microsoft Corporation//Outlook 11.0 MIMEDIR//EN";
         $mail[2] = "VERSION:2.0";

@@ -12,11 +12,11 @@ class SendNewsEmail extends Mailable
     use Queueable, SerializesModels;
 
     public $news;
-    
+
+
     /**
-     * Create a new message instance.
-     *
-     * @return Mailable
+     * SendNewsEmail constructor.
+     * @param News $news
      */
     public function __construct(News $news)
     {

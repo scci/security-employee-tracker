@@ -36,7 +36,7 @@ class DutyGroups extends DutyHelper
 
     public function emailOutput()
     {
-        $collection = $this->list->map(function($value, $key) {
+        $collection = $this->list->map(function($value) {
             return [
                 'users' => $value['group'],
                 'date' => $value['date']
