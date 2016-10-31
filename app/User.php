@@ -2,20 +2,16 @@
 
 namespace SET;
 
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Auth\Authenticatable;
-use Illuminate\Foundation\Auth\Access\Authorizable;
-use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
-use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Foundation\Auth\User as Authenticatable;
 
 /**
  * Class User
  * @package SET
  */
-class User extends Model implements AuthenticatableContract, AuthorizableContract
+class User extends Authenticatable
 {
-
-    use Authenticatable, Authorizable;
+    use Notifiable;
 
     /**
      * @var string
@@ -28,13 +24,13 @@ class User extends Model implements AuthenticatableContract, AuthorizableContrac
     /**
      * @var array
      */
-    protected $fillable = array('username', 'emp_num', 'first_name', 'nickname', 'last_name', 'email', 'phone',
-        'status', 'clearance', 'elig_date', 'inv', 'inv_close', 'destroyed_date',
-        'supervisor_id', 'access_level');
+    protected $fillable = array('username', 'emp_num', 'first_name', 'nickname', 'last_name',
+        'email', 'phone', 'status', 'clearance', 'elig_date', 'inv', 'inv_close', 'destroyed_date',
+        'supervisor_id', 'access_level', 'password');
     /**
      * @var array
      */
-    protected $hidden = array('username', 'password');
+    protected $hidden = array('username', 'password', 'remember_token');
 
     public function supervisor()
     {

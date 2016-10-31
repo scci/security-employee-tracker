@@ -1,7 +1,7 @@
 <div class="card-panel">
     <div class="card-content">
         @can('edit')<div class="right"><a href="{{ url("/user/$user->id/edit") }}" class="btn-flat btn-sm white-text"><i class="material-icons">mode_edit</i></a></div>@endcan
-        <div class="card-title white-text darken-2 {{ $user->status == 'active' ? 'green' : ($user->status == 'separated' ? 'orange' : 'grey') }}">{{ strtoupper($user->status) }}</div>
+        <div class="card-title white-text darken-2 {{ $user->status == 'active' ? 'green' : ($user->status == 'separated' ? 'orange' : 'grey') }}">@if($user->status){{ strtoupper($user->status) }}@else Pending @endif</div>
 
         <div>
             <strong>Employee ID:</strong>

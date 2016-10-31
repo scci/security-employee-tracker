@@ -13,14 +13,16 @@
             }
         ?>
         <ul id="{{$id}}" class="{{$class}}">
-            <li><a href="{{url("news")}}">News</a></li>
-            @can('view')                
-                <li><a href="{{url("user")}}">Users</a></li>
-                <li><a href="{{url("training")}}">Training</a></li>
-                <li><a href="{{url("group")}}">Groups</a></li>
-            @endcan
-            <li><a href="#!" class="dropdown-button" data-activates="duty-lists{{$i}}">Security Checks <i class="material-icons right">arrow_drop_down</i> </a></li>
-            <li><a href="#!" class="dropdown-button" data-activates="username-dropdown{{$i}}">{{ $logged_in_user }} <i class="material-icons right">arrow_drop_down</i></a></li>
+            @if($logged_in_user->status == 'active')
+                <li><a href="{{url("news")}}">News</a></li>
+                @can('view')
+                    <li><a href="{{url("user")}}">Users</a></li>
+                    <li><a href="{{url("training")}}">Training</a></li>
+                    <li><a href="{{url("group")}}">Groups</a></li>
+                @endcan
+                <li><a href="#!" class="dropdown-button" data-activates="duty-lists{{$i}}">Security Checks <i class="material-icons right">arrow_drop_down</i> </a></li>
+            @endif
+            <li><a href="#!" class="dropdown-button" data-activates="username-dropdown{{$i}}">{{ $logged_in_user->userFullName }} <i class="material-icons right">arrow_drop_down</i></a></li>
             <li><a class="modal-trigger waves-effect waves-light" href="#help"><i class="material-icons tooltipped" data-tooltip="Help" data-position="bottom">live_help</i></a></li>
         </ul>
 
