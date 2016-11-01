@@ -9,7 +9,7 @@ class Group extends Model
     protected $table = 'groups';
     public $timestamps = true;
 
-    protected $fillable = array('name', 'closed_area');
+    protected $fillable = ['name', 'closed_area'];
 
     protected $casts = ['closed_area' => 'boolean'];
 
@@ -22,8 +22,9 @@ class Group extends Model
     {
         return $this->belongsToMany('SET\Training');
     }
-    
-    public function duties() {
+
+    public function duties()
+    {
         return $this->belongsToMany('SET\Duty');
     }
 

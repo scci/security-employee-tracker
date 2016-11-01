@@ -2,12 +2,12 @@
 
 namespace SET\Providers;
 
-use SET\Events\TrainingAssigned;
-use SET\Listeners\ResolveLdap;
-use SET\Listeners\LogUserAccess;
-use SET\Listeners\EmailTraining;
-use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 use Illuminate\Auth\Events\Login;
+use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
+use SET\Events\TrainingAssigned;
+use SET\Listeners\EmailTraining;
+use SET\Listeners\LogUserAccess;
+use SET\Listeners\ResolveLdap;
 
 class EventServiceProvider extends ServiceProvider
 {

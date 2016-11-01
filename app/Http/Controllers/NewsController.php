@@ -1,19 +1,21 @@
-<?php namespace SET\Http\Controllers;
+<?php
 
+namespace SET\Http\Controllers;
+
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
+use Krucas\Notification\Facades\Notification;
+use Mail;
+use SET\Attachment;
+use SET\Http\Requests\NewsRequest;
+use SET\Mail\SendNewsEmail;
 use SET\News;
 use SET\User;
-use Mail;
-use Carbon\Carbon;
-use SET\Mail\SendNewsEmail;
-use SET\Attachment;
-use Illuminate\Support\Facades\Gate;
-use SET\Http\Requests\NewsRequest;
-use Krucas\Notification\Facades\Notification;
 
 /**
- * Description of NewsController
+ * Description of NewsController.
  *
  * @author sketa
  */
@@ -36,6 +38,7 @@ class NewsController extends Controller
     public function create()
     {
         $this->authorize('edit');
+
         return view('news.create', compact('users'));
     }
 
@@ -43,6 +46,7 @@ class NewsController extends Controller
      * Store a newly created resource in storage.
      *
      * @param NewsRequest $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(NewsRequest $request)
@@ -51,44 +55,52 @@ class NewsController extends Controller
         $data = $request->all();
         $data['author_id'] = Auth::user()->id;
         $news = News::create($data);
-                
+
         if ($request->hasFile('files')) {
             Attachment::upload($news, $request->file('files'));
         }
-        
-        $this->emailNews($news);      
-        Notification::container()->success("News Created");        
-        
+
+        $this->emailNews($news);
+        Notification::container()->success('News Created');
+
         return redirect()->action('NewsController@index');
     }
-    
+
     /**
-     * Show the individual news article
+     * Show the individual news article.
+     *
      * @param $newsId
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show(News $news)
     {
         $this->authorize('show_published_news', $news);
-        return view('news.show', compact('news')); 
+
+        return view('news.show', compact('news'));
     }
-   
+
     /**
-     * Show the news article to be edited
+     * Show the news article to be edited.
+     *
      * @param $newsId
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function edit($newsId)
     {
         $this->authorize('edit');
         $news = News::findOrFail($newsId);
+
         return view('news.edit', compact('news'));
     }
-    
+
     /**
-     * Update the selected news object with the request
+     * Update the selected news object with the request.
+     *
      * @param NewsRequest $request
-     * @param News $news
+     * @param News        $news
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(NewsRequest $request, News $news)
@@ -101,37 +113,39 @@ class NewsController extends Controller
             Attachment::upload($news, $request->file('files'));
         }
         $this->emailNews($news);
-        
-        Notification::container()->success("News Updated");
+
+        Notification::container()->success('News Updated');
 
         return redirect()->action('NewsController@index');
     }
 
     /**
-     * Delete the specified news article
+     * Delete the specified news article.
+     *
      * @param News $news
      */
     public function destroy(News $news)
     {
         $this->authorize('edit');
-        
-        Storage::deleteDirectory('news_' . $news->id);
+
+        Storage::deleteDirectory('news_'.$news->id);
         $news->delete();
     }
-    
+
     /**
-     * Email the news on the publish_date when a news article is created or updated
+     * Email the news on the publish_date when a news article is created or updated.
+     *
      * @param News $news
      */
-    public function emailNews(News $news) 
-    {        
+    public function emailNews(News $news)
+    {
         $publishDate = Carbon::createFromFormat('Y-m-d', $news->publish_date);
-        
-        if ($news->send_email && $publishDate->eq(Carbon::now())) {            
+
+        if ($news->send_email && $publishDate->eq(Carbon::now())) {
             $allUsers = User::skipSystem()->active()->get();
             foreach ($allUsers as $user) {
-                    Mail::to($user->email)->send(new SendNewsEmail($news));                      
+                Mail::to($user->email)->send(new SendNewsEmail($news));
             }
-        }        
+        }
     }
 }

@@ -4,7 +4,6 @@ namespace SET\Http\Requests;
 
 class NewsRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -14,7 +13,7 @@ class NewsRequest extends Request
     {
         return true;
     }
-	
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,10 +22,10 @@ class NewsRequest extends Request
     public function rules()
     {
         return [
-            'title' => 'required',
-            'description' => 'required',
+            'title'        => 'required',
+            'description'  => 'required',
             'publish_date' => 'required',
-            'expire_date' => 'after:publish_date'
+            'expire_date'  => 'after:publish_date',
         ];
     }
 }

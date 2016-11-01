@@ -3,15 +3,13 @@
 namespace SET\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
 use Krucas\Notification\Facades\Notification;
-use SET\Visit;
 use SET\User;
+use SET\Visit;
 
 class VisitController extends Controller
 {
-
     public function create(User $user)
     {
         return view('visit.create', compact('user'));
@@ -36,7 +34,6 @@ class VisitController extends Controller
 
     public function update(Request $request, User $user, Visit $visit)
     {
-
         $visit->update($request->all());
 
         Notification::container()->success('Visit successfully updated');
@@ -47,6 +44,7 @@ class VisitController extends Controller
     public function destroy($userID, Visit $visit)
     {
         $visit->delete();
+
         return redirect()->action('UserController@show', $userID);
     }
 }

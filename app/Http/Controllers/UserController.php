@@ -1,24 +1,24 @@
-<?php namespace SET\Http\Controllers;
+<?php
 
+namespace SET\Http\Controllers;
+
+use Carbon\Carbon;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
+use Krucas\Notification\Facades\Notification;
 use SET\Duty;
 use SET\Group;
 use SET\Handlers\Excel\JpasImport;
 use SET\Http\Requests\StoreUserRequest;
 use SET\User;
-use Carbon\Carbon;
-use Krucas\Notification\Facades\Notification;
 
 /**
- * Class UserController
- * @package SET\Http\Controllers
+ * Class UserController.
  */
 class UserController extends Controller
 {
-
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -27,11 +27,11 @@ class UserController extends Controller
         $this->authorize('view');
 
         $users = User::with([
-            'assignedTrainings' => function($q) {
+            'assignedTrainings' => function ($q) {
                 $q->whereNull('completed_date')
                     ->whereBetween('due_date', [Carbon::now()->subYear(), Carbon::now()->addWeeks(4)]);
             },
-            'trainings'
+            'trainings',
         ])
             ->skipSystem()
             ->active()
@@ -52,6 +52,7 @@ class UserController extends Controller
 
     /**
      * @param StoreUserRequest $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(StoreUserRequest $request)
@@ -61,7 +62,7 @@ class UserController extends Controller
         $user = User::create($data);
 
         if (array_key_exists('groups', $data)) {
-            settype($data['groups'], "array");
+            settype($data['groups'], 'array');
             $user->groups()->sync($data['groups']);
         }
 
@@ -70,11 +71,12 @@ class UserController extends Controller
 
     /**
      * @param $userId
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show($userId)
     {
-        $user = User::with(['subordinates' => function($query) {
+        $user = User::with(['subordinates' => function ($query) {
             $query->active();
         }, 'supervisor', 'groups', 'duties', 'attachments'])
             ->findOrFail($userId);
@@ -98,9 +100,9 @@ class UserController extends Controller
         $this->previousAndNextUsers($user, $previous, $next);
 
         //This mess is just so that we can output the Security Check list or show none. Mainly just to show none.
-        $duties = Duty::whereHas('users', function($q) use ($userId){
+        $duties = Duty::whereHas('users', function ($q) use ($userId) {
             $q->where('id', $userId);
-        })->orWhereHas('groups.users', function($q) use ($userId) {
+        })->orWhereHas('groups.users', function ($q) use ($userId) {
             $q->where('id', $userId);
         })->get();
 
@@ -117,7 +119,6 @@ class UserController extends Controller
         return view('user.edit', compact('user', 'supervisors', 'groups'));
     }
 
-
     public function update(User $user)
     {
         $this->authorize('edit');
@@ -127,7 +128,7 @@ class UserController extends Controller
         //Set the date when the account will be destroyed.
         if ($data['status'] == 'destroyed') {
             $data['destroyed_date'] = Carbon::today()->addWeek()->startOfWeek();
-        } else if ($data['status'] == 'separated') {
+        } elseif ($data['status'] == 'separated') {
             $data['destroyed_date'] = Carbon::today()->addYears(2)->startOfWeek();
         } else {
             $data['destroyed_date'] = null;
@@ -149,19 +150,19 @@ class UserController extends Controller
         }
 
         return redirect()->action('UserController@show', $user->id);
-
     }
 
     /**
      * @param $userId
+     *
      * @return string
      */
     public function destroy($userId)
     {
-        Storage::deleteDirectory('user_' . $userId);
+        Storage::deleteDirectory('user_'.$userId);
         User::findOrFail($userId)->delete();
 
-        return "success";
+        return 'success';
     }
 
     /**
@@ -170,6 +171,7 @@ class UserController extends Controller
      * That way we keep all this data for the resolve phase.
      *
      * @param JpasImport $import
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function import(JpasImport $import)
@@ -183,18 +185,18 @@ class UserController extends Controller
         $userList = User::orderBy('last_name')->get()->pluck('UserFullName', 'id')->toArray();
 
         return view('user.import', compact('unique', 'changes', 'userList', 'uploadedFile'));
-
     }
 
     /**
      * @param JpasImport $import
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function resolveImport(JpasImport $import)
     {
         $import->handleImport();
 
-        Notification::container()->success("Import Complete");
+        Notification::container()->success('Import Complete');
 
         File::delete($import->getFile('file'));
 
@@ -227,6 +229,7 @@ class UserController extends Controller
 
     /**
      * @param $clearance
+     *
      * @return mixed
      */
     private function spellOutClearance($clearance)
@@ -243,6 +246,7 @@ class UserController extends Controller
                 $clearance = 'Interim Secret';
                 break;
         }
+
         return $clearance;
     }
 }

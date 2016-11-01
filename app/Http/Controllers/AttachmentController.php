@@ -1,23 +1,27 @@
-<?php namespace SET\Http\Controllers;
+<?php
+
+namespace SET\Http\Controllers;
 
 use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Storage;
 use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\Response;
 use SET\Training;
 use SET\User;
 
 class AttachmentController extends Controller
 {
-
     /**
      * Currently only called from the Training page via the sidebar upload.
+     *
      * @param $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         $data = $request->all();
 
         $encrypt = false;
@@ -28,11 +32,12 @@ class AttachmentController extends Controller
 
         if ($data['type'] == 'training') {
             $model = Training::findOrFail($data['id']);
-        } else if ($data['type'] == 'user') {
+        } elseif ($data['type'] == 'user') {
             $model = User::findOrFail($data['id']);
             $encrypt = true;
         } else {
             Notification::container()->success('Upload Failed');
+
             return back();
         }
 
@@ -40,21 +45,22 @@ class AttachmentController extends Controller
         Notification::container()->success('Upload Complete');
 
         return back();
-
     }
 
     /**
      * Let the browser download the file.
+     *
      * @param $fileId
+     *
      * @return Response
      */
     public function show($fileId)
     {
         $entry = Attachment::findOrFail($fileId);
-        $type = explode("\\", $entry->imageable_type);
+        $type = explode('\\', $entry->imageable_type);
         $modelName = strtolower($type[1]);
 
-        $file = $modelName . "_" . $entry->imageable_id . '/' . $entry->filename;
+        $file = $modelName.'_'.$entry->imageable_id.'/'.$entry->filename;
 
         if ($entry->encrypted) {
             try {
@@ -66,16 +72,17 @@ class AttachmentController extends Controller
             $fileContent = Storage::get($file);
         }
 
-        return response()->make($fileContent, 200, array(
-            'Content-Type' => $entry->mime,
-            'Content-Disposition' => 'attachment; filename="' . $entry->filename . '"'
-        ));
-
+        return response()->make($fileContent, 200, [
+            'Content-Type'        => $entry->mime,
+            'Content-Disposition' => 'attachment; filename="'.$entry->filename.'"',
+        ]);
     }
 
     /**
      * Remove the specified resource from storage.
+     *
      * @param  $fileId
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function destroy($fileId)
@@ -83,13 +90,12 @@ class AttachmentController extends Controller
         $file = Attachment::findOrFail($fileId);
         $file->delete();
 
-        $type = explode("\\", $file->imageable_type);
+        $type = explode('\\', $file->imageable_type);
         $modelName = strtolower($type[1]);
 
-        $fileLocation = "app/" . $modelName . "_" . $file->imageable_id . '/' . $file->filename;
+        $fileLocation = 'app/'.$modelName.'_'.$file->imageable_id.'/'.$file->filename;
         Storage::delete($fileLocation);
 
         return back();
     }
-
 }

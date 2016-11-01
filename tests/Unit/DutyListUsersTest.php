@@ -1,10 +1,10 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use SET\Duty;
 use SET\Handlers\Duty\DutyList;
 use SET\User;
-use SET\Duty;
-use Carbon\Carbon;
 
 class DutyListUsersTest extends TestCase
 {
@@ -49,7 +49,7 @@ class DutyListUsersTest extends TestCase
     {
         $email = (new DutyList($this->duty))->scheduledUpdate();
 
-        if(Carbon::today()->startOfWeek() == Carbon::today()) {
+        if (Carbon::today()->startOfWeek() == Carbon::today()) {
             // do nothing
         } else {
             $this->assertEquals($email[0]['users'][0]->id, $this->users->sortBy('last_name')->first()->id);
@@ -91,6 +91,4 @@ class DutyListUsersTest extends TestCase
         $this->assertEquals($htmlOne[0]['date'], $htmlTwo[0]['date']);
         $this->assertEquals($htmlOne[1]['date'], $htmlTwo[1]['date']);
     }
-
-
 }

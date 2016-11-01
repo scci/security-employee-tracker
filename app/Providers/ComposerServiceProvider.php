@@ -16,7 +16,7 @@ class ComposerServiceProvider extends ServiceProvider
     public function boot()
     {
         // Pass the logged in user's full name to the layouts._header view.
-        view()->composer(['layouts._navbar', 'home._last_login'], function($view) {
+        view()->composer(['layouts._navbar', 'home._last_login'], function ($view) {
             $view->with('logged_in_user', Auth::user());
             $view->with('duties', Duty::all());
         });

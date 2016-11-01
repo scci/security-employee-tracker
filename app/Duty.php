@@ -12,7 +12,7 @@ class Duty extends Model
 
     public $timestamps = true;
 
-    protected $fillable = array('name', 'cycle', 'description', 'has_groups');
+    protected $fillable = ['name', 'cycle', 'description', 'has_groups'];
 
     public function users()
     {

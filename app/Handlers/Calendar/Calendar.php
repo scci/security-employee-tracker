@@ -40,7 +40,6 @@ class Calendar
         $newUserList = $this->newUserList();
 
         while ($date <= $this->end) {
-
             $currentDate = $date->format('Y-m-d');
 
             $separatedArray = $this->pushToArray($separatedList, ['destroyed_date'], $currentDate);
@@ -65,7 +64,8 @@ class Calendar
     /**
      * @param string $date
      */
-    private function pushToArray($list, array $columnName, $date) {
+    private function pushToArray($list, array $columnName, $date)
+    {
         $array = [];
 
 
@@ -78,29 +78,32 @@ class Calendar
                 }
             }
         }
+
         return $array;
     }
 
     /**
      * If a carbon object, convert it to our date string. Otherwise leave it alone.
+     *
      * @param date
+     *
      * @return mixed
      */
     private function testForCarbonObject($date)
     {
         //check if format is YYYY-MM-DD
-        if (preg_match("/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/", $date)) {
+        if (preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $date)) {
             return $date;
-        } else if (get_class($date) == 'Carbon\Carbon') {
+        } elseif (get_class($date) == 'Carbon\Carbon') {
             return $date->format('Y-m-d');
         } else {
-            return "Something went horribly wrong with testForCarbonObject.";
+            return 'Something went horribly wrong with testForCarbonObject.';
         }
     }
 
     private function groupUsersForTraining($trainingUsers)
     {
-        $array = array();
+        $array = [];
         foreach ($trainingUsers as $key => $item) {
             $array[$item['training_id']][$key] = $item;
         }
@@ -108,7 +111,7 @@ class Calendar
 
         foreach ($array as $training) {
             foreach ($training as $trainingUser) {
-                $trainingUser['userLink'] = "<a href='" . url('user', $trainingUser->user_id) . "'>" . $trainingUser->user->userFullName . "</a>";
+                $trainingUser['userLink'] = "<a href='".url('user', $trainingUser->user_id)."'>".$trainingUser->user->userFullName.'</a>';
             }
         }
 
@@ -120,9 +123,9 @@ class Calendar
      */
     private function separatedList()
     {
-        return User::where(function($q) {
-                $q->where('status', 'separated')->orWhere('status', 'destroyed');
-            })
+        return User::where(function ($q) {
+            $q->where('status', 'separated')->orWhere('status', 'destroyed');
+        })
             ->whereBetween('destroyed_date', [$this->start, $this->end])
             ->get();
     }
@@ -133,7 +136,7 @@ class Calendar
     private function travelsList()
     {
         return Travel::with('user')
-            ->where(function($query) {
+            ->where(function ($query) {
                 $query->whereBetween('leave_date', [$this->start, $this->end])
                     ->orWhereBetween('return_date', [$this->start, $this->end]);
             })

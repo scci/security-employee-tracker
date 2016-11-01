@@ -1,10 +1,11 @@
-<?php namespace SET\Http\Controllers;
+<?php
 
+namespace SET\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Input;
-use Illuminate\Http\Request;
 use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
 use SET\Events\TrainingAssigned;
@@ -17,13 +18,10 @@ use SET\TrainingUser;
 use SET\User;
 
 /**
- * Class TrainingController
- * @package SET\Http\Controllers
+ * Class TrainingController.
  */
 class TrainingController extends Controller
 {
-
-
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -46,11 +44,11 @@ class TrainingController extends Controller
         return view('training.create', compact('users', 'groups'));
     }
 
-
     /**
      * Store a newly created resource in storage.
      *
      * @param StoreTrainingRequest $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(StoreTrainingRequest $request)
@@ -68,15 +66,16 @@ class TrainingController extends Controller
 
         $this->createTrainingNotes($data);
 
-        Notification::container()->success("Training Created");
+        Notification::container()->success('Training Created');
 
         return redirect()->action('TrainingController@index');
     }
 
-
     /**
-     * Show the individual training record
+     * Show the individual training record.
+     *
      * @param $trainingId
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function show($trainingId)
@@ -106,7 +105,6 @@ class TrainingController extends Controller
         return view('training.edit', compact('training', 'users', 'groups'));
     }
 
-
     public function update(Request $request, Training $training)
     {
         $this->authorize('edit');
@@ -120,7 +118,7 @@ class TrainingController extends Controller
         $data['training_id'] = $training->id;
         $this->createTrainingNotes($data);
 
-        Notification::container()->success("Training Updated");
+        Notification::container()->success('Training Updated');
 
         return redirect()->action('TrainingController@show', $training->id);
     }
@@ -128,13 +126,12 @@ class TrainingController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $trainingId
+     * @param int $trainingId
      */
     public function destroy($trainingId)
     {
         Training::findOrFail($trainingId)->delete();
     }
-
 
     public function assignForm($trainingID)
     {
@@ -149,8 +146,10 @@ class TrainingController extends Controller
 
     /**
      * Assign our users to training.
+     *
      * @param AssignTrainingRequest $request
-     * @param int $trainingID
+     * @param int                   $trainingID
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function assign(AssignTrainingRequest $request, $trainingID)
@@ -162,7 +161,7 @@ class TrainingController extends Controller
 
         $this->createTrainingNotes($data);
 
-        Notification::container()->success("Training was assigned to the user(s).");
+        Notification::container()->success('Training was assigned to the user(s).');
 
         return redirect()->action('TrainingController@show', $trainingID);
     }
@@ -173,6 +172,7 @@ class TrainingController extends Controller
      * Calls to \SET\app\Handlers\Excel\
      *
      * @param CompletedTrainingExport $export
+     *
      * @return mixed
      */
     public function showCompleted(CompletedTrainingExport $export)
@@ -183,15 +183,18 @@ class TrainingController extends Controller
     }
 
     /**
-     * Send out a reminder that the training is due
+     * Send out a reminder that the training is due.
+     *
      * @param $trainingUserId
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function sendReminder($trainingUserId)
     {
         $trainingUser = TrainingUser::with('user')->find($trainingUserId);
         Event::fire(new TrainingAssigned($trainingUser));
-        Notification::container()->success('Reminder sent to ' . $trainingUser->user->userFullName);
+        Notification::container()->success('Reminder sent to '.$trainingUser->user->userFullName);
+
         return redirect()->back();
     }
 
@@ -201,6 +204,7 @@ class TrainingController extends Controller
 
     /**
      * Get a list of users and create training notes from that list.
+     *
      * @param $data
      */
     private function createTrainingNotes($data)
@@ -211,7 +215,7 @@ class TrainingController extends Controller
 
         //If we have groups, let's get the user ids.
         if (isset($data['groups'])) {
-            $groupUsers = User::whereHas('groups', function($q) use ($data) {
+            $groupUsers = User::whereHas('groups', function ($q) use ($data) {
                 $q->where('id', $data['groups']);
             })->get();
 

@@ -1,12 +1,13 @@
 <?php
 
 namespace SET\Console\Commands;
+
 use Carbon\Carbon;
-use SET\News;
-use SET\User;
-use SET\Mail\SendNewsEmail;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Mail;
+use SET\Mail\SendNewsEmail;
+use SET\News;
+use SET\User;
 
 class SendNews extends Command
 {
@@ -35,16 +36,16 @@ class SendNews extends Command
      * @return mixed
      */
     public function handle()
-    {   
+    {
         $newsToPublish = News::where('publish_date', Carbon::today())
             ->where('send_email', 1)
             ->get();
-        
+
         foreach ($newsToPublish as $news) {
             $allUsers = User::skipSystem()->active()->get();
             foreach ($allUsers as $user) {
-                    Mail::to($user->email)->send(new SendNewsEmail($news));        
-            }        
+                Mail::to($user->email)->send(new SendNewsEmail($news));
+            }
         }
     }
 }

@@ -140,7 +140,7 @@ return [
         'first_name' => 'givenname',
         'last_name'  => 'sn',
         'email'      => 'mail',
-        'phone'      => 'telephonenumber'
+        'phone'      => 'telephonenumber',
 
     ],
 

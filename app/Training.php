@@ -6,11 +6,10 @@ use Illuminate\Database\Eloquent\Model;
 
 class Training extends Model
 {
-
     protected $table = 'trainings';
     public $timestamps = true;
 
-    protected $fillable = array('name', 'renews_in', 'description');
+    protected $fillable = ['name', 'renews_in', 'description'];
     protected $dates = ['created_at', 'updated_at'];
     protected $appends = ['incompleted'];
 

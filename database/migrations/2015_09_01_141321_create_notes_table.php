@@ -3,11 +3,11 @@
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 
-class CreateNotesTable extends Migration {
-
-	public function up()
-	{
-		Schema::create('notes', function(Blueprint $table) {
+class CreateNotesTable extends Migration
+{
+    public function up()
+    {
+        Schema::create('notes', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id')->unsigned();
             $table->integer('author_id')->unsigned();
@@ -16,11 +16,11 @@ class CreateNotesTable extends Migration {
             $table->boolean('alert')->default(false);
             $table->boolean('private')->default(false);
             $table->timestamps();
-		});
-	}
+        });
+    }
 
-	public function down()
-	{
-		Schema::drop('notes');
-	}
+    public function down()
+    {
+        Schema::drop('notes');
+    }
 }

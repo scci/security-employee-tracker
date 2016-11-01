@@ -3,27 +3,26 @@
 namespace SET\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Krucas\Notification\Facades\Notification;
-use SET\Http\Requests\TrainingUserRequest;
 use SET\Attachment;
-use Illuminate\Support\Facades\Event;
 use SET\Events\TrainingAssigned;
+use SET\Http\Requests\TrainingUserRequest;
 use SET\Training;
 use SET\TrainingUser;
 use SET\User;
 
 class TrainingUserController extends Controller
 {
-
     public function create(User $user)
     {
         $training = Training::all()->pluck('name', 'id')->toArray();
         $disabled = '';
+
         return view('traininguser.create', compact('user', 'training', 'disabled'));
     }
 
@@ -32,9 +31,9 @@ class TrainingUserController extends Controller
         $data = $request->all();
         $data['author_id'] = Auth::user()->id;
         $data['user_id'] = $user->id;
-        
+
         $trainingUser = TrainingUser::create($data);
-        
+
         if ($request->hasFile('files')) {
             Attachment::upload($trainingUser, $request->file('files'), $data['encrypt']);
         }
@@ -54,9 +53,9 @@ class TrainingUserController extends Controller
         if (isset($trainingUser->completed_date)) {
             return redirect()->action('UserController@show', $user->id);
         }
+
         return view('traininguser.show', compact('trainingUser', 'user'));
     }
-
 
     public function edit(User $user, $trainingUserID)
     {
@@ -91,9 +90,8 @@ class TrainingUserController extends Controller
     public function destroy($userID, $trainingUserID)
     {
         TrainingUser::findOrFail($trainingUserID)->delete();
-        Storage::deleteDirectory('traininguser_' . $trainingUserID);
+        Storage::deleteDirectory('traininguser_'.$trainingUserID);
 
         return Redirect::back();
     }
-
 }

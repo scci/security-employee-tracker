@@ -1,4 +1,5 @@
 <?php
+
 namespace SET\Http\ViewComposers;
 
 use Carbon\Carbon;
@@ -9,11 +10,11 @@ use SET\User;
 
 class ActionItemsComposer
 {
-
     /**
      * Bind data to the view.
      *
-     * @param  View  $view
+     * @param View $view
+     *
      * @return void
      */
     public function compose(View $view)
@@ -32,14 +33,13 @@ class ActionItemsComposer
      */
     private function getDueTraining()
     {
-
-        return Training::with(['users', 'assignedUsers' => function($query) {
+        return Training::with(['users', 'assignedUsers' => function ($query) {
             //filter the assignedusers we get back
             $query->ActiveUsers()
                 ->whereNull('completed_date')
                 ->where('due_date', '<=', Carbon::now());
-            }])
-            ->whereHas('assignedUsers', function($q) {
+        }])
+            ->whereHas('assignedUsers', function ($q) {
                 //filter the training we get.
                 $q->ActiveUsers()
                     ->whereNull('completed_date')
@@ -53,9 +53,9 @@ class ActionItemsComposer
      */
     private function getExpiringVisits()
     {
-        return User::with(['visits' => function($query) {
+        return User::with(['visits' => function ($query) {
             $query->whereBetween('expiration_date', [Carbon::now(), Carbon::now()->addWeek()]);
-        }])->whereHas('visits', function($q) {
+        }])->whereHas('visits', function ($q) {
             $q->whereBetween('expiration_date', [Carbon::now(), Carbon::now()->addWeek()]);
         })->Active()->get();
     }
@@ -69,7 +69,6 @@ class ActionItemsComposer
         $users = User::where('elig_date', '<=', Carbon::now())->active()->orderBy('elig_date', 'DESC')->get();
 
         foreach ($users as $user) {
-
             $calculatedDays = $this->calculateDaysToRenewClearance($user);
 
             $this->buildUserArray($calculatedDays, $builtUser, $user);
@@ -80,6 +79,7 @@ class ActionItemsComposer
 
     /**
      * @param $user
+     *
      * @return int
      */
     private function calculateDaysToRenewClearance($user)
@@ -88,22 +88,20 @@ class ActionItemsComposer
 
         if ($user->access_level == 'TS') {
             $years = 5;
-        } else if ($user->access_level == 'S' || $user->clearance == 'S') {
+        } elseif ($user->access_level == 'S' || $user->clearance == 'S') {
             $years = 10;
-        } else if ($user->clearance = 'TS') {
+        } elseif ($user->clearance = 'TS') {
             $years = 5;
         }
 
         $calculatedDays = Carbon::now()->diffInDays(
-            Carbon::createFromFormat('Y-m-d', $user->elig_date)->addYears($years)
-        , false);
+            Carbon::createFromFormat('Y-m-d', $user->elig_date)->addYears($years), false);
 
         return $calculatedDays;
     }
 
-
     /**
-     * @param integer $calculatedDays
+     * @param int $calculatedDays
      * @param $user
      * @param $builtUser
      */
@@ -111,9 +109,9 @@ class ActionItemsComposer
     {
         if ($calculatedDays <= 90) {
             $builtUser->push([
-                'id' => $user->id,
+                'id'           => $user->id,
                 'userFullName' => $user->userFullName,
-                'days' => $calculatedDays
+                'days'         => $calculatedDays,
             ]);
         }
     }

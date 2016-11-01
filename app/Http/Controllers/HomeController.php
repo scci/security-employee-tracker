@@ -1,24 +1,25 @@
-<?php namespace SET\Http\Controllers;
+<?php
 
+namespace SET\Http\Controllers;
+
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Request;
 use SET\Duty;
 use SET\Handlers\Calendar\Calendar;
 use SET\Log;
+use SET\Training;
 use SET\TrainingUser;
 use SET\User;
-use SET\Training;
-use Carbon\Carbon;
 
 class HomeController extends Controller
 {
-
-
     /**
      * Display a listing of the resource.
      * Return notes with due dates 4 weeks from now.
      * Return last 20 recent notes.
+     *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\Http\RedirectResponse|\Illuminate\View\View
      */
     public function index()
@@ -41,19 +42,19 @@ class HomeController extends Controller
         $calendar = (new Calendar())->getCalendar();
 
         $duties = Duty::with([
-            'users' => function($query) {
+            'users' => function ($query) {
                 $query->orderBy('duty_user.last_worked', 'desc');
             },
-            'groups' => function($query) {
+            'groups' => function ($query) {
                 $query->orderBy('duty_group.last_worked', 'desc');
-            }])->get();
+            }, ])->get();
 
         return view('home.index', compact('trainingUser', 'log', 'calendar', 'duties'));
     }
 
-
     /**
      * Return a list of users & trainings that will be used for our ajax search bar in the headers.
+     *
      * @return \Illuminate\Http\JsonResponse
      */
     public function search()
@@ -65,18 +66,17 @@ class HomeController extends Controller
         $dbTraining = Training::searchTraining($qInput)->get(['id', 'name']);
 
         // Means no result were found
-        if (sizeof($dbUsers) <= 0 && sizeof($dbTraining) <= 0) {
+        if (count($dbUsers) <= 0 && count($dbTraining) <= 0) {
             $status = false;
         }
 
-        return response()->json(array(
-            "status" => $status,
-            "error" => null,
-            "data" => array(
-                "user" => $dbUsers,
-                "training" => $dbTraining
-            )
-        ));
+        return response()->json([
+            'status' => $status,
+            'error'  => null,
+            'data'   => [
+                'user'     => $dbUsers,
+                'training' => $dbTraining,
+            ],
+        ]);
     }
-
 }

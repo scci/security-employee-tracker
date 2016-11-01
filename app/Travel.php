@@ -17,13 +17,13 @@ class Travel extends Model
     /**
      * @var array
      */
-    protected $fillable = array('location', 'brief_date', 'debrief_date', 'leave_date', 'return_date', 'comment', 'is_ready', 'author_id', 'user_id');
-    
+    protected $fillable = ['location', 'brief_date', 'debrief_date', 'leave_date', 'return_date', 'comment', 'is_ready', 'author_id', 'user_id'];
+
     public function user()
     {
         return $this->belongsTo('SET\User');
     }
-    
+
     public function author()
     {
         return $this->belongsTo('SET\User', 'author_id');
@@ -36,9 +36,9 @@ class Travel extends Model
 
     /**
      * @param string $key
-     * @param mixed $value
-     * @return $this
+     * @param mixed  $value
      *
+     * @return $this
      */
     public function setAttribute($key, $value)
     {

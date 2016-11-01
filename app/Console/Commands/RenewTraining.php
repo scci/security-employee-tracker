@@ -6,8 +6,8 @@ use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Event;
-use SET\TrainingUser;
 use SET\Events\TrainingAssigned;
+use SET\TrainingUser;
 
 class RenewTraining extends Command
 {
@@ -42,7 +42,6 @@ class RenewTraining extends Command
 
     /**
      * Create a new command instance.
-     *
      */
     public function __construct()
     {
@@ -79,6 +78,7 @@ class RenewTraining extends Command
      * Check if training note has been renewed already.
      *
      * @param $trainingUser
+     *
      * @return bool
      */
     private function renewedAlready($trainingUser)
@@ -116,7 +116,7 @@ class RenewTraining extends Command
 
             //
             $this->trainingAdminRecord->push([
-                'name' => $trainingUser->user->userFullName,
+                'name'     => $trainingUser->user->userFullName,
                 'training' => $trainingUser->training->name,
                 'due_date' => $dueDate->toDateString(),
             ]);
@@ -126,16 +126,18 @@ class RenewTraining extends Command
     /**
      * @param $trainingUser
      * @param Carbon $dueDate
+     *
      * @return TrainingUser
      */
     private function createRecord($trainingUser, $dueDate)
     {
         $newNote = TrainingUser::create([
-            'user_id' => $trainingUser->user_id,
-            'author_id' => 1,
+            'user_id'     => $trainingUser->user_id,
+            'author_id'   => 1,
             'training_id' => $trainingUser->training_id,
-            'due_date' => $dueDate->toDateString()
+            'due_date'    => $dueDate->toDateString(),
         ]);
+
         return $newNote;
     }
 }

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateUsersTable extends Migration
 {
-
     public function up()
     {
         Schema::create('users', function (Blueprint $table) {
@@ -34,11 +33,11 @@ class CreateUsersTable extends Migration
             $table->string('password')->nullable();
         });
         \SET\User::create([
-            'username' => 'system',
+            'username'   => 'system',
             'first_name' => 'system',
-            'last_name' => 'system',
-            'emp_num' => 0,
-            'email' => 'system@test.com'
+            'last_name'  => 'system',
+            'emp_num'    => 0,
+            'email'      => 'system@test.com',
         ]);
     }
 

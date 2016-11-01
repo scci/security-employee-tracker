@@ -166,6 +166,6 @@ return [
    | add it here.
    |
    */
-    'divisionKeyword' => ''
+    'divisionKeyword' => '',
 
 ];

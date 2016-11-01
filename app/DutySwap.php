@@ -10,7 +10,7 @@ class DutySwap extends Model
 
     public $timestamps = true;
 
-    protected $fillable = array('imageable_id', 'imageable_type', 'duty_id', 'date');
+    protected $fillable = ['imageable_id', 'imageable_type', 'duty_id', 'date'];
 
     public function imageable()
     {

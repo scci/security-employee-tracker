@@ -5,10 +5,7 @@ namespace SET;
 use Illuminate\Database\Eloquent\Model;
 
 /**
- * Class Setting
- * @package SET
- *
- * Handles the varous settings through the project and is updated/set in the admin panel.
+ * Class Setting.
  */
 class Setting extends Model
 {
@@ -17,5 +14,5 @@ class Setting extends Model
     public $incrementing = false;
     protected $primaryKey = 'name';
 
-    protected $fillable = array('name', 'primary', 'secondary');
+    protected $fillable = ['name', 'primary', 'secondary'];
 }

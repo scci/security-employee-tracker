@@ -8,10 +8,9 @@ use Illuminate\Support\Facades\Storage;
 
 class Attachment extends Model
 {
-
     protected $table = 'attachments';
     public $timestamps = true;
-    protected $fillable = array('filename', 'mime', 'imageable_type', 'imageable_id', 'encrypted');
+    protected $fillable = ['filename', 'mime', 'imageable_type', 'imageable_id', 'encrypted'];
 
     public function imageable()
     {
@@ -20,16 +19,15 @@ class Attachment extends Model
 
     public static function upload($model, $files, $encrypted = false)
     {
-        
-        $modelName = strtolower(class_basename($model)) . '_';
+        $modelName = strtolower(class_basename($model)).'_';
 
         foreach ($files as $file) {
             $data = [];
 
-            Storage::makeDirectory($modelName . $model->id);
+            Storage::makeDirectory($modelName.$model->id);
 
             Storage::disk('local')
-                ->put($modelName . $model->id . '/' . $file->getClientOriginalName(), self::encryptFileContents($file, $encrypted));
+                ->put($modelName.$model->id.'/'.$file->getClientOriginalName(), self::encryptFileContents($file, $encrypted));
 
             $data['filename'] = $file->getClientOriginalName();
             $data['mime'] = $file->getClientMimeType();
@@ -41,8 +39,9 @@ class Attachment extends Model
     private static function encryptFileContents($file, $encrypt)
     {
         if ($encrypt) {
-                    return encrypt(File::get($file));
+            return encrypt(File::get($file));
         }
+
         return File::get($file);
     }
 }

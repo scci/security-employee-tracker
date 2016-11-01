@@ -1,10 +1,12 @@
 <?php
+
 namespace SET\Http\Controllers\Auth;
+
 use Adldap\Laravel\Facades\Adldap;
+use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use SET\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use SET\User;
 
 class LoginController extends Controller
@@ -31,9 +33,9 @@ class LoginController extends Controller
     {
         return 'username';
     }
+
     /**
      * Create a new controller instance.
-     *
      */
     public function __construct()
     {
@@ -51,10 +53,11 @@ class LoginController extends Controller
         }
 
         Auth::logout();
+
         return redirect()->back()
             ->withInput($request->only($this->username(), 'remember'))
             ->withErrors([
-                $this->username() => "Your account is currently not active.",
+                $this->username() => 'Your account is currently not active.',
             ]);
     }
 }

@@ -6,12 +6,11 @@ use Illuminate\Database\Eloquent\Model;
 
 class Note extends Model
 {
-
     protected $table = 'notes';
     public $timestamps = true;
 
-    protected $fillable = array('user_id', 'author_id', 'private', 'alert',
-        'comment', 'title');
+    protected $fillable = ['user_id', 'author_id', 'private', 'alert',
+        'comment', 'title', ];
 
     public function user()
     {
@@ -32,5 +31,4 @@ class Note extends Model
     {
         return $this->belongsTo('SET\Training');
     }
-
 }

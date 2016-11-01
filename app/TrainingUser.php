@@ -18,7 +18,7 @@ class TrainingUser extends Model
     /**
      * @var array
      */
-    protected $fillable = array('training_id', 'due_date', 'completed_date', 'comment', 'author_id', 'user_id');
+    protected $fillable = ['training_id', 'due_date', 'completed_date', 'comment', 'author_id', 'user_id'];
 
     public function user()
     {
@@ -45,20 +45,21 @@ class TrainingUser extends Model
      * to return only notes with active users.
      *
      * @param $query
+     *
      * @return mixed
      */
     public function scopeActiveUsers($query)
     {
-        return $query->whereHas('user', function($q) {
+        return $query->whereHas('user', function ($q) {
             $q->where('status', 'active');
         });
     }
 
     /**
      * @param string $key
-     * @param mixed $value
-     * @return $this
+     * @param mixed  $value
      *
+     * @return $this
      */
     public function setAttribute($key, $value)
     {
@@ -68,5 +69,4 @@ class TrainingUser extends Model
 
         return parent::setAttribute($key, $value);
     }
-
 }

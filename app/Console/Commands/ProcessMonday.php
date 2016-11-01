@@ -27,7 +27,7 @@ class ProcessMonday extends Command
     protected $description = 'Process all commands for monday & send single email to Reporter';
 
     /**
-     * Variables we get from other commands so we can have a unified email to the "reporter"
+     * Variables we get from other commands so we can have a unified email to the "reporter".
      */
     protected $trainingUsers;
     protected $visits;
@@ -35,7 +35,6 @@ class ProcessMonday extends Command
     protected $dutyLists;
     protected $monday;
     protected $destroyed;
-
 
     /**
      * ProcessMonday constructor.
@@ -66,9 +65,10 @@ class ProcessMonday extends Command
 
         //update end of day list for both building and lab. Retrieve list
         $duties = Duty::all();
-        $this->dutyLists = $duties->map(function($item) {
+        $this->dutyLists = $duties->map(function ($item) {
             $userDateArray = (new DutyList($item))->emailOutput();
             $userDateArray->put('duty', $item);
+
             return $userDateArray;
         });
 
@@ -83,7 +83,6 @@ class ProcessMonday extends Command
 
     private function sendReporterEmail()
     {
-
         $reportAddress = Setting::where('name', 'report_address')->first();
 
         Mail::send('emails.admin_reminder', [
@@ -93,7 +92,7 @@ class ProcessMonday extends Command
             'monday'    => Carbon::now()->startOfWeek(),
             'dutyLists' => $this->dutyLists,
             'destroyed' => $this->destroyed,
-        ], function($m) use ($reportAddress) {
+        ], function ($m) use ($reportAddress) {
             $m->to($reportAddress->secondary, $reportAddress->primary)
                 ->subject('Weekly Report');
         });

@@ -1,7 +1,7 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
 use SET\Setting;
 
 class CreateSettingsTable extends Migration
@@ -22,8 +22,6 @@ class CreateSettingsTable extends Migration
 
         //Address that receives our reports
         Setting::create(['name' => 'report_address', 'primary' => 'system', 'secondary' => 'system@system.com']);
-
-
     }
 
     /**
