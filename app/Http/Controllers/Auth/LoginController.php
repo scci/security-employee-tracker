@@ -2,7 +2,6 @@
 
 namespace SET\Http\Controllers\Auth;
 
-use Adldap\Laravel\Facades\Adldap;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -40,10 +39,6 @@ class LoginController extends Controller
     public function __construct()
     {
         $this->middleware('guest', ['except' => 'logout']);
-
-        if (config('auth.guards.web.provider') == 'adldap') {
-            Adldap::connect();
-        }
     }
 
     public function authenticated(Request $request, User $user)

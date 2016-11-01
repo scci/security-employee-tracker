@@ -30,7 +30,6 @@ return [
     | mechanisms used by this application to persist your user's data.
     |
     | Supported drivers: "session", "token"
-    | Supported providers: "users", "adldap"
     |
     */
     'guards' => [
@@ -56,14 +55,10 @@ return [
     | sources which represent each model / table. These sources may then
     | be assigned to any extra authentication guards you have defined.
     |
-    | Supported: "database", "eloquent"
+    | Supported: "database", "eloquent", "adldap
     |
     */
     'providers' => [
-        'adldap' => [
-            'driver' => 'adldap',
-            'model'  => SET\User::class,
-        ],
         'users' => [
             'driver' => 'eloquent',
             'model'  => SET\User::class,

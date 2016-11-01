@@ -35,7 +35,8 @@ To view all the various options including cache, database, settings, email, etc.
 3. From SSH, execute `composer install`.
 4. Navigate to your site/install. IE: http://set.company.com/install or http://localhost/security-employee-tracker/public/install
 5. Follow the on screen prompts. Update your .env file as needed.
-6. Recommended/Optional: From SSH, execute `php artisan generate:key` - while you already have a secure encryption key, if you wish to have one unique to you (heightened security), then run this.
+6. Create a cron job/scheduled task: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1` (artisan is located in the application root directory.)
+7. Recommended/Optional: From SSH, execute `php artisan generate:key` - while you already have a secure encryption key, if you wish to have one unique to you (heightened security), then run this.
 
 ## Updating
 
@@ -53,7 +54,17 @@ To view all the various options including cache, database, settings, email, etc.
 **Using LDAP**
 
 * `config/adldap.php` - input your ldap credentials. This file should have enough comments to help you.
-* `config/auth.php` - look for the array guards => web => providers and change the value on line 39 to `adldap`.
+* Insert a new auth driver inside your `config/auth.php` file:
+
+    ```php
+    'providers' => [
+        'users' => [
+            'driver' => 'adldap', // Was 'eloquent'.
+            'model'  => App\User::class,
+        ],
+    ],
+    ```
+* For more customizing options, visit: https://github.com/Adldap2/Adldap2-Laravel
 
 **Hard coding Admins**
 

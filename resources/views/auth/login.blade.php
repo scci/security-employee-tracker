@@ -13,19 +13,17 @@
             <form method="POST" action="{{ url('/login') }}" class="form-signin">
                 {!! csrf_field() !!}
 
-                <span id="reauth-email" class="reauth-email"></span>
-
                 <div class="input-field">
-                    <label for="inputEmail">Windows Login</label>
-                    <input type="text" id="inputEmail" name="username" class="validate" required>
+                    <label for="username">Windows Login</label>
+                    <input type="text" id="username" name="username" class="validate" required>
                 </div>
                 <div class="input-field">
-                    <label for="inputPassword">Password</label>
-                    <input type="password" name="password" id="inputPassword" class="validate" required>
+                    <label for="password">Password</label>
+                    <input type="password" name="password" id="password" class="validate" required>
                 </div>
                 <button class="btn" type="submit">Sign in</button>
 
-                @if(config('auth.guards.web.provider') != 'adldap')
+                @if(config('auth.providers.users.driver') != 'adldap')
                     &nbsp; <small><a href="{{ url('/password/reset') }}">
                         Forgot Your Password?
                     </a></small>

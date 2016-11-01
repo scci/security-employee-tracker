@@ -15,7 +15,7 @@
         "php": ">=5.6.4",
         "laravel/framework": "5.3.*",
         "laravelcollective/html": "5.3.*",
-        "adldap2/adldap2-laravel": "~2.1",
+        "adldap2/adldap2-laravel": "2.1.*",
         "maatwebsite/excel": "~2.0",
         "edvinaskrucas/notification": "5.*",
         "predis/predis": "~1.0",
