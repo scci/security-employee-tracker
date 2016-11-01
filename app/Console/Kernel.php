@@ -4,12 +4,12 @@ namespace SET\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use \SET\Console\Commands\RenewTraining;
-use \SET\Console\Commands\SendReminders;
-use \SET\Console\Commands\UpdateDuty;
-use \SET\Console\Commands\ProcessMonday;
-use \SET\Console\Commands\DeleteSeparatedAndDestroyedUsers;
-use \SET\Console\Commands\SendNews;
+use SET\Console\Commands\DeleteSeparatedAndDestroyedUsers;
+use SET\Console\Commands\ProcessMonday;
+use SET\Console\Commands\RenewTraining;
+use SET\Console\Commands\SendNews;
+use SET\Console\Commands\SendReminders;
+use SET\Console\Commands\UpdateDuty;
 
 class Kernel extends ConsoleKernel
 {
@@ -24,13 +24,14 @@ class Kernel extends ConsoleKernel
         UpdateDuty::class,
         ProcessMonday::class,
         DeleteSeparatedAndDestroyedUsers::class,
-        SendNews::class
+        SendNews::class,
     ];
 
     /**
      * Define the application's command schedule.
      *
-     * @param  \Illuminate\Console\Scheduling\Schedule  $schedule
+     * @param \Illuminate\Console\Scheduling\Schedule $schedule
+     *
      * @return void
      */
     protected function schedule(Schedule $schedule)

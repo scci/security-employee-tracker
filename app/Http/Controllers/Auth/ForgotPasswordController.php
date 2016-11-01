@@ -1,7 +1,10 @@
 <?php
+
 namespace SET\Http\Controllers\Auth;
-use SET\Http\Controllers\Controller;
+
 use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use SET\Http\Controllers\Controller;
+
 class ForgotPasswordController extends Controller
 {
     /*
@@ -15,9 +18,9 @@ class ForgotPasswordController extends Controller
     |
     */
     use SendsPasswordResetEmails;
+
     /**
      * Create a new controller instance.
-     *
      */
     public function __construct()
     {

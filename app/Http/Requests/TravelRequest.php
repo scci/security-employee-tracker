@@ -4,7 +4,6 @@ namespace SET\Http\Requests;
 
 class TravelRequest extends Request
 {
-
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -14,7 +13,7 @@ class TravelRequest extends Request
     {
         return true;
     }
-	
+
     /**
      * Get the validation rules that apply to the request.
      *
@@ -23,9 +22,9 @@ class TravelRequest extends Request
     public function rules()
     {
         return [
-            'location' => 'required',
-            'leave_date' => 'required',
-            'return_date' => 'required|after:leave_date'
+            'location'    => 'required',
+            'leave_date'  => 'required',
+            'return_date' => 'required|after:leave_date',
         ];
     }
 }

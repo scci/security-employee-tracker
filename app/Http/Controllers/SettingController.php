@@ -3,7 +3,6 @@
 namespace SET\Http\Controllers;
 
 use Illuminate\Http\Request;
-
 use Illuminate\Support\Facades\Config;
 use SET\Setting;
 use SET\User;
@@ -35,7 +34,8 @@ class SettingController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param \Illuminate\Http\Request $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request)
@@ -53,8 +53,8 @@ class SettingController extends Controller
         }
 
         Setting::where('name', 'report_address')->update([
-            'primary' => $data['report_address-primary'],
-            'secondary' => $data['report_address-secondary']
+            'primary'   => $data['report_address-primary'],
+            'secondary' => $data['report_address-secondary'],
         ]);
 
         return redirect()->action('SettingController@index');

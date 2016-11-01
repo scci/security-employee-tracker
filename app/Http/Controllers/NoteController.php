@@ -1,18 +1,19 @@
-<?php namespace SET\Http\Controllers;
+<?php
+
+namespace SET\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Storage;
 use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
-use SET\Http\Requests\UpdateNoteRequest;
 use SET\Http\Requests\StoreNoteRequest;
+use SET\Http\Requests\UpdateNoteRequest;
 use SET\Note;
 use SET\User;
-use Illuminate\Support\Facades\Storage;
 
 class NoteController extends Controller
 {
-
     public function create(User $user)
     {
         return view('note.create', compact('user'));
@@ -37,9 +38,9 @@ class NoteController extends Controller
     public function edit(User $user, $noteID)
     {
         $note = Note::findOrFail($noteID);
+
         return view('note.edit', compact('user', 'note'));
     }
-
 
     public function update(UpdateNoteRequest $request, $userID, $noteId)
     {
@@ -57,12 +58,10 @@ class NoteController extends Controller
         return redirect()->action('UserController@show', $userID);
     }
 
-
     public function destroy($userID, $noteId)
     {
-        
         Note::find($noteId)->delete();
-        Storage::deleteDirectory('note_' . $noteId);
+        Storage::deleteDirectory('note_'.$noteId);
 
         return back();
     }

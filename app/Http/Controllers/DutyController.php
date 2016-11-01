@@ -13,6 +13,7 @@ class DutyController extends Controller
     public function index()
     {
         $duties = Duty::all();
+
         return view('duty.index', compact('duties'));
     }
 
@@ -22,6 +23,7 @@ class DutyController extends Controller
 
         $users = User::active()->skipSystem()->get()->sortBy('userFullName')->pluck('userFullName', 'id');
         $groups = Group::all()->pluck('name', 'id');
+
         return view('duty.create', compact('users', 'groups'));
     }
 
@@ -29,11 +31,11 @@ class DutyController extends Controller
     {
         $data = $request->all();
         $duty = Duty::create($data);
-        
+
         isset($data['groups'])
             ? $duty->groups()->attach($data['groups'])
             : $duty->users()->attach($data['users']);
-        
+
         return redirect()->action('DutyController@index');
     }
 
@@ -65,17 +67,18 @@ class DutyController extends Controller
         isset($data['groups'])
             ? $duty->groups()->sync($data['groups'])
             : $duty->users()->sync($data['users']);
-        
+
         return redirect()->action('DutyController@index');
     }
 
     public function destroy(Duty $duty)
     {
         $this->authorize('edit');
-        
+
         $duty->has_groups ? $duty->groups()->detach() : $duty->users()->detach();
 
         $duty->delete();
+
         return redirect()->action('DutyController@index');
     }
 }

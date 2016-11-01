@@ -1,13 +1,13 @@
 <?php
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\User;
-use SET\Training;
-use SET\Visit;
 use Carbon\Carbon;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
+use SET\Training;
+use SET\User;
+use SET\Visit;
 
 /**
- * Class ActionItemsTest
+ * Class ActionItemsTest.
  *
  * Runs tests against app/Http/ViewComposers/ActionItemsComposer.php file.
  * This is displayed on the left column for admin users.
@@ -47,33 +47,31 @@ class ActionItemsTest extends TestCase
         $this->visit('duty')
             ->see($visitOne->smo_code)
             ->dontSee($visitTwo->smo_code);
-
     }
 
     /** @test */
     public function it_lists_users_whose_clearance_is_about_to_expire()
     {
-
         $topSecretUser = factory(User::class)->create([
             'clearance' => 'TS',
-            'elig_date' => Carbon::today()->subYears(2)->format('Y-m-d')
+            'elig_date' => Carbon::today()->subYears(2)->format('Y-m-d'),
         ]);
         $secretUser = factory(User::class)->create([
             'clearance' => 'S',
-            'elig_date' => Carbon::today()->subYears(8)->format('Y-m-d')
+            'elig_date' => Carbon::today()->subYears(8)->format('Y-m-d'),
         ]);
         $expiringTopSecretUser = factory(User::class)->create([
             'clearance' => 'TS',
-            'elig_date' => Carbon::today()->subYears(5)->format('Y-m-d')
+            'elig_date' => Carbon::today()->subYears(5)->format('Y-m-d'),
         ]);
         $expiringSecretUser = factory(User::class)->create([
             'clearance' => 'S',
-            'elig_date' => Carbon::today()->subYears(10)->format('Y-m-d')
+            'elig_date' => Carbon::today()->subYears(10)->format('Y-m-d'),
         ]);
         $secretAccessLevelUser = factory(User::class)->create([
-            'clearance' => 'TS',
+            'clearance'    => 'TS',
             'access_level' => 'S',
-            'elig_date' => Carbon::today()->subYears(6)->format('Y-m-d')
+            'elig_date'    => Carbon::today()->subYears(6)->format('Y-m-d'),
         ]);
 
         $this->visit('duty')
@@ -82,7 +80,5 @@ class ActionItemsTest extends TestCase
             ->dontSee($topSecretUser->userFullName)
             ->dontSee($secretUser->userFullName)
             ->dontSee($secretAccessLevelUser->userFullName);
-
     }
-
 }

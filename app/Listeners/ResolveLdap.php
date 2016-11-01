@@ -3,27 +3,24 @@
 namespace SET\Listeners;
 
 use Adldap\Laravel\Facades\Adldap;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Config;
 use SET\User;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 class ResolveLdap implements ShouldQueue
 {
-
     private $ldapUsers;
 
     /**
-     * Build the event handler
+     * Build the event handler.
      */
     public function __construct()
     {
         //
     }
 
-
     /**
      * Call to add missing users.
-     *
      */
     public function handle()
     {
@@ -52,8 +49,7 @@ class ResolveLdap implements ShouldQueue
     }
 
     /**
-     * Gets an array of current ldap users in Austin
-     *
+     * Gets an array of current ldap users in Austin.
      */
     private function ldapList()
     {
@@ -79,25 +75,22 @@ class ResolveLdap implements ShouldQueue
 
     /**
      * Takes our ldap list and kicks anyone in our rejected list or records that are not a person.
-     *
      */
     private function actualUsers()
     {
         for ($i = count($this->ldapUsers) - 1; $i >= 0; $i--) {
-            if (count($this->ldapUsers[$i]["samaccountname"]) == 0 ||
-                count($this->ldapUsers[$i]["sn"]) == 0 ||
-                count($this->ldapUsers[$i]["givenname"]) == 0 ||
-                count($this->ldapUsers[$i]["mail"]) == 0
+            if (count($this->ldapUsers[$i]['samaccountname']) == 0 ||
+                count($this->ldapUsers[$i]['sn']) == 0 ||
+                count($this->ldapUsers[$i]['givenname']) == 0 ||
+                count($this->ldapUsers[$i]['mail']) == 0
             ) {
                 unset($this->ldapUsers[$i]);
             }
         }
-
     }
 
     /**
      * Takes our ldap list and simplify with with just the username, first/last name, phone and email.
-     *
      */
     private function simplifyList()
     {

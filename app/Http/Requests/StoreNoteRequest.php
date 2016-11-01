@@ -5,8 +5,7 @@ namespace SET\Http\Requests;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * Class StoreNoteRequest
- * @package SET\Http\Requests
+ * Class StoreNoteRequest.
  */
 class StoreNoteRequest extends Request
 {

@@ -1,12 +1,11 @@
 <?php
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Contracts\Console\Kernel;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\User;
 
 class TestCase extends Illuminate\Foundation\Testing\TestCase
 {
-
     use DatabaseTransactions;
     /**
      * The base URL to use while testing the application.
@@ -33,7 +32,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
     public function signIn($user = null)
     {
-        if (! $user) {
+        if (!$user) {
             $user = factory(User::class)->create(['role' => 'edit']);
         }
 

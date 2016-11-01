@@ -2,10 +2,10 @@
 
 namespace SET\Mail;
 
-use SET\News;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
+use SET\News;
 
 class SendNewsEmail extends Mailable
 {
@@ -13,9 +13,9 @@ class SendNewsEmail extends Mailable
 
     public $news;
 
-
     /**
      * SendNewsEmail constructor.
+     *
      * @param News $news
      */
     public function __construct(News $news)
@@ -32,12 +32,13 @@ class SendNewsEmail extends Mailable
     {
         $mailer = $this->view('emails.published_news')
                 ->subject($this->news->title);
-        
+
         //ATTACH FILES
         foreach ($this->news->attachments as $file) {
-            $path = 'app/news_' . $file->imageable_id . '/' . $file->filename;
+            $path = 'app/news_'.$file->imageable_id.'/'.$file->filename;
             $mailer->attach(storage_path($path), ['as' => $file->filename, 'mime' => $file->mime]);
         }
+
         return $mailer;
     }
 }

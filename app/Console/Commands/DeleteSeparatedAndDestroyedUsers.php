@@ -47,6 +47,7 @@ class DeleteSeparatedAndDestroyedUsers extends Command
 
     /**
      * Return list of users who were destroyed.
+     *
      * @return Collection
      */
     public function getDestroyed()
@@ -56,14 +57,14 @@ class DeleteSeparatedAndDestroyedUsers extends Command
 
     public function setDestroyed()
     {
-        $deadmanList = User::where(function($q) {
-                $q->where('status', 'separated')->orWhere('status', 'destroyed');
-            })
+        $deadmanList = User::where(function ($q) {
+            $q->where('status', 'separated')->orWhere('status', 'destroyed');
+        })
             ->whereBetween('destroyed_date', [Carbon::today(), Carbon::today()->addDays(6)])
             ->get();
 
         foreach ($deadmanList as $user) {
-            Storage::deleteDirectory('user_' . $user->id);
+            Storage::deleteDirectory('user_'.$user->id);
             $user->delete();
         }
 

@@ -9,7 +9,6 @@ use Maatwebsite\Excel\Files\ExcelFile;
 
 class JpasImport extends ExcelFile
 {
-
     public function getFile()
     {
         //If we pass a filepath, use it and get out
@@ -23,13 +22,13 @@ class JpasImport extends ExcelFile
 
         $storagePath = Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix();
 
-        return $storagePath . $fileName;
+        return $storagePath.$fileName;
     }
 
     public function getFilters()
     {
         return [
-            'chunk'
+            'chunk',
         ];
     }
 }

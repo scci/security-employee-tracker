@@ -17,7 +17,7 @@ class Log extends Model
     /**
      * @var array
      */
-    protected $fillable = array('comment', 'author_id', 'user_id', 'created_at', 'updated_at');
+    protected $fillable = ['comment', 'author_id', 'user_id', 'created_at', 'updated_at'];
 
     public function user()
     {

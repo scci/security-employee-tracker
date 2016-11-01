@@ -10,7 +10,6 @@ class TrainingAssigned extends Event
 
     private $trainingUser;
 
-
     /**
      * Builds our trainingAssigned Class.
      *

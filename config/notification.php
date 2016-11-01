@@ -1,6 +1,6 @@
 <?php
 
-return array(
+return [
 
     /*
     |--------------------------------------------------------------------------
@@ -30,7 +30,7 @@ return array(
     | These types will be added for new containers.
     |
     */
-    'default_types'                         => array('info', 'success', 'warning', 'error'),
+    'default_types'                         => ['info', 'success', 'warning', 'error'],
 
     /*
     |--------------------------------------------------------------------------
@@ -40,7 +40,7 @@ return array(
     | Specify available types for each container separately.
     |
     */
-    'types'                                 => array(),
+    'types'                                 => [],
 
     /*
     |--------------------------------------------------------------------------
@@ -74,7 +74,7 @@ return array(
     | :message - message text.
     |
     */
-    'format'                                => array(),
+    'format'                                => [],
 
     /*
     |--------------------------------------------------------------------------
@@ -88,12 +88,12 @@ return array(
     | :message - message text.
     |
     */
-    'default_formats'                       => array(
+    'default_formats'                       => [
         'info'                  => '<div class="card-panel light-blue accent-1">:message</div>',
         'success'               => '<script>Materialize.toast(\':message\', 4000)</script>',
         'warning'               => '<div class="card-panel yellow accent-1">:message</div>',
         'error'                 => '<div class="card-panel red accent-2">:message</div>',
-    ),
+    ],
 
     /*
     |--------------------------------------------------------------------------
@@ -115,6 +115,6 @@ return array(
     | :message - message text.
     |
     */
-    'formats'                       => array(),
+    'formats'                       => [],
 
-);
+];

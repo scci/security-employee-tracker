@@ -3,9 +3,9 @@
 namespace SET\Providers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\ServiceProvider;
 use SET\Log;
 use SET\User;
-use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         // If the save() function is used on the User model, we will generate a new log note.
-        User::updating(function($user) {
+        User::updating(function ($user) {
             $this->createUserLog($user);
         });
     }
@@ -39,13 +39,14 @@ class AppServiceProvider extends ServiceProvider
      * and creates a new note for the change being made.
      *
      * @param $user
+     *
      * @return bool
      */
     private function createUserLog($user)
     {
         $ignoreList = ['password', 'last_logon', 'remember_token'];
 
-        $log = array();
+        $log = [];
         $log['comment'] = '';
         if ($user->isDirty()) {
             $log = $this->buildLogComment($user, $ignoreList, $log);
@@ -56,6 +57,7 @@ class AppServiceProvider extends ServiceProvider
                 Log::create($log);
             }
         }
+
         return true;
     }
 
@@ -69,9 +71,10 @@ class AppServiceProvider extends ServiceProvider
         foreach ($user->getDirty() as $key => $value) {
             $original = $user->getOriginal($key);
             if (!in_array($key, $ignoreList) && !$this->nullToEmptyString($original, $value)) {
-                $log['comment'] .= ucfirst($key) . " changed from '" . $original . "' to '" . $value . "'.\n";
+                $log['comment'] .= ucfirst($key)." changed from '".$original."' to '".$value."'.\n";
             }
         }
+
         return $log;
     }
 

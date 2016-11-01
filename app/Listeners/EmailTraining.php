@@ -3,13 +3,12 @@
 namespace SET\Listeners;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use SET\Events\TrainingAssigned;
-use Illuminate\Contracts\Queue\ShouldQueue;
 
 /**
- * Class EmailTraining
- * @package SET\Listeners
+ * Class EmailTraining.
  */
 class EmailTraining implements ShouldQueue
 {
@@ -24,7 +23,8 @@ class EmailTraining implements ShouldQueue
     /**
      * Email the employee about the training. Then return a notification to the user that an email was sent.
      *
-     * @param  TrainingAssigned $event
+     * @param TrainingAssigned $event
+     *
      * @return void
      */
     public function handle(TrainingAssigned $event)
@@ -41,6 +41,7 @@ class EmailTraining implements ShouldQueue
 
     /**
      * @param $due_date
+     *
      * @return mixed
      */
     private function makeDueDatePretty($due_date)
@@ -59,12 +60,12 @@ class EmailTraining implements ShouldQueue
         Mail::send(
             'emails.training',
             ['user' => $user, 'training' => $training, 'due_date' => $dueDate, 'trainingUser' => $trainingUser],
-            function($m) use ($user, $training) {
-                $m->to($user->email, $user->userFullName)->subject($training->name . " was assigned to you.");
+            function ($m) use ($user, $training) {
+                $m->to($user->email, $user->userFullName)->subject($training->name.' was assigned to you.');
 
                 //ATTACH FILES
                 foreach ($training->attachments as $file) {
-                    $path = 'app/training_' . $file->imageable_id . '/' . $file->filename;
+                    $path = 'app/training_'.$file->imageable_id.'/'.$file->filename;
                     $m->attach(storage_path($path), ['as' => $file->filename, 'mime' => $file->mime]);
                 }
             } // end $m function

@@ -2,24 +2,22 @@
 
 namespace SET\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Input;
 use SET\Events\TrainingAssigned;
-use Carbon\Carbon;
 use SET\Group;
+use SET\Http\Requests\GroupRequest;
+use SET\Training;
 use SET\TrainingUser;
 use SET\User;
-use SET\Training;
-use SET\Http\Requests\GroupRequest;
-use Illuminate\Support\Facades\Event;
 
 /**
- * Class GroupController
- * @package SET\Http\Controllers
+ * Class GroupController.
  */
 class GroupController extends Controller
 {
-
     /**
      * Display a listing of the resource.
      *
@@ -30,10 +28,10 @@ class GroupController extends Controller
         $this->authorize('view');
 
         $groups = Group::with([
-            'users' => function($q) {
+            'users' => function ($q) {
                 $q->orderBy('last_name');
             },
-            'trainings'
+            'trainings',
         ])->get()->sortBy('name');
 
         return view('group.index', compact('groups'));
@@ -52,6 +50,7 @@ class GroupController extends Controller
 
     /**
      * @param GroupRequest $request
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(GroupRequest $request)
@@ -81,6 +80,7 @@ class GroupController extends Controller
     /**
      * @param GroupRequest $request
      * @param $groupId
+     *
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(GroupRequest $request, $groupId)
@@ -100,7 +100,8 @@ class GroupController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  int $groupId
+     * @param int $groupId
+     *
      * @return \Illuminate\Http\Response
      */
     public function destroy($groupId)
@@ -119,10 +120,10 @@ class GroupController extends Controller
     {
         $request = Input::all();
         if (empty($request['groups'])) {
-            return "nothing sent.";
+            return 'nothing sent.';
         }
 
-        return User::whereHas('groups', function($query) use ($request) {
+        return User::whereHas('groups', function ($query) use ($request) {
             $query->whereIn('id', $request['groups']);
         })->pluck('id');
     }
@@ -145,11 +146,11 @@ class GroupController extends Controller
 
         //We need to take the group and get all the training records so we can assign them to users.
         $groupList = $group->trainings()->get();
-        $data = array(
+        $data = [
             'author_id' => Auth::user()->id,
-            'type' => 'training',
-            'due_date' => Carbon::now()->AddWeeks(2)->format('Y-m-d')
-        );
+            'type'      => 'training',
+            'due_date'  => Carbon::now()->AddWeeks(2)->format('Y-m-d'),
+        ];
 
         // Cycle through each user & figure what training they are missing.
         foreach ($users as $userID) {

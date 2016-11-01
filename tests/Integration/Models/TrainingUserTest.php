@@ -6,6 +6,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class TrainingUserTest extends TestCase
 {
     use DatabaseTransactions;
+
     /** @test */
     public function it_can_get_all_records_with_active_users()
     {
@@ -24,12 +25,11 @@ class TrainingUserTest extends TestCase
     public function it_sets_values_to_null_if_empty_string_is_passed()
     {
         $note = factory(SET\TrainingUser::class)->create([
-            'due_date' => '',
-            'completed_date' => ''
+            'due_date'       => '',
+            'completed_date' => '',
         ]);
 
         $this->assertNull($note->due_date);
         $this->assertNull($note->completed_date);
-
     }
 }

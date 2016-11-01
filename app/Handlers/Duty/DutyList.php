@@ -8,7 +8,7 @@ use SET\DutySwap;
 class DutyList
 {
     private $duty;
-    
+
     public function __construct($duty)
     {
         if (is_int($duty)) {
@@ -21,7 +21,7 @@ class DutyList
     {
         return $this->processedList()->HTMLOutput();
     }
-    
+
     public function scheduledUpdate()
     {
         //build the list and write into the database the next record.
@@ -33,13 +33,13 @@ class DutyList
     public function emailOutput()
     {
         $userGroup = $this->processedList();
+
         return $userGroup->emailOutput();
     }
 
-
     /**
-     * @param array $dateArray
-     * @param array $IDArray
+     * @param array  $dateArray
+     * @param array  $IDArray
      * @param string $type
      */
     public function processSwapRequest(array $dateArray, array $IDArray, $type)
@@ -75,10 +75,10 @@ class DutyList
     private function createDutySwap($date, $ID, $type)
     {
         DutySwap::create([
-            'imageable_id' => $ID,
+            'imageable_id'   => $ID,
             'imageable_type' => $type,
-            'duty_id' => $this->duty->id,
-            'date' => $date
+            'duty_id'        => $this->duty->id,
+            'date'           => $date,
         ]);
     }
 }

@@ -6,18 +6,14 @@ use Carbon\Carbon;
 use SET\Duty;
 
 /**
- * Class DutyBase
- * @package SET\Handlers\Duty
- *
- * Please refer to DutyGroups and DutyUsers.
- * Just implementing DRY principles by pulling out functions present in both classes.
+ * Class DutyBase.
  */
 class DutyHelper
 {
     public $list;
     public $lastWorked = null;
     public $duty;
-    
+
     public function __construct(Duty $duty)
     {
         $this->duty = $duty;
@@ -70,6 +66,7 @@ class DutyHelper
                 $this->list->push($this->list->shift());
             }
         }
+
         return $this;
     }
 }

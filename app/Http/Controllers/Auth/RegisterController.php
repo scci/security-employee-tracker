@@ -1,9 +1,12 @@
 <?php
+
 namespace SET\Http\Controllers\Auth;
+
+use Illuminate\Foundation\Auth\RegistersUsers;
+use SET\Http\Controllers\Controller;
 use SET\User;
 use Validator;
-use SET\Http\Controllers\Controller;
-use Illuminate\Foundation\Auth\RegistersUsers;
+
 class RegisterController extends Controller
 {
     /*
@@ -23,44 +26,48 @@ class RegisterController extends Controller
      * @var string
      */
     protected $redirectTo = '/';
+
     /**
      * Create a new controller instance.
-     *
      */
     public function __construct()
     {
         $this->middleware('guest');
     }
+
     /**
      * Get a validator for an incoming registration request.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return \Illuminate\Contracts\Validation\Validator
      */
     protected function validator(array $data)
     {
         return Validator::make($data, [
             'first_name' => 'required|max:255',
-            'last_name' => 'required|max:255',
-            'username' => 'required|max:255|unique:users',
-            'email' => 'required|max:255|email|unique:users',
-            'phone' => 'max:255'
+            'last_name'  => 'required|max:255',
+            'username'   => 'required|max:255|unique:users',
+            'email'      => 'required|max:255|email|unique:users',
+            'phone'      => 'max:255',
         ]);
     }
+
     /**
      * Create a new user instance after a valid registration.
      *
-     * @param  array  $data
+     * @param array $data
+     *
      * @return User
      */
     protected function create(array $data)
     {
         return User::create([
             'first_name' => $data['first_name'],
-            'last_name' => $data['last_name'],
-            'username' => $data['username'],
-            'email' => $data['email'],
-            'phone' => $data['phone']
+            'last_name'  => $data['last_name'],
+            'username'   => $data['username'],
+            'email'      => $data['email'],
+            'phone'      => $data['phone'],
         ]);
     }
 }

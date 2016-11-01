@@ -1,21 +1,19 @@
 <?php
+
 namespace SET\Handlers\Excel;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
+use Maatwebsite\Excel\Files\ImportHandler;
 use SET\User;
-use \Maatwebsite\Excel\Files\ImportHandler;
 
 /**
- * Class JpasImportHandler
+ * Class JpasImportHandler.
  *
  * Going to handle importing our JPAS excel file.
- *
- * @package SET\Handlers
  */
 class JpasImportHandler implements ImportHandler
 {
-
     private $unique;
     private $changes;
 
@@ -33,6 +31,7 @@ class JpasImportHandler implements ImportHandler
      * Based on what we get, we will either call an initial import or the resolve import.
      *
      * @param $import
+     *
      * @return array
      */
     public function handle($import)
@@ -48,7 +47,7 @@ class JpasImportHandler implements ImportHandler
         }
 
         //Return this data. It is just used for the initial import, but still nice to see.
-        return array('unique' => $this->unique, 'changes' => $this->changes);
+        return ['unique' => $this->unique, 'changes' => $this->changes];
     }
 
     /**
@@ -84,8 +83,7 @@ class JpasImportHandler implements ImportHandler
         foreach ($data as $jpasName => $userGroup) {
             if ($jpasName == 'approve') {
                 $this->updateUserData($userGroup);
-
-            } else if ($userGroup != '' && is_numeric($userGroup)) {
+            } elseif ($userGroup != '' && is_numeric($userGroup)) {
                 $this->importNewData($excel, $userGroup, $jpasName);
             }
         }
@@ -101,10 +99,10 @@ class JpasImportHandler implements ImportHandler
         if ($user->isDirty()) {
             foreach ($user->getDirty() as $attribute => $newValue) {
                 $this->changes->push([
-                    'user' => $user,
-                    'field' => $attribute,
+                    'user'     => $user,
+                    'field'    => $attribute,
                     'original' => $user->getOriginal($attribute),
-                    'new' => $newValue
+                    'new'      => $newValue,
                 ]);
             }
         }
@@ -127,7 +125,6 @@ class JpasImportHandler implements ImportHandler
             $user->save();
             $this->changes->push($log);
         }
-
     }
 
     /**
@@ -167,13 +164,13 @@ class JpasImportHandler implements ImportHandler
         }
 
         //Otherwise store null for the date.
-        return null;
     }
 
     /**
      * @param $excel
      * @param $userGroup
      * @param $jpasName
+     *
      * @return mixed
      */
     private function importNewData($excel, $userGroup, $jpasName)
@@ -195,7 +192,7 @@ class JpasImportHandler implements ImportHandler
         foreach ($userGroup as $userId => $changesGroup) {
             $user = User::find($userId);
             foreach ($changesGroup as $field => $newValue) {
-                if ($newValue != "0") {
+                if ($newValue != '0') {
                     $user[$field] = $newValue;
                 }
             }

@@ -3,17 +3,16 @@
 namespace SET\Handlers\Duty;
 
 use Carbon\Carbon;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\Gate;
 use SET\Duty;
 use SET\DutySwap;
 
 class DutyGroups extends DutyHelper
 {
-
     public function __construct(Duty $duty)
     {
-        parent::__construct($duty); ;
+        parent::__construct($duty);
     }
 
     public function HTMLOutput()
@@ -21,13 +20,12 @@ class DutyGroups extends DutyHelper
         $newCollection = new Collection();
 
         foreach ($this->list as $entry) {
-
             $row = $this->buildHTMLUserRow($entry);
 
             $newCollection->push([
-                'row' => $row,
-                'id' => $entry['id'],
-                'date' => $entry['date']
+                'row'  => $row,
+                'id'   => $entry['id'],
+                'date' => $entry['date'],
             ]);
         }
 
@@ -36,10 +34,10 @@ class DutyGroups extends DutyHelper
 
     public function emailOutput()
     {
-        $collection = $this->list->map(function($value) {
+        $collection = $this->list->map(function ($value) {
             return [
                 'users' => $value['group'],
-                'date' => $value['date']
+                'date'  => $value['date'],
             ];
         });
 
@@ -55,13 +53,14 @@ class DutyGroups extends DutyHelper
     public function getLastWorked()
     {
         $this->lastWorked = $this->duty->groups()->orderBy('duty_group.last_worked', 'DESC')->first();
+
         return $this;
     }
 
     public function queryList()
     {
-
         $this->list = $this->duty->groups()->orderBy('name')->get();
+
         return $this;
     }
 
@@ -71,16 +70,16 @@ class DutyGroups extends DutyHelper
         $newList = new Collection();
         $count = $this->list->count();
 
-        for ($i = 0; $i < $count; $i++)
-        {
+        for ($i = 0; $i < $count; $i++) {
             $newList->push([
-                'date' => $dates[$i],
+                'date'  => $dates[$i],
                 'group' => $this->list[$i]->users()->get(),
-                'id'   => $this->list[$i]->id,
+                'id'    => $this->list[$i]->id,
             ]);
         }
 
         $this->list = $newList;
+
         return $this;
     }
 
@@ -92,15 +91,13 @@ class DutyGroups extends DutyHelper
             ->orderBy('date', 'ASC')
             ->get();
 
-        foreach ($dutySwaps as $swap)
-        {
-            foreach ($this->list as $key => $entry)
-            {
+        foreach ($dutySwaps as $swap) {
+            foreach ($this->list as $key => $entry) {
                 if ($swap->date == $entry['date']) {
                     $this->list[$key] = [
                         'group' => $swap->imageable()->first()->users()->get(),
-                        'id'   => $swap->imageable()->first()->id,
-                        'date' => $entry['date']
+                        'id'    => $swap->imageable()->first()->id,
+                        'date'  => $entry['date'],
                     ];
                 }
             }
@@ -109,6 +106,7 @@ class DutyGroups extends DutyHelper
 
     /**
      * @param $entry
+     *
      * @return string
      */
     private function buildHTMLUserRow($entry)
@@ -116,12 +114,13 @@ class DutyGroups extends DutyHelper
         $row = '';
         foreach ($entry['group'] as $user) {
             if (Gate::allows('view')) {
-                $row .= "<a href='" . url('user', $user->id) . "'>" . $user->userFullName . "</a> & ";
+                $row .= "<a href='".url('user', $user->id)."'>".$user->userFullName.'</a> & ';
             } else {
-                $row .= $user->userFullName . " & ";
+                $row .= $user->userFullName.' & ';
             }
         }
         $row = rtrim($row, '& ');
+
         return $row;
     }
 }

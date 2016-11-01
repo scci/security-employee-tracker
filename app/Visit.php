@@ -17,7 +17,7 @@ class Visit extends Model
     /**
      * @var array
      */
-    protected $fillable = array('smo_code', 'poc', 'phone', 'comment', 'visit_date', 'expiration_date', 'author_id', 'user_id');
+    protected $fillable = ['smo_code', 'poc', 'phone', 'comment', 'visit_date', 'expiration_date', 'author_id', 'user_id'];
 
     public function user()
     {
@@ -34,11 +34,12 @@ class Visit extends Model
      * to return only notes with active users.
      *
      * @param $query
+     *
      * @return mixed
      */
     public function scopeActiveUsers($query)
     {
-        return $query->whereHas('user', function($q) {
+        return $query->whereHas('user', function ($q) {
             $q->where('status', 'active');
         });
     }

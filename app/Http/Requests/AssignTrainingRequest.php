@@ -24,9 +24,9 @@ class AssignTrainingRequest extends Request
     public function rules()
     {
         return [
-            'users' => 'required_without:groups',
-            'groups' => 'required_without:users',
-            'due_date' => 'required'
+            'users'    => 'required_without:groups',
+            'groups'   => 'required_without:users',
+            'due_date' => 'required',
         ];
     }
 }

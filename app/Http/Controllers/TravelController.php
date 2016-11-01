@@ -6,10 +6,10 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
 use Krucas\Notification\Facades\Notification;
-use SET\Http\Requests\TravelRequest;
 use SET\Attachment;
-use SET\User;
+use SET\Http\Requests\TravelRequest;
 use SET\Travel;
+use SET\User;
 
 class TravelController extends Controller
 {
@@ -60,7 +60,7 @@ class TravelController extends Controller
     public function destroy($userID, $travelID)
     {
         Travel::findOrFail($travelID)->delete();
-        Storage::deleteDirectory('travel_' . $travelID);
+        Storage::deleteDirectory('travel_'.$travelID);
 
         return Redirect::back();
     }

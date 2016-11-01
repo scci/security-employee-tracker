@@ -25,8 +25,8 @@ class StoreUserRequest extends Request
     {
         return [
             'first_name' => 'required',
-            'last_name' => 'required',
-            'email' => 'required|email|unique:users,email',
+            'last_name'  => 'required',
+            'email'      => 'required|email|unique:users,email',
         ];
     }
 }

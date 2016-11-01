@@ -2,18 +2,17 @@
 
 namespace SET\Console\Commands;
 
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Mail;
-use SET\TrainingUser;
 use Carbon\Carbon;
-use SET\Events\TrainingAssigned;
 use Illuminate\Console\Command;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Mail;
+use SET\Events\TrainingAssigned;
+use SET\TrainingUser;
 use SET\Visit;
 
 /**
- * Class SendReminders
- * @package SET\Console\Commands
+ * Class SendReminders.
  */
 class SendReminders extends Command
 {
@@ -56,7 +55,6 @@ class SendReminders extends Command
         }
 
         $this->emailSupervisor();
-
     }
 
     /**
@@ -67,22 +65,20 @@ class SendReminders extends Command
         $supervisors = $this->getSupervisors();
 
         foreach ($supervisors as $supervisor) {
-
             $newNotes = new Collection();
 
-            $this->trainingUsers->each(function($item) use ($supervisor, $newNotes) {
+            $this->trainingUsers->each(function ($item) use ($supervisor, $newNotes) {
                 if ($item->user->supervisor_id == $supervisor->id) {
                     $newNotes->push($item);
                 }
             });
 
             if (!$newNotes->isEmpty()) {
-                Mail::send('emails.supervisor_reminder', ['notes' => $newNotes], function($m) use ($supervisor) {
+                Mail::send('emails.supervisor_reminder', ['notes' => $newNotes], function ($m) use ($supervisor) {
                     $m->to($supervisor->email, $supervisor->userFullName)
-                        ->subject($supervisor->email . ' Training that your employees need to complete.');
+                        ->subject($supervisor->email.' Training that your employees need to complete.');
                 });
             }
-
         }
     }
 
@@ -108,7 +104,7 @@ class SendReminders extends Command
     {
         $this->visits = Visit::with('user')
             ->whereBetween('expiration_date', [
-                Carbon::today()->subDay()->toDateString(), Carbon::today()->addWeek()->toDateString()
+                Carbon::today()->subDay()->toDateString(), Carbon::today()->addWeek()->toDateString(),
             ])
             ->activeUsers()
             ->orderBy('expiration_date')
@@ -116,7 +112,8 @@ class SendReminders extends Command
     }
 
     /**
-     * Get our Notes list
+     * Get our Notes list.
+     *
      * @return mixed
      */
     public function gettrainingUsers()
@@ -125,7 +122,8 @@ class SendReminders extends Command
     }
 
     /**
-     * Get our Visits list
+     * Get our Visits list.
+     *
      * @return mixed
      */
     public function getVisits()
@@ -135,6 +133,7 @@ class SendReminders extends Command
 
     /**
      * Take a list of notes and return a list of supervisors related to those notes.
+     *
      * @return Collection
      */
     private function getSupervisors()
@@ -145,6 +144,7 @@ class SendReminders extends Command
                 $supervisors->push($trainingUser->user->supervisor);
             }
         }
+
         return $supervisors->unique();
     }
 }

@@ -1,7 +1,10 @@
 <?php
+
 namespace SET\Http\Controllers\Auth;
-use SET\Http\Controllers\Controller;
+
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use SET\Http\Controllers\Controller;
+
 class ResetPasswordController extends Controller
 {
     /*
@@ -15,9 +18,9 @@ class ResetPasswordController extends Controller
     |
     */
     use ResetsPasswords;
+
     /**
      * Create a new controller instance.
-     *
      */
     public function __construct()
     {

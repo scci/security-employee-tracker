@@ -1,11 +1,11 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use SET\Duty;
 use SET\Group;
 use SET\Handlers\Duty\DutyList;
 use SET\User;
-use SET\Duty;
-use Carbon\Carbon;
 
 class DutyListGroupsTest extends TestCase
 {
@@ -65,5 +65,4 @@ class DutyListGroupsTest extends TestCase
         $this->assertEquals($htmlOne[0]['date'], $htmlTwo[0]['date']);
         $this->assertEquals($htmlOne[1]['date'], $htmlTwo[1]['date']);
     }
-
 }

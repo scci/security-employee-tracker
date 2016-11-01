@@ -6,8 +6,7 @@ use Illuminate\Support\Facades\Gate;
 use SET\Note;
 
 /**
- * Class UpdateNoteRequest
- * @package SET\Http\Requests
+ * Class UpdateNoteRequest.
  */
 class UpdateNoteRequest extends Request
 {
@@ -19,6 +18,7 @@ class UpdateNoteRequest extends Request
     public function authorize()
     {
         $noteID = $this->route('note');
+
         return Gate::allows('update_record', Note::findOrFail($noteID));
     }
 
