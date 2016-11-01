@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Artisan;
 
 class ResolveLdap implements ShouldQueue
 {
-
     /**
      * Build the event handler.
      */
