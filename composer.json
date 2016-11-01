@@ -1,7 +1,7 @@
 {
-    "name": "laravel/laravel",
-    "description": "The Laravel Framework.",
-    "keywords": ["framework", "laravel"],
+    "name": "scci/security-employee-tracker",
+    "description": "Security Employee Tracker",
+    "keywords": ["SET", "laravel", "SCCI", "DOD"],
     "license": "MIT",
     "type": "project",
     "require": {
