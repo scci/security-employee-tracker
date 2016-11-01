@@ -227,15 +227,4 @@ return [
 
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Division Keyword (Optional)
-    |--------------------------------------------------------------------------
-    |
-    | Need to refine your adldap list? If your division has a specific value,
-    | add it here.
-    |
-    */
-    'divisionKeyword' => ''
-
 ];

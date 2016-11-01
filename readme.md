@@ -66,6 +66,8 @@ To view all the various options including cache, database, settings, email, etc.
     ```
 * For more customizing options, visit: https://github.com/Adldap2/Adldap2-Laravel
 
+NOTE: The initial login after setting up ldap will take some time as your users are imported into SET.
+
 **Hard coding Admins**
 
 * `config/auth.php` - line 111, set each username, you may have multiples. 
