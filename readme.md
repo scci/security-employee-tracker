@@ -31,27 +31,30 @@ To view all the various options including cache, database, settings, email, etc.
 ## Installation
 
 1. From SSH, execute `git clone https://github.com/scci/security-employee-tracker.git` in your web root directory.
-2. Set your domain to point to the `public` directory.
-3. From SSH, execute `composer install`.
+2. Set your domain to point to the `security-employee-tracker/public` directory.
+3. From SSH, execute `composer install` from within the `security-employee-tracker` directory.
 4. Navigate to your site/install. IE: http://set.company.com/install or http://localhost/security-employee-tracker/public/install
-5. Follow the on screen prompts. Update your .env file as needed.
+  1. Follow the on screen prompts. 
+  2. Update your .env file as needed.
+  3. Check for required extensions and permissions.
+  4. Perform the database installation (this may take some time).
+  5. Create Admin User.
+  6. Note: Install page will only be available upon initialization.
 6. Create a cron job/scheduled task: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1` (artisan is located in the application root directory.)
-7. Recommended/Optional: From SSH, execute `php artisan generate:key` - while you already have a secure encryption key, if you wish to have one unique to you (heightened security), then run this.
+7. From SSH, execute `php artisan generate:key` to have one unique to you (heightened security).
 
 ## Updating
 
-* Execute `git pull`. 
+* Execute `git pull`.
+* If there was a database update/new migration files, execute `php artisan migrate --force`
 
 ## FAQs
 
-**Error Installing Database**
-
 1. Change the PHP max execution time to a higher value such as 60 seconds.
-2. Set the .env file to `APP_ENV=local` until after the installation is complete.
-3. From SSH, execute `php artisan migrate --force` and then go to your URL/install/user. IE: http://set.company.com/install/user
-4. Review the log contents: /storage/logs/laravel.log
+2. From SSH, execute `php artisan migrate --force` and then go to your URL/install/user. IE: http://set.company.com/install/user
+3. Review the log contents: /storage/logs/laravel.log
 
-**Using LDAP**
+**Using LDAP (After Install)**
 
 * `config/adldap.php` - input your ldap credentials. This file should have enough comments to help you.
 * Insert a new auth driver inside your `config/auth.php` file:
@@ -82,7 +85,7 @@ NOTE: The initial login after setting up ldap will take some time as your users 
 
 ## Tests
 
-You may run tests via executing the following in the application's root folder: `phpunit`
+You may run tests via executing the following in the application's root folder: `phpunit`. While testing, you may place the app in debug move by editing the .env file and setting `APP_DEBUG = true`.
 
 ## Contribute
 
