@@ -44,7 +44,7 @@ $factory->define(SET\Duty::class, function (Faker\Generator $faker) {
 $factory->define(SET\Group::class, function (Faker\Generator $faker) {
     return [
        'name'        => $faker->text(25),
-       'closed_area' => $faker->boolean(25),
+       'closed_area' => 0,
    ];
 });
 
@@ -73,8 +73,8 @@ $factory->define(SET\Note::class, function (Faker\Generator $faker) use ($factor
         'comment'   => $faker->text(),
         'author_id' => $factory->create(SET\User::class)->id,
         'user_id'   => $factory->create(SET\User::class)->id,
-        'alert'     => $faker->boolean(20),
-        'private'   => $faker->boolean(20),
+        'alert'     => 0,
+        'private'   => 0,
     ];
 });
 
