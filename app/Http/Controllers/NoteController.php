@@ -16,12 +16,14 @@ class NoteController extends Controller
 {
     public function create(User $user)
     {
+        $this->authorize('edit');
         return view('note.create', compact('user'));
     }
 
     public function store(StoreNoteRequest $request, User $user)
     {
-        $data = $request->all();
+        $this->authorize('edit');
+        $data = $request->all();        
         $data['author_id'] = Auth::user()->id;
 
         $note = $user->notes()->create($data);
@@ -37,6 +39,8 @@ class NoteController extends Controller
 
     public function edit(User $user, $noteID)
     {
+        $this->authorize('edit');
+        
         $note = Note::findOrFail($noteID);
 
         return view('note.edit', compact('user', 'note'));
@@ -44,6 +48,7 @@ class NoteController extends Controller
 
     public function update(UpdateNoteRequest $request, $userID, $noteId)
     {
+        $this->authorize('edit');
         $note = Note::findOrFail($noteId);
         $note['author_id'] = Auth::user()->id;
         $data = $request->all();
@@ -58,10 +63,12 @@ class NoteController extends Controller
         return redirect()->action('UserController@show', $userID);
     }
 
-    public function destroy($userID, $noteId)
+    public function destroy($userID, Note $note)
     {
-        Note::find($noteId)->delete();
-        Storage::deleteDirectory('note_'.$noteId);
+        $this->authorize('edit');
+        
+        $note->delete();
+        Storage::deleteDirectory('note_'.$note->id);
 
         return back();
     }

@@ -28,7 +28,7 @@ class HomeController extends Controller
         if (Gate::denies('view')) {
             return redirect()->action('UserController@show', Auth::user()->id);
         }
-
+        
         $trainingUser = TrainingUser::with('user', 'training')
             ->where('completed_date', '>=', Carbon::today()->subWeek(1))
             ->orderBy('updated_at', 'DESC')
@@ -48,7 +48,7 @@ class HomeController extends Controller
             'groups' => function ($query) {
                 $query->orderBy('duty_group.last_worked', 'desc');
             }, ])->get();
-
+        
         return view('home.index', compact('trainingUser', 'log', 'calendar', 'duties'));
     }
 
@@ -59,6 +59,7 @@ class HomeController extends Controller
      */
     public function search()
     {
+        $this->authorize('view');
         $qInput = Request::input('q');
         $status = true;
         $dbUsers = User::skipSystem()->searchUsers($qInput)
