@@ -1,10 +1,10 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\User;
 use SET\Note;
+use SET\User;
 
-class NoteControllerTest extends TestCase 
+class NoteControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
@@ -41,7 +41,7 @@ class NoteControllerTest extends TestCase
 
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -51,8 +51,8 @@ class NoteControllerTest extends TestCase
         $userId = $this->user->id;
         $data = ['title'    => 'Test Note',
                  'comment'  => 'Description For Note',
-                 'private' => '1',
-                 'alert'   => 0, ];
+                 'private'  => '1',
+                 'alert'    => 0, ];
 
         $this->call('POST', "/user/$userId/note/", $data);
         $this->assertRedirectedToRoute('user.show', $userId);
@@ -71,7 +71,7 @@ class NoteControllerTest extends TestCase
         $this->call('POST', "/user/$userId/note/", $data);
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -86,14 +86,14 @@ class NoteControllerTest extends TestCase
         $this->assertSessionHasErrors();
         $this->assertSessionHasErrors(['title']);
         $this->assertSessionHasErrors('title', 'The title field is required.');
-        
+
         // Logged in as admin - Only publish_date is entered.
         $data = ['comment' => 'A Note Description'];
         $this->call('POST', "/user/$userId/note/", $data);
         $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors('title', 'The title field is required.');       
+        $this->assertSessionHasErrors('title', 'The title field is required.');
     }
-    
+
     /**
      * @test
      */
@@ -117,7 +117,7 @@ class NoteControllerTest extends TestCase
         $this->call('GET', "/user/$userId/note/$createdNoteId/edit");
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -131,7 +131,7 @@ class NoteControllerTest extends TestCase
         // Logged in as admin - Can update the note
         $data = ['title'    => 'Test Note',
                  'comment'  => 'Description For Note',
-                 'private' => '1'];//,
+                 'private'  => '1', ]; //,
                  //'alert'   => 0, ];
 
         $this->call('PATCH', "/user/$userId/note/$createdNoteId", $data);
@@ -144,7 +144,7 @@ class NoteControllerTest extends TestCase
         $this->assertEquals($createdNote->comment, $data['comment']);
         $this->assertEquals($createdNote->private, $data['private']);
         $this->assertEquals($createdNote->alert, $noteToCreate->alert);
-        
+
         // Logged in as a regular user - Cannot update the note
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
@@ -159,7 +159,7 @@ class NoteControllerTest extends TestCase
         $this->call('PATCH', "/user/$userId/note/$createdNoteId", $data);
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -171,7 +171,7 @@ class NoteControllerTest extends TestCase
         $createdNoteId = $noteToCreate->id;
 
         // Ensure the created note is in the database
-        $createdNote= Note::find($createdNoteId);
+        $createdNote = Note::find($createdNoteId);
         $this->assertNotNull($createdNote);
         $this->assertEquals($createdNote->id, $createdNoteId);
 
@@ -196,5 +196,3 @@ class NoteControllerTest extends TestCase
         $this->seeStatusCode(403);
     }
 }
-
-?>
