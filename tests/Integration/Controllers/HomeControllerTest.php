@@ -1,11 +1,11 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\User;
 use SET\Training;
+use SET\User;
 
 class HomeControllerTest extends TestCase
-{    
+{
     use DatabaseTransactions;
 
     public function setUp()
@@ -27,27 +27,27 @@ class HomeControllerTest extends TestCase
         $this->assertViewHas('log');
         $this->assertViewHas('calendar');
         $this->assertViewHas('duties');
-        
-        // Logged in as a user with role view - Can access the home page and 
+
+        // Logged in as a user with role view - Can access the home page and
         // display calendar, duties, etc
         $newuser = factory(User::class)->create(['role' => 'view']);
-        $this->actingAs($newuser);        
+        $this->actingAs($newuser);
         $this->action('GET', 'HomeController@index');
-        
+
         $this->seePageIs('/');
         $this->assertViewHas('trainingUser');
         $this->assertViewHas('log');
         $this->assertViewHas('calendar');
         $this->assertViewHas('duties');
-        
+
         // Logged in as a regular user - User redirected to user's home page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $this->action('GET', 'HomeController@index');
-        
-        $this->assertRedirectedTo('/user/'.$newuser->id);        
+
+        $this->assertRedirectedTo('/user/'.$newuser->id);
     }
-    
+
     /**
      * @test
      */
@@ -58,14 +58,14 @@ class HomeControllerTest extends TestCase
         $this->action('GET', 'HomeController@search');
         $this->seeJsonStructure(['status',
                                 'error',
-                                'data' => ['user', 'training']
+                                'data' => ['user', 'training'],
                                 ]);
-        
+
         $this->assertContains('"status":true', $this->response->getContent());
         $this->assertContains('"error":null', $this->response->getContent());
         $this->assertContains($this->user->last_name, $this->response->getContent());
         $this->assertContains($training->name, $this->response->getContent());
-        
+
         // Logged in as a regular user - User redirected to user's home page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
@@ -73,5 +73,3 @@ class HomeControllerTest extends TestCase
         $this->seeStatusCode(403);
     }
 }
-
-?>
