@@ -40,7 +40,7 @@ class Calendar
         return $this->calendarArray;
     }
 
-    public function generateCalendarItems()
+    private function generateCalendarItems()
     {
 
         //Let's build that calendar.
@@ -54,16 +54,16 @@ class Calendar
             $this->test = false;
 
             foreach($this->lists as $functionName => $columns) {
-                $list[$functionName] = $this->buildArrayByDate($list[$functionName], $columns, $currentDate);
+                $list2[$functionName] = $this->buildArrayByDate($list[$functionName], $columns, $currentDate);
             }
 
             if ($this->test || $currentDate == Carbon::today()->format('Y-m-d')) {
                 $this->calendarArray[$i] = [
                     'date' => $currentDate,
-                    'separated' => $list['separatedList'],
-                    'travel' => $list['travelsList'],
-                    'trainingUser' => $this->groupUsersForTraining($list['trainingUsersList']),
-                    'newUser' => $list['newUserList']
+                    'separated' => $list2['separatedList'],
+                    'travel' => $list2['travelsList'],
+                    'trainingUser' => $this->groupUsersForTraining($list2['trainingUsersList']),
+                    'newUser' => $list2['newUserList']
                 ];
             }
 
@@ -104,7 +104,7 @@ class Calendar
         } elseif (get_class($date) == 'Carbon\Carbon') {
             return $date->format('Y-m-d');
         } else {
-            return null;
+            return 'Something went horribly wrong with testForCarbonObject.';
         }
     }
 
@@ -122,18 +122,6 @@ class Calendar
             }
         }
 
-        return $array;
-    }
-
-    /**
-     * @return array
-     */
-    private function callFunctionsFromLookup()
-    {
-        $array = [];
-        foreach ($this->lists as $functionName => $columns) {
-            $array[$functionName] = $this->$functionName();
-        }
         return $array;
     }
 
@@ -179,4 +167,15 @@ class Calendar
         return User::whereBetween('created_at', [$this->start, $this->end])->get();
     }
 
+    /**
+     * @return array
+     */
+    private function callFunctionsFromLookup()
+    {
+        $array = [];
+        foreach ($this->lists as $functionName => $columns) {
+            $array[$functionName] = $this->$functionName();
+        }
+        return $array;
+    }
 }
