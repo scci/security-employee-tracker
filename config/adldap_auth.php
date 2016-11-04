@@ -71,7 +71,7 @@ return [
     |
     */
 
-    'login_fallback' => env('ADLDAP_LOGIN_FALLBACK', false),
+    'login_fallback' => env('ADLDAP_LOGIN_FALLBACK', true),
 
     /*
     |--------------------------------------------------------------------------
