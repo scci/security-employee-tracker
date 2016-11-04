@@ -31,7 +31,7 @@
             </div>
             <div class="row">
                 <div class="col s12 right-align">
-                        {!! Form::submit('Save', array('class' => 'btn-flat')) !!}
+                        {!! Form::submit('Save', array('class' => 'btn-flat waves-effect waves-indigo')) !!}
                 </div>
             </div>
             {!! Form::close() !!}
