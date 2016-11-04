@@ -30,7 +30,7 @@
             @endforeach
 
             <li class="collection-item">
-            {!! Form::open(array('action' => ['AttachmentController@store'], 'method' => 'POST', 'files' => true, 'class' => 'form-inline', 'id' => 'training-attachments')) !!}
+            {!! Form::open(array('action' => ['AttachmentController@store'], 'method' => 'POST', 'files' => true, 'class' => 'form-inline', 'id' => 'attachments-form')) !!}
                 {!! Form::hidden('type', 'training') !!}
                 {!! Form::hidden('id', $training->id) !!}
                 {!! Form::multipleFiles('js-upload') !!}
