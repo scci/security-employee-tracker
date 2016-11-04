@@ -17,13 +17,14 @@ class Calendar
     /**
      * Name of function that generates a collection followed by an array of dates
      * we want to mark in our calendar/agenda.
+     *
      * @var array
      */
     private $lists = [
         'separatedList'     => ['destroyed_date'],
         'travelsList'       => ['leave_date', 'return_date'],
         'trainingUsersList' => ['due_date'],
-        'newUserList'       => ['created_at']
+        'newUserList'       => ['created_at'],
     ];
 
     public function __construct()
@@ -53,17 +54,17 @@ class Calendar
             $currentDate = $date->format('Y-m-d');
             $this->test = false;
 
-            foreach($this->lists as $functionName => $columns) {
+            foreach ($this->lists as $functionName => $columns) {
                 $list2[$functionName] = $this->buildArrayByDate($list[$functionName], $columns, $currentDate);
             }
 
             if ($this->test || $currentDate == Carbon::today()->format('Y-m-d')) {
                 $this->calendarArray[$i] = [
-                    'date' => $currentDate,
-                    'separated' => $list2['separatedList'],
-                    'travel' => $list2['travelsList'],
+                    'date'         => $currentDate,
+                    'separated'    => $list2['separatedList'],
+                    'travel'       => $list2['travelsList'],
                     'trainingUser' => $this->groupUsersForTraining($list2['trainingUsersList']),
-                    'newUser' => $list2['newUserList']
+                    'newUser'      => $list2['newUserList'],
                 ];
             }
 
@@ -176,6 +177,7 @@ class Calendar
         foreach ($this->lists as $functionName => $columns) {
             $array[$functionName] = $this->$functionName();
         }
+
         return $array;
     }
 }
