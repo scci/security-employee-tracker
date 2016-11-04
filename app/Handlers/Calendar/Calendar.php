@@ -52,6 +52,7 @@ class Calendar
         while ($date <= $this->end) {
             $currentDate = $date->format('Y-m-d');
             $this->test = false;
+            $list2 = [];
 
             foreach($this->lists as $functionName => $columns) {
                 $list2[$functionName] = $this->buildArrayByDate($list[$functionName], $columns, $currentDate);
