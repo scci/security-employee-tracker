@@ -17,7 +17,7 @@
 <div class="row">
     <div class="input-field col s12" id="news_description">
         {!! Form::label('description', 'Description:') !!}<br />
-        {!! Form::textarea('description', ' ', ['class' => 'wysiwyg']) !!}
+        {!! Form::textarea('description', null, ['class' => 'wysiwyg']) !!}
     </div>
 </div>
 <div class="row">
@@ -47,3 +47,7 @@
         {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
     </div>
 </div>
+
+<script>
+    new SimpleMDE({});
+</script>

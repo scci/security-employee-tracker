@@ -46,3 +46,7 @@
         {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
     </div>
 </div>
+
+<script>
+    new SimpleMDE({});
+</script>

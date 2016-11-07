@@ -41,7 +41,7 @@
 <div class="row">
     <div class="col s12 input-field" id="training_textarea">
         {!! Form::label('comment', 'User Notes:') !!}
-        {!! Form::textarea('comment', null, array('class' => 'materialize-textarea')) !!}
+        {!! Form::textarea('comment', ' ', array('class' => 'materialize-textarea')) !!}
     </div>
 </div>
 <div class="row">

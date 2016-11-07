@@ -44,7 +44,5 @@ $( document ).ready(function() {
         $('#attachments-form').submit();
     });
 
-    var simplemde = new SimpleMDE({ element: $(".wysiwyg")[0] });
-
     $('select').material_select();
 });
