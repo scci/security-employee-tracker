@@ -25,19 +25,18 @@
             <label for="encrypt">File has PII/Encrypt File.</label>
         </p>
     </div>
+    @if (isset($trainingUser))
+        <div class="col s12">Attachments:
+            @foreach($trainingUser->attachments as $file)
+                <span class="chip">
+                    <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                    <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                </span> &nbsp;
+            @endforeach
+        </div>
+    @endif
 </div>
-@if ($trainingUser)
-<div class="row">
-    @foreach($trainingUser->attachments as $file)
-        <span class="chip">
-            <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
-            @can('update_record', $trainingUser)
-                <i class="material-icons close" data-id="{{$file->id}}">close</i>
-            @endcan
-        </span> &nbsp;
-    @endforeach
-</div>
-@endif
+
 <div class="row">
     <div class="col s12 input-field" id="training_textarea">
         {!! Form::label('comment', 'User Notes:') !!}

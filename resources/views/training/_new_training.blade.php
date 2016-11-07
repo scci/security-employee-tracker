@@ -17,6 +17,15 @@
     </div>
     <div class="col s12" id="file_upload">
         {!! Form::multipleFiles() !!}
+        @if (isset($training))
+            Attachments:
+            @foreach($training->attachments as $file)
+                <span class="chip">
+                    <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                    <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                </span> &nbsp;
+            @endforeach
+        @endif
     </div>
     <div class="col s12 m6">
         <div class="input-field" id="assignment_buttons">

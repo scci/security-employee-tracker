@@ -22,15 +22,16 @@
 </div>
 <div class="row">
     <div class="col s12" id="file_upload">
-        <div class="file-field input-field">
-            <div class="btn">
-                <span>File</span>
-                {!! Form::file('files[]', array('multiple' => true)) !!}
-            </div>
-            <div class="file-path-wrapper">
-                <input class="file-path validate" type="text" placeholder="Upload one or more files">
-            </div>
-        </div>
+        {!! Form::multipleFiles() !!}
+        @if (isset($news))
+            Attachments:
+            @foreach($news->attachments as $file)
+                <span class="chip">
+                    <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                    <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                </span> &nbsp;
+            @endforeach
+        @endif
     </div>
 </div>
 <div class="row">
