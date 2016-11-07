@@ -44,6 +44,6 @@
         <div class="card-title">Description
             <a tabindex="0" role="button" data-trigger="focus" class="pull-right tooltipped"  data-position="top" data-tooltip="This will be the main body of the email to your assignees. It is best to input instructions on how to perform the training." aria-hidden="true"><i class="material-icons">live_help</i></a>
         </div>
-        <span class="browser-default">{!! $training->description !!}</span>
+        <span class="browser-default">{!! Markdown::convertToHTML($training->description) !!}</span>
     </div>
 </div>

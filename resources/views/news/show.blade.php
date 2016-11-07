@@ -35,7 +35,7 @@
                         </div>
                     </div>
                     <div class="browser-default">
-                        {!! $news->description !!}
+                        {!! Markdown::convertToHTML($news->description) !!}
                     </div>
                 </div>
             </div>

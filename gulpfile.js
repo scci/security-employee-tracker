@@ -18,7 +18,7 @@ elixir(function(mix) {
         'materialize.min.js',
         'jquery.typeahead.min.js',
         'jquery.dataTables.min.js',
-        'trumbowyg.min.js'
+        'simplemde.min.js'
     ],'public/js/lib.js');
     mix.sass('app.scss');
     mix.phpUnit();

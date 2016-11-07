@@ -26,6 +26,18 @@
         </p>
     </div>
 </div>
+@if ($trainingUser)
+<div class="row">
+    @foreach($trainingUser->attachments as $file)
+        <span class="chip">
+            <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+            @can('update_record', $trainingUser)
+                <i class="material-icons close" data-id="{{$file->id}}">close</i>
+            @endcan
+        </span> &nbsp;
+    @endforeach
+</div>
+@endif
 <div class="row">
     <div class="col s12 input-field" id="training_textarea">
         {!! Form::label('comment', 'User Notes:') !!}

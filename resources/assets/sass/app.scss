@@ -2,7 +2,7 @@
 @import "jquery.typeahead.min";
 @import "fileinput.min";
 @import "jquery.dataTables.min";
-@import "trumbowyg.min";
+@import "simplemde.min";
 @import "print";
 
 body {
@@ -45,6 +45,10 @@ main {
 
 .content {
   flex-basis: 100%;
+}
+
+.side-nav {
+  z-index: 1;
 }
 
 .handle-action-item-sidebar {
@@ -206,13 +210,21 @@ table tr:hover .action-buttons, ul li:hover .action-buttons {
   visibility: visible;
 }
 
-ul.browser-default, .trumbowyg-box ul, .browser-default ul {
-  padding-left: 30px;
+ul.browser-default, .trumbowyg-box ul, .browser-default ul, .browser-default ol {
+  padding-left: 20px;
   margin-top: 10px;
   margin-bottom: 15px;
 }
 ul.browser-default li, .trumbowyg-box ul li, .browser-default ul li {
   list-style-type: initial;
+}
+
+.browser-default ol li {
+  list-style-type: inherit;
+}
+
+.browser-default p {
+  padding: initial;
 }
 
 /* Home Calendar */

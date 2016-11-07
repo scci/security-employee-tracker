@@ -15,6 +15,7 @@
 
     <link rel="stylesheet" href="{{ url('/css/app.css') }}" />
 
+
     <script type="text/javascript">
         var root = '{{url("/")}}';
         @can('edit') var edit = 'true'; @endcan
@@ -65,6 +66,9 @@
             </div>
         </div>
     </div>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+    <script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 
 </body>
 </html>

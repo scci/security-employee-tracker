@@ -17,7 +17,7 @@
 <div class="row">
     <div class="input-field col s12" id="news_description">
         {!! Form::label('description', 'Description:') !!}<br />
-        {!! Form::textarea('description', null, ['class' => 'wysiwyg']) !!}
+        {!! Form::textarea('description', ' ', ['class' => 'wysiwyg']) !!}
     </div>
 </div>
 <div class="row">
