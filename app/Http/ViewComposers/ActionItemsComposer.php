@@ -116,7 +116,7 @@ class ActionItemsComposer
         }
     }
 
-    /**	
+    /**
      * @param Collection $userArray
      */
     private function sortUserCollection($userArray)
