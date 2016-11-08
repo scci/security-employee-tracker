@@ -30,7 +30,9 @@ class TrainingController extends Controller
     {
         $this->authorize('view');
 
-        $trainings = Training::with(['users'])->get()->sortBy('name');
+        $trainings = Training::with(['users' => function ($q) {
+            $q->active();
+        }])->get()->sortBy('name');
 
         return view('training.index', compact('trainings'));
     }
@@ -90,7 +92,7 @@ class TrainingController extends Controller
             ->orderBy('due_date', 'desc')
             ->get();
         if (!$showAll) {
-            $notes = $notes->unique('user_id');
+            $notes = $notes->unique('user_id')->where('user.status', 'active');
         }
 
         return view('training.show', compact('notes', 'training', 'showAll'));

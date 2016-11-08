@@ -31,14 +31,14 @@
                             <td><a href="{{ url('/training', $training->id) }}">{{ $training->name }}</a></td>
                             <td class="text-right">
                                 @if($training->users->count())
-                                    {{ $training->incompleted }}/{{$training->users->count()}}
+                                    {{ $training->incompleted }}/{{$training->users->groupby('id')->count()}}
                                 @else
                                     0/0
                                 @endif
                             </td>
                             <td>
                                 @if($training->users->count() && $training->users->count())
-                                    {{ (int)( 100 - ( $training->incompleted / $training->users->count() ) * 100)}}%
+                                    {{ (int)( 100 - ( $training->incompleted / $training->users->groupby('id')->count() ) * 100)}}%
                                 @else
                                     100%
                                 @endif
