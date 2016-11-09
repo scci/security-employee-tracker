@@ -62,7 +62,7 @@
 
                                         <h2 style="font-style: normal;font-weight: bold;Margin-bottom: 0;Margin-top: 0;font-size: 16px;line-height: 24px;font-family: Ubuntu,sans-serif;color: #3e4751;">What do I do once completed?</h2>
                                         <p style='font-style: normal;font-weight: 400;Margin-bottom: 0;Margin-top: 16px;font-size: 13px;line-height: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f;'>Once you have completed your training, please log into the Security Employee Tracker and update your record with the date of completion. In addition, if you have a PDF or a screenshot of any certificates showing training has been completed, please add those as well.</p>
-                                        <p style='font-style: normal;font-weight: 400;Margin-bottom: 0;Margin-top: 16px;font-size: 13px;line-height: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f;'>Unable to access the Security Employee Tracker? Email <a href="mailto:{{ config('mail.from.address') }}">{{ config('mail.from.name') }}</a> directly with the training name, date completed and any completed certificates.</p>
+                                        <p style='font-style: normal;font-weight: 400;Margin-bottom: 0;Margin-top: 16px;font-size: 13px;line-height: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f;'>Unable to access the Security Employee Tracker? Email <a href="mailto:{{ $reportAddress->secondary }}">{{ $reportAddress->primary  }}</a> directly with the training name, date completed and any completed certificates.</p>
                                         <p style='font-style: normal;font-weight: 400;Margin-bottom: 22px;Margin-top: 22px;font-size: 13px;line-height: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f;'>If you have any questions or concerns, please let me know.</p>
 
                                     </td>
@@ -76,17 +76,6 @@
                                         <div class="btn" style="Margin-bottom: 22px;Margin-top: 0;text-align: center;">
                                             <![if !mso]><a style='border-radius: 3px;display: inline-block;font-size: 14px;font-weight: 700;line-height: 24px;padding: 13px 35px 12px 35px;text-align: center;text-decoration: none !important;transition: opacity 0.2s ease-in;font-family: "PT Serif",Georgia,serif;background-color: #16588a;color: #fff;' href="{{ action('TrainingUserController@show', [$user->id, $trainingUser->id]) }}">Complete Training</a><![endif]>
                                             <!--[if mso]><v:roundrect xmlns:v="urn:schemas-microsoft-com:vml" href="{{ action('TrainingUserController@show', [$user->id, $trainingUser->id]) }}" style="width:155px" arcsize="7%" fillcolor="#16588A" stroke="f"><v:textbox style="mso-fit-shape-to-text:t" inset="0px,12px,0px,11px"><center style="font-size:14px;line-height:24px;color:#FFFFFF;font-family:Georgia,serif;font-weight:700;mso-line-height-rule:exactly;mso-text-raise:4px">Complete Training</center></v:textbox></v:roundrect><![endif]--></div>
-
-                                    </td>
-                                </tr>
-                                </tbody></table>
-
-                            <table class="contents" style="border-collapse: collapse;border-spacing: 0;table-layout: fixed;width: 100%;">
-                                <tbody><tr>
-                                    <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 56px;padding-right: 56px;word-break: break-word;word-wrap: break-word;">
-
-                                        <p style='font-style: normal;font-weight: 400;Margin-bottom: 0;Margin-top: 0;font-size: 13px;line-height: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f;'>Kind regards,<br />
-                                            {{ config('mail.from.name') }}</p>
 
                                     </td>
                                 </tr>
