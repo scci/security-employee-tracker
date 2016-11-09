@@ -311,6 +311,11 @@ nav .input-field label i {
 /* Top Search Box End */
 
 
+.editor-preview-side > p, .editor-preview > p, .browser-default > p {
+  margin-bottom: 10px !important;
+}
+
+
 /* Disable Chrome's native datepicker. */
 
 input::-webkit-calendar-picker-indicator{

@@ -93,6 +93,6 @@
 
     <strong>Auto Renew</strong>
     <p>This function allows you to set the auto-renwal function such that the training will be automatically reassigned to be due for a person after X days has passed.</p>
-    <p>Example: If you have a training that renews every year (365 days), and you have a user who completed the training 335 days ago, the system will automatically assign that user the same training to be done again. And will have the due date set for the 365th day.</p>
+    <p>Example: If you have a training that renews every year (365 days), and you have a user who completed the training 355 days ago, the system will automatically assign that user the same training to be done again. And will have the due date set for the 365th day.</p>
 
 @stop
