@@ -38,7 +38,7 @@ class DutyHelper
     {
         $today = Carbon::today()->format('Y-m-d');
 
-        if ( isset($this->lastWorkedUser->pivot->last_worked) && $today == $this->lastWorkedUser->pivot->last_worked ) {
+        if (isset($this->lastWorkedUser->pivot->last_worked) && $today == $this->lastWorkedUser->pivot->last_worked) {
             return;
         }
 
