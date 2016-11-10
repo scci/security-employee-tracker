@@ -11,7 +11,7 @@ use SET\Duty;
 class DutyHelper
 {
     public $list;
-    public $lastWorked = null;
+    public $lastWorkedUser = null;
     public $duty;
 
     public function __construct(Duty $duty)
@@ -38,7 +38,7 @@ class DutyHelper
     {
         $today = Carbon::today()->format('Y-m-d');
 
-        if ($today == $this->lastWorked->pivot->last_worked) {
+        if ( isset($this->lastWorkedUser->pivot->last_worked) && $today == $this->lastWorkedUser->pivot->last_worked ) {
             return;
         }
 
@@ -61,8 +61,8 @@ class DutyHelper
 
     public function sortList()
     {
-        if (!is_null($this->lastWorked)) {
-            while ($this->list->first()->id != $this->lastWorked->id) {
+        if (!is_null($this->lastWorkedUser)) {
+            while ($this->list->first()->id != $this->lastWorkedUser->id) {
                 $this->list->push($this->list->shift());
             }
         }

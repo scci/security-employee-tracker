@@ -52,7 +52,7 @@ class DutyGroups extends DutyHelper
 
     public function getLastWorked()
     {
-        $this->lastWorked = $this->duty->groups()->orderBy('duty_group.last_worked', 'DESC')->first();
+        $this->lastWorkedUser = $this->duty->groups()->orderBy('duty_group.last_worked', 'DESC')->first();
 
         return $this;
     }
