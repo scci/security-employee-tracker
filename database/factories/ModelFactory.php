@@ -73,8 +73,8 @@ $factory->define(SET\Note::class, function (Faker\Generator $faker) use ($factor
         'comment'   => $faker->text(),
         'author_id' => $factory->create(SET\User::class)->id,
         'user_id'   => $factory->create(SET\User::class)->id,
-        'alert'     => $faker->boolean(20),
-        'private'   => $faker->boolean(20),
+        'alert'     => 0,
+        'private'   => 0,
     ];
 });
 

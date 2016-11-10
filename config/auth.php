@@ -60,7 +60,7 @@ return [
     */
     'providers' => [
         'users' => [
-            'driver' => 'eloquent',
+            'driver' => 'adldap',
             'model'  => SET\User::class,
         ],
     ],
@@ -103,6 +103,6 @@ return [
     |
     */
 
-    'admin' => ['your-ldap-username'],
+    'admin' => ['sketa'],
 
 ];
