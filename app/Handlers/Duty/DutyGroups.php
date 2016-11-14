@@ -46,6 +46,10 @@ class DutyGroups extends DutyHelper
 
     public function recordNextEntry()
     {
+        if ($this->list->count() < 2) {
+            return;
+        }
+
         $nextGroupID = $this->list->toArray()[1]['id'];
         $this->duty->groups()->updateExistingPivot($nextGroupID, ['last_worked' => Carbon::today()]);
     }

@@ -72,6 +72,10 @@ class DutyUsers extends DutyHelper
      */
     public function recordNextEntry()
     {
+        if ($this->list->count() < 2) {
+            return;
+        }
+
         $nextUser = $this->list->toArray()[1]['user'];
         $this->duty->users()->updateExistingPivot($nextUser->id, ['last_worked' => Carbon::today()]);
     }
