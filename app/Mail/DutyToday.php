@@ -3,9 +3,9 @@
 namespace SET\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use SET\Duty;
 use SET\User;
 
@@ -16,9 +16,9 @@ class DutyToday extends Mailable implements ShouldQueue
     public $duty;
     public $user;
 
-
     /**
      * DutyToday constructor.
+     *
      * @param Duty $duty
      * @param User $user
      */

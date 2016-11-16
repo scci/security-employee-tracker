@@ -10,13 +10,13 @@ class SyncLdapTest extends TestCase
     use DatabaseTransactions;
 
     /**
-     * WARNING: THIS IS A VERY SLOW TEST
+     * WARNING: THIS IS A VERY SLOW TEST.
      *
      * @test
      */
     public function it_adds_missing_users_if_ldap_is_setup()
     {
-//        if (config('auth.providers.users.driver') != 'adldap') {
+        //        if (config('auth.providers.users.driver') != 'adldap') {
 //            return true;
 //        }
 //
