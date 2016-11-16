@@ -157,7 +157,7 @@ class RenewTraining extends Command
             'author_id'      => 1,
             'training_id'    => $trainingUser->training_id,
             'due_date'       => $dueDate->toDateString(),
-            'completed_date' => null
+            'completed_date' => null,
         ]);
 
         return $newNote;

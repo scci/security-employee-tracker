@@ -3,6 +3,7 @@
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Console\Commands\RenewTraining;
+use SET\Events\TrainingAssigned;
 use SET\Training;
 use SET\TrainingUser;
 use SET\User;
@@ -14,6 +15,8 @@ class RenewTrainingTest extends TestCase
     /** @test */
     public function it_renews_training_when_it_is_time_to_renew()
     {
+        $this->expectsEvents(TrainingAssigned::class);
+
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
         $training->users()->attach($user, [
@@ -83,13 +86,13 @@ class RenewTrainingTest extends TestCase
         $training->users()->attach($user, [
             'author_id'      => $user->first()->id,
             'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
-            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d')
+            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d'),
         ]);
 
         $training->users()->attach($user, [
             'author_id'      => $user->first()->id,
             'due_date'       => Carbon::today()->subWeek()->format('Y-m-d'),
-            'completed_date' => Carbon::today()->subWeek()->format('Y-m-d')
+            'completed_date' => Carbon::today()->subWeek()->format('Y-m-d'),
         ]);
 
         (new RenewTraining())->handle();
