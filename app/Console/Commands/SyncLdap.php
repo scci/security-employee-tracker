@@ -32,7 +32,7 @@ class SyncLdap extends Command
     public function handle()
     {
         if (config('auth.providers.users.driver') != 'adldap') {
-            return new Exception("LDAP not setup. Syncing users will not work.");
+            return new Exception('LDAP not setup. Syncing users will not work.');
         }
 
         Artisan::call('adldap:import');
