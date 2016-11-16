@@ -27,7 +27,7 @@ class SyncLdap extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return Exception|null
      */
     public function handle()
     {

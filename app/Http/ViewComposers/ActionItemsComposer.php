@@ -116,6 +116,9 @@ class ActionItemsComposer
         }
     }
 
+    /**
+     * @param Collection $userArray
+     */
     private function sortUserCollection($userArray)
     {
         return $userArray->sortByDesc(function ($array) {
