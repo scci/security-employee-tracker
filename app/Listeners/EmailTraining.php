@@ -43,7 +43,7 @@ class EmailTraining implements ShouldQueue
     /**
      * @param $due_date
      *
-     * @return mixed
+     * @return string
      */
     private function makeDueDatePretty($due_date)
     {
@@ -53,7 +53,7 @@ class EmailTraining implements ShouldQueue
     /**
      * @param $user
      * @param $training
-     * @param $dueDate
+     * @param string $dueDate
      * @param $trainingUser
      */
     private function sendEmail($user, $training, $dueDate, $trainingUser)
