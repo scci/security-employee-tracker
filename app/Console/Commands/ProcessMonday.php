@@ -39,6 +39,8 @@ class ProcessMonday extends Command
      */
     public function handle()
     {
+        $mailArray = array();
+
         foreach ($this->classesToProcess as $key => $class) {
             $mailArray[$key] = (new $class())->handle()->getList();
         }
