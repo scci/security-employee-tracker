@@ -6,7 +6,6 @@ use SET\Console\Commands\RenewTraining;
 use SET\Training;
 use SET\TrainingUser;
 use SET\User;
-use SET\Visit;
 
 class ExpiringVisitsTest extends TestCase
 {
@@ -18,12 +17,12 @@ class ExpiringVisitsTest extends TestCase
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
         $training->users()->attach($user, [
-            'author_id' => $user->first()->id,
-            'due_date' => Carbon::today()->subYear()->format('Y-m-d'),
-            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d')
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d'),
         ]);
 
-        (new RenewTraining)->handle();
+        (new RenewTraining())->handle();
 
         $trainingUser = TrainingUser::where('training_id', $training->id)
             ->where('user_id', $user->id)
@@ -39,12 +38,12 @@ class ExpiringVisitsTest extends TestCase
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
         $training->users()->attach($user, [
-            'author_id' => $user->first()->id,
-            'due_date' => Carbon::today()->subMonths(9)->format('Y-m-d'),
-            'completed_date' => Carbon::today()->subMonths(9)->format('Y-m-d')
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subMonths(9)->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subMonths(9)->format('Y-m-d'),
         ]);
 
-        (new RenewTraining)->handle();
+        (new RenewTraining())->handle();
 
         $trainingUser = TrainingUser::where('training_id', $training->id)
             ->where('user_id', $user->id)
@@ -60,12 +59,12 @@ class ExpiringVisitsTest extends TestCase
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
         $training->users()->attach($user, [
-            'author_id' => $user->first()->id,
-            'due_date' => Carbon::today()->subYears(2)->format('Y-m-d'),
-            'completed_date' => null
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subYears(2)->format('Y-m-d'),
+            'completed_date' => null,
         ]);
 
-        (new RenewTraining)->handle();
+        (new RenewTraining())->handle();
 
         $trainingUser = TrainingUser::where('training_id', $training->id)
             ->where('user_id', $user->id)
@@ -74,5 +73,4 @@ class ExpiringVisitsTest extends TestCase
 
         $this->assertCount(0, $trainingUser);
     }
-
 }
