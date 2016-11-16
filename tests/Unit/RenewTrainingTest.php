@@ -7,7 +7,7 @@ use SET\Training;
 use SET\TrainingUser;
 use SET\User;
 
-class ExpiringVisitsTest extends TestCase
+class RenewTrainingTest extends TestCase
 {
     use DatabaseTransactions;
 
@@ -26,8 +26,9 @@ class ExpiringVisitsTest extends TestCase
 
         $trainingUser = TrainingUser::where('training_id', $training->id)
             ->where('user_id', $user->id)
-            ->where('created_at', Carbon::now())
+            ->whereNotNull('created_at')
             ->get();
+
 
         $this->assertCount(1, $trainingUser);
     }
@@ -47,7 +48,7 @@ class ExpiringVisitsTest extends TestCase
 
         $trainingUser = TrainingUser::where('training_id', $training->id)
             ->where('user_id', $user->id)
-            ->where('created_at', Carbon::now())
+            ->whereNotNull('created_at')
             ->get();
 
         $this->assertCount(0, $trainingUser);
@@ -68,7 +69,34 @@ class ExpiringVisitsTest extends TestCase
 
         $trainingUser = TrainingUser::where('training_id', $training->id)
             ->where('user_id', $user->id)
-            ->where('created_at', Carbon::now())
+            ->whereNotNull('created_at')
+            ->get();
+
+        $this->assertCount(0, $trainingUser);
+    }
+
+    /** @test */
+    public function it_does_not_renew_if_it_has_already_been_renewed()
+    {
+        $training = factory(Training::class)->create(['renews_in' => 365]);
+        $user = factory(User::class)->create();
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d')
+        ]);
+
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subWeek()->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subWeek()->format('Y-m-d')
+        ]);
+
+        (new RenewTraining())->handle();
+
+        $trainingUser = TrainingUser::where('training_id', $training->id)
+            ->where('user_id', $user->id)
+            ->whereNotNull('created_at')
             ->get();
 
         $this->assertCount(0, $trainingUser);

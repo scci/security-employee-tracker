@@ -60,7 +60,9 @@ class RenewTraining extends Command
             ->whereNotNull('completed_date')
             ->where('due_date', '<', Carbon::today())
             ->activeUsers()
-            ->get();
+            ->orderBy('completed_date', 'desc')
+            ->get()
+            ->unique('user_id', 'training_id');
 
         foreach ($trainingUsers as $trainingUser) {
             if (!$this->renewedAlready($trainingUser) && $this->timeToRenew($trainingUser)) {
@@ -129,15 +131,15 @@ class RenewTraining extends Command
         $dueDate = Carbon::createFromFormat('Y-m-d', $trainingUser->completed_date)
             ->addDays($trainingUser->training->renews_in);
 
-        $this->createRecord($trainingUser, $dueDate);
+        $assignedTraining = $this->createRecord($trainingUser, $dueDate);
 
         //Email user of new training is due
-        Event::fire(new TrainingAssigned($trainingUser));
+        Event::fire(new TrainingAssigned($assignedTraining));
 
         //
         $this->trainingAdminRecord->push([
-            'name'     => $trainingUser->user->userFullName,
-            'training' => $trainingUser->training->name,
+            'name'     => $assignedTraining->user->userFullName,
+            'training' => $assignedTraining->training->name,
             'due_date' => $dueDate->toDateString(),
         ]);
     }
@@ -151,10 +153,11 @@ class RenewTraining extends Command
     private function createRecord($trainingUser, $dueDate)
     {
         $newNote = TrainingUser::create([
-            'user_id'     => $trainingUser->user_id,
-            'author_id'   => 1,
-            'training_id' => $trainingUser->training_id,
-            'due_date'    => $dueDate->toDateString(),
+            'user_id'        => $trainingUser->user_id,
+            'author_id'      => 1,
+            'training_id'    => $trainingUser->training_id,
+            'due_date'       => $dueDate->toDateString(),
+            'completed_date' => null
         ]);
 
         return $newNote;
