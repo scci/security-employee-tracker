@@ -38,7 +38,7 @@ class DeleteUsers extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return DeleteUsers
      */
     public function handle()
     {

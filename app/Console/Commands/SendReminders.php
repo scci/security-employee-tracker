@@ -39,7 +39,7 @@ class SendReminders extends Command
      * Execute the console command.
      * Sends out reminder emails to all employees. Then sends a reminder to their supervisor.
      *
-     * @return mixed
+     * @return SendReminders
      */
     public function handle()
     {
