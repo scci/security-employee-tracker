@@ -3,12 +3,13 @@
 namespace SET\Mail;
 
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use SET\News;
 use SET\Setting;
 
-class SendNewsEmail extends Mailable
+class SendNewsEmail extends Mailable implements ShouldQueue
 {
     use Queueable, SerializesModels;
 

@@ -8,8 +8,8 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Mail;
 use SET\Events\TrainingAssigned;
+use SET\Mail\EmailSupervisorReminder;
 use SET\TrainingUser;
-use SET\Visit;
 
 /**
  * Class SendReminders.
@@ -34,10 +34,6 @@ class SendReminders extends Command
      * @var
      */
     protected $trainingUsers;
-    /**
-     * @var
-     */
-    protected $visits;
 
     /**
      * Execute the console command.
@@ -48,13 +44,14 @@ class SendReminders extends Command
     public function handle()
     {
         $this->setTrainingUsers();
-        $this->setVisits();
 
         foreach ($this->trainingUsers as $trainingUser) {
             Event::fire(new TrainingAssigned($trainingUser));
         }
 
         $this->emailSupervisor();
+
+        return $this;
     }
 
     /**
@@ -74,10 +71,7 @@ class SendReminders extends Command
             });
 
             if (!$newNotes->isEmpty()) {
-                Mail::send('emails.supervisor_reminder', ['notes' => $newNotes], function ($m) use ($supervisor) {
-                    $m->to($supervisor->email, $supervisor->userFullName)
-                        ->subject($supervisor->email.' Training that your employees need to complete.');
-                });
+                Mail::to($supervisor)->send(new EmailSupervisorReminder($newNotes));
             }
         }
     }
@@ -87,8 +81,10 @@ class SendReminders extends Command
      */
     public function setTrainingUsers()
     {
-        $this->trainingUsers = TrainingUser::with(['training', 'training.attachments', 'user', 'user.supervisor'])
-            ->where('due_date', '<=', Carbon::today()->addWeek(2))
+        $this->trainingUsers = TrainingUser::with([
+            'training', 'training.attachments', 'user', 'user.supervisor'
+        ])
+            ->where('due_date', '<=', Carbon::today()->addWeek())
             ->whereNull('completed_date')
             ->activeUsers()
             ->orderBy('due_date')
@@ -98,37 +94,13 @@ class SendReminders extends Command
     }
 
     /**
-     *  Stores a list of visits that are due to expire sometime between yesterday and the next week.
-     */
-    public function setVisits()
-    {
-        $this->visits = Visit::with('user')
-            ->whereBetween('expiration_date', [
-                Carbon::today()->subDay()->toDateString(), Carbon::today()->addWeek()->toDateString(),
-            ])
-            ->activeUsers()
-            ->orderBy('expiration_date')
-            ->get();
-    }
-
-    /**
      * Get our Notes list.
      *
      * @return mixed
      */
-    public function gettrainingUsers()
+    public function getList()
     {
         return $this->trainingUsers;
-    }
-
-    /**
-     * Get our Visits list.
-     *
-     * @return mixed
-     */
-    public function getVisits()
-    {
-        return $this->visits;
     }
 
     /**

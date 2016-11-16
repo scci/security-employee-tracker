@@ -2,6 +2,8 @@
 
 namespace SET\Http\Requests;
 
+use Illuminate\Support\Facades\Gate;
+
 class NewsRequest extends Request
 {
     /**
@@ -11,7 +13,7 @@ class NewsRequest extends Request
      */
     public function authorize()
     {
-        return true;
+        return Gate::allows('edit');
     }
 
     /**

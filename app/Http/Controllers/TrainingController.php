@@ -89,7 +89,7 @@ class TrainingController extends Controller
         $training = Training::with('attachments')->find($trainingId);
         $notes = $training->assignedUsers()
             ->with('user')
-            ->orderBy('due_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
         if (!$showAll) {
             $notes = $notes->unique('user_id')->where('user.status', 'active');

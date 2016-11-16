@@ -5,6 +5,7 @@ namespace SET\Console;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
 use SET\Console\Commands\ProcessMonday;
+use SET\Console\Commands\RenewTraining;
 use SET\Console\Commands\SendNews;
 use SET\Console\Commands\SyncLdap;
 use SET\Console\Commands\UpdateDuty;
@@ -21,6 +22,7 @@ class Kernel extends ConsoleKernel
         ProcessMonday::class,
         SendNews::class,
         SyncLdap::class,
+        RenewTraining::class,
     ];
 
     /**
