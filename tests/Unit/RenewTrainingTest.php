@@ -83,13 +83,13 @@ class RenewTrainingTest extends TestCase
         $training->users()->attach($user, [
             'author_id'      => $user->first()->id,
             'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
-            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d')
+            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d'),
         ]);
 
         $training->users()->attach($user, [
             'author_id'      => $user->first()->id,
             'due_date'       => Carbon::today()->subWeek()->format('Y-m-d'),
-            'completed_date' => Carbon::today()->subWeek()->format('Y-m-d')
+            'completed_date' => Carbon::today()->subWeek()->format('Y-m-d'),
         ]);
 
         (new RenewTraining())->handle();
