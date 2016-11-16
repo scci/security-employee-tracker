@@ -16,7 +16,7 @@ class RenewTraining extends Command
      *
      * @var int
      */
-    protected $offset = 30;
+    protected $offset = 14;
 
 
     /**
@@ -63,10 +63,11 @@ class RenewTraining extends Command
             ->get();
 
         foreach ($trainingUsers as $trainingUser) {
-            if (!$this->renewedAlready($trainingUser) && $trainingUser->training->renews_in > 0) {
+            if (!$this->renewedAlready($trainingUser) && $this->timeToRenew($trainingUser)) {
                 $this->processRenewal($trainingUser);
             }
         }
+        return $this;
     }
 
     public function getTrainingAdminRecord()
@@ -92,35 +93,48 @@ class RenewTraining extends Command
     }
 
     /**
-     * Generate a new Training note that will be due $this->offset days from now.
+     * Check if the training is past the renews_in value.
      *
      * @param $trainingUser
+     * @return bool
      */
-    private function processRenewal($trainingUser)
+    private function timeToRenew($trainingUser)
     {
+        if($trainingUser->training->renews_in == 0) return false;
+
         $today = Carbon::today();
 
         $renewalDate = Carbon::createFromFormat('Y-m-d', $trainingUser->completed_date)
             ->addDays($trainingUser->training->renews_in)
             ->subDays($this->offset);
 
+        if ($renewalDate >= $today) return false;
+
+        return true;
+    }
+
+    /**
+     * Generate a new Training note that will be due $this->offset days from now.
+     *
+     * @param $trainingUser
+     */
+    private function processRenewal($trainingUser)
+    {
+
         $dueDate = Carbon::createFromFormat('Y-m-d', $trainingUser->completed_date)
             ->addDays($trainingUser->training->renews_in);
 
-        //check if the renewalDate is past today and if the dueDate is still in the future,
-        if ($today >= $renewalDate && $today < $dueDate) {
-            $this->createRecord($trainingUser, $dueDate);
+        $this->createRecord($trainingUser, $dueDate);
 
-            //Email user of new training is due
-            Event::fire(new TrainingAssigned($trainingUser));
+        //Email user of new training is due
+        Event::fire(new TrainingAssigned($trainingUser));
 
-            //
-            $this->trainingAdminRecord->push([
-                'name'     => $trainingUser->user->userFullName,
-                'training' => $trainingUser->training->name,
-                'due_date' => $dueDate->toDateString(),
-            ]);
-        }
+        //
+        $this->trainingAdminRecord->push([
+            'name'     => $trainingUser->user->userFullName,
+            'training' => $trainingUser->training->name,
+            'due_date' => $dueDate->toDateString(),
+        ]);
     }
 
     /**
