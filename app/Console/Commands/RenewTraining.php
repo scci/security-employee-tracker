@@ -67,6 +67,7 @@ class RenewTraining extends Command
                 $this->processRenewal($trainingUser);
             }
         }
+
         return $this;
     }
 
@@ -96,11 +97,14 @@ class RenewTraining extends Command
      * Check if the training is past the renews_in value.
      *
      * @param $trainingUser
+     *
      * @return bool
      */
     private function timeToRenew($trainingUser)
     {
-        if($trainingUser->training->renews_in == 0) return false;
+        if ($trainingUser->training->renews_in == 0) {
+            return false;
+        }
 
         $today = Carbon::today();
 
@@ -108,7 +112,9 @@ class RenewTraining extends Command
             ->addDays($trainingUser->training->renews_in)
             ->subDays($this->offset);
 
-        if ($renewalDate >= $today) return false;
+        if ($renewalDate >= $today) {
+            return false;
+        }
 
         return true;
     }
@@ -120,7 +126,6 @@ class RenewTraining extends Command
      */
     private function processRenewal($trainingUser)
     {
-
         $dueDate = Carbon::createFromFormat('Y-m-d', $trainingUser->completed_date)
             ->addDays($trainingUser->training->renews_in);
 
