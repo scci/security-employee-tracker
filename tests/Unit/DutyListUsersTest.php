@@ -49,9 +49,7 @@ class DutyListUsersTest extends TestCase
     {
         $email = (new DutyList($this->duty))->scheduledUpdate();
 
-        if (Carbon::today()->startOfWeek() == Carbon::today()) {
-            // do nothing
-        } else {
+        if (Carbon::today()->startOfWeek() != Carbon::today()) {
             $this->assertEquals($email[0]['users'][0]->id, $this->users->sortBy('last_name')->first()->id);
         }
         $this->assertEquals($email[0]['date'], Carbon::today()->startOfWeek()->format('Y-m-d'));

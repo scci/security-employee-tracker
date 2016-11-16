@@ -8,21 +8,21 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Storage;
 use SET\User;
 
-class DeleteSeparatedAndDestroyedUsers extends Command
+class DeleteUsers extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'users:destroyed';
+    protected $signature = 'users:purge';
 
     /**
      * The console command description.
      *
      * @var string
      */
-    protected $description = 'Changes deadman users to destroyed users after 2 years.';
+    protected $description = 'Deletes users on their destroyed date.';
 
     protected $destroyed;
 
@@ -38,11 +38,13 @@ class DeleteSeparatedAndDestroyedUsers extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return DeleteUsers
      */
     public function handle()
     {
         $this->setDestroyed();
+
+        return $this;
     }
 
     /**
@@ -50,17 +52,15 @@ class DeleteSeparatedAndDestroyedUsers extends Command
      *
      * @return Collection
      */
-    public function getDestroyed()
+    public function getList()
     {
         return $this->destroyed;
     }
 
     public function setDestroyed()
     {
-        $deadmanList = User::where(function ($q) {
-            $q->where('status', 'separated')->orWhere('status', 'destroyed');
-        })
-            ->whereBetween('destroyed_date', [Carbon::today(), Carbon::today()->addDays(6)])
+        $deadmanList = User::where('status', '!=', 'active')
+            ->where('destroyed_date', '<=', Carbon::today())
             ->get();
 
         foreach ($deadmanList as $user) {

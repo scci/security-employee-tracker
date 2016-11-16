@@ -14,6 +14,7 @@ class GroupControllerTest extends TestCase
     {
         parent::setUp();
         $this->signIn();
+        $this->withoutEvents();
     }
 
     /**

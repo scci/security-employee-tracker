@@ -52,7 +52,7 @@ class RenewTraining extends Command
     /**
      * Execute the console command.
      *
-     * @return mixed
+     * @return RenewTraining
      */
     public function handle()
     {
@@ -74,7 +74,7 @@ class RenewTraining extends Command
         return $this;
     }
 
-    public function getTrainingAdminRecord()
+    public function getList()
     {
         return $this->trainingAdminRecord->sortBy('userFullName');
     }
@@ -119,11 +119,7 @@ class RenewTraining extends Command
             ->addDays($trainingUser->training->renews_in)
             ->subDays($this->offset);
 
-        if ($renewalDate >= $today) {
-            return false;
-        }
-
-        return true;
+        return !($renewalDate >= $today);
     }
 
     /**
