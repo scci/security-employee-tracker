@@ -82,7 +82,7 @@ class SendReminders extends Command
     public function setTrainingUsers()
     {
         $this->trainingUsers = TrainingUser::with([
-            'training', 'training.attachments', 'user', 'user.supervisor'
+            'training', 'training.attachments', 'user', 'user.supervisor',
         ])
             ->where('due_date', '<=', Carbon::today()->addWeek())
             ->whereNull('completed_date')

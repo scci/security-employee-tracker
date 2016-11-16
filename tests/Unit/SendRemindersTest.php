@@ -22,7 +22,7 @@ class SendRemindersTest extends TestCase
 
         $this->training = factory(Training::class)->create(['renews_in' => 365]);
         $this->user = factory(User::class)->create([
-            "supervisor_id" => factory(User::class)->create()->id
+            'supervisor_id' => factory(User::class)->create()->id,
         ]);
     }
 

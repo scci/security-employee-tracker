@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\Events\TrainingAssigned;
 use SET\Group;
 use SET\Http\Controllers\GroupController;
 use SET\Training;

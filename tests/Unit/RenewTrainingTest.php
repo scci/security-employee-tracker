@@ -5,7 +5,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Console\Commands\RenewTraining;
 use SET\Events\TrainingAssigned;
 use SET\Training;
-use SET\TrainingUser;
 use SET\User;
 
 class RenewTrainingTest extends TestCase

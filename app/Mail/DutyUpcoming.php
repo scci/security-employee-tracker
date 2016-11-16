@@ -4,9 +4,9 @@ namespace SET\Mail;
 
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use SET\Duty;
 use SET\Setting;
 use SET\User;
@@ -19,9 +19,9 @@ class DutyUpcoming extends Mailable implements ShouldQueue
     public $date;
     public $duty;
 
-
     /**
      * DutyUpcoming constructor.
+     *
      * @param Duty $duty
      * @param User $user
      * @param $date
@@ -43,19 +43,19 @@ class DutyUpcoming extends Mailable implements ShouldQueue
         $filename = $this->generateICS();
 
         if ($this->duty->cycle = 'daily') {
-            $subject = "You have ".$this->duty->name." security check on $this->date.";
+            $subject = 'You have '.$this->duty->name." security check on $this->date.";
         } else {
-            $subject = "You have ".$this->duty->name." security check starting $this->date.";
+            $subject = 'You have '.$this->duty->name." security check starting $this->date.";
         }
 
         return $this->view('emails.duty_future')
             ->subject($subject)
             ->attach($filename, ['mime' => 'text/calendar']);
-
     }
 
     /**
      * Make our ICS file.
+     *
      * @return string
      */
     private function generateICS()

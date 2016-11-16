@@ -9,7 +9,6 @@ use SET\Duty;
 use SET\Handlers\Duty\DutyList;
 use SET\Mail\DutyToday;
 use SET\Mail\DutyUpcoming;
-use SET\Setting;
 
 /**
  * Processes the emails for upcoming employees working security checks. Also notifies FSO

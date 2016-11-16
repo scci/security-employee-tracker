@@ -19,7 +19,7 @@ class SendNewsTest extends TestCase
         $send_news = factory(News::class)->create(['send_email' => 1, 'publish_date' => Carbon::today()]);
         $news = factory(News::class)->create();
 
-        (new SendNews)->handle();
+        (new SendNews())->handle();
 
         Mail::assertSent(SendNewsEmail::class, function ($mail) use ($send_news) {
             return $mail->news->id == $send_news->id;

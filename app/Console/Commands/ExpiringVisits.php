@@ -26,7 +26,6 @@ class ExpiringVisits extends Command
 
     /**
      * Create a new command instance.
-     *
      */
     public function __construct()
     {
@@ -47,6 +46,7 @@ class ExpiringVisits extends Command
             ->activeUsers()
             ->orderBy('expiration_date')
             ->get();
+
         return $this;
     }
 
