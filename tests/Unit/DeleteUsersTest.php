@@ -20,5 +20,4 @@ class DeleteUsersTest extends TestCase
 
         $this->assertCount(2, $users);
     }
-
 }

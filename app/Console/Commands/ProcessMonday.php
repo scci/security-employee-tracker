@@ -2,15 +2,12 @@
 
 namespace SET\Console\Commands;
 
-use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Mail;
 use SET\Duty;
 use SET\Handlers\Duty\DutyList;
 use SET\Mail\EmailAdminSummary;
 use SET\Setting;
-use SET\Visit;
 
 class ProcessMonday extends Command
 {
@@ -42,8 +39,7 @@ class ProcessMonday extends Command
      */
     public function handle()
     {
-        foreach ($this->classesToProcess as $key => $class)
-        {
+        foreach ($this->classesToProcess as $key => $class) {
             $mailArray[$key] = (new $class())->handle()->getList();
         }
 
@@ -66,6 +62,7 @@ class ProcessMonday extends Command
     private function getDutyList()
     {
         $duties = Duty::all();
+
         return $duties->map(function ($item) {
             $userDateArray = (new DutyList($item))->emailOutput();
             $userDateArray->put('duty', $item);

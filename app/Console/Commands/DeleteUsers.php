@@ -43,6 +43,7 @@ class DeleteUsers extends Command
     public function handle()
     {
         $this->setDestroyed();
+
         return $this;
     }
 
