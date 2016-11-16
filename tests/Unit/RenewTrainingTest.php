@@ -83,16 +83,56 @@ class RenewTrainingTest extends TestCase
     {
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
+
+        //year past (renews in eligible) - completed
         $training->users()->attach($user, [
             'author_id'      => $user->first()->id,
             'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
             'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d'),
         ]);
 
+        //past - completed
         $training->users()->attach($user, [
             'author_id'      => $user->first()->id,
             'due_date'       => Carbon::today()->subWeek()->format('Y-m-d'),
             'completed_date' => Carbon::today()->subWeek()->format('Y-m-d'),
+        ]);
+
+        //past - incomplete
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subWeek()->format('Y-m-d'),
+            'completed_date' => null,
+        ]);
+
+        (new RenewTraining())->handle();
+
+        $trainingUser = TrainingUser::where('training_id', $training->id)
+            ->where('user_id', $user->id)
+            ->whereNotNull('created_at')
+            ->get();
+
+        $this->assertCount(0, $trainingUser);
+    }
+
+    /** @test */
+    public function it_does_not_renew_if_incomplete_but_past_due()
+    {
+        $training = factory(Training::class)->create(['renews_in' => 365]);
+        $user = factory(User::class)->create();
+
+        //year past (renews in eligible) - completed
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d'),
+        ]);
+
+        //past - incomplete
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subWeek()->format('Y-m-d'),
+            'completed_date' => null,
         ]);
 
         (new RenewTraining())->handle();

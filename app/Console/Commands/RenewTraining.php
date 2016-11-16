@@ -57,12 +57,13 @@ class RenewTraining extends Command
     public function handle()
     {
         $trainingUsers = TrainingUser::with('user', 'training')
-            ->whereNotNull('completed_date')
             ->where('due_date', '<', Carbon::today())
             ->activeUsers()
-            ->orderBy('completed_date', 'desc')
+            ->orderBy('id', 'desc')
             ->get()
-            ->unique('user_id', 'training_id');
+            ->unique(function ($item) {
+                return $item['user_id'].'-'.$item['training_id'];
+            });
 
         foreach ($trainingUsers as $trainingUser) {
             if (!$this->renewedAlready($trainingUser) && $this->timeToRenew($trainingUser)) {
@@ -87,6 +88,10 @@ class RenewTraining extends Command
      */
     private function renewedAlready($trainingUser)
     {
+        if (is_null($trainingUser->completed_date)) {
+            return true;
+        }
+
         $trainingRecord = TrainingUser::where('training_id', $trainingUser->training_id)
             ->where('user_id', $trainingUser->user_id)
             ->where('due_date', '>', Carbon::today())
