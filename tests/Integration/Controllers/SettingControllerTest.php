@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\User;
 use SET\Setting;
+use SET\User;
 
 class SettingControllerTest extends TestCase
 {
-     use DatabaseTransactions;
+    use DatabaseTransactions;
 
     public function setUp()
     {
@@ -34,9 +34,9 @@ class SettingControllerTest extends TestCase
         $this->actingAs($newuser);
         $this->call('GET', '/settings');
 
-         $this->seeStatusCode(403);
+        $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -44,14 +44,14 @@ class SettingControllerTest extends TestCase
     {
         // Currently there is only one row for setting. Get the first setting.
         $currentSetting = Setting::get()->first();
-        
-        // Logged in as admin - Can update the news
-        $data = ['report_address-primary'    => 'FSO-Primary',
-                 'report_address-secondary'    => 'FSO-Secondary',
-                 'admin'    => $currentSetting->admin,
-                 'viewer'   => $currentSetting->viewer ];
 
-        $this->call('PATCH', "settings/none", $data);
+        // Logged in as admin - Can update the news
+        $data = ['report_address-primary'      => 'FSO-Primary',
+                 'report_address-secondary'    => 'FSO-Secondary',
+                 'admin'                       => $currentSetting->admin,
+                 'viewer'                      => $currentSetting->viewer, ];
+
+        $this->call('PATCH', 'settings/none', $data);
 
         $this->assertRedirectedToRoute('settings.index');
 
@@ -59,19 +59,17 @@ class SettingControllerTest extends TestCase
         $this->assertNotEquals($currentSetting->primary, $updatedSetting->primary);
         $this->assertEquals($updatedSetting->primary, $data['report_address-primary']);
         $this->assertEquals($updatedSetting->secondary, $data['report_address-secondary']);
-        
+
         // Logged in as a regular user - Cannot update settings
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('PATCH', "settings/none", $data);
+        $this->call('PATCH', 'settings/none', $data);
         $this->seeStatusCode(403);
 
         // Logged in as a user with role view - Cannot update settings
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('PATCH', "settings/none", $data);
+        $this->call('PATCH', 'settings/none', $data);
         $this->seeStatusCode(403);
     }
 }
-
-?>

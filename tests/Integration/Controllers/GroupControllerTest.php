@@ -263,22 +263,22 @@ class GroupControllerTest extends TestCase
         $this->actingAs($newuser);
         $groupToCreate = factory(Group::class)->create();
         $createdGroupId = $groupToCreate->id;
-        
+
         // Try to delete as a regular user. Get forbidden status code
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $this->call('DELETE', "group/$createdGroupId");
         $this->seeStatusCode(403);
-        
+
         // Try to delete as a user with view permissions. Get forbidden status code
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        
+
         $this->call('DELETE', "group/$createdGroupId");
         $this->seeStatusCode(403);
-    } 
-     
-     /**
+    }
+
+    /**
      * @test
      */
     public function it_assigns_training()

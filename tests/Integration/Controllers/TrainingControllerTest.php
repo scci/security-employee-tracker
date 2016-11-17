@@ -1,14 +1,13 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\User;
+use SET\Http\Controllers\TrainingController;
 use SET\Training;
 use SET\TrainingUser;
-use SET\Http\Controllers\TrainingController;
-use SET\Handlers\Excel\CompletedTrainingExport;
+use SET\User;
 
-class TrainingControllerTest extends TestCase {
-    
+class TrainingControllerTest extends TestCase
+{
     use DatabaseTransactions;
 
     public function setUp()
@@ -32,19 +31,19 @@ class TrainingControllerTest extends TestCase {
         // Logged in as a regular user - Cannot access the training page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', '/training');        
-        
+        $this->call('GET', '/training');
+
         $this->seeStatusCode(403);
-        
+
         // Logged in as a user with role view - Can access the training page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $this->call('GET', '/training');
-        
+
         $this->seePageIs('training');
         $this->assertViewHas('trainings');
     }
-    
+
     /**
      * @test
      */
@@ -71,7 +70,7 @@ class TrainingControllerTest extends TestCase {
 
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -79,14 +78,14 @@ class TrainingControllerTest extends TestCase {
     {
         // Logged in as admin - Can store the training
         $data = ['name'        => 'A Training',
-                 'renews_in'  => "15",
+                 'renews_in'   => '15',
                  'description' => 'A Description',
-                 'assign'   => "None",
-                 'due_date' => '2016-11-28'];
+                 'assign'      => 'None',
+                 'due_date'    => '2016-11-28', ];
 
         $this->call('POST', 'training', $data);
         $this->assertRedirectedToRoute('training.index');
-        
+
         // Retrieve the training note created by this user
         $userNote = SET\Note::where('user_id', $this->user->id)->get();
 
@@ -105,7 +104,7 @@ class TrainingControllerTest extends TestCase {
         $this->call('POST', 'training', $data);
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -117,17 +116,17 @@ class TrainingControllerTest extends TestCase {
         $this->call('POST', 'training', $data);
 
         $this->assertSessionHasErrors();
-        
+
         $this->assertSessionHasErrors(['name']);
-        $this->assertSessionHasErrors('name', 'The name field is required.');        
+        $this->assertSessionHasErrors('name', 'The name field is required.');
 
         // Logged in as admin - Only assign value is entered.
-        $data = ['assign' => "due_date"];
+        $data = ['assign' => 'due_date'];
         $this->call('POST', 'training', $data);
         $this->assertSessionHasErrors();
         $this->assertSessionHasErrors(['name', 'due_date']);
     }
-    
+
     /**
      * @test
      */
@@ -144,7 +143,7 @@ class TrainingControllerTest extends TestCase {
         $this->assertViewHas('training');
         $this->assertViewHas('showAll');
     }
-    
+
     /**
      * @test
      */
@@ -167,14 +166,14 @@ class TrainingControllerTest extends TestCase {
         $this->actingAs($newuser);
         $this->call('GET', "training/$createdTrainingId/edit");
         $this->seeStatusCode(403);
-        
+
         // Logged in as a user with role view - Cannot edit the training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $this->call('GET', "training/$createdTrainingId/edit");
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -185,14 +184,14 @@ class TrainingControllerTest extends TestCase {
         $createdTrainingId = $trainingToCreate->id;
 
         // Logged in as admin - Can update the training
-        $data = ['name'       => 'A Training',
-                 'renews_in'  => "15",
+        $data = ['name'        => 'A Training',
+                 'renews_in'   => '15',
                  'description' => 'A Description',
-                 'assign'   => "None",
-                 'due_date' => '2016-11-28'];
+                 'assign'      => 'None',
+                 'due_date'    => '2016-11-28', ];
 
         $this->call('PATCH', "training/$createdTrainingId", $data);
-                
+
         $this->assertRedirectedTo("/training/$createdTrainingId");
 
         $createdTraining = Training::find($trainingToCreate->id);
@@ -208,7 +207,7 @@ class TrainingControllerTest extends TestCase {
 
         // Ensure that the note is created - tests the private method createTrainingNote
         $this->assertNotNull($userNote);
-     
+
         // Logged in as a regular user - Cannot update the training
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
@@ -221,7 +220,7 @@ class TrainingControllerTest extends TestCase {
         $this->call('PATCH', "training/$createdTrainingId", $data);
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -255,21 +254,21 @@ class TrainingControllerTest extends TestCase {
         $this->actingAs($newuser);
         $trainingToCreate = factory(Training::class)->create();
         $createdTrainingId = $trainingToCreate->id;
-        
+
         // Try to delete as a regular user. Get forbidden status code
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $this->call('DELETE', "training/$createdTrainingId");
         $this->seeStatusCode(403);
-        
+
         // Try to delete as a user with view permissions. Get forbidden status code
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        
+
         $this->call('DELETE', "training/$createdTrainingId");
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -277,27 +276,27 @@ class TrainingControllerTest extends TestCase {
     {
         $training = factory(Training::class)->create();
         $createdTrainingId = $training->id;
-        
+
         $this->action('GET', 'TrainingController@assignForm', $createdTrainingId);
-        
+
         $this->seePageIs("training/{$createdTrainingId}/assign");
         $this->assertViewHas('training');
         $this->assertViewHas('users');
         $this->assertViewHas('groups');
-        
-        // Logged in as a regular user - Cannot assign the training 
+
+        // Logged in as a regular user - Cannot assign the training
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $this->action('GET', 'TrainingController@assignForm', $createdTrainingId);
         $this->seeStatusCode(403);
-        
+
         // Logged in as a user with role view - Cannot assign the training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $this->action('GET', 'TrainingController@assignForm', $createdTrainingId);
-        $this->seeStatusCode(403);        
+        $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -305,36 +304,36 @@ class TrainingControllerTest extends TestCase {
     {
         $training = factory(Training::class)->create();
         $createdTrainingId = $training->id;
-        
-        $data = ['name'       => 'A Training',
-                 'renews_in'  => "15",
+
+        $data = ['name'        => 'A Training',
+                 'renews_in'   => '15',
                  'description' => 'A Description',
-                 'assign'   => "None",
-                 'due_date' => '2016-11-28',
-                 'users' => [$this->user->id]];       
-        
-        $this->call('POST', "/training/$createdTrainingId/assign/", $data);        
+                 'assign'      => 'None',
+                 'due_date'    => '2016-11-28',
+                 'users'       => [$this->user->id], ];
+
+        $this->call('POST', "/training/$createdTrainingId/assign/", $data);
         $this->assertRedirectedTo("/training/$createdTrainingId");
-        
+
         // Retrieve the training note created by this user
         $userNote = SET\Note::where('user_id', $this->user->id)->get();
 
         // Ensure that the note is created - tests the private method createTrainingNote
         $this->assertNotNull($userNote);
-        
-        // Logged in as a regular user - Cannot assign users to training 
+
+        // Logged in as a regular user - Cannot assign users to training
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $this->call('POST', "/training/$createdTrainingId/assign/", $data);
         $this->seeStatusCode(403);
-        
+
         // Logged in as a user with role view - Cannot assign users to training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $this->call('POST', "/training/$createdTrainingId/assign/", $data);
-        $this->seeStatusCode(403);       
-    }    
-    
+        $this->seeStatusCode(403);
+    }
+
     /**
      * @test
      */
@@ -342,11 +341,8 @@ class TrainingControllerTest extends TestCase {
     {
         $trainingUser = factory(TrainingUser::class)->create();
         $trainingUserId = $trainingUser->id;
-        
+
         $this->action('GET', 'TrainingController@sendReminder', $trainingUserId);
-        $this->expectsEvents(SET\Events\TrainingAssigned::class);        
+        $this->expectsEvents(SET\Events\TrainingAssigned::class);
     }
-
 }
-
-?>

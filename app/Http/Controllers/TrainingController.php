@@ -133,7 +133,7 @@ class TrainingController extends Controller
      */
     public function destroy($trainingId)
     {
-        $this->authorize('edit');        
+        $this->authorize('edit');
         Training::findOrFail($trainingId)->delete();
     }
 
