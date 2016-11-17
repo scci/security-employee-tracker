@@ -22,6 +22,7 @@
                         <th>Publish Date</th>
                         @can('edit')
                             <th>Expire Date</th>
+                            <th>Email</th>
                         @endcan
                         <th></th>
                     </tr>
@@ -33,6 +34,15 @@
                             <td class="text-nowrap">{{ $news->publish_date }}</td>
                             @can('edit')
                                 <td class="text-nowrap">{{ $news->expire_date }}</td>
+                                <td>
+                                    @if($news->send_email &&  Carbon\Carbon::today()->gt(Carbon\Carbon::createFromFormat('Y-m-d', $news->publish_date)))
+                                        <i class="small material-icons green-text tooltipped" data-tooltip="Sent">check</i>
+                                    @elseif($news->send_email)
+                                        <i class="small material-icons amber-text text-darken-1 tooltipped" data-tooltip="Will send on publish date.">query_builder</i>
+                                    @else
+                                        <i class="small material-icons tooltipped" data-tooltip="Don't Send">close</i>
+                                    @endif
+                                </td>
                             @endcan
                             <td class="no-wrap">
                                 <div class="action-buttons">
