@@ -87,7 +87,7 @@ return [
                 |
                 */
 
-                'account_prefix' => '',
+                'account_prefix' => env('ADLDAP_ACCOUNT_PREFIX',''),
 
                 /*
                 |--------------------------------------------------------------------------
@@ -102,7 +102,7 @@ return [
                 |
                 */
 
-                'account_suffix' => '@teamscci.local',
+                'account_suffix' => env('ADLDAP_ACCOUNT_SUFFIX',''),
 
                 /*
                 |--------------------------------------------------------------------------
@@ -118,7 +118,10 @@ return [
                 |
                 */
 
-                'domain_controllers' => ['192.168.0.72', '192.168.0.71'],
+                'domain_controllers' => [
+                    env('ADLDAP_DOMAIN_CONTROLER1'),
+                    env('ADLDAP_DOMAIN_CONTROLER2')
+                ],
 
                 /*
                 |--------------------------------------------------------------------------
@@ -158,7 +161,7 @@ return [
                 |
                 */
 
-                'base_dn' => 'DC=teamscci,DC=local',
+                'base_dn' => env('ADLDAP_BASE_DN','dc=company,dc=com'),
 
                 /*
                 |--------------------------------------------------------------------------
@@ -187,8 +190,8 @@ return [
                 |
                 */
 
-                'admin_username' => 'buildmaster',
-                'admin_password' => 'SCCIbuild!',
+                'admin_username' => env('ADLDAP_ADMIN_USERNAME', 'username'),
+                'admin_password' => env('ADLDAP_ADMIN_PASSWORD', 'password'),
 
                 /*
                 |--------------------------------------------------------------------------

@@ -60,7 +60,7 @@ return [
     */
     'providers' => [
         'users' => [
-            'driver' => 'adldap',
+            'driver' => env('AUTH_DRIVER', 'eloquent'),
             'model'  => SET\User::class,
         ],
     ],
@@ -103,6 +103,6 @@ return [
     |
     */
 
-    'admin' => ['sketa'],
+    'admin' => ['sdibble','tdonaghue'],
 
 ];
