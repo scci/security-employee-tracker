@@ -42,21 +42,7 @@ class DutyHelper
             return;
         }
 
-        switch ($this->duty->cycle) {
-            case 'daily':
-                $this->recordNextEntry();
-                break;
-            case 'weekly':
-                if (Carbon::today()->startOfWeek()->format('Y-m-d') == $today) {
-                    $this->recordNextEntry();
-                }
-                break;
-            case 'monthly':
-                if (Carbon::today()->startOfMonth()->format('Y-m-d') == $today) {
-                    $this->recordNextEntry();
-                }
-                break;
-        }
+        $this->readyToRecordNextEntry($today);
     }
 
     public function sortList()
@@ -68,5 +54,28 @@ class DutyHelper
         }
 
         return $this;
+    }
+
+    /**
+     * Check duty cycle. Then determine if time to record next entry.
+     *
+     * @param $today
+     */
+    private function readyToRecordNextEntry($today)
+    {
+        switch ($this->duty->cycle) {
+            case 'daily':
+                $this->recordNextEntry();
+                break;
+            case 'weekly':
+                if (Carbon::today()->startOfWeek()->format('Y-m-d') == $today) {
+                    $this->recordNextEntry();
+                }
+                break;
+            default: //monthly
+                if (Carbon::today()->startOfMonth()->format('Y-m-d') == $today) {
+                    $this->recordNextEntry();
+                }
+        }
     }
 }
