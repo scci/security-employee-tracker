@@ -44,12 +44,14 @@
             @yield('content')
         </div>
     </main>
-    <footer class="page-footer @can('view')handle-action-item-sidebar @endcan">
-        <div class="container">
-            <div class="row">
-                <div class="col s12 white-text">
-                    Powered by SET &copy; 2015-<?php echo date("Y") ?>. An <a href="https://www.teamscci.com">SCCI</a> Product.
-                </div>
+    <footer class="page-footer @can('view')handle-action-item-sidebar @endcan" style="padding-top:0;">
+        <div class="footer-copyright">
+            <div class="container">
+                Powered by SET &copy; 2015-<?php echo date("Y") ?>. An <a href="https://www.teamscci.com">SCCI</a> Product.
+                @can('view')
+                    <a href="https://github.com/scci/security-employee-tracker/wiki" class="right btn small">Documentation</a>
+                    <a href="https://github.com/scci/security-employee-tracker/issues" class="right btn small">Report Bugs</a>
+                @endcan
             </div>
         </div>
     </footer>

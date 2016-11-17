@@ -71,6 +71,11 @@
             </div>
         </div>
     </div>
+    <div class="footer-copyright">
+        <div class="container">
+            Powered by SET &copy; 2015-<?php echo date("Y") ?>. An <a href="https://www.teamscci.com">SCCI</a> Product.
+        </div>
+    </div>
 </footer>
 </body>
 </html>
