@@ -57,5 +57,5 @@
 </div>
 
 <script>
-    new SimpleMDE({});
+    new SimpleMDE({spellChecker: false});
 </script>
