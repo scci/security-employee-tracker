@@ -60,7 +60,7 @@ return [
     */
     'providers' => [
         'users' => [
-            'driver' => 'adldap',
+            'driver' => 'eloquent',
             'model'  => SET\User::class,
         ],
     ],
