@@ -59,7 +59,7 @@ class DutyHelper
     /**
      * Check duty cycle. Then determine if time to record next entry.
      *
-     * @param $today
+     * @param string $today
      */
     private function readyToRecordNextEntry($today)
     {
