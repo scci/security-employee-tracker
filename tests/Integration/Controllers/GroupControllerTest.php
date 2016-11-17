@@ -232,6 +232,54 @@ class GroupControllerTest extends TestCase
      /**
      * @test
      */
+    public function it_deletes_the_group()
+    {
+        // Create a group object
+        $groupToCreate = factory(Group::class)->create();
+        $createdGroupId = $groupToCreate->id;
+
+        // Ensure the created group is in the database
+        $createdGroup = Group::find($createdGroupId);
+        $this->assertNotNull($createdGroup);
+        $this->assertEquals($createdGroup->id, $createdGroupId);
+
+        // Delete the created group. Assert that a null object is returned.
+        $this->call('DELETE', "group/$createdGroupId");
+        $deletedGroup = Group::find($createdGroupId);
+        $this->assertNull($deletedGroup);
+
+        // Logged in as a regular user
+        $newuser = factory(User::class)->create();
+        $this->actingAs($newuser);
+
+        // Cannot access the delete group page since the group with
+        // the provided Id has already been deleted
+        $this->call('DELETE', "group/$createdGroupId");
+        $this->seeStatusCode(403);
+
+        // Create a new group(Only user with edit permission can create)
+        $user = factory(User::class)->create(['role' => 'edit']);
+        $this->actingAs($newuser);
+        $groupToCreate = factory(Group::class)->create();
+        $createdGroupId = $groupToCreate->id;
+        
+        // Try to delete as a regular user. Get forbidden status code
+        $newuser = factory(User::class)->create();
+        $this->actingAs($newuser);
+        $this->call('DELETE', "group/$createdGroupId");
+        $this->seeStatusCode(403);
+        
+        // Try to delete as a user with view permissions. Get forbidden status code
+        $newuser = factory(User::class)->create(['role' => 'view']);
+        $this->actingAs($newuser);
+        
+        $this->call('DELETE', "group/$createdGroupId");
+        $this->seeStatusCode(403);
+    } 
+     
+     /**
+     * @test
+     */
     public function it_assigns_training()
     {       
         $group = factory(Group::class)->create();
