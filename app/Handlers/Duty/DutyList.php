@@ -17,9 +17,9 @@ class DutyList
         $this->duty = $duty;
     }
 
-    public function HTMLOutput()
+    public function htmlOutput()
     {
-        return $this->processedList()->HTMLOutput();
+        return $this->processedList()->htmlOutput();
     }
 
     public function scheduledUpdate()

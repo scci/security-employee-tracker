@@ -34,7 +34,6 @@ class UserController extends Controller
             'trainings',
         ])
             ->skipSystem()
-            ->active()
             ->orderBy('last_name')->get();
 
         return view('user.index', compact('users'));

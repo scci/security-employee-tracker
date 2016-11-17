@@ -16,27 +16,32 @@
 </div>
 <div class="row">
     <div class="input-field col s12" id="news_description">
-        {!! Form::label('description', 'Description:') !!}<br />
+        {!! Form::label('description', 'Description:', ['style' => 'margin-top:-2em']) !!}
         {!! Form::textarea('description', null, ['class' => 'wysiwyg']) !!}
     </div>
 </div>
 <div class="row">
     <div class="col s12" id="file_upload">
-        <div class="file-field input-field">
-            <div class="btn">
-                <span>File</span>
-                {!! Form::file('files[]', array('multiple' => true)) !!}
-            </div>
-            <div class="file-path-wrapper">
-                <input class="file-path validate" type="text" placeholder="Upload one or more files">
-            </div>
-        </div>
+        {!! Form::multipleFiles() !!}
+        @if (isset($news))
+            Attachments:
+            @foreach($news->attachments as $file)
+                <span class="chip">
+                    <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                    <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                </span> &nbsp;
+            @endforeach
+        @endif
     </div>
 </div>
 <div class="row">
     <div class="col m4 s12">
             {!! Form::hidden('send_email', 0) !!}
-            <input type="checkbox" name="send_email" value=1 class="filled-in" id="send_email" @if( old('send_email') || ( $submit == 'Update' && $news->send_email) ) checked @endif />
+            <input type="checkbox" name="send_email" value=1 class="filled-in" id="send_email"
+                   @if( old('send_email') || ( $submit == 'Update' && $news->send_email) )
+                        checked
+                   @endif
+            />
             <label for="send_email">Email news on publish date</label>
     </div>    
 </div>
@@ -47,3 +52,7 @@
         {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
     </div>
 </div>
+
+<script>
+    new SimpleMDE({spellChecker: false});
+</script>

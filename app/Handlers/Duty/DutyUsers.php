@@ -20,7 +20,7 @@ class DutyUsers extends DutyHelper
      *
      * @return Collection
      */
-    public function HTMLOutput()
+    public function htmlOutput()
     {
         $newCollection = new Collection();
 
@@ -72,6 +72,10 @@ class DutyUsers extends DutyHelper
      */
     public function recordNextEntry()
     {
+        if ($this->list->count() < 2) {
+            return;
+        }
+
         $nextUser = $this->list->toArray()[1]['user'];
         $this->duty->users()->updateExistingPivot($nextUser->id, ['last_worked' => Carbon::today()]);
     }
@@ -83,7 +87,7 @@ class DutyUsers extends DutyHelper
      */
     public function getLastWorked()
     {
-        $this->lastWorked = $this->duty->users()->orderBy('duty_user.last_worked', 'DESC')->orderBy('last_name')->first();
+        $this->lastWorkedUser = $this->duty->users()->orderBy('duty_user.last_worked', 'DESC')->orderBy('last_name')->first();
 
         return $this;
     }

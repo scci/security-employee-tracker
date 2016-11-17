@@ -29,8 +29,8 @@
                     </div>
                     <div class="row">
                         <div class="col m3">Training Instructions:</div>
-                        <div class="col m9">
-                            {!! nl2br(e($trainingUser->training->description)) !!} <br />
+                        <div class="col m9 browser-default">
+                            {!! Markdown::convertToHTML($trainingUser->training->description) !!} <br />
                             @foreach($trainingUser->training->attachments as $file)
                                 <div class="chip">
                                     <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>

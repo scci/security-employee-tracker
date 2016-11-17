@@ -86,7 +86,7 @@
                         {{$row['date']}} -
 
                         @foreach($row['users'] as $user)
-                            {{ $user->userFullName }} ;
+                            {{ $user->userFullName }}@if(!$loop->last); @endif
                         @endforeach
                         <br />
                     @endif

@@ -42,7 +42,7 @@ class DutyController extends Controller
     public function show($dutyID)
     {
         $duty = Duty::findOrFail($dutyID);
-        $list = (new DutyList($duty))->HTMLOutput();
+        $list = (new DutyList($duty))->htmlOutput();
 
         return view('duty.show', compact('duty', 'list'));
     }

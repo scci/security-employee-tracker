@@ -12,6 +12,20 @@ class Calendar
     private $start;
     private $end;
     private $calendarArray;
+    private $test;
+
+    /**
+     * Name of function that generates a collection followed by an array of dates
+     * we want to mark in our calendar/agenda.
+     *
+     * @var array
+     */
+    private $lists = [
+        'separatedList'     => ['destroyed_date'],
+        'travelsList'       => ['leave_date', 'return_date'],
+        'trainingUsersList' => ['due_date'],
+        'newUserList'       => ['created_at'],
+    ];
 
     public function __construct()
     {
@@ -34,26 +48,25 @@ class Calendar
         $date = $this->start;
         $i = 0;
 
-        $separatedList = $this->separatedList();
-        $travelList = $this->travelsList();
-        $trainingUsersList = $this->trainingUsersList();
-        $newUserList = $this->newUserList();
+        $list = $this->callFunctionsFromLookup();
 
         while ($date <= $this->end) {
             $currentDate = $date->format('Y-m-d');
+            $this->test = false;
+            $list2 = [];
 
-            $separatedArray = $this->pushToArray($separatedList, ['destroyed_date'], $currentDate);
-            $travelsArray = $this->pushToArray($travelList, ['leave_date', 'return_date'], $currentDate);
-            $trainingUsersArray = $this->pushToArray($trainingUsersList, ['due_date'], $currentDate);
-            $newUserArray = $this->pushToArray($newUserList, ['created_at'], $currentDate);
-            $trainingUsersArray = $this->groupUsersForTraining($trainingUsersArray);
+            foreach ($this->lists as $functionName => $columns) {
+                $list2[$functionName] = $this->buildArrayByDate($list[$functionName], $columns, $currentDate);
+            }
 
-            if ((!empty($separatedArray) || !empty($travelsArray) || !empty($trainingUsersArray) || !empty($newUserArray)) || $currentDate == Carbon::today()->format('Y-m-d')) {
-                $this->calendarArray[$i]['date'] = $currentDate;
-                $this->calendarArray[$i]['separated'] = $separatedArray;
-                $this->calendarArray[$i]['travel'] = $travelsArray;
-                $this->calendarArray[$i]['trainingUser'] = $trainingUsersArray;
-                $this->calendarArray[$i]['newUser'] = $newUserArray;
+            if ($this->test || $currentDate == Carbon::today()->format('Y-m-d')) {
+                $this->calendarArray[$i] = [
+                    'date'         => $currentDate,
+                    'separated'    => $list2['separatedList'],
+                    'travel'       => $list2['travelsList'],
+                    'trainingUser' => $this->groupUsersForTraining($list2['trainingUsersList']),
+                    'newUser'      => $list2['newUserList'],
+                ];
             }
 
             $date->addDay();
@@ -61,19 +74,15 @@ class Calendar
         }
     }
 
-    /**
-     * @param string $date
-     */
-    private function pushToArray($list, array $columnName, $date)
+    private function buildArrayByDate($list, array $columnName, $date)
     {
         $array = [];
-
-
 
         foreach ($list as $item) {
             foreach ($columnName as $column) {
                 $dbDate = $this->testForCarbonObject($item[$column]);
                 if ($date == $dbDate) {
+                    $this->test = true;
                     array_push($array, $item);
                 }
             }
@@ -158,5 +167,18 @@ class Calendar
     private function newUserList()
     {
         return User::whereBetween('created_at', [$this->start, $this->end])->get();
+    }
+
+    /**
+     * @return array
+     */
+    private function callFunctionsFromLookup()
+    {
+        $array = [];
+        foreach ($this->lists as $functionName => $columns) {
+            $array[$functionName] = $this->$functionName();
+        }
+
+        return $array;
     }
 }

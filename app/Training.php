@@ -35,7 +35,10 @@ class Training extends Model
 
     public function getIncompletedAttribute()
     {
-        return $this->users()->whereNull('training_user.completed_date')->count();
+        return $this->users()
+            ->whereNull('training_user.completed_date')
+            ->active()
+            ->count();
     }
 
     /**

@@ -15,7 +15,7 @@ class DutyGroups extends DutyHelper
         parent::__construct($duty);
     }
 
-    public function HTMLOutput()
+    public function htmlOutput()
     {
         $newCollection = new Collection();
 
@@ -46,13 +46,17 @@ class DutyGroups extends DutyHelper
 
     public function recordNextEntry()
     {
+        if ($this->list->count() < 2) {
+            return;
+        }
+
         $nextGroupID = $this->list->toArray()[1]['id'];
         $this->duty->groups()->updateExistingPivot($nextGroupID, ['last_worked' => Carbon::today()]);
     }
 
     public function getLastWorked()
     {
-        $this->lastWorked = $this->duty->groups()->orderBy('duty_group.last_worked', 'DESC')->first();
+        $this->lastWorkedUser = $this->duty->groups()->orderBy('duty_group.last_worked', 'DESC')->first();
 
         return $this;
     }

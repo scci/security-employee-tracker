@@ -69,7 +69,7 @@ class NewsController extends Controller
     /**
      * Show the individual news article.
      *
-     * @param $newsId
+     * @param News $news
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
@@ -142,10 +142,8 @@ class NewsController extends Controller
         $publishDate = Carbon::createFromFormat('Y-m-d', $news->publish_date);
 
         if ($news->send_email && $publishDate->eq(Carbon::now())) {
-            $allUsers = User::skipSystem()->active()->get();
-            foreach ($allUsers as $user) {
-                Mail::to($user->email)->send(new SendNewsEmail($news));
-            }
+            $users = User::skipSystem()->active()->get();
+            Mail::to($users)->send(new SendNewsEmail($news));
         }
     }
 }

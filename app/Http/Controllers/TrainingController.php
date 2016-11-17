@@ -2,6 +2,7 @@
 
 namespace SET\Http\Controllers;
 
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
@@ -29,7 +30,9 @@ class TrainingController extends Controller
     {
         $this->authorize('view');
 
-        $trainings = Training::with(['users'])->get()->sortBy('name');
+        $trainings = Training::with(['users' => function ($q) {
+            $q->active();
+        }])->get()->sortBy('name');
 
         return view('training.index', compact('trainings'));
     }
@@ -86,10 +89,10 @@ class TrainingController extends Controller
         $training = Training::with('attachments')->find($trainingId);
         $notes = $training->assignedUsers()
             ->with('user')
-            ->orderBy('due_date', 'desc')
+            ->orderBy('created_at', 'desc')
             ->get();
         if (!$showAll) {
-            $notes = $notes->unique('user_id');
+            $notes = $notes->unique('user_id')->where('user.status', 'active');
         }
 
         return view('training.show', compact('notes', 'training', 'showAll'));
@@ -211,6 +214,7 @@ class TrainingController extends Controller
     private function createTrainingNotes($data)
     {
         $data['author_id'] = Auth::user()->id;
+        $data['due_date'] = Carbon::today()->addWeeks(2);
 
         $users = [];
 

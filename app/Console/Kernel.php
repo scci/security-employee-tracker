@@ -4,11 +4,10 @@ namespace SET\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
-use SET\Console\Commands\DeleteSeparatedAndDestroyedUsers;
 use SET\Console\Commands\ProcessMonday;
 use SET\Console\Commands\RenewTraining;
 use SET\Console\Commands\SendNews;
-use SET\Console\Commands\SendReminders;
+use SET\Console\Commands\SyncLdap;
 use SET\Console\Commands\UpdateDuty;
 
 class Kernel extends ConsoleKernel
@@ -19,12 +18,11 @@ class Kernel extends ConsoleKernel
      * @var array
      */
     protected $commands = [
-        RenewTraining::class,
-        SendReminders::class,
         UpdateDuty::class,
         ProcessMonday::class,
-        DeleteSeparatedAndDestroyedUsers::class,
         SendNews::class,
+        SyncLdap::class,
+        RenewTraining::class,
     ];
 
     /**
@@ -42,5 +40,9 @@ class Kernel extends ConsoleKernel
             ->weekly()->mondays()->at('6:01');
         $schedule->command('emails:news')->withoutOverlapping()
             ->daily()->at('6:00');
+
+        if (config('auth.providers.users.driver') == 'adldap') {
+            $schedule->command('users:sync')->withoutOverlapping()->hourly();
+        }
     }
 }

@@ -66,7 +66,7 @@ class ActionItemsComposer
     private function getEligibilityRenewal()
     {
         $builtUser = new Collection();
-        $users = User::where('elig_date', '<=', Carbon::now())->active()->orderBy('elig_date', 'DESC')->get();
+        $users = User::where('elig_date', '<=', Carbon::now())->active()->get();
 
         foreach ($users as $user) {
             $calculatedDays = $this->calculateDaysToRenewClearance($user);
@@ -74,7 +74,7 @@ class ActionItemsComposer
             $this->buildUserArray($calculatedDays, $builtUser, $user);
         }
 
-        return $builtUser;
+        return $this->sortUserCollection($builtUser);
     }
 
     /**
@@ -114,5 +114,15 @@ class ActionItemsComposer
                 'days'         => $calculatedDays,
             ]);
         }
+    }
+
+    /**
+     * @param Collection $userArray
+     */
+    private function sortUserCollection($userArray)
+    {
+        return $userArray->sortByDesc(function ($array) {
+            return $array['days'];
+        });
     }
 }

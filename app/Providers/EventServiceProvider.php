@@ -7,7 +7,6 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 use SET\Events\TrainingAssigned;
 use SET\Listeners\EmailTraining;
 use SET\Listeners\LogUserAccess;
-use SET\Listeners\ResolveLdap;
 
 class EventServiceProvider extends ServiceProvider
 {
@@ -18,7 +17,6 @@ class EventServiceProvider extends ServiceProvider
      */
     protected $listen = [
         Login::class => [
-            ResolveLdap::class,
             LogUserAccess::class,
         ],
         TrainingAssigned::class => [

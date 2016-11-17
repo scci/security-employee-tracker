@@ -37,6 +37,16 @@
             <label for="encrypt">File has PII/Encrypt File.</label>
         </p>
     </div>
+    @if (isset($travel))
+        <div class="col s12">Attachments:
+            @foreach($travel->attachments as $file)
+                <span class="chip">
+                    <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                    <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                </span> &nbsp;
+            @endforeach
+        </div>
+    @endif
 </div>
 
 <div class="row">

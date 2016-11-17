@@ -44,10 +44,5 @@ $( document ).ready(function() {
         $('#attachments-form').submit();
     });
 
-    $.trumbowyg.svgPath = root + '/img/icons.svg';
-    $('.wysiwyg').trumbowyg({
-        autogrow: true
-    });
-
     $('select').material_select();
 });

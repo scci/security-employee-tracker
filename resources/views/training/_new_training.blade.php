@@ -12,11 +12,20 @@
         </div>
     </div>
     <div class="input-field col s12" id="training_description">
-        {!! Form::label('description', 'Instructions:') !!}<br />
+        {!! Form::label('description', 'Instructions:', ['style' => 'margin-top:-2em']) !!}
         {!! Form::textarea('description', null, ['class' => 'wysiwyg']) !!}
     </div>
     <div class="col s12" id="file_upload">
         {!! Form::multipleFiles() !!}
+        @if (isset($training))
+            Attachments:
+            @foreach($training->attachments as $file)
+                <span class="chip">
+                    <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                    <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                </span> &nbsp;
+            @endforeach
+        @endif
     </div>
     <div class="col s12 m6">
         <div class="input-field" id="assignment_buttons">
@@ -46,3 +55,7 @@
         {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
     </div>
 </div>
+
+<script>
+    new SimpleMDE({spellChecker: false});
+</script>

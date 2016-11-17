@@ -37,7 +37,7 @@ return [
     |
     */
 
-    'url' => 'http://localhost/',
+    'url' => env('APP_URL', 'http://localhost/'),
 
     /*
     |--------------------------------------------------------------------------
@@ -164,6 +164,7 @@ return [
         Krucas\Notification\NotificationServiceProvider::class,
         Barryvdh\Debugbar\ServiceProvider::class,
         RachidLaasri\LaravelInstaller\Providers\LaravelInstallerServiceProvider::class,
+        GrahamCampbell\Markdown\MarkdownServiceProvider::class,
     ],
 
     /*
@@ -218,6 +219,7 @@ return [
         'Adldap'       => Adldap\Laravel\Facades\Adldap::class,
         'Excel'        => Maatwebsite\Excel\Facades\Excel::class,
         'Debugbar'     => Barryvdh\Debugbar\Facade::class,
+        'Markdown'     => GrahamCampbell\Markdown\Facades\Markdown::class,
     ],
 
 ];

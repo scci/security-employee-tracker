@@ -6,6 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use SET\Events\TrainingAssigned;
+use SET\Setting;
 
 /**
  * Class EmailTraining.
@@ -42,7 +43,7 @@ class EmailTraining implements ShouldQueue
     /**
      * @param $due_date
      *
-     * @return mixed
+     * @return string
      */
     private function makeDueDatePretty($due_date)
     {
@@ -52,14 +53,22 @@ class EmailTraining implements ShouldQueue
     /**
      * @param $user
      * @param $training
-     * @param $dueDate
+     * @param string $dueDate
      * @param $trainingUser
      */
     private function sendEmail($user, $training, $dueDate, $trainingUser)
     {
+        $reportAddress = Setting::where('name', 'report_address')->first();
+
         Mail::send(
             'emails.training',
-            ['user' => $user, 'training' => $training, 'due_date' => $dueDate, 'trainingUser' => $trainingUser],
+            [
+                'user'          => $user,
+                'training'      => $training,
+                'due_date'      => $dueDate,
+                'trainingUser'  => $trainingUser,
+                'reportAddress' => $reportAddress,
+            ],
             function ($m) use ($user, $training) {
                 $m->to($user->email, $user->userFullName)->subject($training->name.' was assigned to you.');
 

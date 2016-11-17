@@ -11,7 +11,7 @@ use SET\Duty;
 class DutyHelper
 {
     public $list;
-    public $lastWorked = null;
+    public $lastWorkedUser = null;
     public $duty;
 
     public function __construct(Duty $duty)
@@ -38,10 +38,31 @@ class DutyHelper
     {
         $today = Carbon::today()->format('Y-m-d');
 
-        if ($today == $this->lastWorked->pivot->last_worked) {
+        if (isset($this->lastWorkedUser->pivot->last_worked) && $today == $this->lastWorkedUser->pivot->last_worked) {
             return;
         }
 
+        $this->readyToRecordNextEntry($today);
+    }
+
+    public function sortList()
+    {
+        if (!is_null($this->lastWorkedUser)) {
+            while ($this->list->first()->id != $this->lastWorkedUser->id) {
+                $this->list->push($this->list->shift());
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check duty cycle. Then determine if time to record next entry.
+     *
+     * @param $today
+     */
+    private function readyToRecordNextEntry($today)
+    {
         switch ($this->duty->cycle) {
             case 'daily':
                 $this->recordNextEntry();
@@ -51,22 +72,10 @@ class DutyHelper
                     $this->recordNextEntry();
                 }
                 break;
-            case 'monthly':
+            default: //monthly
                 if (Carbon::today()->startOfMonth()->format('Y-m-d') == $today) {
                     $this->recordNextEntry();
                 }
-                break;
         }
-    }
-
-    public function sortList()
-    {
-        if (!is_null($this->lastWorked)) {
-            while ($this->list->first()->id != $this->lastWorked->id) {
-                $this->list->push($this->list->shift());
-            }
-        }
-
-        return $this;
     }
 }
