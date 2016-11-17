@@ -12,7 +12,7 @@
         </div>
     </div>
     <div class="input-field col s12" id="training_description">
-        {!! Form::label('description', 'Instructions:') !!}<br />
+        {!! Form::label('description', 'Instructions:', ['style' => 'margin-top:-2em']) !!}
         {!! Form::textarea('description', null, ['class' => 'wysiwyg']) !!}
     </div>
     <div class="col s12" id="file_upload">
