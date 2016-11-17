@@ -83,7 +83,7 @@ $factory->define(SET\TrainingUser::class, function (Faker\Generator $faker) use 
         'comment'        => $faker->text(),
         'author_id'      => $factory->create(SET\User::class)->id,
         'user_id'        => $factory->create(SET\User::class)->id,
-        'training_id'    => $faker->create(SET\Training::class)->id,
+        'training_id'    => $factory->create(SET\Training::class)->id,
         'completed_date' => $faker->date(),
         'due_date'       => $faker->date(),
     ];
