@@ -16,7 +16,7 @@ class RenewTraining extends Command
      *
      * @var int
      */
-    protected $offset = 14;
+    protected $offset = 30;
 
 
     /**
