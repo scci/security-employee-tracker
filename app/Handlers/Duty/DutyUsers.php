@@ -20,7 +20,7 @@ class DutyUsers extends DutyHelper
      *
      * @return Collection
      */
-    public function HTMLOutput()
+    public function htmlOutput()
     {
         $newCollection = new Collection();
 

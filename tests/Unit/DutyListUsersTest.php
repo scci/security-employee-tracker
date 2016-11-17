@@ -26,7 +26,7 @@ class DutyListUsersTest extends TestCase
     /** @test */
     public function it_outputs_a_user_list_ordered_by_last_name()
     {
-        $html = (new DutyList($this->duty))->HTMLOutput();
+        $html = (new DutyList($this->duty))->htmlOutput();
 
         $user = $this->users->sortBy('last_name')->first();
 
@@ -39,7 +39,7 @@ class DutyListUsersTest extends TestCase
         $user = $this->users->random();
         $this->duty->users()->updateExistingPivot($user->id, ['last_worked' => Carbon::yesterday()]);
 
-        $html = (new DutyList($this->duty))->HTMLOutput();
+        $html = (new DutyList($this->duty))->htmlOutput();
 
         $this->assertEquals($user->id, $html[0]['id']);
     }
@@ -74,7 +74,7 @@ class DutyListUsersTest extends TestCase
     /** @test */
     public function it_processes_user_swap_requests()
     {
-        $htmlOne = ( new DutyList($this->duty) )->HTMLOutput();
+        $htmlOne = ( new DutyList($this->duty) )->htmlOutput();
 
         $dates = [$htmlOne[0]['date'], $htmlOne[1]['date']];
         $IDs = [$htmlOne[0]['id'], $htmlOne[1]['id']];
@@ -82,7 +82,7 @@ class DutyListUsersTest extends TestCase
 
         ( new DutyList($this->duty) )->processSwapRequest($dates, $IDs, $type);
 
-        $htmlTwo = ( new DutyList($this->duty) )->HTMLOutput();
+        $htmlTwo = ( new DutyList($this->duty) )->htmlOutput();
 
         $this->assertEquals($htmlOne[0]['id'], $htmlTwo[1]['id']);
         $this->assertEquals($htmlOne[1]['id'], $htmlTwo[0]['id']);

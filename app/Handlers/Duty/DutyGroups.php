@@ -15,7 +15,7 @@ class DutyGroups extends DutyHelper
         parent::__construct($duty);
     }
 
-    public function HTMLOutput()
+    public function htmlOutput()
     {
         $newCollection = new Collection();
 
