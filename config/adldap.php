@@ -102,7 +102,7 @@ return [
                 |
                 */
 
-                'account_suffix' => '@teamscci.local',
+                'account_suffix' => '@acme.org',
 
                 /*
                 |--------------------------------------------------------------------------
@@ -118,7 +118,7 @@ return [
                 |
                 */
 
-                'domain_controllers' => ['192.168.0.72', '192.168.0.71'],
+                'domain_controllers' => ['corp-dc1.corp.acme.org', 'corp-dc2.corp.acme.org'],
 
                 /*
                 |--------------------------------------------------------------------------
@@ -158,7 +158,7 @@ return [
                 |
                 */
 
-                'base_dn' => 'DC=teamscci,DC=local',
+                'base_dn' => 'dc=corp,dc=acme,dc=org',
 
                 /*
                 |--------------------------------------------------------------------------
@@ -172,7 +172,7 @@ return [
                 |
                 */
 
-                'admin_account_suffix' => '',
+                'admin_account_suffix' => '@acme.org',
 
                 /*
                 |--------------------------------------------------------------------------
@@ -187,8 +187,8 @@ return [
                 |
                 */
 
-                'admin_username' => 'buildmaster',
-                'admin_password' => 'SCCIbuild!',
+                'admin_username' => env('ADLDAP_ADMIN_USERNAME', 'username'),
+                'admin_password' => env('ADLDAP_ADMIN_PASSWORD', 'password'),
 
                 /*
                 |--------------------------------------------------------------------------
