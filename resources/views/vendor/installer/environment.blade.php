@@ -8,10 +8,9 @@
     <form method="post" action="{{ url('install/environment') }}">
         {!! csrf_field() !!}
 
-        {!! Form::hidden('APP_ENV', 'local') !!}
-        {!! Form::hidden('APP_DEBUG', 'true') !!}
-        {!! Form::hidden('APP_ENV', 'local') !!}
-        {!! Form::hidden('APP_ENV', 'local') !!}
+        {!! Form::hidden('APP_ENV', $field['APP_ENV']) !!}
+        {!! Form::hidden('APP_DEBUG', $field['APP_DEBUG']) !!}
+        {!! Form::hidden('APP_KEY', $field['APP_KEY']) !!}
 
         @if($fields['APP_URL'])
             {!! Form::label('APP_URL', 'Application URL') !!}
