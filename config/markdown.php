@@ -57,8 +57,8 @@ return [
     */
 
     'renderer' => [
-        'block_separator' => "<br />",
-        'inner_separator' => "<br />",
+        'block_separator' => '<br />',
+        'inner_separator' => '<br />',
         'soft_break'      => '<br />',
     ],
 
