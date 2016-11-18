@@ -87,7 +87,7 @@ return [
                 |
                 */
 
-                'account_prefix' => env('ADLDAP_ACCOUNT_PREFIX',''),
+                'account_prefix' => env('ADLDAP_ACCOUNT_PREFIX', ''),
 
                 /*
                 |--------------------------------------------------------------------------
@@ -102,7 +102,7 @@ return [
                 |
                 */
 
-                'account_suffix' => env('ADLDAP_ACCOUNT_SUFFIX',''),
+                'account_suffix' => env('ADLDAP_ACCOUNT_SUFFIX', ''),
 
                 /*
                 |--------------------------------------------------------------------------
@@ -120,7 +120,7 @@ return [
 
                 'domain_controllers' => [
                     env('ADLDAP_DOMAIN_CONTROLER1'),
-                    env('ADLDAP_DOMAIN_CONTROLER2')
+                    env('ADLDAP_DOMAIN_CONTROLER2'),
                 ],
 
                 /*
@@ -161,7 +161,7 @@ return [
                 |
                 */
 
-                'base_dn' => env('ADLDAP_BASE_DN','dc=company,dc=com'),
+                'base_dn' => env('ADLDAP_BASE_DN', 'dc=company,dc=com'),
 
                 /*
                 |--------------------------------------------------------------------------
