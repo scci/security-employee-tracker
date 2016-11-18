@@ -1,6 +1,4 @@
-<strong>Title</strong>
-<p>The title of the news article. This is a required field.</p>
-    
+
 <strong>Publish Date</strong>
 <p>The publish date is the date the news article will be available to the
     users. This is a required field.
@@ -12,13 +10,11 @@
     only between the publish date and the expires on date.
 </p>
     
-<strong>Description</strong>
-<p>The description is the detailed information about the article.</p>
-    
-<strong>File</strong>
-<p>A user can attach multiple files to the article.</p>
-    
-<strong>Reset</strong>
-<p>To clear the values in the above fields, click the reset button towards 
-    the bottom right corner of the page.
-</p>
+<strong>Email on publish date</strong>
+<p>Email will go out on the publish date. This includes creating a new news or editing it.
+    Here are some examples of what would cause news to be emailed out when the checkbox is checked.</p>
+<ul>
+    <li>Creating or Updating news when publish date is today.</li>
+    <li>Creating a news with a future publish date (will send at 6am on publish date).</li>
+    <li>Creating a news with a future publish date and then editing it on said published date.</li>
+</ul>
