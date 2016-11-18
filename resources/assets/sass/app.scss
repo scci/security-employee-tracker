@@ -47,8 +47,8 @@ main {
   flex-basis: 100%;
 }
 
-.side-nav {
-  z-index: 1;
+.CodeMirror-fullscreen, .editor-toolbar.fullscreen {
+  z-index: 1000;
 }
 
 .handle-action-item-sidebar {
