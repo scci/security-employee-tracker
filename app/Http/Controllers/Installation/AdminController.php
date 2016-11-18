@@ -1,16 +1,18 @@
 <?php
 
-namespace SET\Http\Controllers;
+namespace SET\Http\Controllers\Installation;
 
 use Illuminate\Support\Facades\Hash;
 use RachidLaasri\LaravelInstaller\Helpers\DatabaseManager;
 use RachidLaasri\LaravelInstaller\Helpers\InstalledFileManager;
+use SET\Http\Controllers\Controller;
 use SET\Http\Requests\InstallationRequest;
 use SET\User;
 
-class InstallController extends Controller
+class AdminController extends Controller
 {
-    public function createUser()
+
+    public function index()
     {
         $response = (new DatabaseManager())->migrateAndSeed();
 
@@ -26,7 +28,7 @@ class InstallController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function storeUser(InstallationRequest $request)
+    public function store(InstallationRequest $request)
     {
         $user = User::create($request->all());
         $user->password = Hash::make($request->password);

@@ -10,6 +10,8 @@
 |
 */
 
+use SET\Http\Controllers\Installation\EnvironmentController;
+
 Auth::routes();
 
 // This group requires a user to be logged in.
@@ -44,7 +46,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('news', 'NewsController');
     Route::get('logout', 'Auth\LoginController@logout');
 });
-Route::group(['middleware' => 'canInstall'], function () {
-    Route::get('install/user', ['as' => 'installAdmin', 'uses' => 'InstallController@createUser']);
-    Route::post('install/user', 'InstallController@storeUser');
+Route::group(['middleware' => 'canInstall', 'namespace' => 'Installation'], function () {
+    Route::resource('install/user', 'AdminController');
+    Route::resource('install/environment', 'EnvironmentController');
 });
