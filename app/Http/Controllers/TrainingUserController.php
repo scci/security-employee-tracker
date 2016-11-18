@@ -45,9 +45,9 @@ class TrainingUserController extends Controller
         return redirect()->action('UserController@show', $user->id);
     }
 
-    public function show(User $user, $trainingID)
+    public function show(User $user, $trainingUserID)
     {
-        $trainingUser = TrainingUser::with('training')->findOrFail($trainingID);
+        $trainingUser = TrainingUser::with('training')->findOrFail($trainingUserID);
         $this->authorize('show_user', $user);
 
         if (isset($trainingUser->completed_date)) {
