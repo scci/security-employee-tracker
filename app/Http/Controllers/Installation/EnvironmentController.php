@@ -60,7 +60,7 @@ class EnvironmentController extends Controller
      * Key should be before the first = symbol and value should be after.
      * Each new line (\r\n) should be a new array entry.
      *
-     * @param $string
+     * @param string $string
      *
      * @return array
      */
@@ -87,7 +87,7 @@ class EnvironmentController extends Controller
     /**
      * Save the edited content to the file.
      *
-     * @param $string
+     * @param string $string
      * @return string
      */
     public function saveFile($string)
