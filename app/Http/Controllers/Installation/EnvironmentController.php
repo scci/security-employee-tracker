@@ -2,11 +2,11 @@
 
 namespace SET\Http\Controllers\Installation;
 
+use Exception;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Artisan;
 use RachidLaasri\LaravelInstaller\Helpers\EnvironmentManager;
 use SET\Http\Controllers\Controller;
-use Exception;
 
 class EnvironmentController extends Controller
 {
@@ -78,9 +78,10 @@ class EnvironmentController extends Controller
         unset($results['_token']);
 
         $env = '';
-        foreach($results as $key => $value) {
-            $env .= $key ."=". $value ."\r\n";
+        foreach ($results as $key => $value) {
+            $env .= $key.'='.$value."\r\n";
         }
+
         return $env;
     }
 
@@ -88,6 +89,7 @@ class EnvironmentController extends Controller
      * Save the edited content to the file.
      *
      * @param $string
+     *
      * @return string
      */
     public function saveFile($string)
@@ -96,12 +98,10 @@ class EnvironmentController extends Controller
 
         try {
             file_put_contents($this->envPath, $string);
-        }
-        catch(Exception $e) {
+        } catch (Exception $e) {
             $message = trans('messages.environment.errors');
         }
 
         return $message;
     }
-
 }
