@@ -8,6 +8,7 @@
     <link rel="icon" type="image/png" href="{{ asset('installer/img/favicon/favicon-32x32.png') }}" sizes="32x32"/>
     <link rel="icon" type="image/png" href="{{ asset('installer/img/favicon/favicon-96x96.png') }}" sizes="96x96"/>
     <link href="{{ asset('installer/css/style.min.css') }}" rel="stylesheet"/>
+    <script src="{{ url('installer/js/jquery-3.1.1.min.js') }}"></script>
   </head>
   <body>
     <div class="master">

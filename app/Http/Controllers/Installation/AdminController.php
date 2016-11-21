@@ -11,7 +11,6 @@ use SET\User;
 
 class AdminController extends Controller
 {
-
     public function index()
     {
         $response = (new DatabaseManager())->migrateAndSeed();
