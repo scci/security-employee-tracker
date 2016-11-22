@@ -144,9 +144,9 @@
         {
             var selected = $($this).val();
             if (selected != value) {
-                $(target).show();
-            } else {
                 $(target).hide();
+            } else {
+                $(target).show();
             }
         }
     </script>
