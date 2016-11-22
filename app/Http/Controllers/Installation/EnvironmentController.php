@@ -70,6 +70,7 @@ class EnvironmentController extends Controller
 
         $array = array_combine($matches[1], $matches[2]);
         $array['MAIL_FROM_NAME'] = $this->removeQuotes($array['MAIL_FROM_NAME']);
+
         return $array;
     }
 
@@ -110,7 +111,8 @@ class EnvironmentController extends Controller
 
     private function removeQuotes($string)
     {
-        $string = str_replace('"', "", $string);
-        return str_replace("'", "", $string);
+        $string = str_replace('"', '', $string);
+
+        return str_replace("'", '', $string);
     }
 }
