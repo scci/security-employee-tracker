@@ -22,7 +22,7 @@
             <a href="{{url('install/final')}}" title="Disable Installer"><i class="step__icon database"></i></a>
           </li>
           <li class="step__divider"></li>
-          <li class="step__item {{ isActive('installAdmin') }}">
+          <li class="step__item {{ isActive('user') }}">
             <a href="{{url('install/user')}}" title="Admin User"><i class="step__icon user"></i></a>
           </li>
           <li class="step__divider"></li>
@@ -34,7 +34,7 @@
             <a href="{{url('install/requirements')}}" title="PHP Requirements"><i class="step__icon requirements"></i></a>
           </li>
           <li class="step__divider"></li>
-          <li class="step__item {{ isActive('LaravelInstaller::environment') }}">
+          <li class="step__item {{ isActive('environment') }}">
             <a href="{{url('install/environment')}}" title="Environment Settings"><i class="step__icon update"></i></a>
           </li>
           <li class="step__divider"></li>
