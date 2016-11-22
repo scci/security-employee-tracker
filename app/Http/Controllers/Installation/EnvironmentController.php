@@ -16,23 +16,23 @@ class EnvironmentController extends Controller
     protected $EnvironmentManager;
     protected $envPath;
     protected $envSetup = [
-        'APP_ENV' => FILTER_SANITIZE_ENCODED,
-        'APP_DEBUG' => FILTER_SANITIZE_ENCODED,
-        'APP_KEY' => FILTER_DEFAULT,
-        'APP_URL' => FILTER_VALIDATE_URL,
-        'DB_CONNECTION' => FILTER_SANITIZE_ENCODED,
-        'DB_HOST' => FILTER_SANITIZE_ENCODED,
-        'DB_DATABASE' => FILTER_SANITIZE_ENCODED,
-        'DB_USERNAME' => FILTER_SANITIZE_ENCODED,
-        'DB_PASSWORD' => FILTER_DEFAULT,
-        'MAIL_DRIVER' => FILTER_SANITIZE_ENCODED,
-        'MAIL_HOST' => FILTER_SANITIZE_ENCODED,
-        'MAIL_PORT' => FILTER_VALIDATE_INT,
-        'MAIL_USERNAME' => FILTER_SANITIZE_ENCODED,
-        'MAIL_PASSWORD' => FILTER_DEFAULT,
-        'MAIL_ENCRYPTION' => FILTER_SANITIZE_ENCODED,
+        'APP_ENV'           => FILTER_SANITIZE_ENCODED,
+        'APP_DEBUG'         => FILTER_SANITIZE_ENCODED,
+        'APP_KEY'           => FILTER_DEFAULT,
+        'APP_URL'           => FILTER_VALIDATE_URL,
+        'DB_CONNECTION'     => FILTER_SANITIZE_ENCODED,
+        'DB_HOST'           => FILTER_SANITIZE_ENCODED,
+        'DB_DATABASE'       => FILTER_SANITIZE_ENCODED,
+        'DB_USERNAME'       => FILTER_SANITIZE_ENCODED,
+        'DB_PASSWORD'       => FILTER_DEFAULT,
+        'MAIL_DRIVER'       => FILTER_SANITIZE_ENCODED,
+        'MAIL_HOST'         => FILTER_SANITIZE_ENCODED,
+        'MAIL_PORT'         => FILTER_VALIDATE_INT,
+        'MAIL_USERNAME'     => FILTER_SANITIZE_ENCODED,
+        'MAIL_PASSWORD'     => FILTER_DEFAULT,
+        'MAIL_ENCRYPTION'   => FILTER_SANITIZE_ENCODED,
         'MAIL_FROM_ADDRESS' => FILTER_VALIDATE_EMAIL,
-        'MAIL_FROM_NAME' => FILTER_DEFAULT,
+        'MAIL_FROM_NAME'    => FILTER_DEFAULT,
     ];
 
     /**
@@ -138,10 +138,11 @@ class EnvironmentController extends Controller
     {
         $array = filter_var_array($array, $this->envSetup);
         foreach ($array as $key => $value) {
-            if( !in_array($key, array_keys($this->envSetup))) {
+            if (!in_array($key, array_keys($this->envSetup))) {
                 unset($array[$key]);
             }
         }
+
         return $array;
     }
 }
