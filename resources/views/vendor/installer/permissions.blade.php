@@ -13,7 +13,7 @@
 
 @if(!isset($permissions['errors']))
 <div class="buttons">
-    <a class="button" href="{{ action('InstallController@createUser') }}">
+    <a class="button" href="{{ action('Installation\AdminController@index') }}">
         {{ trans('messages.install') }}
     </a>
 </div>
