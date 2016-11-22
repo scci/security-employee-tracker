@@ -8,58 +8,43 @@
     <form method="post" action="{{ url('install/environment') }}">
         {!! csrf_field() !!}
 
-        @if($fields['APP_URL'])
-            {!! Form::label('APP_URL', 'Application URL') !!}
-            {!! Form::text('APP_URL', $fields['APP_URL']) !!}
-        @endif
+        {!! Form::label('APP_URL', 'Application URL') !!}
+        {!! Form::text('APP_URL', $fields['APP_URL']) !!}
 
-        @if($fields['APP_URL'])
-            {!! Form::label('MAIL_FROM_ADDRESS', 'Application Email Address') !!}
-            {!! Form::text('MAIL_FROM_ADDRESS', $fields['MAIL_FROM_ADDRESS']) !!}
-        @endif
+        {!! Form::label('MAIL_FROM_ADDRESS', 'Application Email Address') !!}
+        {!! Form::text('MAIL_FROM_ADDRESS', $fields['MAIL_FROM_ADDRESS']) !!}
 
-        @if($fields['APP_URL'])
-            {!! Form::label('MAIL_FROM_NAME', 'Application Email Name') !!}
-            {!! Form::text('MAIL_FROM_NAME', $fields['MAIL_FROM_NAME']) !!}
-            <small style="display:block">Wrap in quotes if you use spaces.</small>
-        @endif
+        {!! Form::label('MAIL_FROM_NAME', 'Application Email Name') !!}
+        {!! Form::text('MAIL_FROM_NAME', $fields['MAIL_FROM_NAME']) !!}
 
         <br />
 
         @if($fields['DB_CONNECTION'])
             {!! Form::label('DB_CONNECTION', 'DATABASE TYPE') !!}
             {!! Form::select('DB_CONNECTION', [
+                'sqlite' => 'SQLite',
                 'mysql' => 'MySQL',
                 'postgres' => 'Postgres',
-                'sqlite' => 'SQLite',
-                'sqlsrv' => 'SQL Server'
+                'sqlsrv' => 'SQL Server',
             ], $fields['DB_CONNECTION'], ['class' => 'db_select']) !!}
         @endif
 
         <div class="db_fields">
 
-            @if($fields['DB_HOST'])
-                {!! Form::label('DB_HOST', 'Database Host') !!}
-                {!! Form::text('DB_HOST', $fields['DB_HOST']) !!}
-            @endif
+            {!! Form::label('DB_HOST', 'Database Host') !!}
+            {!! Form::text('DB_HOST', $fields['DB_HOST']) !!}
 
-            @if($fields['DB_DATABASE'])
-                {!! Form::label('DB_DATABASE', 'Database Name') !!}
-                {!! Form::text('DB_DATABASE', $fields['DB_DATABASE']) !!}
-            @endif
+            {!! Form::label('DB_DATABASE', 'Database Name') !!}
+            {!! Form::text('DB_DATABASE', $fields['DB_DATABASE']) !!}
 
-            @if($fields['DB_USERNAME'])
-                {!! Form::label('DB_USERNAME', 'Database Username') !!}
-                {!! Form::text('DB_USERNAME', $fields['DB_USERNAME']) !!}
-            @endif
+            {!! Form::label('DB_USERNAME', 'Database Username') !!}
+            {!! Form::text('DB_USERNAME', $fields['DB_USERNAME']) !!}
 
-            @if($fields['DB_PASSWORD'])
-                {!! Form::label('DB_PASSWORD', 'Database Password') !!}
-                <input type="password" value="{{$fields['DB_PASSWORD']}}" name="DB_PASSWORD" class="showpassword" />
-                    <button type="button" class="toggle-button button button--light buttons--right">Show</button>
-            @endif
+            {!! Form::label('DB_PASSWORD', 'Database Password') !!}
+            <input type="password" value="{{$fields['DB_PASSWORD']}}" name="DB_PASSWORD" class="showpassword" />
+            <button type="button" class="toggle-button button button--light buttons--right">Show</button>
 
-        </div><br />
+        </div> <br />
 
         @if($fields['MAIL_DRIVER'])
             {!! Form::label('MAIL_DRIVER', 'Mail Driver') !!}
@@ -72,26 +57,18 @@
 
         <div class="mail_fields">
 
-            @if($fields['MAIL_HOST'])
-                {!! Form::label('MAIL_HOST', 'Mail Host') !!}
-                {!! Form::text('MAIL_HOST', $fields['MAIL_HOST']) !!}
-            @endif
+            {!! Form::label('MAIL_HOST', 'Mail Host') !!}
+            {!! Form::text('MAIL_HOST', $fields['MAIL_HOST']) !!}
 
-            @if($fields['MAIL_PORT'])
-                {!! Form::label('MAIL_PORT', 'Mail Port') !!}
-                {!! Form::text('MAIL_PORT', $fields['MAIL_PORT']) !!}
-            @endif
+            {!! Form::label('MAIL_PORT', 'Mail Port') !!}
+            {!! Form::text('MAIL_PORT', $fields['MAIL_PORT']) !!}
 
-            @if($fields['MAIL_USERNAME'])
-                {!! Form::label('MAIL_USERNAME', 'Mail Username') !!}
-                {!! Form::text('MAIL_USERNAME', $fields['MAIL_USERNAME']) !!}
-            @endif
+            {!! Form::label('MAIL_USERNAME', 'Mail Username') !!}
+            {!! Form::text('MAIL_USERNAME', $fields['MAIL_USERNAME']) !!}
 
-            @if($fields['MAIL_PASSWORD'])
-                {!! Form::label('MAIL_PASSWORD', 'Mail Password') !!}
-                <input type="password" value="{{$fields['MAIL_PASSWORD']}}" name="MAIL_PASSWORD" class="showpassword" />
-                <button type="button" class="toggle-button button button--light buttons--right">Show</button>
-            @endif
+            {!! Form::label('MAIL_PASSWORD', 'Mail Password') !!}
+            <input type="password" value="{{$fields['MAIL_PASSWORD']}}" name="MAIL_PASSWORD" class="showpassword" />
+            <button type="button" class="toggle-button button button--light buttons--right">Show</button>
 
         </div>
 
@@ -165,12 +142,11 @@
 
         function showFieldsIf(target, value, $this)
         {
-            console.log(target, value);
             var selected = $($this).val();
             if (selected != value) {
-                $(target).hide();
-            } else {
                 $(target).show();
+            } else {
+                $(target).hide();
             }
         }
     </script>

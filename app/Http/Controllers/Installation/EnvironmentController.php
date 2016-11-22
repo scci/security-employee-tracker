@@ -68,14 +68,17 @@ class EnvironmentController extends Controller
     {
         preg_match_all('/([^=]*?)=([^\r\n]*?)[\r\n]+/', $string, $matches);
 
-        return array_combine($matches[1], $matches[2]);
+        $array = array_combine($matches[1], $matches[2]);
+        $array['MAIL_FROM_NAME'] = $this->removeQuotes($array['MAIL_FROM_NAME']);
+        return $array;
     }
 
     private function flattenRequest(Request $input)
     {
         $fields = $this->breakApartEnv($this->EnvironmentManager->getEnvContent());
-        $results = array_merge($fields, $input->toArray());
+        $results = filter_var_array(array_merge($fields, $input->toArray()));
         unset($results['_token']);
+        $results['MAIL_FROM_NAME'] = '"'.$this->removeQuotes($results['MAIL_FROM_NAME']).'"';
 
         $env = '';
         foreach ($results as $key => $value) {
@@ -103,5 +106,11 @@ class EnvironmentController extends Controller
         }
 
         return $message;
+    }
+
+    private function removeQuotes($string)
+    {
+        $string = str_replace('"', "", $string);
+        return str_replace("'", "", $string);
     }
 }
