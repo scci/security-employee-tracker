@@ -14,7 +14,7 @@
 
         <ul class="collapsible popout" data-collapsible="accordion">
             @include('user._show_notes_blocks', ['alert' => true])
-        <ul>
+        </ul>
 
         <h2 style="margin-left:1.5rem" class="hide-on-small-only">{{$user->userFullName}}</h2>
 
