@@ -79,7 +79,7 @@ class EnvironmentController extends Controller
      * Key should be before the first = symbol and value should be after.
      * Each new line (\r\n) should be a new array entry.
      *
-     * @param $string
+     * @param string $string
      *
      * @return array
      */
