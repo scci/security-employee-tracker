@@ -38,6 +38,7 @@
                                     <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 56px;padding-right: 56px;word-break: break-word;word-wrap: break-word;">
 
                                         <h1 style="font-style: normal;font-weight: 400;Margin-bottom: 0;Margin-top: 14px;font-size: 22px;line-height: 30px;font-family: Ubuntu,sans-serif;color: #3e4751;text-align: center;">{{ $news->title }}</h1>
+                                        <br />
                                         <p style='font-style: normal;font-weight: 400;Margin-bottom: 22px;Margin-top: 18px;font-size: 13px;line-height: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f;text-align: left;'>{!! Markdown::convertToHTML($news->description) !!}</p>
 
                                     </td>
@@ -58,8 +59,7 @@
                                 <tbody><tr>
                                     <td class="padded" style="padding: 0;vertical-align: middle;padding-left: 56px;padding-right: 56px;word-break: break-word;word-wrap: break-word;">
 
-                                        <p style="font-style: normal;font-weight: bold;Margin-bottom: 0;Margin-top: 0;font-size: 16px;line-height: 24px;font-family: Ubuntu,sans-serif;color: #3e4751;">Having trouble viewing this message?</p>
-                                        <p style='font-style: normal;font-weight: 400;Margin-bottom: 0;Margin-top: 16px;font-size: 13px;line-height: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f;'><a href="{{ url('news', $news->id) }}">View it in SET</a></p>
+                                        <p style="font-style: normal;Margin-bottom: 0;Margin-top: 0;font-size: 14px;line-height: 24px;font-family: Ubuntu,sans-serif;color: #3e4751;">Having trouble viewing this message? <a href="{{ url('news', $news->id) }}">View it in SET</a></p>
 
                                     </td>
                                 </tr>

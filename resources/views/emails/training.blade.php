@@ -40,6 +40,7 @@
                                         <h3 style='font-style: normal;font-weight: 400;Margin-bottom: 0;Margin-top: 0;font-size: 16px;line-height: 24px;font-family: "PT Serif",Georgia,serif;color: #788991;text-align: center;'>TRAINING REQUEST:</h3>
                                         <h1 style="font-style: normal;font-weight: 400;Margin-bottom: 0;Margin-top: 14px;font-size: 22px;line-height: 30px;font-family: Ubuntu,sans-serif;color: #3e4751;text-align: center;">{{ $training->name }}</h1>
                                         <h3 style='font-style: normal;font-weight: 400;Margin-bottom: 0;Margin-top: 0;font-size: 16px;line-height: 24px;font-family: "PT Serif",Georgia,serif;color: #788991;text-align: center;'>Due Date: {{ $due_date }}</h3>
+                                        <br />
                                         <p style='font-style: normal;font-weight: 400;Margin-bottom: 22px;Margin-top: 18px;font-size: 13px;line-height: 22px;font-family: "PT Serif",Georgia,serif;color: #7c7e7f;text-align: left;'>{!! Markdown::convertToHTML($training->description) !!}</p>
 
                                     </td>
