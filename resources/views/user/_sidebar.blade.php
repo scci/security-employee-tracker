@@ -125,3 +125,6 @@
     </li>
     @endcan
 </ul>
+
+{{-- Administrative --}}
+@include('user._show_administrative_blocks')

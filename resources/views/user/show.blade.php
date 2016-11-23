@@ -4,17 +4,19 @@
 
 @section('content')
 
-    <div class="col s12 m4 l3">
+    <h2 style="margin-left:.5rem" class="hide-on-med-and-up">{{$user->userFullName}}</h2>
+
+    <div class="col s12 m4">
         @include('user._sidebar')
     </div>
 
-    <div class="col s12 m8 l9">
+    <div class="col s12 m8">
 
         <ul class="collapsible popout" data-collapsible="accordion">
             @include('user._show_notes_blocks', ['alert' => true])
         <ul>
 
-        <h2 style="margin-left:1.5rem">{{$user->userFullName}}</h2>
+        <h2 style="margin-left:1.5rem" class="hide-on-small-only">{{$user->userFullName}}</h2>
 
         @include('user._show_training_blocks', ['sectionId' => 'scheduled'])
 
