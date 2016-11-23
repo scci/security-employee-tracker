@@ -59,7 +59,7 @@ return [
     'renderer' => [
         'block_separator' => "\r\n",
         'inner_separator' => "\r\n",
-        'soft_break'      => "<br />",
+        'soft_break'      => '<br />',
     ],
 
     /*
