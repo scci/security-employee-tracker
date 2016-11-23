@@ -1,7 +1,7 @@
 <ul class="collapsible popout" data-collapsible="accordion">
     <li><div class="collapsible-title">{{ucfirst($sectionId)}} Training</div></li>
     @foreach ($trainings as $trainingUser)
-        @if ($sectionId == 'scheduled' ? is_null($trainingUser->completed_date) : !is_null($trainingUser->completed_date))
+        @if (!$trainingUser->training->administrative && ($sectionId == 'scheduled' ? is_null($trainingUser->completed_date) : !is_null($trainingUser->completed_date)))
             <li>
                 <div class="collapsible-header" >
                     <div class="right">

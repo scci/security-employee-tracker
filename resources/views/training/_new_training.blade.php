@@ -1,18 +1,25 @@
 <div class="row">
-    <div class="col s12 m8">
+    <div class="col s12 m6">
         <div class="input-field" id="training_name">
             {!! Form::label('name', 'Name:') !!}
             {!! Form::text('name', null) !!}
         </div>
     </div>
-    <div class="col s12 m4">
+    <div class="col s12 m3">
         <div class="input-field" id="training_renews_in">
             {!! Form::label('renews_in', 'Days until Renewal:') !!}
             {!! Form::text('renews_in', null, ['class' => 'active']) !!}
         </div>
     </div>
+    <div class="col s12 m3">
+        <div class="input-field" id="administrative_training">
+            {!! Form::hidden('administrative', false) !!}
+            {!! Form::checkbox('administrative', 1, null, ['id' => 'administrative', 'class' => 'filled-in']) !!}
+            {!! Form::label('administrative', 'Administrative') !!}
+        </div>
+    </div>
     <div class="input-field col s12" id="training_description">
-        {!! Form::label('description', 'Instructions:', ['style' => 'margin-top:-2em']) !!}
+        {{-- Form::label('description', 'Instructions:', ['class' => 'active']) --}}
         {!! Form::textarea('description', null, ['class' => 'wysiwyg']) !!}
     </div>
     <div class="col s12" id="file_upload">
