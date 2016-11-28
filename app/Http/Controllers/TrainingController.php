@@ -216,7 +216,6 @@ class TrainingController extends Controller
     private function createTrainingNotes($data)
     {
         $data['author_id'] = Auth::user()->id;
-        $data['due_date'] = $data['due_date'] ?: Carbon::today()->addWeeks(2)->format('Y-m-d');
 
         $users = [];
 
