@@ -35,7 +35,7 @@
                             @can('edit')
                                 <td class="text-nowrap">{{ $news->expire_date }}</td>
                                 <td>
-                                    @if($news->send_email &&  Carbon\Carbon::today()->gt(Carbon\Carbon::createFromFormat('Y-m-d', $news->publish_date)))
+                                    @if($news->send_email &&  Carbon\Carbon::now()->gte(Carbon\Carbon::createFromFormat('Y-m-d', $news->publish_date)))
                                         <i class="small material-icons green-text tooltipped" data-tooltip="Sent">check</i>
                                     @elseif($news->send_email)
                                         <i class="small material-icons amber-text text-darken-1 tooltipped" data-tooltip="Will send on publish date.">query_builder</i>
