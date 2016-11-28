@@ -16,7 +16,6 @@
 </div>
 <div class="row">
     <div class="input-field col s12" id="news_description">
-        {!! Form::label('description', 'Description:', ['class' => 'active']) !!}
         {!! Form::textarea('description', null, ['class' => 'wysiwyg']) !!}
     </div>
 </div>
