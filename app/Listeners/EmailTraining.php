@@ -47,13 +47,7 @@ class EmailTraining implements ShouldQueue
      */
     private function makeDueDatePretty($date)
     {
-        //check if format is YYYY-MM-DD
-        if (preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $date)) {
-            return Carbon::createFromFormat('Y-m-d', $date)->toFormattedDateString();
-        }
-
-        //Otherwise it is YYYY-MM-DD HH:MM:SS
-        return Carbon::createFromFormat('Y-m-d H:i:s', $date)->toFormattedDateString();
+        return Carbon::createFromFormat('Y-m-d', $date)->toFormattedDateString();
     }
 
     /**
