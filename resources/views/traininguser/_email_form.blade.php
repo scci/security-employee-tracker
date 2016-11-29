@@ -17,7 +17,7 @@
         @foreach($trainingUser->attachments as $file)
             <span class="chip">
                 <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
-                <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                <i class="material-icons delete-attachment" data-id="{{$file->id}}">close</i>
             </span> &nbsp;
         @endforeach
     </div>

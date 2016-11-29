@@ -46,7 +46,7 @@
                                 <span class="chip">
                                         <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
                                     @can('update_record', $trainingUser)
-                                        <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                                        <i class="material-icons delete-attachment" data-id="{{$file->id}}">close</i>
                                     @endcan
                                 </span> &nbsp;
                             @endforeach
