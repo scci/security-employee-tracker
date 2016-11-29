@@ -7,11 +7,9 @@
 
 $(document).ready(function() {
     $('#_new_user_groups_field').change(function(){
-        console.log("Value Changed");
         var selectVal = $(this).val();
         $('.closed-area').hide();
         $.each(selectVal, function( index, value) {
-            console.log('access-'+value);
             $('#access-' + value).show();
         });
     });

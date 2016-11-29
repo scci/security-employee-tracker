@@ -112,7 +112,6 @@
 </div>
 <div class="row">
     <div class="col s12 right-align">
-        {!! Form::reset('Reset', array('class' => 'btn-flat waves-effect waves-indigo')) !!}
         {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
     </div>
 </div>
