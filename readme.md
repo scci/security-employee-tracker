@@ -33,7 +33,7 @@ To view all the various options including cache, database, settings, email, etc.
 2. Set your domain to point to the `security-employee-tracker/public` directory.
 3. Open the installer in your browser. IE: http://set.company.com/install or http://localhost/security-employee-tracker/public/install
   1. Follow the on screen prompts. 
-  2. Update your .env file as needed.
+  2. Set url, database & email settings.
   3. Check for required extensions and permissions.
   4. Perform the database installation (this may take some time).
   5. Create Admin User.
