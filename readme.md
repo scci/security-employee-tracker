@@ -48,7 +48,7 @@ _Note: Install page will only be available upon initialization._
 
 ## Contribute
 
-If you wish to submit enhancements, bug fixes and other changes, please submit a pull request **with test cases**.
+If you wish to submit enhancements, bug fixes and other changes, please submit a pull request.
 
 ## More Information
 
