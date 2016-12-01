@@ -38,6 +38,15 @@
                 {{ $user->access_level }}
             </div>
         @endif
+
+        @if($user->status != 'active' and $user->destroyed_date)
+            <div class="divider"></div>
+            <div>
+                <strong>Destroy Date:</strong>
+                {{ $user->destroyed_date->format('Y-m-d') }}
+            </div>
+        @endif
+
         <div class="divider"></div>
         <div>
             <strong>Clearance:</strong>
