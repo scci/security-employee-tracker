@@ -10,14 +10,10 @@
         @include('user._sidebar')
     </div>
 
-<<<<<<< HEAD
-    <div class="col s12 m8 l9">
+    <div class="col s12 m8">
         @if($user->status != 'active')
           @include('user._show_destoryed_date_block')
         @endif
-=======
-    <div class="col s12 m8">
->>>>>>> origin/master
 
         <ul class="collapsible popout" data-collapsible="accordion">
             @include('user._show_notes_blocks', ['alert' => true])
