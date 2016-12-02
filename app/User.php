@@ -32,7 +32,7 @@ class User extends Authenticatable
     protected $hidden = ['username', 'password', 'remember_token'];
 
     /**
-     * make destroyed_date a Carbon instance
+     * make destroyed_date a Carbon instance.
      */
     protected $dates = ['destroyed_date'];
 
