@@ -17,7 +17,7 @@ SET is for FSO and security officers of DoD companies to manage their employees.
 
 The application currently utilizes the PHP Laravel 5 framework.
 
-- PHP >= 5.6.4
+- PHP >= 7.0
 - OpenSSL PHP Extension
 - PDO PHP Extension
 - Mbstring PHP Extension
