@@ -28,9 +28,7 @@ Code Coverage Options:
 Logging Options:
 
   --log-junit <file>        Log test execution in JUnit XML format to file.
-  --log-tap <file>          Log test execution in TAP format to file.
   --log-teamcity <file>     Log test execution in TeamCity format to file.
-  --log-json <file>         Log test execution in JSON format.
   --testdox-html <file>     Write agile documentation in HTML format to file.
   --testdox-text <file>     Write agile documentation in Text format to file.
   --testdox-xml <file>      Write agile documentation in XML format to file.
@@ -78,7 +76,6 @@ Test Execution Options:
 
   --loader <loader>         TestSuiteLoader implementation to use.
   --repeat <times>          Runs the test(s) repeatedly.
-  --tap                     Report test execution progress in TAP format.
   --teamcity                Report test execution progress in TeamCity format.
   --testdox                 Report test execution progress in TestDox format.
   --testdox-group           Only include tests from the specified group(s).
@@ -91,6 +88,7 @@ Configuration Options:
   -c|--configuration <file> Read configuration from XML file.
   --no-configuration        Ignore default configuration file (phpunit.xml).
   --no-coverage             Ignore code coverage configuration.
+  --no-extensions           Do not load PHPUnit extensions.
   --include-path <path(s)>  Prepend PHP's include_path with given path(s).
   -d key[=value]            Sets a php.ini value.
   --generate-configuration  Generate configuration file with suggested settings.
