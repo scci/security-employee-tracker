@@ -10,7 +10,6 @@ return [
     'title' => 'Εγκατάσταση Laravel',
     'next'  => 'Επόμενο',
 
-
     /*
      *
      * Home page translations.
@@ -21,7 +20,6 @@ return [
         'message' => 'Καλωσήρθατε στον οδηγό εγκατάστασης.',
     ],
 
-
     /*
      *
      * Requirements page translations.
@@ -31,7 +29,6 @@ return [
         'title' => 'Απαιτήσεις συστήματος',
     ],
 
-
     /*
      *
      * Permissions page translations.
@@ -40,7 +37,6 @@ return [
     'permissions' => [
         'title' => 'Δικαιώματα',
     ],
-
 
     /*
      *
@@ -53,7 +49,6 @@ return [
         'success' => 'Το αρχείο ρυθμίσεων .env έχει αποθηκευτεί με επιτυχία.',
         'errors'  => 'Το αρχείο ρυθμίσεων .env ΔΕΝ μπόρεσε να αποθηκευτεί με επιτυχία. Παρακαλώ δημιουργίστε το χειροκίνητα.',
     ],
-
 
     /*
      *
