@@ -10,7 +10,6 @@ return [
     'title' => 'Laravel Instalator',
     'next'  => 'Następny krok',
 
-
     /*
      *
      * Home page translations.
@@ -21,7 +20,6 @@ return [
         'message' => 'Witaj w kreatorze instalacji.',
     ],
 
-
     /*
      *
      * Requirements page translations.
@@ -31,7 +29,6 @@ return [
         'title' => 'Wymagania systemowe ',
     ],
 
-
     /*
      *
      * Permissions page translations.
@@ -40,7 +37,6 @@ return [
     'permissions' => [
         'title' => 'Uprawnienia',
     ],
-
 
     /*
      *
@@ -53,7 +49,6 @@ return [
         'success' => 'Plik .env został poprawnie zainstalowany.',
         'errors'  => 'Nie można zapisać pliku .env, Proszę utworzyć go ręcznie.',
     ],
-
 
     /*
      *

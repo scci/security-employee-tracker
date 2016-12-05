@@ -11,7 +11,6 @@ return [
     'next'   => 'Next Step',
     'finish' => 'Install',
 
-
     /*
      *
      * Home page translations.
@@ -22,7 +21,6 @@ return [
         'message' => 'This wizard will guide you though the setup process.',
     ],
 
-
     /*
      *
      * Requirements page translations.
@@ -32,7 +30,6 @@ return [
         'title' => 'PHP Extension Requirements',
     ],
 
-
     /*
      *
      * Permissions page translations.
@@ -41,7 +38,6 @@ return [
     'permissions' => [
         'title' => 'Directory Permissions',
     ],
-
 
     /*
      *

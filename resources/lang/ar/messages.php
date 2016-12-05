@@ -10,7 +10,6 @@ return [
     'title' => 'تنصيب Laravel',
     'next'  => 'متابعة',
 
-
     /*
      *
      * Home page translations.
@@ -21,7 +20,6 @@ return [
         'message' => 'أهلا بك في صفحة تنصيب Laravel',
     ],
 
-
     /*
      *
      * Requirements page translations.
@@ -31,7 +29,6 @@ return [
         'title' => 'المتطلبات',
     ],
 
-
     /*
      *
      * Permissions page translations.
@@ -40,7 +37,6 @@ return [
     'permissions' => [
         'title' => 'تراخيص المجلدات',
     ],
-
 
     /*
      *
@@ -53,7 +49,6 @@ return [
         'success' => 'تم حفظ الإعدادات بنجاح',
         'errors'  => 'حدث خطأ أثناء إنشاء ملف .env. رجاءا قم بإنشاءه يدويا',
     ],
-
 
     /*
      *
