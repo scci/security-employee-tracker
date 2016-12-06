@@ -2,9 +2,9 @@
 
 namespace SET\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Input;
 use Krucas\Notification\Facades\Notification;
@@ -87,7 +87,8 @@ class TrainingController extends Controller
         $training = Training::with('attachments')->find($trainingId);
         $notes = $training->assignedUsers()
             ->with('user')
-            ->orderBy('created_at', 'desc')
+            ->orderBy(DB::raw('CASE WHEN completed_date IS NULL THEN 0 ELSE 1 END'))
+            ->orderBy('completed_date', 'desc')
             ->get();
         if (!$showAll) {
             $notes = $notes->unique('user_id')->where('user.status', 'active');
@@ -212,7 +213,6 @@ class TrainingController extends Controller
     private function createTrainingNotes($data)
     {
         $data['author_id'] = Auth::user()->id;
-        $data['due_date'] = Carbon::today()->addWeeks(2);
 
         $users = [];
 

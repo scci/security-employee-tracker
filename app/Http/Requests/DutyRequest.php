@@ -27,7 +27,7 @@ class DutyRequest extends FormRequest
         return [
             'name'   => 'required|max:255',
             'users'  => 'required_without:groups',
-            'groups' => 'required_without:users,has_groups',
+            'groups' => 'required_without:users',
         ];
     }
 

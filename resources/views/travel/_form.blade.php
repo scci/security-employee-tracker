@@ -42,7 +42,7 @@
             @foreach($travel->attachments as $file)
                 <span class="chip">
                     <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
-                    <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                    <i class="material-icons delete-attachment" data-id="{{$file->id}}">close</i>
                 </span> &nbsp;
             @endforeach
         </div>
@@ -57,7 +57,6 @@
 </div>
 <div class="row">
     <div class="col s12 right-align">
-        {!! Form::reset('Reset', array('class' => 'btn-flat waves-effect waves-indigo', 'id' => 'training-reset')) !!}
         {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
     </div>
 </div>

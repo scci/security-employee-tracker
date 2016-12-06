@@ -41,13 +41,13 @@ class EmailTraining implements ShouldQueue
     }
 
     /**
-     * @param $due_date
+     * @param string $date
      *
      * @return string
      */
-    private function makeDueDatePretty($due_date)
+    private function makeDueDatePretty($date)
     {
-        return Carbon::createFromFormat('Y-m-d', $due_date)->toFormattedDateString();
+        return Carbon::createFromFormat('Y-m-d', $date)->toFormattedDateString();
     }
 
     /**

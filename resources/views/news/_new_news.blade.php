@@ -16,7 +16,6 @@
 </div>
 <div class="row">
     <div class="input-field col s12" id="news_description">
-        {!! Form::label('description', 'Description:', ['style' => 'margin-top:-2em']) !!}
         {!! Form::textarea('description', null, ['class' => 'wysiwyg']) !!}
     </div>
 </div>
@@ -28,7 +27,7 @@
             @foreach($news->attachments as $file)
                 <span class="chip">
                     <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
-                    <i class="material-icons close" data-id="{{$file->id}}">close</i>
+                    <i class="material-icons delete-attachment" data-id="{{$file->id}}">close</i>
                 </span> &nbsp;
             @endforeach
         @endif
@@ -48,7 +47,6 @@
 
 <div class="row">
     <div class="col s12 right-align">
-        {!! Form::reset('Reset', array('class' => 'btn-flat waves-effect waves-indigo', 'id' => 'training-reset')) !!}
         {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
     </div>
 </div>

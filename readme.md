@@ -15,43 +15,40 @@ SET is for FSO and security officers of DoD companies to manage their employees.
 
 ## Server Requirements
 
-The application currently utilizes the PHP Laravel 5 framework. It also currently requires an LDAP connection.
+The application currently utilizes the PHP Laravel 5 framework.
 
-- PHP >= 5.6.4
+- PHP >= 7.0
 - OpenSSL PHP Extension
 - PDO PHP Extension
 - Mbstring PHP Extension
 - Tokenizer PHP Extension
 - XML PHP Extension
 - LDAP PHP Extension
-- [Composer](https://getcomposer.org/)
 
 To view all the various options including cache, database, settings, email, etc..., view the [Laravel Documentation.](https://laravel.com/docs/master)
 
 ## Installation
 
-1. From SSH, execute `git clone https://github.com/scci/security-employee-tracker.git` in your web root directory.
+1. FTP the files to your server OR From SSH, execute `git clone https://github.com/scci/security-employee-tracker.git` in your web root directory
 2. Set your domain to point to the `security-employee-tracker/public` directory.
-3. From SSH, execute `composer install` from within the `security-employee-tracker` directory.
-4. Navigate to your site/install. IE: http://set.company.com/install or http://localhost/security-employee-tracker/public/install
+3. Open the installer in your browser. IE: http://set.company.com/install or http://localhost/security-employee-tracker/public/install
   1. Follow the on screen prompts. 
-  2. Update your .env file as needed.
+  2. Set url, database & email settings.
   3. Check for required extensions and permissions.
   4. Perform the database installation (this may take some time).
   5. Create Admin User.
-6. Create a cron job/scheduled task: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1` (artisan is located in the application root directory.)
-7. From SSH, execute `php artisan generate:key` to have one unique to you (heightened security).
+4. Create a cron job/scheduled task: `* * * * * php /path/to/artisan schedule:run >> /dev/null 2>&1` (artisan is located in the application root directory.)
 
 _Note: Install page will only be available upon initialization._
 
 ## Updating
 
-* Execute `git pull`.
-* If there was a database update/new migration files, execute `php artisan migrate --force`
+* Execute `git pull` or download a new copy of the files and place them over your existing setup. Take care if you have made any modifications to the config directory.
+* If there was a database update/new migration files, execute `php artisan migrate --force` via SSH
 
 ## Contribute
 
-If you wish to submit enhancements, bug fixes and other changes, please submit a pull request. Pull request must have all changes for a single feature **and test cases**.
+If you wish to submit enhancements, bug fixes and other changes, please submit a pull request.
 
 ## More Information
 

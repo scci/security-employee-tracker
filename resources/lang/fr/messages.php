@@ -10,7 +10,6 @@ return [
     'title' => 'Installateur de Laravel',
     'next'  => 'Suivant',
 
-
     /*
      *
      * Home page translations.
@@ -21,7 +20,6 @@ return [
         'message' => 'Bienvenue dans le programme d’installation.',
     ],
 
-
     /*
      *
      * Requirements page translations.
@@ -31,7 +29,6 @@ return [
         'title' => 'Prérequis',
     ],
 
-
     /*
      *
      * Permissions page translations.
@@ -40,7 +37,6 @@ return [
     'permissions' => [
         'title' => 'Permissions',
     ],
-
 
     /*
      *
@@ -53,7 +49,6 @@ return [
         'success' => 'Votre fichier .env a été sauvegardé.',
         'errors'  => 'Impossible d’enregistrer le fichier .env, il faut que vous le créiez manuellement.',
     ],
-
 
     /*
      *

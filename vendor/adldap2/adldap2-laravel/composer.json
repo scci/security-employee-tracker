@@ -1,0 +1,28 @@
+{
+    "name": "adldap2/adldap2-laravel",
+    "description": "Adldap2 for Laravel 5.",
+    "keywords": ["adldap", "adldap2", "ldap", "laravel"],
+    "license": "MIT",
+    "type": "project",
+    "require": {
+        "php": ">=5.5.0",
+        "adldap2/adldap2": "6.1.*"
+    },
+    "require-dev": {
+        "mockery/mockery": "0.9.*",
+        "orchestra/testbench": "~3.2"
+    },
+    "archive": {
+        "exclude": ["/tests"]
+    },
+    "autoload": {
+        "psr-4": {
+            "Adldap\\Laravel\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Adldap\\Laravel\\Tests\\": "tests/"
+        }
+    }
+}

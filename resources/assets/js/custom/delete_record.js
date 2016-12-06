@@ -24,7 +24,7 @@ $(document).ready(function(){
     $('.delete-news').click(function(){
         delete_record(this, 'news');
     });
-    $('.chip .close').click(function(){
+    $('.delete-attachment').click(function(){
         delete_record(this, 'attachment')
     });
 
@@ -44,7 +44,7 @@ function delete_record($this, page)
     }else {
         var record_id = $($this).data('id');
         var type = page;
-        selector = $('.'+ page + '-' + record_id);
+        selector = page == 'attachment' ? $($this).parent('.chip') : $('.'+ page + '-' + record_id);
         url = "/" + page + "/" + record_id;
     }
 

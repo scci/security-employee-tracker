@@ -22,7 +22,8 @@
         "doctrine/dbal": "^2.5",
         "pusher/pusher-php-server": "^2.6",
         "rachidlaasri/laravel-installer": "~1.5",
-        "graham-campbell/markdown": "^7.0"
+        "graham-campbell/markdown": "^7.0",
+        "barryvdh/laravel-debugbar": "^2.1"
     },
     "require-dev": {
         "symfony/dom-crawler": "~3.0",
@@ -30,9 +31,7 @@
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "0.9.*",
         "phpunit/phpunit": "~5.0",
-        "laracasts/generators": "~1.1",
-        "phpmd/phpmd" : "@stable",
-        "barryvdh/laravel-debugbar": "^2.1"
+        "laracasts/generators": "~1.1"
     },
     "autoload": {
         "classmap": [

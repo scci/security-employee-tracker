@@ -1,7 +1,6 @@
-vendor/
-!resources/views/vendor/
 node_modules/
 .env
 .svn/
 storage/database.sqlite
 storage/installed
+_ide_helper.php

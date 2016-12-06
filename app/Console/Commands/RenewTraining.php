@@ -5,6 +5,7 @@ namespace SET\Console\Commands;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use SET\Events\TrainingAssigned;
 use SET\TrainingUser;
@@ -17,7 +18,6 @@ class RenewTraining extends Command
      * @var int
      */
     protected $offset = 30;
-
 
     /**
      * List of all renewed notes.
@@ -59,7 +59,8 @@ class RenewTraining extends Command
         $trainingUsers = TrainingUser::with('user', 'training')
             ->where('due_date', '<', Carbon::today())
             ->activeUsers()
-            ->orderBy('id', 'desc')
+            ->orderBy(DB::raw('CASE WHEN completed_date IS NULL THEN 0 ELSE 1 END'))
+            ->orderBy('completed_date', 'desc')
             ->get()
             ->unique(function ($item) {
                 return $item['user_id'].'-'.$item['training_id'];

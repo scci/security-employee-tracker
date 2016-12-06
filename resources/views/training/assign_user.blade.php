@@ -29,7 +29,6 @@
             </div>
             <div class="row">
                 <div class="col s12 right-align">
-                    {!! Form::reset('Reset', array('class' => 'btn-flat waves-effect waves-indigo', 'id' => 'training-reset')) !!}
                     {!! Form::submit('Submit', array('class' => 'btn-flat waves-effect waves-indigo')) !!}
                 </div>
             </div>

@@ -5,7 +5,7 @@
     @if (session('message'))
         <p class="alert">{{ session('message') }}</p>
     @endif
-    <form method="post" action="{{ action('InstallController@storeUser') }}">
+    <form method="post" action="{{ url('install/user') }}">
         {!! csrf_field() !!}
 
         {!! Form::label('first_name', 'First Name') !!}
