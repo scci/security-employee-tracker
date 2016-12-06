@@ -4,7 +4,8 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Travel;
 use SET\User;
 
-class TravelControllerTest extends TestCase {
+class TravelControllerTest extends TestCase
+{
     use DatabaseTransactions;
 
     public function setUp()
@@ -20,18 +21,18 @@ class TravelControllerTest extends TestCase {
     {
         // Logged in as admin - Can access the travel create page
         $userId = $this->user->id;
-        
+
         $this->call('GET', "/user/$userId/travel/create");
         $this->seePageIs("/user/$userId/travel/create");
 
         // Create a regular user - Still logged in as admin
-        $newuser = factory(User::class)->create();        
+        $newuser = factory(User::class)->create();
         $userId = $newuser->id;
-        
+
         // Admin can access another user's travel create page
         $this->call('GET', "/user/$userId/travel/create");
         $this->seePageIs("/user/$userId/travel/create");
-        
+
          // Logged in as a regular user - Cannot access the travel create page
         $this->actingAs($newuser);
         $this->call('GET', "/user/$userId/travel/create");
@@ -53,13 +54,13 @@ class TravelControllerTest extends TestCase {
     {
         // Logged in as admin - Can store the travel
         $userId = $this->user->id;
-        $data = ['location'     => 'Test travel',
-                 'leave_date'   => "2016-12-10",
-                 'return_date'  => "2016-12-20",
-                 'brief_date'   => "2016-12-08",
-                 'debrief_date'  => "2016-12-21",
-                 'comment'  => 'Description For travel',
-                 'encrypt'  => ""];
+        $data = ['location'      => 'Test travel',
+                 'leave_date'    => '2016-12-10',
+                 'return_date'   => '2016-12-20',
+                 'brief_date'    => '2016-12-08',
+                 'debrief_date'  => '2016-12-21',
+                 'comment'       => 'Description For travel',
+                 'encrypt'       => '', ];
 
         $this->call('POST', "/user/$userId/travel/", $data);
         $this->assertRedirectedToRoute('user.show', $userId);
@@ -78,7 +79,7 @@ class TravelControllerTest extends TestCase {
         $this->call('POST', "/user/$userId/travel/", $data);
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -104,7 +105,7 @@ class TravelControllerTest extends TestCase {
         $this->assertSessionHasErrors('leave_date', 'The leave date field is required.');
         $this->assertSessionHasErrors('return_date', 'The return date field is required.');
     }
-    
+
     /**
      * @test
      */
@@ -130,7 +131,7 @@ class TravelControllerTest extends TestCase {
         $this->assertViewHas('user');
         $this->assertViewHas('travel');
     }
-    
+
     /**
      * @test
      */
@@ -142,11 +143,11 @@ class TravelControllerTest extends TestCase {
         $createdTravelId = $travelToCreate->id;
 
         // Logged in as admin - Can update the travel
-        $data = ['location' => 'Travel to this place',
-                 'comment'  => 'This is a travel comment',
-                 'leave_date'   => "2016-12-10",
-                 'return_date'  => "2016-12-20"]; 
-        
+        $data = ['location'     => 'Travel to this place',
+                 'comment'      => 'This is a travel comment',
+                 'leave_date'   => '2016-12-10',
+                 'return_date'  => '2016-12-20', ];
+
         $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
 
         $this->assertRedirectedToRoute('user.show', $userId);
@@ -161,10 +162,10 @@ class TravelControllerTest extends TestCase {
         // Logged in as a regular user - Still logged in as admin
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
-        
+
         $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
         $this->assertRedirectedToRoute('user.show', $userId);
-        
+
         // Logged in as new user. User should be able to edit own travel
         $this->actingAs($newuser);
         $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
@@ -175,13 +176,13 @@ class TravelControllerTest extends TestCase {
         $this->actingAs($newuser);
         $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
         $this->seeStatusCode(403);
-        
+
         // Get userId for user with role view and try to update travel for the same user
-        $userId = $newuser->id;        
+        $userId = $newuser->id;
         $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
         $this->assertRedirectedToRoute('user.show', $userId);
     }
-    
+
     /**
      * @test
      */
@@ -218,5 +219,3 @@ class TravelControllerTest extends TestCase {
         $this->seeStatusCode(403);
     }
 }
-
-?>

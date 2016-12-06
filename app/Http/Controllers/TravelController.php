@@ -23,7 +23,7 @@ class TravelController extends Controller
     public function store(TravelRequest $request, User $user)
     {
         $this->authorize('edit');
-        
+
         $data = $request->all();
         $data['author_id'] = Auth::user()->id;
 

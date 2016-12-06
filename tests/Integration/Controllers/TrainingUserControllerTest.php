@@ -1,9 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\Http\Controllers\TrainingUserController;
-use SET\TrainingUser;
 use SET\Training;
+use SET\TrainingUser;
 use SET\User;
 
 class TrainingUserControllerTest extends TestCase
@@ -16,7 +15,7 @@ class TrainingUserControllerTest extends TestCase
         $this->signIn();
         $this->withoutEvents();
     }
-    
+
     /**
      * @test
      */
@@ -29,13 +28,13 @@ class TrainingUserControllerTest extends TestCase
         $this->seePageIs("/user/$userId/training/create");
         $this->assertViewHas('user');
         $this->assertViewHas('training');
-        $this->assertViewHas('disabled');        
+        $this->assertViewHas('disabled');
 
         // Logged in as a regular user - Cannot access the training user create page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        
+
         $this->call('GET', "/user/$userId/training/create");
         $this->seeStatusCode(403);
 
@@ -43,11 +42,11 @@ class TrainingUserControllerTest extends TestCase
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        
+
         $this->call('GET', "/user/$userId/training/create");
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -56,10 +55,10 @@ class TrainingUserControllerTest extends TestCase
         // Logged in as admin - Can store the training user
         $userId = $this->user->id;
         $data = ['training_id'      => factory(Training::class)->create()->id,
-                 'completed_date'   => "",
+                 'completed_date'   => '',
                  'due_date'         => '2017-01-23',
-                 'encrypt'          => "", 
-                 'comment'          => "Training user notes"];
+                 'encrypt'          => '',
+                 'comment'          => 'Training user notes', ];
 
         $this->call('POST', "/user/$userId/training/", $data);
         $this->assertRedirectedToRoute('user.show', $userId);
@@ -69,7 +68,7 @@ class TrainingUserControllerTest extends TestCase
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        
+
         $this->call('POST', "/user/$userId/training/", $data);
         $this->seeStatusCode(403);
 
@@ -77,11 +76,11 @@ class TrainingUserControllerTest extends TestCase
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        
+
         $this->call('POST', "/user/$userId/training/", $data);
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -104,71 +103,69 @@ class TrainingUserControllerTest extends TestCase
         $this->assertSessionHasErrors();
         $this->assertSessionHasErrors('training_id', 'Please select a training.');
     }
-    
+
     /**
      * @test
      */
     public function it_shows_the_training_user()
     {
-        // Logged in as admin 
+        // Logged in as admin
         $userId = $this->user->id;
-        
+
         // Create a traininguser object
-        $trainingUser = factory(TrainingUser::class)->create();        
+        $trainingUser = factory(TrainingUser::class)->create();
         $trainingUserId = $trainingUser->id;
-        
+
         // Create a traininguser object without the completed date
-        $trainingUserNoCompletedDate = factory(TrainingUser::class)->create(['completed_date' => null]);        
+        $trainingUserNoCompletedDate = factory(TrainingUser::class)->create(['completed_date' => null]);
         $trainingUserNoCompletedDateId = $trainingUserNoCompletedDate->id;
 
         //Can see the training user details
-        $this->call('GET', "/user/$userId/training/$trainingUserId");        
-        $this->assertRedirectedToRoute('user.show', $userId);        
-        
-        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");        
+        $this->call('GET', "/user/$userId/training/$trainingUserId");
+        $this->assertRedirectedToRoute('user.show', $userId);
+
+        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");
         $this->seePageIs("/user/$userId/training/$trainingUserNoCompletedDateId");
-        
-        
+
         // Logged in as regular user
         $newuser = factory(User::class)->create();
-        $this->actingAs($newuser);        
-        $userId = $newuser->id;         
+        $this->actingAs($newuser);
+        $userId = $newuser->id;
 
         // Can see the training user details for the logged in user
-        $this->call('GET', "/user/$userId/training/$trainingUserId");        
-        $this->assertRedirectedToRoute('user.show', $userId);        
-                
+        $this->call('GET', "/user/$userId/training/$trainingUserId");
+        $this->assertRedirectedToRoute('user.show', $userId);
+
         // Can see the training user details for the logged in user
-        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");        
+        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");
         $this->seePageIs("/user/$userId/training/$trainingUserNoCompletedDateId");
-        
+
         // Create another new user - But try to access the training user page for the previous user
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        
+
         // Cannot see the training user details for the previously created user
-        $this->call('GET', "/user/$userId/training/$trainingUserId");        
-        $this->seeStatusCode(403);;
-        
-        // Cannot see the training user details for the previously created user
-        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");        
+        $this->call('GET', "/user/$userId/training/$trainingUserId");
         $this->seeStatusCode(403);
-        
-        
+
+        // Cannot see the training user details for the previously created user
+        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");
+        $this->seeStatusCode(403);
+
         // Logged in as user with view permissions
         $newuser = factory(User::class)->create(['role' => 'view']);
-        $this->actingAs($newuser);        
-        $userId = $newuser->id;         
+        $this->actingAs($newuser);
+        $userId = $newuser->id;
 
         // Can see the training user details for the logged in user
-        $this->call('GET', "/user/$userId/training/$trainingUserId");        
-        $this->assertRedirectedToRoute('user.show', $userId);        
-                
+        $this->call('GET', "/user/$userId/training/$trainingUserId");
+        $this->assertRedirectedToRoute('user.show', $userId);
+
         // Can see the training user details for the logged in user
-        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");        
-        $this->seePageIs("/user/$userId/training/$trainingUserNoCompletedDateId");        
+        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");
+        $this->seePageIs("/user/$userId/training/$trainingUserNoCompletedDateId");
     }
-    
+
     /**
      * @test
      */
@@ -190,18 +187,18 @@ class TrainingUserControllerTest extends TestCase
         // Create a new user - Still logged in as an admin
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
-        
+
         // Able to edit the new user's training
         $this->call('GET', "/user/$userId/training/$trainingUserId/edit");
         $this->seePageIs("/user/$userId/training/$trainingUserId/edit");
         $this->assertViewHas('user');
         $this->assertViewHas('trainingUser');
         $this->assertViewHas('training');
-        $this->assertViewHas('disabled'); 
-        
-        // Log in as a regular user - User should be able to edit their own training page        
+        $this->assertViewHas('disabled');
+
+        // Log in as a regular user - User should be able to edit their own training page
         $this->actingAs($newuser);
-        
+
         $this->call('GET', "/user/$userId/training/$trainingUserId/edit");
         $this->seePageIs("/user/$userId/training/$trainingUserId/edit");
         $this->assertViewHas('user');
@@ -209,24 +206,24 @@ class TrainingUserControllerTest extends TestCase
         $this->assertViewHas('training');
         // Ensure the due by field is disabled since user is not an admin.
         $this->assertViewHas('disabled', 'disabled');
-        
+
         // Create a new user
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
-        
+
         // Still logged in as previous user - Cannot edit the newuser's training
         $this->call('GET', "/user/$userId/training/$trainingUserId/edit");
         $this->seeStatusCode(403);
-        
+
         // Create a new user with view permissions
-        $newuser = factory(User::class)->create(['role' => 'view']);        
+        $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        
+
         // Cannot edit the previous user's training
         $this->call('GET', "/user/$userId/training/$trainingUserId/edit");
-        $this->seeStatusCode(403);        
+        $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -234,35 +231,35 @@ class TrainingUserControllerTest extends TestCase
     {
         // Get the admin user id
         $userId = $this->user->id;
-        
+
         // Create a traininguser object
         $trainingUserToCreate = factory(TrainingUser::class)->create();
         $createdTrainingUserId = $trainingUserToCreate->id;
 
         // Logged in as admin - Can update the training user
         $data = ['training_id'      => $createdTrainingUserId,
-                 'completed_date'   => "",
-                 'due_date'         => "2016-12-29",
-                 'comment'          => 'Training User Notes'
-                ]; 
+                 'completed_date'   => '',
+                 'due_date'         => '2016-12-29',
+                 'comment'          => 'Training User Notes',
+                ];
 
         $this->call('PATCH', "/user/$userId/training/$createdTrainingUserId", $data);
 
         $this->assertRedirectedToRoute('user.show', $userId);
-        
+
         // Ensure the training user is updated with the provided data
         $updatedTrainingUser = TrainingUser::find($createdTrainingUserId);
         $this->assertEquals($updatedTrainingUser->completed_date, $data['completed_date']);
         $this->assertEquals($updatedTrainingUser->comment, $data['comment']);
         $this->assertEquals($updatedTrainingUser->due_date, $data['due_date']);
-        
+
         // Create new user - still logged in as admin
-        $newuser = factory(User::class)->create();       
+        $newuser = factory(User::class)->create();
         $userId = $newuser->id;
-        
+
         $this->call('PATCH', "/user/$userId/training/$createdTrainingUserId", $data);
         $this->assertRedirectedToRoute('user.show', $userId);
-                
+
         // Logged in as new user. User should be able to edit own training
         $this->actingAs($newuser);
         $this->call('PATCH', "/user/$userId/training/$createdTrainingUserId", $data);
@@ -271,11 +268,11 @@ class TrainingUserControllerTest extends TestCase
         // Logged in as a user with role view - Cannot update another user's training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        
+
         $this->call('PATCH', "/user/$userId/training/$createdTrainingUserId", $data);
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -311,7 +308,4 @@ class TrainingUserControllerTest extends TestCase
         $this->call('DELETE', "/user/$userId/training/$createdTrainingUserId");
         $this->seeStatusCode(403);
     }
-
 }
-
-?>

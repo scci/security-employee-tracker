@@ -5,9 +5,10 @@ namespace SET\Http\Requests;
 use Illuminate\Support\Facades\Gate;
 
 /**
- * Class VisitRequest
+ * Class VisitRequest.
  */
-class VisitRequest extends Request {
+class VisitRequest extends Request
+{
     /**
      * Determine if the user is authorized to make this request.
      *
@@ -26,10 +27,8 @@ class VisitRequest extends Request {
     public function rules()
     {
         return [
-            'smo_code' => 'required',
+            'smo_code'        => 'required',
             'expiration_date' => 'required',
         ];
     }
 }
-
-?>

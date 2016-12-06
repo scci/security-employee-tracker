@@ -5,10 +5,10 @@ use SET\Http\Controllers\UserController;
 use SET\User;
 
 /**
- * Class UserControllerTest
- *
+ * Class UserControllerTest.
  */
-class UserControllerTest extends TestCase {
+class UserControllerTest extends TestCase
+{
     use DatabaseTransactions;
 
     public function setUp()
@@ -16,7 +16,7 @@ class UserControllerTest extends TestCase {
         parent::setUp();
         $this->signIn();
     }
-    
+
     /**
      * @test
      */
@@ -31,7 +31,7 @@ class UserControllerTest extends TestCase {
         // Logged in as a regular user - Cannot access the user page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        
+
         $this->call('GET', '/user');
         $this->seeStatusCode(403);
     }
@@ -42,23 +42,24 @@ class UserControllerTest extends TestCase {
     public function it_shows_the_create_page()
     {
         // Logged in as admin - Can access the visit create page
-        $this->call('GET', "/user/create");
-        $this->seePageIs("/user/create");
+        $this->call('GET', '/user/create');
+        $this->seePageIs('/user/create');
         $this->assertViewHas('supervisors');
         $this->assertViewHas('groups');
 
         // Create a regular user - Cannot access the visit create page
-        $newuser = factory(User::class)->create();        
+        $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', "/user/create");
+        $this->call('GET', '/user/create');
         $this->seeStatusCode(403);
 
         // Logged in as a user with role view - Cannot access the visit create page
         $newuser = factory(User::class)->create(['role' => 'view']);
-        $this->actingAs($newuser);$this->call('GET', "/user/create");
+        $this->actingAs($newuser);
+        $this->call('GET', '/user/create');
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -66,20 +67,20 @@ class UserControllerTest extends TestCase {
     {
         // Logged in as admin - Can store the visit
         $userId = $this->user->id;
-        $data = ['first_name'       => "John",
-                 'nickname'         => "Johnny",
-                 'last_name'        => "Smith",
-                 'email'            => "jsmith@test.com",
-                 'username'         => "jsmith",
-                 'phone'            => "1234567890",
-                 'emp_num'          => "321",
-                 'supervisor_id'    => "21",
-                 'access_level'     => "secret",
-                 'clearance'        => "interim",
-                 'elig_date'        => "2016-12-20",
-                 'inv'              => "investigation",
-                 'inv_close'        => "2016-12-29",
-                 'status'           => "active"];
+        $data = ['first_name'       => 'John',
+                 'nickname'         => 'Johnny',
+                 'last_name'        => 'Smith',
+                 'email'            => 'jsmith@test.com',
+                 'username'         => 'jsmith',
+                 'phone'            => '1234567890',
+                 'emp_num'          => '321',
+                 'supervisor_id'    => '21',
+                 'access_level'     => 'secret',
+                 'clearance'        => 'interim',
+                 'elig_date'        => '2016-12-20',
+                 'inv'              => 'investigation',
+                 'inv_close'        => '2016-12-29',
+                 'status'           => 'active', ];
 
         $this->call('POST', 'user', $data);
         $this->assertRedirectedToRoute('user.index');
@@ -87,7 +88,7 @@ class UserControllerTest extends TestCase {
         // Retrieve the created  user and ensure that the user is created
         $createdUser = SET\User::where('email', $data['email'])->get();
         $this->assertNotNull($createdUser);
-                
+
         // Logged in as a regular user - Cannot store the user
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
@@ -100,7 +101,7 @@ class UserControllerTest extends TestCase {
         $this->call('POST', 'user', $data);
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -115,16 +116,16 @@ class UserControllerTest extends TestCase {
         $this->assertSessionHasErrors('first_name', 'The first_name field is required.');
         $this->assertSessionHasErrors('last_name', 'The last_name field is required.');
         $this->assertSessionHasErrors('email', 'The email field is required.');
-        
-        $data = ['first_name'   => "Jane",
-                 'last_name'    => "Doe"];
+
+        $data = ['first_name'   => 'Jane',
+                 'last_name'    => 'Doe', ];
 
         $this->call('POST', 'user', $data);
         $this->assertSessionHasErrors();
         $this->assertSessionHasErrors(['email']);
-        $this->assertSessionHasErrors('email', 'The email field is required.');       
+        $this->assertSessionHasErrors('email', 'The email field is required.');
     }
-    
+
     /**
      * @test
      */
@@ -143,7 +144,7 @@ class UserControllerTest extends TestCase {
         $this->assertViewHas('visits');
         $this->assertViewHas('travels');
         $this->assertViewHas('logs');
-        
+
         // Create a user object
         $createdUser = factory(User::class)->create([]);
         $createdUserId = $createdUser->id;
@@ -160,9 +161,9 @@ class UserControllerTest extends TestCase {
         $this->assertViewHas('visits');
         $this->assertViewHas('travels');
         $this->assertViewHas('logs');
-        
+
         // Logged in as the created user - Can see the created user's page
-        $this->actingAs($createdUser); 
+        $this->actingAs($createdUser);
         $this->call('GET', "user/$createdUserId");
         $this->seePageIs('/user/'.$createdUserId);
         $this->assertViewHas('user');
@@ -174,15 +175,15 @@ class UserControllerTest extends TestCase {
         $this->assertViewHas('visits');
         $this->assertViewHas('travels');
         $this->assertViewHas('logs');
-        
+
         // Create another user object
         $newUser = factory(User::class)->create([]);
-        
+
         // Logged in as the newuser - Cannot see the previously created user's page
-        $this->actingAs($newUser); 
+        $this->actingAs($newUser);
         $this->call('GET', "user/$createdUserId");
         $this->seeStatusCode(403);
-        
+
         // Logged in as a user with role view - Can see the previously created user's page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
@@ -198,8 +199,7 @@ class UserControllerTest extends TestCase {
         $this->assertViewHas('travels');
         $this->assertViewHas('logs');
     }
-    
-    
+
     /**
      * @test
      */
@@ -213,7 +213,7 @@ class UserControllerTest extends TestCase {
         $this->assertViewHas('user');
         $this->assertViewHas('supervisors');
         $this->assertViewHas('groups');
-        
+
         // Create a user object
         $createdUser = factory(User::class)->create();
         $createdUserId = $createdUser->id;
@@ -240,7 +240,7 @@ class UserControllerTest extends TestCase {
         $this->call('GET', "user/$newuserId/edit");
         $this->seeStatusCode(403);
     }
-    
+
     /**
      * @test
      */
@@ -251,9 +251,9 @@ class UserControllerTest extends TestCase {
         $createdUserId = $createdUser->id;
 
         // Logged in as admin - Can update the user
-        $data = ['first_name'       => "John",
-                 'last_name'        => "Doe",
-                 'nickname'         => "Johnny",
+        $data = ['first_name'       => 'John',
+                 'last_name'        => 'Doe',
+                 'nickname'         => 'Johnny',
                  'email'            => $createdUser->email,
                  'username'         => $createdUser->username,
                  'phone'            => $createdUser->phone,
@@ -264,10 +264,10 @@ class UserControllerTest extends TestCase {
                  'elig_date'        => $createdUser->elig_date,
                  'inv'              => $createdUser->inv,
                  'inv_close'        => $createdUser->inv_close,
-                 'status'           => $createdUser->status];
+                 'status'           => $createdUser->status, ];
 
         $this->call('PATCH', "/user/$createdUserId", $data);
-        
+
         $this->assertRedirectedToRoute('user.show', $createdUserId);
 
         $newlyCreatedUser = User::find($createdUser->id);
@@ -339,5 +339,3 @@ class UserControllerTest extends TestCase {
         $this->seeStatusCode(403);
     }
 }
-
-?>
