@@ -158,6 +158,8 @@ class UserController extends Controller
      */
     public function destroy($userId)
     {
+        $this->authorize('edit');
+
         Storage::deleteDirectory('user_'.$userId);
         User::findOrFail($userId)->delete();
 

@@ -20,6 +20,8 @@ class TrainingUserController extends Controller
 {
     public function create(User $user)
     {
+        $this->authorize('edit');
+
         $training = Training::all()->pluck('name', 'id')->toArray();
         $disabled = '';
 
@@ -28,6 +30,8 @@ class TrainingUserController extends Controller
 
     public function store(TrainingUserRequest $request, User $user)
     {
+        $this->authorize('edit');
+
         $data = $request->all();
         $data['author_id'] = Auth::user()->id;
         $data['user_id'] = $user->id;
@@ -59,6 +63,7 @@ class TrainingUserController extends Controller
 
     public function edit(User $user, $trainingUserID)
     {
+        $this->authorize('edit_training_user', $user);
         $training = Training::all()->pluck('name', 'id')->toArray();
         $trainingUser = TrainingUser::findOrFail($trainingUserID);
 
@@ -72,8 +77,9 @@ class TrainingUserController extends Controller
         return view('traininguser.edit', compact('user', 'trainingUser', 'training', 'disabled'));
     }
 
-    public function update(Request $request, $userID, $trainingUserID)
+    public function update(Request $request, User $user, $trainingUserID)
     {
+        $this->authorize('edit_training_user', $user);
         $trainingUser = TrainingUser::findOrFail($trainingUserID);
         $data = $request->all();
         $trainingUser->update($data);
@@ -84,11 +90,12 @@ class TrainingUserController extends Controller
 
         Notification::container()->success('Training successfully updated');
 
-        return redirect()->action('UserController@show', $userID);
+        return redirect()->action('UserController@show', $user->id);
     }
 
     public function destroy($userID, $trainingUserID)
     {
+        $this->authorize('edit');
         TrainingUser::findOrFail($trainingUserID)->delete();
         Storage::deleteDirectory('traininguser_'.$trainingUserID);
 
