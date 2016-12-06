@@ -52,7 +52,7 @@ class AuthServiceProvider extends ServiceProvider
         $gate->define('show_user', function ($user, $page) {
             return $this->isViewer($user) || $user->id === $page->id;
         });
-        
+
         $gate->define('edit_training_user', function ($user, $page) {
             return $this->isAdmin($user) || $user->id === $page->id;
         });
