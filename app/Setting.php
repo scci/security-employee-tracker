@@ -56,7 +56,7 @@ class Setting extends Model
      * Set a setting value. If no value is provided, it is stored as null.
      *
      * @param string      $key
-     * @param string|null $value
+     * @param mixed $value
      */
     public static function set(string $key, $value = null)
     {
