@@ -4,8 +4,8 @@ namespace SET\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use SET\User;
 use SET\Setting;
+use SET\User;
 
 class SettingController extends Controller
 {
@@ -26,7 +26,7 @@ class SettingController extends Controller
         $users = User::skipSystem()->active()->get()->sortBy('UserFullName');
         $userList = $users->pluck('UserFullName', 'id');
         $admins = $users->where('role', 'edit')->pluck('id')->all();
-        $viewers = $users->where('role', 'view')->pluck('id')->all();;
+        $viewers = $users->where('role', 'view')->pluck('id')->all();
         $configAdmins = User::whereIn('username', Config::get('auth.admin'))
             ->get()->pluck('userFullName')->implode('; ');
 
@@ -52,7 +52,7 @@ class SettingController extends Controller
         unset($data['_token']);
 
         foreach ($data as $key => $value) {
-            Setting::set($key,$value);
+            Setting::set($key, $value);
         }
 
         return redirect()->action('SettingController@index');
@@ -60,6 +60,7 @@ class SettingController extends Controller
 
     /**
      * @param $data
+     *
      * @return mixed
      */
     private function updateUserRoles($data)
@@ -73,9 +74,9 @@ class SettingController extends Controller
             User::whereIn('id', $data['admin'])->update(['role' => 'edit']);
             unset($data['admin']);
         }
+
         return $data;
     }
-
 
     /**
      * PHP converts our periods to underscores.
@@ -88,17 +89,16 @@ class SettingController extends Controller
     private function saveAdldapKeyFormat($data)
     {
         $adldapData = [
-            'auth.providers.users.driver' => 'auth_driver',
-            'adldap.connections.default.connection_settings.base_dn' => 'adldap_connections_default_connection_settings_base_dn',
+            'auth.providers.users.driver'                                   => 'auth_driver',
+            'adldap.connections.default.connection_settings.base_dn'        => 'adldap_connections_default_connection_settings_base_dn',
             'adldap.connections.default.connection_settings.admin_username' => 'adldap_connections_default_connection_settings_admin_username',
             'adldap.connections.default.connection_settings.admin_password' => 'adldap_connections_default_connection_settings_admin_password',
             'adldap.connections.default.connection_settings.account_prefix' => 'adldap_connections_default_connection_settings_account_prefix',
             'adldap.connections.default.connection_settings.account_suffix' => 'adldap_connections_default_connection_settings_account_suffix',
-            'adldap_auth.limitation_filter' => 'adldap_auth_limitation_filter'
+            'adldap_auth.limitation_filter'                                 => 'adldap_auth_limitation_filter',
         ];
 
-        foreach ($adldapData as $correctKey => $formKey)
-        {
+        foreach ($adldapData as $correctKey => $formKey) {
             $data[$correctKey] = $data[$formKey];
             unset($data[$formKey]);
         }
@@ -107,7 +107,7 @@ class SettingController extends Controller
         unset($data['ldap_controller1']);
         unset($data['ldap_controller2']);
 
-        if ($data['adldap.connections.default.connection_settings.admin_password'] == "") {
+        if ($data['adldap.connections.default.connection_settings.admin_password'] == '') {
             $data['adldap.connections.default.connection_settings.admin_password'] = Setting::get('adldap.connections.default.connection_settings.admin_password');
         }
 

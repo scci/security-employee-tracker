@@ -21,13 +21,13 @@ class LdapTest extends TestCase
     public function it_sets_adldap_settings_from_array()
     {
         $array = [
-            'auth.providers.users.driver' => 'adldap',
+            'auth.providers.users.driver'                                       => 'adldap',
             'adldap.connections.default.connection_settings.domain_controllers' => ['123.123.123', '789.789.789'],
-            'adldap.connections.default.connection_settings.admin_username' => 'someaddress@email.com',
-            'adldap.connections.default.connection_settings.admin_password' => 'SomePassword',
-            'adldap.connections.default.connection_settings.account_prefix' => null,
-            'adldap.connections.default.connection_settings.account_suffix' => null,
-            'adldap_auth.limitation_filter' => null
+            'adldap.connections.default.connection_settings.admin_username'     => 'someaddress@email.com',
+            'adldap.connections.default.connection_settings.admin_password'     => 'SomePassword',
+            'adldap.connections.default.connection_settings.account_prefix'     => null,
+            'adldap.connections.default.connection_settings.account_suffix'     => null,
+            'adldap_auth.limitation_filter'                                     => null,
         ];
 
         (new Ldap($array))->setup();
@@ -43,5 +43,4 @@ class LdapTest extends TestCase
         (new Ldap(['auth.providers.users.driver' => null]))->setup();
         $this->assertNotNull(config('auth.providers.users.driver'));
     }
-
 }

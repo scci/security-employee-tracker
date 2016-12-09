@@ -13,8 +13,7 @@ class ProcessMondayTest extends TestCase
     /** @test */
     public function it_sends_a_summary_email_to_the_FSO()
     {
-
-       return true;
+        return true;
         Mail::fake();
 
         Setting::set('sender_address', 'fake@email.com');

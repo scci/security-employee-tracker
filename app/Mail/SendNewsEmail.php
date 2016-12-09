@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use SET\News;
-use SET\Setting;
 
 class SendNewsEmail extends Mailable implements ShouldQueue
 {

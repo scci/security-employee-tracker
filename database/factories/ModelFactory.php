@@ -116,7 +116,7 @@ $factory->define(SET\Visit::class, function (Faker\Generator $faker) use ($facto
 
 $factory->define(SET\Setting::class, function (Faker\Generator $faker) {
     return [
-        'key' => $faker->word,
+        'key'   => $faker->word,
         'value' => $faker->word,
     ];
 });
