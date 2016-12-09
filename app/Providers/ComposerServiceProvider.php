@@ -3,8 +3,6 @@
 namespace SET\Providers;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Schema;
-use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use SET\Duty;
 use SET\Setting;
