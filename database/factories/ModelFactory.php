@@ -113,3 +113,10 @@ $factory->define(SET\Visit::class, function (Faker\Generator $faker) use ($facto
         'user_id'         => $factory->create(SET\User::class)->id,
     ];
 });
+
+$factory->define(SET\Setting::class, function (Faker\Generator $faker) {
+    return [
+        'key'   => $faker->word,
+        'value' => $faker->word,
+    ];
+});

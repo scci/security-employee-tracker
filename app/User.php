@@ -123,16 +123,20 @@ class User extends Authenticatable
     public function getUserFullNameAttribute()
     {
         if ($this->attributes['id'] == 1) {
-            $fullName = 'system';
-        } elseif ($this->attributes['nickname']) {
-            $fullName = $this->attributes['last_name']
-                .', '.$this->attributes['first_name']
-                .' ('.$this->attributes['nickname'].')';
-        } else {
-            $fullName = $this->attributes['last_name'].', '.$this->attributes['first_name'];
+            return 'system';
         }
 
-        return $fullName;
+        if ($this->attributes['nickname']) {
+            $firstName = $this->attributes['first_name'].' ('.$this->attributes['nickname'].')';
+        } else {
+            $firstName = $this->attributes['first_name'];
+        }
+
+        if (Setting::get('full_name_format') == 'first_last') {
+            return $firstName.' '.$this->attributes['last_name'];
+        }
+
+        return $this->attributes['last_name'].', '.$firstName;
     }
 
     /**

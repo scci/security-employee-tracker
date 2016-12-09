@@ -77,7 +77,7 @@ class UserController extends Controller
     {
         $user = User::with(['subordinates' => function ($query) {
             $query->active();
-        }, 'supervisor', 'groups', 'duties', 'attachments'])
+        }, 'supervisor', 'groups', 'duties', 'attachments', 'notes.author'])
             ->findOrFail($userId);
 
         //Make sure the user can't access other people's pages.

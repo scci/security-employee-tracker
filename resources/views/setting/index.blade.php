@@ -1,42 +1,36 @@
 @extends('layouts.master')
 
-@section('title', 'Settings')
+@section('title', 'Administration Settings')
 
 @section('content')
 
     <div class="card">
         <div class="card-content">
-            <div class="card-title">Settings</div>
+            <div class="card-title">Administration Settings</div>
 
             {!! Form::open(array('action' => ['SettingController@update', 'id'=>'none'], 'method' => 'PUT', 'class' => 'container-fluid')) !!}
 
-            <div class="row">
-                <div class="col s6 m4 input-field">
-                        {!! Form::label( 'report_address-primary', 'FSO Name:') !!}
-                        {!! Form::text( 'report_address-primary', $report->primary ,['class' => 'form-control']) !!}
-                </div>
-                <div class="col s6 m4 input-field">
-                        {!! Form::label('report_address-secondary', 'FSO Email:') !!}
-                        {!! Form::text('report_address-secondary', $report->secondary ,['class' => 'form-control']) !!}
-                </div>
-                <div class="col s6 m4">
-                        {!! Form::label('admin[]', 'Admin:') !!}
-                        {!! Form::select('admin[]', $userList, $admins ,['class' => 'form-control', 'multiple', 'data-live-search' => "true"]) !!}
-                        <small>From Config: {{ $configAdmins }}</small>
-                </div>
-                <div class="col s6 m4">
-                        {!! Form::label('viewer[]', 'Viewer:') !!}
-                        {!! Form::select('viewer[]', $userList, $viewers ,['class' => 'form-control', 'multiple', 'data-live-search' => "true"]) !!}
-                </div>
-            </div>
+            <ul class="tabs">
+                <li class="tab"><a href="#general">General</a></li>
+                <li class="tab"><a href="#ldap">AD/LDAP</a></li>
+                <li class="tab"><a href="#mail">Mail</a></li>
+                <li class="tab"><a href="#users">Users</a></li>
+            </ul><br />
+
+            <div id="general">@include('setting._general')</div>
+            <div id="ldap">@include('setting._adldap')</div>
+            <div id="mail">@include('setting._mail')</div>
+            <div id="users">@include('setting._users')</div>
+
             <div class="row">
                 <div class="col s12 right-align">
-                        {!! Form::submit('Save', array('class' => 'btn-flat waves-effect waves-indigo')) !!}
+                    {!! Form::submit('Save', array('class' => 'btn-flat waves-effect waves-indigo')) !!}
                 </div>
             </div>
             {!! Form::close() !!}
         </div>
     </div>
+
 
 @stop
 

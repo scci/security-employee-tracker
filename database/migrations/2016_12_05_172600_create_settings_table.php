@@ -2,7 +2,6 @@
 
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
-use SET\Setting;
 
 class CreateSettingsTable extends Migration
 {
@@ -13,15 +12,15 @@ class CreateSettingsTable extends Migration
      */
     public function up()
     {
+        //Drop current settings table before making a new one.
+        Schema::dropIfExists('settings');
+
         Schema::create('settings', function (Blueprint $table) {
-            $table->string('name')->primary();
-            $table->string('primary')->nullable();
-            $table->string('secondary')->nullable();
+            $table->increments('id');
+            $table->string('key')->index();
+            $table->text('value')->nullable();
             $table->timestamps();
         });
-
-        //Address that receives our reports
-        Setting::create(['name' => 'report_address', 'primary' => 'system', 'secondary' => 'system@system.com']);
     }
 
     /**
