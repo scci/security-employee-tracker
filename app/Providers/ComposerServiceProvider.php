@@ -3,6 +3,7 @@
 namespace SET\Providers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use SET\Duty;
@@ -17,7 +18,9 @@ class ComposerServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        View::share('app_name', Setting::get('app_name', 'SET'));
+        view()->composer(['layouts.master'], function ($view) {
+            $view->with('app_name', Setting::get('app_name', 'SET'));
+        });
 
         // Pass the logged in user's full name to the layouts._header view.
         view()->composer(['layouts._navbar', 'home._last_login'], function ($view) {
