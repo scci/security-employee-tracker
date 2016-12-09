@@ -36,12 +36,11 @@ class SettingsTest extends TestCase
     /**
      * @test
      * This tests the AppServiceProvider where we hook into the updating setting.
-     *
      */
     public function it_updates_the_cache_when_settings_are_updated()
     {
         $setting = factory(Setting::class)->create();
-        Setting::updateOrCreate(['key' => $setting->key],['value' => 'New Value']);
+        Setting::updateOrCreate(['key' => $setting->key], ['value' => 'New Value']);
 
         $this->assertEquals('New Value', Cache::get($setting->key));
     }
@@ -53,10 +52,11 @@ class SettingsTest extends TestCase
         $returned = Setting::getAll();
 
         //Filter out any pre-existing settings.
-        foreach($returned as $key => $value){
-            if (!in_array($key, $settings->pluck('key')->toArray())) unset($returned[$key]);
+        foreach ($returned as $key => $value) {
+            if (!in_array($key, $settings->pluck('key')->toArray())) {
+                unset($returned[$key]);
+            }
         }
-
 
         $this->assertCount(3, $returned);
     }
@@ -75,6 +75,5 @@ class SettingsTest extends TestCase
         Setting::set($setting->key, 'newValue');
 
         $this->assertEquals('newValue', Setting::get($setting->key));
-
     }
 }

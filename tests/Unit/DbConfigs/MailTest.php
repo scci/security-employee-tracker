@@ -21,14 +21,14 @@ class MailTest extends TestCase
     public function it_sets_smtp_settings_from_array()
     {
         $array = [
-            'mail.driver' => 'smtp',
-            'mail.host' => '123.456.789',
-            'mail.port' => 5555,
+            'mail.driver'       => 'smtp',
+            'mail.host'         => '123.456.789',
+            'mail.port'         => 5555,
             'mail.from.address' => 'someaddress@email.com',
-            'mail.from.name' => 'My Name',
-            'mail.encryption' => null,
-            'mail.username' => null,
-            'mail.password' => null
+            'mail.from.name'    => 'My Name',
+            'mail.encryption'   => null,
+            'mail.username'     => null,
+            'mail.password'     => null,
         ];
 
         (new Mail($array))->setup();
@@ -49,5 +49,4 @@ class MailTest extends TestCase
         (new Mail(['mail.driver' => null]))->setup();
         $this->assertNotNull(config('mail.driver'));
     }
-
 }

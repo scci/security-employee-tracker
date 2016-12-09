@@ -2,8 +2,6 @@
 
 namespace SET\Handlers\DBConfigs;
 
-use SET\Setting;
-
 class Ldap extends ConfigAbstract
 {
     public $allowable = [

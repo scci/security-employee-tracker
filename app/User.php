@@ -133,10 +133,10 @@ class User extends Authenticatable
         }
 
         if (Setting::get('full_name_format') == 'first_last') {
-            return $firstName." ".$this->attributes['last_name'];
+            return $firstName.' '.$this->attributes['last_name'];
         }
 
-        return $this->attributes['last_name'].", ".$firstName;
+        return $this->attributes['last_name'].', '.$firstName;
     }
 
     /**

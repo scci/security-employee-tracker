@@ -17,7 +17,7 @@ class SettingControllerTest extends TestCase
     /** @test */
     public function it_loads()
     {
-       return true;
+        return true;
     }
 
 //    /**

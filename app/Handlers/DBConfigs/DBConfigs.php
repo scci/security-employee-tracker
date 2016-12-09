@@ -3,7 +3,7 @@
  * Created by PhpStorm.
  * User: sdibble
  * Date: 12/7/2016
- * Time: 2:17 PM
+ * Time: 2:17 PM.
  */
 
 namespace SET\Handlers\DBConfigs;
@@ -12,12 +12,10 @@ use Illuminate\Support\Facades\Schema;
 use SET\Setting;
 
 /**
- * Class DBConfigs
- * @package SET\Handlers\DBConfigs
+ * Class DBConfigs.
  */
 class DBConfigs
 {
-
     /**
      * @var array
      */
@@ -31,10 +29,11 @@ class DBConfigs
      */
     public static function execute()
     {
-        if (!Schema::hasTable('settings')) return;
+        if (!Schema::hasTable('settings')) {
+            return;
+        }
         $settings = Setting::getAll();
-        foreach (static::$classes as $class)
-        {
+        foreach (static::$classes as $class) {
             (new $class($settings))->setup();
         }
     }
