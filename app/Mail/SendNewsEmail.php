@@ -14,7 +14,6 @@ class SendNewsEmail extends Mailable implements ShouldQueue
     use Queueable, SerializesModels;
 
     public $news;
-    public $reportAddress;
 
     /**
      * SendNewsEmail constructor.
@@ -24,7 +23,6 @@ class SendNewsEmail extends Mailable implements ShouldQueue
     public function __construct(News $news)
     {
         $this->news = $news;
-        $this->reportAddress = Setting::where('name', 'report_address')->first();
     }
 
     /**

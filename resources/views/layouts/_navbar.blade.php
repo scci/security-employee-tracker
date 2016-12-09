@@ -1,6 +1,6 @@
 <nav>
     <div class="nav-wrapper">
-        <a class="brand-logo" href="{{url("/")}}"> <img src="{{url("/img/logo-white.png")}}" alt="Security Employee Tracker" /> <span data-toggle="tooltip" data-placement="bottom" title="Security Employee Tracker">SET</span></a>
+        <a class="brand-logo" href="{{url("/")}}"> <img src="{{url("/img/logo-white.png")}}" alt="Security Employee Tracker" /> <span data-toggle="tooltip" data-placement="bottom" title="Security Employee Tracker">{{ $app_name }}</span></a>
         <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 
         <?php
@@ -45,7 +45,7 @@
     @endcan
     @can('edit')
         <li><a class="waves-effect waves-light modal-trigger" href="#jpas-form">JPAS Import</a></li>
-        <li><a href="{{url("settings")}}">Settings</a></li>
+        <li><a href="{{url("settings")}}">Administration</a></li>
     @endcan
     <li><a href="{{url("user", Auth::user()->id)}}">My Profile</a></li>
     <li><a href="{{url("logout")}}">Logout</a></li>

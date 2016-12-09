@@ -3,8 +3,11 @@
 namespace SET\Providers;
 
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use SET\Handlers\DBConfigs\DBConfigs;
 use SET\Log;
+use SET\Setting;
 use SET\User;
 
 class AppServiceProvider extends ServiceProvider
@@ -16,9 +19,14 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
+        DBConfigs::execute();
+
         // If the save() function is used on the User model, we will generate a new log note.
         User::updating(function ($user) {
             $this->createUserLog($user);
+        });
+        Setting::saving(function ($setting) {
+            Cache::forever($setting->key, $setting->value);
         });
     }
 

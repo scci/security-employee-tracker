@@ -161,7 +161,7 @@ return [
                 |
                 */
 
-                'base_dn' => env('ADLDAP_BASE_DN', 'dc=company,dc=com'),
+                'base_dn' => env('ADLDAP_BASE_DN', ''),
 
                 /*
                 |--------------------------------------------------------------------------
@@ -190,8 +190,8 @@ return [
                 |
                 */
 
-                'admin_username' => env('ADLDAP_ADMIN_USERNAME', 'username'),
-                'admin_password' => env('ADLDAP_ADMIN_PASSWORD', 'password'),
+                'admin_username' => env('ADLDAP_ADMIN_USERNAME', ''),
+                'admin_password' => env('ADLDAP_ADMIN_PASSWORD', ''),
 
                 /*
                 |--------------------------------------------------------------------------

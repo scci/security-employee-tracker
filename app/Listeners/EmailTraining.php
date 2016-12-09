@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use SET\Events\TrainingAssigned;
-use SET\Setting;
+use Setting;
 
 /**
  * Class EmailTraining.
@@ -58,7 +58,7 @@ class EmailTraining implements ShouldQueue
      */
     private function sendEmail($user, $training, $dueDate, $trainingUser)
     {
-        $reportAddress = Setting::where('name', 'report_address')->first();
+        $reportAddress = Setting::get('sender_address', 'set@yourcompany.com');
 
         Mail::send(
             'emails.training',
