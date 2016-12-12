@@ -25,9 +25,7 @@ class LdapTest extends TestCase
             'adldap.connections.default.connection_settings.domain_controllers' => ['123.123.123', '789.789.789'],
             'adldap.connections.default.connection_settings.admin_username'     => 'someaddress@email.com',
             'adldap.connections.default.connection_settings.admin_password'     => 'SomePassword',
-            'adldap.connections.default.connection_settings.account_prefix'     => null,
-            'adldap.connections.default.connection_settings.account_suffix'     => null,
-            'adldap_auth.limitation_filter'                                     => null,
+            'adldap.connections.default.connection_settings.account_suffix'     => '@company.com',
         ];
 
         (new Ldap($array))->setup();

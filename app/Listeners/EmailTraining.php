@@ -6,7 +6,7 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use SET\Events\TrainingAssigned;
-use Setting;
+use SET\Setting;
 
 /**
  * Class EmailTraining.
