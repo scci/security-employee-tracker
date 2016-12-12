@@ -2,17 +2,13 @@
 
 namespace SET\Http\Controllers;
 
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Krucas\Notification\Facades\Notification;
-use Mail;
 use SET\Attachment;
 use SET\Http\Requests\NewsRequest;
-use SET\Mail\SendNewsEmail;
 use SET\News;
-use SET\User;
 
 /**
  * Description of NewsController.
@@ -60,7 +56,7 @@ class NewsController extends Controller
             Attachment::upload($news, $request->file('files'));
         }
 
-        $this->emailNews($news);
+        $news->emailNews();
         Notification::container()->success('News Created');
 
         return redirect()->action('NewsController@index');
@@ -112,7 +108,7 @@ class NewsController extends Controller
         if ($request->hasFile('files')) {
             Attachment::upload($news, $request->file('files'));
         }
-        $this->emailNews($news);
+        $news->emailNews();
 
         Notification::container()->success('News Updated');
 
@@ -130,20 +126,5 @@ class NewsController extends Controller
 
         Storage::deleteDirectory('news_'.$news->id);
         $news->delete();
-    }
-
-    /**
-     * Email the news on the publish_date when a news article is created or updated.
-     *
-     * @param News $news
-     */
-    public function emailNews(News $news)
-    {
-        $publishDate = Carbon::createFromFormat('Y-m-d', $news->publish_date);
-
-        if ($news->send_email && $publishDate->eq(Carbon::now())) {
-            $users = User::skipSystem()->active()->get();
-            Mail::to($users)->send(new SendNewsEmail($news));
-        }
     }
 }

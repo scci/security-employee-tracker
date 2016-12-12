@@ -8,6 +8,7 @@ class Mail extends ConfigAbstract
         'mail.host',
         'mail.port',
         'mail.encryption',
+        'mail.username',
         'mail.password',
     ];
 

@@ -42,8 +42,7 @@ class SendNews extends Command
             ->get();
 
         foreach ($newsToPublish as $news) {
-            $allUsers = User::skipSystem()->active()->get();
-            Mail::to($allUsers)->send(new SendNewsEmail($news));
+            $news->emailNews();
         }
     }
 }
