@@ -4,10 +4,7 @@ namespace SET\Console\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
-use SET\Mail\SendNewsEmail;
 use SET\News;
-use SET\User;
 
 class SendNews extends Command
 {
@@ -42,8 +39,7 @@ class SendNews extends Command
             ->get();
 
         foreach ($newsToPublish as $news) {
-            $allUsers = User::skipSystem()->active()->get();
-            Mail::to($allUsers)->send(new SendNewsEmail($news));
+            $news->emailNews();
         }
     }
 }

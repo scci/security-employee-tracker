@@ -96,6 +96,12 @@ class SettingController extends Controller
             'adldap.connections.default.connection_settings.account_prefix' => 'adldap_connections_default_connection_settings_account_prefix',
             'adldap.connections.default.connection_settings.account_suffix' => 'adldap_connections_default_connection_settings_account_suffix',
             'adldap_auth.limitation_filter'                                 => 'adldap_auth_limitation_filter',
+            'mail.driver'                                                   => 'mail_driver',
+            'mail.username'                                                 => 'mail_username',
+            'mail.password'                                                 => 'mail_password',
+            'mail.port'                                                     => 'mail_port',
+            'mail.encryption'                                               => 'mail_encryption',
+            'mail.host'                                                     => 'mail_host',
         ];
 
         foreach ($adldapData as $correctKey => $formKey) {
