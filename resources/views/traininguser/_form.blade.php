@@ -7,7 +7,7 @@
 <div class="row">
     <div class="col m6 s12" id="completed_date_field">
         {!! Form::label('completed_date', 'Completed date:') !!}
-        {!! Form::date('completed_date', null, array('class' => 'datepicker')) !!}
+        {!! Form::date('completed_date', $submit == 'Update' ? \Carbon\Carbon::today() : null, array('class' => 'datepicker')) !!}
     </div>
     <div class="col m6 s12" id="due_date_field">
         {!! Form::label('due_date', 'Due date:') !!}
