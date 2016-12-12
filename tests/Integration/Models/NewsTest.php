@@ -1,11 +1,11 @@
 <?php
 
-use SET\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 use SET\Mail\SendNewsEmail;
 use SET\News;
+use SET\User;
 
 class NewsTest extends TestCase
 {
