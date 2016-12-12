@@ -4,10 +4,7 @@ namespace SET\Console\Commands;
 
 use Carbon\Carbon;
 use Illuminate\Console\Command;
-use Illuminate\Support\Facades\Mail;
-use SET\Mail\SendNewsEmail;
 use SET\News;
-use SET\User;
 
 class SendNews extends Command
 {
