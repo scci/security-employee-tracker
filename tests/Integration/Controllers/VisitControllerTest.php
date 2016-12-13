@@ -54,7 +54,7 @@ class VisitControllerTest extends TestCase
    {
        // Logged in as admin - Can store the visit
         $userId = $this->user->id;
-       $data = ['smo_code'         => 'A SMO Code',
+       $data = ['smo_code'          => 'A SMO Code',
                  'visit_date'       => '2016-12-10',
                  'expiration_date'  => '2016-12-20',
                  'poc'              => 'A point of contact',
