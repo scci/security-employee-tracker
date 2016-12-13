@@ -8,9 +8,9 @@
  */
 
 $(function(){
-    $('#email').keypress(function(){
-        var email = $('#email').val();
-        var username = email.split('@');
-        $('#username').val(username[0]);
+    $("#email").keypress(function(){
+        var email = $("#email").val();
+        var username = email.split("@");
+        $("#username").val(username[0]);
     });
 })

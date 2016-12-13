@@ -1,24 +1,40 @@
+/**
+ * Generates a string for today"s date in the format of yyyy-mm-dd
+ *
+ * @returns {string}
+ */
+function formatToday() {
+    var d = new Date(),
+        month = "" + (d.getMonth() + 1),
+        day = "" + d.getDate(),
+        year = d.getFullYear();
+
+    if (month.length < 2) month = "0" + month;
+    if (day.length < 2) day = "0" + day;
+
+    return [year, month, day].join("-");
+}
+
 $(function(){
-    $('.completed-today').click(function(){
+    $(".completed-today").click(function(){
         var today = formatToday();
-        var training_user_id = $(this).data('id');
-        var user_id = $(this).data('user');
+        var training_user_id = $(this).data("id");
+        var user_id = $(this).data("user");
         var token = $("meta[name=csrf-token]").attr("content");
-        //var due = $(this).closest('tr').children('.training_due_date').text();
 
         //Set value on page.
-        $(this).closest('tr').children('.training_completed_date').text(today);
+        $(this).closest("tr").children(".training_completed_date").text(today);
 
         //hide completed today button & reminder button.
         $(this).hide();
-        $(this).closest('td').children('a').hide();
+        $(this).closest("td").children("a").hide();
 
         //Make an ajax call to update the record.
         $.ajax({
             url: root + "/user/" + user_id + "/training/" + training_user_id,
-            type: 'post',
+            type: "post",
             data: {
-                _method: 'put',
+                _method: "put",
                 _token : token,
                 completed_date : today
             },
@@ -28,20 +44,3 @@ $(function(){
 
     });
 });
-
-/**
- * Generates a string for today's date in the format of yyyy-mm-dd
- *
- * @returns {string}
- */
-function formatToday() {
-    var d = new Date(),
-        month = '' + (d.getMonth() + 1),
-        day = '' + d.getDate(),
-        year = d.getFullYear();
-
-    if (month.length < 2) month = '0' + month;
-    if (day.length < 2) day = '0' + day;
-
-    return [year, month, day].join('-');
-}
