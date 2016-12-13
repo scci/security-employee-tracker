@@ -7,7 +7,6 @@ use SET\TrainingUser;
 
 class TrainingUsers extends CollectionList
 {
-
     public function getList() : Collection
     {
         return TrainingUser::with('user', 'training')

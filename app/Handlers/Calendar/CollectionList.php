@@ -12,8 +12,8 @@ abstract class CollectionList
     public function __construct($start, $end)
     {
         $this->start = $start;
-        $this->end   = $end;
+        $this->end = $end;
     }
 
-    public abstract function getList() : Collection;
+    abstract public function getList() : Collection;
 }

@@ -7,12 +7,11 @@ use SET\User;
 
 class Separated extends CollectionList
 {
-
     public function getList() : Collection
     {
         return User::where(function ($q) {
-                $q->where('status', 'separated')->orWhere('status', 'destroyed');
-            })
+            $q->where('status', 'separated')->orWhere('status', 'destroyed');
+        })
             ->whereBetween('destroyed_date', [$this->start, $this->end])
             ->get();
     }
