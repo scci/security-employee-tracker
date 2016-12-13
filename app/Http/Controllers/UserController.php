@@ -75,21 +75,19 @@ class UserController extends Controller
      */
     public function show($userId)
     {
-        $user = User::with(['subordinates' => function ($query) {
-            $query->active();
-        }, 'supervisor', 'groups', 'duties', 'attachments'])
-            ->findOrFail($userId);
-
+        $user = User::with(['subordinates' => function ($query) { $query->active();}, 
+                            'supervisor', 'groups', 'duties', 'attachments',
+                            'visits', 'notes.author', 'notes.attachments', 
+                            'travels.author', 'travels.attachments'])
+                    ->findOrFail($userId);
+            
         //Make sure the user can't access other people's pages.
         $this->authorize('show_user', $user);
 
         $user['clearance'] = $this->spellOutClearance($user['clearance']);
         $user['access_level'] = $this->spellOutClearance($user['access_level']);
 
-        $trainings = $user->assignedTrainings()->with('author', 'training', 'attachments')->orderBy('completed_date', 'DESC')->get();
-        $notes = $user->notes()->with('author', 'attachments')->get();
-        $visits = $user->visits()->with('author')->get();
-        $travels = $user->travels()->with('author', 'attachments')->get();
+        $trainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')->orderBy('completed_date', 'DESC')->get();
 
         $logs = [];
         if (Gate::allows('view')) {
@@ -105,7 +103,7 @@ class UserController extends Controller
             $q->where('id', $userId);
         })->get();
 
-        return view('user.show', compact('user', 'duties', 'previous', 'next', 'trainings', 'notes', 'visits', 'travels', 'logs'));
+        return view('user.show', compact('user', 'duties', 'previous', 'next', 'trainings', 'logs'));
     }
 
     public function edit(User $user)
