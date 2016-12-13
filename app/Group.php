@@ -37,6 +37,7 @@ class Group extends Model
      * Allows you to get only active users.
      *
      * @param $query
+     *
      * @return mixed
      */
     public function scopeActiveUsers($query)

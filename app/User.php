@@ -183,9 +183,13 @@ class User extends Authenticatable
 
     public function getDestroyDate($status)
     {
-        if ($status == 'active') return null;
+        if ($status == 'active') {
+            return;
+        }
 
-        if ($status == 'separated') return Carbon::today()->addYears(2)->startOfWeek();
+        if ($status == 'separated') {
+            return Carbon::today()->addYears(2)->startOfWeek();
+        }
 
         return Carbon::today()->addWeek()->startOfWeek();
     }
