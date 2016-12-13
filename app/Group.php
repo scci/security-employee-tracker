@@ -32,4 +32,17 @@ class Group extends Model
     {
         return $this->morphMany('SET\DutySwap', 'imageable');
     }
+
+    /**
+     * Allows you to get only active users.
+     *
+     * @param $query
+     * @return mixed
+     */
+    public function scopeActiveUsers($query)
+    {
+        return $query->whereHas('users', function ($q) {
+            $q->where('status', 'active');
+        });
+    }
 }
