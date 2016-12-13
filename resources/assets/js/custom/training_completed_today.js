@@ -9,8 +9,12 @@ function formatToday() {
         day = "" + d.getDate(),
         year = d.getFullYear();
 
-    if (month.length < 2) month = "0" + month;
-    if (day.length < 2) day = "0" + day;
+    if (month.length < 2) {
+        month = "0" + month;
+    }
+    if (day.length < 2) {
+        day = "0" + day;
+    }
 
     return [year, month, day].join("-");
 }
@@ -18,8 +22,8 @@ function formatToday() {
 $(function(){
     $(".completed-today").click(function(){
         var today = formatToday();
-        var training_user_id = $(this).data("id");
-        var user_id = $(this).data("user");
+        var trainingUserId = $(this).data("id");
+        var userId = $(this).data("user");
         var token = $("meta[name=csrf-token]").attr("content");
 
         //Set value on page.
@@ -31,7 +35,7 @@ $(function(){
 
         //Make an ajax call to update the record.
         $.ajax({
-            url: root + "/user/" + user_id + "/training/" + training_user_id,
+            url: root + "/user/" + userId + "/training/" + trainingUserId,
             type: "post",
             data: {
                 _method: "put",
