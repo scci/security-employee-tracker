@@ -75,12 +75,14 @@ class UserController extends Controller
      */
     public function show($userId)
     {
-        $user = User::with(['subordinates' => function ($query) { $query->active();}, 
+        $user = User::with(['subordinates' => function ($query) {
+            $query->active();
+        },
                             'supervisor', 'groups', 'duties', 'attachments',
-                            'visits', 'notes.author', 'notes.attachments', 
-                            'travels.author', 'travels.attachments'])
+                            'visits', 'notes.author', 'notes.attachments',
+                            'travels.author', 'travels.attachments', ])
                     ->findOrFail($userId);
-            
+
         //Make sure the user can't access other people's pages.
         $this->authorize('show_user', $user);
 
