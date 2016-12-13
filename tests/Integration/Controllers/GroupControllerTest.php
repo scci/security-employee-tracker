@@ -259,7 +259,7 @@ class GroupControllerTest extends TestCase
         $this->seeStatusCode(403);
 
         // Create a new group(Only user with edit permission can create)
-        $user = factory(User::class)->create(['role' => 'edit']);
+        factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
         $groupToCreate = factory(Group::class)->create();
         $createdGroupId = $groupToCreate->id;

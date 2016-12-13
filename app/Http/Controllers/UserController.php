@@ -124,14 +124,7 @@ class UserController extends Controller
 
         $data = Input::all();
 
-        //Set the date when the account will be destroyed.
-        if ($data['status'] == 'destroyed') {
-            $data['destroyed_date'] = Carbon::today()->addWeek()->startOfWeek();
-        } elseif ($data['status'] == 'separated') {
-            $data['destroyed_date'] = Carbon::today()->addYears(2)->startOfWeek();
-        } else {
-            $data['destroyed_date'] = null;
-        }
+        $data['destroyed_date'] = $user->getDestroyDate($data['status']);
 
         $user->update($data);
 

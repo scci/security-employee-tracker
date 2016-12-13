@@ -434,41 +434,53 @@ class PHPUnit_Util_Test
      */
     private static function getDataFromDataProviderAnnotation($docComment, $className, $methodName)
     {
-        if (preg_match(self::REGEX_DATA_PROVIDER, $docComment, $matches)) {
-            $dataProviderMethodNameNamespace = explode('\\', $matches[1]);
-            $leaf                            = explode('::', array_pop($dataProviderMethodNameNamespace));
-            $dataProviderMethodName          = array_pop($leaf);
+        if (preg_match_all(self::REGEX_DATA_PROVIDER, $docComment, $matches)) {
+            $result = [];
 
-            if (!empty($dataProviderMethodNameNamespace)) {
-                $dataProviderMethodNameNamespace = implode('\\', $dataProviderMethodNameNamespace) . '\\';
-            } else {
-                $dataProviderMethodNameNamespace = '';
+            foreach ($matches[1] as $match) {
+                $dataProviderMethodNameNamespace = explode('\\', $match);
+                $leaf                            = explode('::', array_pop($dataProviderMethodNameNamespace));
+                $dataProviderMethodName          = array_pop($leaf);
+
+                if (!empty($dataProviderMethodNameNamespace)) {
+                    $dataProviderMethodNameNamespace = implode('\\', $dataProviderMethodNameNamespace) . '\\';
+                } else {
+                    $dataProviderMethodNameNamespace = '';
+                }
+
+                if (!empty($leaf)) {
+                    $dataProviderClassName = $dataProviderMethodNameNamespace . array_pop($leaf);
+                } else {
+                    $dataProviderClassName = $className;
+                }
+
+                $dataProviderClass  = new ReflectionClass($dataProviderClassName);
+                $dataProviderMethod = $dataProviderClass->getMethod(
+                    $dataProviderMethodName
+                );
+
+                if ($dataProviderMethod->isStatic()) {
+                    $object = null;
+                } else {
+                    $object = $dataProviderClass->newInstance();
+                }
+
+                if ($dataProviderMethod->getNumberOfParameters() == 0) {
+                    $data = $dataProviderMethod->invoke($object);
+                } else {
+                    $data = $dataProviderMethod->invoke($object, $methodName);
+                }
+
+                if ($data instanceof Iterator) {
+                    $data = iterator_to_array($data);
+                }
+
+                if (is_array($data)) {
+                    $result = array_merge($result, $data);
+                }
             }
 
-            if (!empty($leaf)) {
-                $dataProviderClassName = $dataProviderMethodNameNamespace . array_pop($leaf);
-            } else {
-                $dataProviderClassName = $className;
-            }
-
-            $dataProviderClass  = new ReflectionClass($dataProviderClassName);
-            $dataProviderMethod = $dataProviderClass->getMethod(
-                $dataProviderMethodName
-            );
-
-            if ($dataProviderMethod->isStatic()) {
-                $object = null;
-            } else {
-                $object = $dataProviderClass->newInstance();
-            }
-
-            if ($dataProviderMethod->getNumberOfParameters() == 0) {
-                $data = $dataProviderMethod->invoke($object);
-            } else {
-                $data = $dataProviderMethod->invoke($object, $methodName);
-            }
-
-            return $data;
+            return $result;
         }
     }
 

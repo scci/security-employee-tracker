@@ -7,12 +7,11 @@ $(document).ready(function($) {
     // Set the Options for "Bloodhound" suggestion engine
     var engine = new Bloodhound({
         prefetch: {
-            url: root + '/search',
+            url: root + "/search",
             filter: function (data) {
-                console.log(data);
                 return $.map(data.data.user, function (user) {
                     return {
-                        name: user.last_name + ', ' + user.first_name,
+                        name: user.last_name + ", " + user.first_name,
                         id: user.id,
                         employeeNumber: user.emp_num
                     };
@@ -35,17 +34,17 @@ $(document).ready(function($) {
         highlight: true
     },{
         source: engine.ttAdapter(),
-        display: 'name',
-        name: 'usersList',
+        display: "name",
+        name: "usersList",
 
         // the key from the array we want to display (name,id,email,etc...)
         templates: {
             empty: [
-                '<div class="list-group search-results-dropdown"><div class="list-group-item" style="color:black">Nothing found.</div></div>'
+                "<div class='list-group search-results-dropdown'><div class='list-group-item' style='color:black'>Nothing found.</div></div>"
             ],
             suggestion: function (data) {
 
-               return '<div><a href="' + root + '/user/' + data.id + '" class="list-group-item">' + data.name + ' <small>(' + data.employeeNumber + ')</small></a></div>';
+               return "<div><a href=" + root + "/user/" + data.id + " class='list-group-item'>" + data.name + " <small>(" + data.employeeNumber + ")</small></a></div>";
 
             }
         }

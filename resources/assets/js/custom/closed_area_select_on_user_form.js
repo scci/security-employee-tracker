@@ -6,11 +6,11 @@
  */
 
 $(document).ready(function() {
-    $('#_new_user_groups_field').change(function(){
+    $("#_new_user_groups_field").change(function(){
         var selectVal = $(this).val();
-        $('.closed-area').hide();
+        $(".closed-area").hide();
         $.each(selectVal, function( index, value) {
-            $('#access-' + value).show();
+            $("#access-" + value).show();
         });
     });
 });

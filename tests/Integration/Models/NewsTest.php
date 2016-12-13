@@ -2,7 +2,10 @@
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Mail;
+use SET\Mail\SendNewsEmail;
 use SET\News;
+use SET\User;
 
 class NewsTest extends TestCase
 {
@@ -52,5 +55,42 @@ class NewsTest extends TestCase
 
         // Ensure that the query returns an empty collection
         $this->assertNotContains($createdNews2->title, $newsPublished->pluck('title'));
+    }
+
+    /** @test */
+    public function it_sends_out_emails_to_all_users()
+    {
+        Mail::fake();
+
+        $news = factory(SET\News::class)->create(['publish_date' => Carbon::today(), 'send_email' => 1]);
+
+        $news->emailNews();
+
+        $users = User::skipSystem()->active()->get();
+        Mail::assertSentTo($users, SendNewsEmail::class);
+    }
+
+    /** @test */
+    public function it_does_not_send_out_emails_if_the_publish_date_is_not_today()
+    {
+        Mail::fake();
+
+        $news = factory(SET\News::class)->create(['publish_date' => Carbon::tomorrow(), 'send_email' => 1]);
+
+        $news->emailNews();
+
+        Mail::assertNotSent(SendNewsEmail::class);
+    }
+
+    /** @test */
+    public function it_does_not_send_out_emails_if_not_flagged_to_send_email()
+    {
+        Mail::fake();
+
+        $news = factory(SET\News::class)->create(['publish_date' => Carbon::today(), 'send_email' => 0]);
+
+        $news->emailNews();
+
+        Mail::assertNotSent(SendNewsEmail::class);
     }
 }

@@ -2,6 +2,7 @@
 
 namespace SET;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -123,16 +124,20 @@ class User extends Authenticatable
     public function getUserFullNameAttribute()
     {
         if ($this->attributes['id'] == 1) {
-            $fullName = 'system';
-        } elseif ($this->attributes['nickname']) {
-            $fullName = $this->attributes['last_name']
-                .', '.$this->attributes['first_name']
-                .' ('.$this->attributes['nickname'].')';
-        } else {
-            $fullName = $this->attributes['last_name'].', '.$this->attributes['first_name'];
+            return 'system';
         }
 
-        return $fullName;
+        $firstName = $this->attributes['first_name'];
+
+        if ($this->attributes['nickname']) {
+            $firstName = $this->attributes['first_name'].' ('.$this->attributes['nickname'].')';
+        }
+
+        if (Setting::get('full_name_format') == 'first_last') {
+            return $firstName.' '.$this->attributes['last_name'];
+        }
+
+        return $this->attributes['last_name'].', '.$firstName;
     }
 
     /**
@@ -174,5 +179,18 @@ class User extends Authenticatable
         }
 
         return parent::setAttribute($key, $value);
+    }
+
+    public function getDestroyDate($status)
+    {
+        if ($status == 'active') {
+            return;
+        }
+
+        if ($status == 'separated') {
+            return Carbon::today()->addYears(2)->startOfWeek();
+        }
+
+        return Carbon::today()->addWeek()->startOfWeek();
     }
 }
