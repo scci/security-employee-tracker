@@ -33,7 +33,7 @@ class ActionItemsComposer
      */
     private function getDueTraining()
     {
-        return Training::with(['users', 'assignedUsers' => function ($query) {
+        return Training::with(['users', 'assignedUsers.user', 'assignedUsers' => function ($query) {
             //filter the assignedusers we get back
             $query->ActiveUsers()
                 ->whereNull('completed_date')

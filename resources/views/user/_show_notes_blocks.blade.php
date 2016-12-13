@@ -1,4 +1,4 @@
-@foreach ($notes as $note)
+@foreach ($user->notes as $note)
     @if ($note->alert == $alert)
         @unless($note->private == 1 && $note->author_id != Auth::user()->id)
         <li>

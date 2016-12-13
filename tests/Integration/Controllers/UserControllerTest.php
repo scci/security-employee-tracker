@@ -138,9 +138,6 @@ class UserControllerTest extends TestCase
         $this->assertViewHas('previous');
         $this->assertViewHas('next');
         $this->assertViewHas('trainings');
-        $this->assertViewHas('notes');
-        $this->assertViewHas('visits');
-        $this->assertViewHas('travels');
         $this->assertViewHas('logs');
 
         // Create a user object
@@ -155,9 +152,6 @@ class UserControllerTest extends TestCase
         $this->assertViewHas('previous');
         $this->assertViewHas('next');
         $this->assertViewHas('trainings');
-        $this->assertViewHas('notes');
-        $this->assertViewHas('visits');
-        $this->assertViewHas('travels');
         $this->assertViewHas('logs');
 
         // Logged in as the created user - Can see the created user's page
@@ -169,9 +163,6 @@ class UserControllerTest extends TestCase
         $this->assertViewHas('previous');
         $this->assertViewHas('next');
         $this->assertViewHas('trainings');
-        $this->assertViewHas('notes');
-        $this->assertViewHas('visits');
-        $this->assertViewHas('travels');
         $this->assertViewHas('logs');
 
         // Create another user object
@@ -192,9 +183,6 @@ class UserControllerTest extends TestCase
         $this->assertViewHas('previous');
         $this->assertViewHas('next');
         $this->assertViewHas('trainings');
-        $this->assertViewHas('notes');
-        $this->assertViewHas('visits');
-        $this->assertViewHas('travels');
         $this->assertViewHas('logs');
     }
 

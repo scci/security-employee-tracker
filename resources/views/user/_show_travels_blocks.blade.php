@@ -3,7 +3,7 @@
         <div class="collapsible-title">Travels</div>
     </li>
 
-    @foreach ($travels as $travel)
+    @foreach ($user->travels as $travel)
         <li>
             <div class="collapsible-header">
                 <span class="right">Gone: {{ $travel->leave_date }} - {{ $travel->return_date }}</span>
