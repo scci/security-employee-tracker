@@ -100,7 +100,7 @@ class DutyUsers extends DutyHelper
      */
     public function queryList()
     {
-        $this->list = $this->duty->users()->orderBy('last_name')->get();
+        $this->list = $this->duty->users()->active()->orderBy('last_name')->get();
 
         return $this;
     }

@@ -2,6 +2,7 @@
 
 namespace SET;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 
@@ -178,5 +179,18 @@ class User extends Authenticatable
         }
 
         return parent::setAttribute($key, $value);
+    }
+
+    public function getDestroyDate($status)
+    {
+        if ($status == 'active') {
+            return;
+        }
+
+        if ($status == 'separated') {
+            return Carbon::today()->addYears(2)->startOfWeek();
+        }
+
+        return Carbon::today()->addWeek()->startOfWeek();
     }
 }
