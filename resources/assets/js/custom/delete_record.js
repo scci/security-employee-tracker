@@ -2,7 +2,7 @@
  * Created by sdibble on 10/14/2015.
  */
 
-function delete_record($this, page)
+function deleteRecord($this, page)
 {
     var token = $("meta[name=csrf-token]").attr("content");
 
@@ -27,7 +27,7 @@ function delete_record($this, page)
             url: root + url,
             type: "post",
             data: {_method: "delete", _token : token},
-            success: function(result) {
+            success: function() {
                 selector.remove();
                 Materialize.toast("The selected " + type + " was deleted successfully.", 4000);
             }
@@ -40,28 +40,28 @@ function delete_record($this, page)
 
 $(document).ready(function(){
     $(".delete-record").click(function(){
-        delete_record(this, "profile");
+        deleteRecord(this, "profile");
     });
     $(".delete-group").click(function(){
-        delete_record(this, "group");
+        deleteRecord(this, "group");
     });
     $(".delete-user").click(function(){
-        delete_record(this, "user");
+        deleteRecord(this, "user");
     });
     $(".delete-training").click(function(){
-        delete_record(this, "training");
+        deleteRecord(this, "training");
     });
     $(".delete-training-user").click(function(){
-        delete_record(this, "training-user");
+        deleteRecord(this, "training-user");
     });
     $(".delete-duty").click(function(){
-        delete_record(this, "duty");
+        deleteRecord(this, "duty");
     });
     $(".delete-news").click(function(){
-        delete_record(this, "news");
+        deleteRecord(this, "news");
     });
     $(".delete-attachment").click(function(){
-        delete_record(this, "attachment");
+        deleteRecord(this, "attachment");
     });
 
 });

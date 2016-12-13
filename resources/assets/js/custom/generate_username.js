@@ -13,4 +13,4 @@ $(function(){
         var username = email.split("@");
         $("#username").val(username[0]);
     });
-})
+});

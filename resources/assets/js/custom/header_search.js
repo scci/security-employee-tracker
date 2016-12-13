@@ -9,7 +9,6 @@ $(document).ready(function($) {
         prefetch: {
             url: root + "/search",
             filter: function (data) {
-                console.log(data);
                 return $.map(data.data.user, function (user) {
                     return {
                         name: user.last_name + ", " + user.first_name,

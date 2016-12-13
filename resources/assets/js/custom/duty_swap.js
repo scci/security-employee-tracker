@@ -55,5 +55,5 @@ $(function(){
             //append the form to the body and submit it.
             newForm.appendTo("body").submit();
         }
-    })
+    });
 });
