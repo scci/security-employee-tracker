@@ -27,8 +27,8 @@ class MailTest extends TestCase
             'mail.from.address' => 'someaddress@email.com',
             'mail.from.name'    => 'My Name',
             'mail.encryption'   => null,
-            'mail.username'     => null,
-            'mail.password'     => null,
+            'mail.username'     => 'username',
+            'mail.password'     => 'password',
         ];
 
         (new Mail($array))->setup();

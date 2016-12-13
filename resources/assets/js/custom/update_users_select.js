@@ -7,7 +7,7 @@
 
 $(function(){
     //when we pick a group, begin.
-    $('#group_field select').on('change', function (e){
+    $("#group_field select").on("change", function (e){
 
         //get our values
         var token = $("meta[name=csrf-token]").attr("content");
@@ -16,9 +16,9 @@ $(function(){
         //process a post request
         $.ajax({
             url: root + "/group-user-id",
-            type: 'post',
+            type: "post",
             data: {
-                _method: 'post',
+                _method: "post",
                 _token : token,
                 groups : selected
             },
@@ -26,12 +26,12 @@ $(function(){
                 // if we get a string, then deselect users.
                 // if we get an array, select those users.
                 // otherwise do nothing.
-                if (typeof result == 'string') {
-                    $('select.User-select').val('');
-                } else if (typeof result == 'object') {
-                    $('select.User-select').val(result);
+                if (typeof result == "string") {
+                    $("select.User-select").val("");
+                } else if (typeof result == "object") {
+                    $("select.User-select").val(result);
                 }
-                $('select').material_select();
+                $("select").material_select();
             }
         });
     });

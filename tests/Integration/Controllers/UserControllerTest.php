@@ -65,8 +65,6 @@ class UserControllerTest extends TestCase
      */
     public function it_stores_the_user_by_testing_each_user_role()
     {
-        // Logged in as admin - Can store the visit
-        $userId = $this->user->id;
         $data = ['first_name'       => 'John',
                  'nickname'         => 'Johnny',
                  'last_name'        => 'Smith',
@@ -320,7 +318,7 @@ class UserControllerTest extends TestCase
         $this->seeStatusCode(403);
 
         // Create a new user(Only user with edit permission can create)
-        $user = factory(User::class)->create(['role' => 'edit']);
+        factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
         $userToCreate = factory(User::class)->create();
         $createdUserId = $userToCreate->id;

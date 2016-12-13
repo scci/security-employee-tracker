@@ -250,7 +250,7 @@ class TrainingControllerTest extends TestCase
         $this->seeStatusCode(403);
 
         // Create a new training(Only user with edit permission can create)
-        $user = factory(User::class)->create(['role' => 'edit']);
+        factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
         $trainingToCreate = factory(Training::class)->create();
         $createdTrainingId = $trainingToCreate->id;

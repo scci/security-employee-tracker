@@ -1,4 +1,4 @@
-var elixir = require('laravel-elixir');
+var elixir = require("laravel-elixir");
 
 /*
  |--------------------------------------------------------------------------
@@ -12,14 +12,14 @@ var elixir = require('laravel-elixir');
  */
 
 elixir(function(mix) {
-    mix.scriptsIn('resources/assets/js/custom','public/js/custom.js');
+    mix.scriptsIn("resources/assets/js/custom","public/js/custom.js");
     mix.scripts([
-        'jquery-1.11.3.min.js',
-        'materialize.min.js',
-        'jquery.typeahead.min.js',
-        'jquery.dataTables.min.js',
-        'simplemde.min.js'
-    ],'public/js/lib.js');
-    mix.sass('app.scss');
+        "jquery-1.11.3.min.js",
+        "materialize.min.js",
+        "jquery.typeahead.min.js",
+        "jquery.dataTables.min.js",
+        "simplemde.min.js"
+    ],"public/js/lib.js");
+    mix.sass("app.scss");
     mix.phpUnit();
 });

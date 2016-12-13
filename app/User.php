@@ -126,10 +126,10 @@ class User extends Authenticatable
             return 'system';
         }
 
+        $firstName = $this->attributes['first_name'];
+
         if ($this->attributes['nickname']) {
             $firstName = $this->attributes['first_name'].' ('.$this->attributes['nickname'].')';
-        } else {
-            $firstName = $this->attributes['first_name'];
         }
 
         if (Setting::get('full_name_format') == 'first_last') {
