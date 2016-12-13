@@ -8,17 +8,18 @@ function deleteRecord($this, page)
 
     var url, selector, type;
 
+    var recordId = $($this).data("id");
+    type = page;
+    selector = page === "attachment" ? $($this).parent(".chip") : $("."+ page + "-" + recordId);
+    url = "/" + page + "/" + recordId;
+
     if (page === "profile" || page === "training-user")
     {
         url = $($this).data("url");
         type = $($this).data("type");
         selector = (page === "profile") ? $($this).closest("li") : $($this).closest("tr");
-    }else {
-        var recordId = $($this).data("id");
-        type = page;
-        selector = page === "attachment" ? $($this).parent(".chip") : $("."+ page + "-" + recordId);
-        url = "/" + page + "/" + recordId;
     }
+
 
     selector.addClass("red accent-1");
 
@@ -33,9 +34,7 @@ function deleteRecord($this, page)
             }
         });
     }
-    else {
-        selector.removeClass("red accent-1");
-    }
+    selector.removeClass("red accent-1");
 }
 
 $(document).ready(function(){
