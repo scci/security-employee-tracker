@@ -7,7 +7,6 @@ use SET\Travel;
 
 class Travels extends CollectionList
 {
-
     public function getList() : Collection
     {
         return Travel::with('user')
