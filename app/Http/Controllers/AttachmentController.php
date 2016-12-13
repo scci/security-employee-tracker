@@ -37,7 +37,6 @@ class AttachmentController extends Controller
             $encrypt = true;
         } else {
             Notification::container()->success('Upload Failed');
-
             return back();
         }
 

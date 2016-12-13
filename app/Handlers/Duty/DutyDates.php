@@ -41,9 +41,9 @@ class DutyDates
             return Carbon::now()->startOfMonth();
         } elseif ($cycle == 'weekly') {
             return Carbon::now()->startOfWeek();
-        } else {
-            return Carbon::now()->startOfDay();
         }
+
+        return Carbon::now()->startOfDay();
     }
 
     private function nextDate($cycle, Carbon $date)

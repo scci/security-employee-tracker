@@ -152,14 +152,14 @@ class JpasImportHandler implements ImportHandler
         }
 
         //If we get a string in the a format such as 2/15/2015 0:00 then convert it to Y-m-d
-        $d = \DateTime::createFromFormat('n/j/Y G:i', $date);
-        if ($d) {
-            return $d->format('Y-m-d');
+        $carbonDate = \DateTime::createFromFormat('n/j/Y G:i', $date);
+        if ($carbonDate) {
+            return $carbonDate->format('Y-m-d');
         }
 
         //if already in Y-m-d, then just return it.
-        $d = \DateTime::createFromFormat('Y-m-d', $date);
-        if ($d) {
+        $carbonDate = \DateTime::createFromFormat('Y-m-d', $date);
+        if ($carbonDate) {
             return $date;
         }
 

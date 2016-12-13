@@ -35,7 +35,7 @@ class NewsController extends Controller
     {
         $this->authorize('edit');
 
-        return view('news.create', compact('users'));
+        return view('news.create');
     }
 
     /**

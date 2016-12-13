@@ -68,10 +68,9 @@ class TrainingUserController extends Controller
         $trainingUser = TrainingUser::findOrFail($trainingUserID);
 
         //disable the due by field unless admin.
+        $disabled = '';
         if (Gate::denies('edit')) {
             $disabled = 'disabled';
-        } else {
-            $disabled = '';
         }
 
         return view('traininguser.edit', compact('user', 'trainingUser', 'training', 'disabled'));
