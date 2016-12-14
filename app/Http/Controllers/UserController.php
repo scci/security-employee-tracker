@@ -78,7 +78,7 @@ class UserController extends Controller
         $user = User::with(['subordinates' => function ($query) {
             $query->active();
         },
-                            'supervisor', 'groups', 'duties', 'attachments',
+                            'groups', 'duties', 'attachments',
                             'visits', 'notes.author', 'notes.attachments',
                             'travels.author', 'travels.attachments', ])
                     ->findOrFail($userId);
