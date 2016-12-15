@@ -93,4 +93,12 @@ class NewsTest extends TestCase
 
         Mail::assertNotSent(SendNewsEmail::class);
     }
+
+    /** @test */
+    public function it_returns_the_expiration_date_in_the_correct_format()
+    {
+        $news = factory(News::class)->create(['expire_date' => Carbon::today()]);
+
+        $this->assertEquals($news->expirationDate, Carbon::today()->format('Y-m-d'));
+    }
 }

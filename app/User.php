@@ -106,16 +106,6 @@ class User extends Authenticatable
         return $this->belongsToMany('SET\Duty');
     }
 
-    public function dutySwap()
-    {
-        return $this->morphMany('SET\DutySwap', 'imageable');
-    }
-
-    public function news()
-    {
-        return $this->hasMany('SET\News');
-    }
-
     /**
      * If we have a nickname, return 'lastname, nickname' otherwise return 'lastname, firstname'.
      *
@@ -167,6 +157,8 @@ class User extends Authenticatable
     }
 
     /**
+     * Store empty values as null in the DB
+     *
      * @param string $key
      * @param mixed  $value
      *

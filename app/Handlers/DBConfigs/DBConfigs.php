@@ -29,6 +29,7 @@ class DBConfigs
      */
     public static function execute()
     {
+        //Stop if we haven't performed our migrations yet.
         if (!Schema::hasTable('settings')) {
             return;
         }

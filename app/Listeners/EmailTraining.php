@@ -14,14 +14,6 @@ use SET\Setting;
 class EmailTraining implements ShouldQueue
 {
     /**
-     * Create the event handler.
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
      * Email the employee about the training. Then return a notification to the user that an email was sent.
      *
      * @param TrainingAssigned $event

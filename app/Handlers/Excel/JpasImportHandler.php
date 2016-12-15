@@ -5,6 +5,7 @@ namespace SET\Handlers\Excel;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
 use Maatwebsite\Excel\Files\ImportHandler;
+use SET\Handlers\DateFormat;
 use SET\User;
 
 /**
@@ -14,6 +15,8 @@ use SET\User;
  */
 class JpasImportHandler implements ImportHandler
 {
+    use DateFormat;
+
     private $unique;
     private $changes;
 
@@ -137,33 +140,11 @@ class JpasImportHandler implements ImportHandler
     {
         $user->jpas_name = $data->name;
         $user->clearance = $data->eligibility;
-        $user->elig_date = $this->getCorrectDateFormat($data->eligibility_date);
+        $user->elig_date = $this->dateFormat($data->eligibility_date);
         $user->inv = $data->inves;
-        $user->inv_close = $this->getCorrectDateFormat($data->prev_inves);
+        $user->inv_close = $this->dateFormat($data->prev_inves);
 
         return $user;
-    }
-
-    private function getCorrectDateFormat($date)
-    {
-        //If we get a date object, just format to Y-m-d
-        if (is_object($date)) {
-            return $date->toDateString();
-        }
-
-        //If we get a string in the a format such as 2/15/2015 0:00 then convert it to Y-m-d
-        $carbonDate = \DateTime::createFromFormat('n/j/Y G:i', $date);
-        if ($carbonDate) {
-            return $carbonDate->format('Y-m-d');
-        }
-
-        //if already in Y-m-d, then just return it.
-        $carbonDate = \DateTime::createFromFormat('Y-m-d', $date);
-        if ($carbonDate) {
-            return $date;
-        }
-
-        //Otherwise store null for the date.
     }
 
     /**

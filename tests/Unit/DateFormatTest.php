@@ -34,4 +34,14 @@ class DateFormatTest extends TestCase
 
         $this->assertEquals($mock->dateFormat($date), Carbon::today()->format('Y-m-d'));
     }
+
+    /** @test */
+    public function it_reutns_the_correct_format_when_giving_a_JPAS_datetime()
+    {
+        $mock = $this->getMockForTrait(DateFormat::class);
+
+        $date = Carbon::today()->format('n/j/Y G:i');
+
+        $this->assertEquals($mock->dateFormat($date), Carbon::today()->format('Y-m-d'));
+    }
 }

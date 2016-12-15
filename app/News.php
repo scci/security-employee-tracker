@@ -40,6 +40,8 @@ class News extends Model
     }
 
     /**
+     * Store empty values as null in the DB
+     *
      * @param string $key
      * @param mixed  $value
      *
@@ -54,14 +56,14 @@ class News extends Model
         return parent::setAttribute($key, $value);
     }
 
-    public function getPublishDateAttribute($value)
+    public function getPublishDateAttribute()
     {
-        return $this->dateFormat($value);
+        return $this->dateFormat($this->attributes['publish_date']);
     }
 
-    public function getExpirationDateAttribute($value)
+    public function getExpirationDateAttribute()
     {
-        return $this->dateFormat($value);
+        return $this->dateFormat($this->attributes['expire_date']);
     }
 
     /**

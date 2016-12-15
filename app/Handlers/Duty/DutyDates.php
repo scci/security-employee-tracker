@@ -50,14 +50,10 @@ class DutyDates
     {
         if ($cycle == 'monthly') {
             return $date->addMonth();
-        } elseif ($cycle == 'weekly') {
-            return $date->addWeek();
         } elseif ($cycle == 'daily') {
             return $date->addDay();
-        } else {
-            Log::error('Duty has an invalid cycle name. Must use monthly, weekly or daily');
-
-            return;
         }
+
+        return $date->addWeek();
     }
 }
