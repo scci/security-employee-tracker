@@ -23,7 +23,7 @@ trait DateFormat
         }
 
         // sqlite
-        if ($carbonDate = Carbon::createFromFormat('Y-m-d H:i:s', $date)) {
+        if ($carbonDate = \DateTime::createFromFormat('Y-m-d H:i:s', $date)) {
             return $carbonDate->format('Y-m-d');
         }
 
