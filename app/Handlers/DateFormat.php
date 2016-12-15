@@ -18,7 +18,7 @@ trait DateFormat
             return $date;
         }
 
-        if ($date instanceof Carbon or $date instanceof \DateTime) {
+        if ($date instanceof Carbon || $date instanceof \DateTime) {
             return $date->format('Y-m-d');
         }
 
