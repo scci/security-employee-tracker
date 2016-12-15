@@ -31,7 +31,5 @@ trait DateFormat
         if ($carbonDate = \DateTime::createFromFormat('n/j/Y G:i', $date)) {
             return $carbonDate->format('Y-m-d');
         }
-
-        return null;
     }
 }

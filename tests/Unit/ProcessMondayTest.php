@@ -40,8 +40,8 @@ class ProcessMondayTest extends TestCase
             'supervisor_id' => factory(User::class)->create()->id,
         ]);
         $training->users()->attach($user, [
-            'author_id' => $user->first()->id,
-            'due_date' => Carbon::yesterday()->format('Y-m-d'),
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::yesterday()->format('Y-m-d'),
             'completed_date' => null,
         ]);
         $training->users()->attach($user, [

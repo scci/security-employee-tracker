@@ -5,7 +5,6 @@ use SET\Events\TrainingAssigned;
 
 class TrainingAssignedTest extends TestCase
 {
-
     /** @test */
     public function it_returns_the_constructed_value()
     {

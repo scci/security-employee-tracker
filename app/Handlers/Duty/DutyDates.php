@@ -4,7 +4,6 @@ namespace SET\Handlers\Duty;
 
 use Carbon\Carbon;
 use SET\Duty;
-use SET\Log;
 
 class DutyDates
 {
