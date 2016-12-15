@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use SET\Events\TrainingAssigned;
-use SET\Setting;
 use SET\Training;
 use SET\User;
 
@@ -15,7 +14,6 @@ use SET\User;
  */
 class EmailTrainingTest implements ShouldQueue
 {
-
     /** @test */
     public function it_sends_an_email()
     {
@@ -24,12 +22,11 @@ class EmailTrainingTest implements ShouldQueue
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
         $trainingUser = $training->users()->attach($user, ['author_id' => $user->first()->id,
-            'due_date' => Carbon::today()->subYear()->format('Y-m-d'),
-            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d'),]);
+            'due_date'                                                 => Carbon::today()->subYear()->format('Y-m-d'),
+            'completed_date'                                           => Carbon::today()->subYear()->subMonth()->format('Y-m-d'), ]);
 
         (new EmailTraining())->handle(new TrainingAssigned($trainingUser));
 
         Mail::assertSent();
-
     }
 }

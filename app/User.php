@@ -157,7 +157,7 @@ class User extends Authenticatable
     }
 
     /**
-     * Store empty values as null in the DB
+     * Store empty values as null in the DB.
      *
      * @param string $key
      * @param mixed  $value
