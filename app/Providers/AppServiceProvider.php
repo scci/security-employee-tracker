@@ -2,7 +2,10 @@
 
 namespace SET\Providers;
 
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use SET\Handlers\DBConfigs\DBConfigs;
+use SET\Setting;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -13,7 +16,13 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+
+        DBConfigs::execute();
+
+        Setting::saving(function ($setting) {
+            Cache::forever($setting->key, $setting->value);
+        });
+
     }
 
     /**

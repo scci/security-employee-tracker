@@ -62,7 +62,7 @@ class DutyUpcoming extends Mailable implements ShouldQueue
     {
         $date = Carbon::createFromFormat('Y-m-d', $this->date);
 
-        $reportAddress = Setting::where('name', 'report_address')->first();
+        $reportAddress = Setting::get('summary_recipient', null);
 
         $rrule = '';
         if ($this->duty->cycle == 'weekly') {

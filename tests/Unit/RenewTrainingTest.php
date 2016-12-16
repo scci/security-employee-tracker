@@ -30,6 +30,24 @@ class RenewTrainingTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_renew_training_with_a_0_renews_in_value()
+    {
+        $this->doesntExpectEvents(TrainingAssigned::class);
+
+        $training = factory(Training::class)->create(['renews_in' => 0]);
+        $user = factory(User::class)->create();
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subYear()->format('Y-m-d'),
+        ]);
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+
+        $this->assertCount(0, $trainingUser);
+    }
+
+    /** @test */
     public function it_does_not_renew_training_if_before_renewal_date()
     {
         $this->doesntExpectEvents(TrainingAssigned::class);

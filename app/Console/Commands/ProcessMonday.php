@@ -53,9 +53,10 @@ class ProcessMonday extends Command
 
     private function sendReporterEmail($array)
     {
-        $reportAddress = Setting::where('name', 'report_address')->first();
-
-        Mail::to($reportAddress->secondary)->send(new EmailAdminSummary($array));
+        $reportAddress = Setting::get('summary_recipient', null);
+        if ($reportAddress !== null) {
+            Mail::to($reportAddress)->send(new EmailAdminSummary($array));
+        }
     }
 
     /**

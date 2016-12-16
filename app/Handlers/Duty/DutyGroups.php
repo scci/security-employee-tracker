@@ -77,7 +77,7 @@ class DutyGroups extends DutyHelper
         for ($i = 0; $i < $count; $i++) {
             $newList->push([
                 'date'  => $dates[$i],
-                'group' => $this->list[$i]->users()->get(),
+                'group' => $this->list[$i]->users()->active()->get(),
                 'id'    => $this->list[$i]->id,
             ]);
         }
@@ -99,7 +99,7 @@ class DutyGroups extends DutyHelper
             foreach ($this->list as $key => $entry) {
                 if ($swap->date == $entry['date']) {
                     $this->list[$key] = [
-                        'group' => $swap->imageable()->first()->users()->get(),
+                        'group' => $swap->imageable()->first()->users()->active()->get(),
                         'id'    => $swap->imageable()->first()->id,
                         'date'  => $entry['date'],
                     ];

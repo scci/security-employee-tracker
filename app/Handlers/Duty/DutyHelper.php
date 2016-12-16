@@ -29,11 +29,6 @@ class DutyHelper
             ->insertFromDutySwap();
     }
 
-    public function getList()
-    {
-        return $this->list;
-    }
-
     public function iterateList()
     {
         $today = Carbon::today()->format('Y-m-d');
@@ -67,13 +62,13 @@ class DutyHelper
             case 'daily':
                 $this->recordNextEntry();
                 break;
-            case 'weekly':
-                if (Carbon::today()->startOfWeek()->format('Y-m-d') == $today) {
+            case 'monthly':
+                if (Carbon::today()->startOfMonth()->format('Y-m-d') == $today) {
                     $this->recordNextEntry();
                 }
                 break;
-            default: //monthly
-                if (Carbon::today()->startOfMonth()->format('Y-m-d') == $today) {
+            default: //weekly
+                if (Carbon::today()->startOfWeek()->format('Y-m-d') == $today) {
                     $this->recordNextEntry();
                 }
         }

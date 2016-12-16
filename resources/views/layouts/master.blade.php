@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>SCCI SET - @yield('title')</title>
+    <title>{{ $app_name }} - @yield('title')</title>
     <meta name="csrf-token" content="{{ csrf_token() }}" />
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -64,7 +64,7 @@
                 @yield('help')
             </div>
             <div class="modal-footer">
-                <a href="#!" class="modal-action modal-close waves-effect waves-green btn-flat ">Close</a>
+                <a href="#!" class="modal-action modal-close waves-effect btn-flat ">Close</a>
             </div>
         </div>
     </div>

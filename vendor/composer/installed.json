@@ -4227,14 +4227,18 @@
             "shasum": ""
         },
         "require": {
-            "php": ">=5.5.9",
-            "symfony/polyfill-mbstring": "~1.0"
+            "php": ">=5.5.9"
         },
         "require-dev": {
-            "symfony/css-selector": "~2.8|~3.0"
+            "psr/log": "~1.0",
+            "symfony/config": "~2.8|~3.0",
+            "symfony/dependency-injection": "~2.8|~3.0",
+            "symfony/expression-language": "~2.8|~3.0",
+            "symfony/stopwatch": "~2.8|~3.0"
         },
         "suggest": {
-            "symfony/css-selector": ""
+            "symfony/dependency-injection": "",
+            "symfony/http-kernel": ""
         },
         "time": "2016-11-25 12:32:42",
         "type": "library",
@@ -4246,7 +4250,7 @@
         "installation-source": "dist",
         "autoload": {
             "psr-4": {
-                "Symfony\\Component\\DomCrawler\\": ""
+                "Symfony\\Component\\EventDispatcher\\": ""
             },
             "exclude-from-classmap": [
                 "/Tests/"
@@ -4266,7 +4270,7 @@
                 "homepage": "https://symfony.com/contributors"
             }
         ],
-        "description": "Symfony DomCrawler Component",
+        "description": "Symfony EventDispatcher Component",
         "homepage": "https://symfony.com"
     },
     {
@@ -5020,6 +5024,7 @@
             "log",
             "spatie",
             "user"
+
         ]
     }
 ]

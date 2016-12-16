@@ -14,14 +14,6 @@ use SET\Setting;
 class EmailTraining implements ShouldQueue
 {
     /**
-     * Create the event handler.
-     */
-    public function __construct()
-    {
-        //
-    }
-
-    /**
      * Email the employee about the training. Then return a notification to the user that an email was sent.
      *
      * @param TrainingAssigned $event
@@ -58,7 +50,7 @@ class EmailTraining implements ShouldQueue
      */
     private function sendEmail($user, $training, $dueDate, $trainingUser)
     {
-        $reportAddress = Setting::where('name', 'report_address')->first();
+        $reportAddress = Setting::get('sender_address', 'set@yourcompany.com');
 
         Mail::send(
             'emails.training',

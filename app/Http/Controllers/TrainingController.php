@@ -56,8 +56,6 @@ class TrainingController extends Controller
      */
     public function store(StoreTrainingRequest $request)
     {
-        $this->authorize('edit');
-
         $data = $request->all();
         $training = Training::create($data);
 

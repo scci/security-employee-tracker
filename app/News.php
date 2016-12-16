@@ -4,9 +4,14 @@ namespace SET;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Mail;
+use SET\Handlers\DateFormat;
+use SET\Mail\SendNewsEmail;
 
 class News extends Model
 {
+    use DateFormat;
+
     protected $table = 'news';
     public $timestamps = true;
 
@@ -24,7 +29,6 @@ class News extends Model
 
     /**
      * @param $query
-     * @param $input
      */
     public function scopePublishedNews($query)
     {
@@ -36,6 +40,8 @@ class News extends Model
     }
 
     /**
+     * Store empty values as null in the DB.
+     *
      * @param string $key
      * @param mixed  $value
      *
@@ -48,5 +54,28 @@ class News extends Model
         }
 
         return parent::setAttribute($key, $value);
+    }
+
+    public function getPublishDateAttribute()
+    {
+        return $this->dateFormat($this->attributes['publish_date']);
+    }
+
+    public function getExpirationDateAttribute()
+    {
+        return $this->dateFormat($this->attributes['expire_date']);
+    }
+
+    /**
+     * Email the news on the publish_date when a news article is created or updated.
+     */
+    public function emailNews()
+    {
+        $publishDate = Carbon::createFromFormat('Y-m-d', $this->publish_date);
+
+        if ($this->send_email && $publishDate->eq(Carbon::now())) {
+            $users = User::skipSystem()->active()->get();
+            Mail::bcc($users)->send(new SendNewsEmail($this));
+        }
     }
 }

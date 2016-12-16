@@ -4,7 +4,6 @@ namespace SET\Handlers\Duty;
 
 use Carbon\Carbon;
 use SET\Duty;
-use SET\Log;
 
 class DutyDates
 {
@@ -41,23 +40,19 @@ class DutyDates
             return Carbon::now()->startOfMonth();
         } elseif ($cycle == 'weekly') {
             return Carbon::now()->startOfWeek();
-        } else {
-            return Carbon::now()->startOfDay();
         }
+
+        return Carbon::now()->startOfDay();
     }
 
     private function nextDate($cycle, Carbon $date)
     {
         if ($cycle == 'monthly') {
             return $date->addMonth();
-        } elseif ($cycle == 'weekly') {
-            return $date->addWeek();
         } elseif ($cycle == 'daily') {
             return $date->addDay();
-        } else {
-            Log::error('Duty has an invalid cycle name. Must use monthly, weekly or daily');
-
-            return;
         }
+
+        return $date->addWeek();
     }
 }

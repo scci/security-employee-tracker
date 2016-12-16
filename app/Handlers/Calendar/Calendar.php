@@ -3,12 +3,15 @@
 namespace SET\Handlers\Calendar;
 
 use Carbon\Carbon;
+use SET\Handlers\DateFormat;
 use SET\TrainingUser;
 use SET\Travel;
 use SET\User;
 
 class Calendar
 {
+    use DateFormat;
+
     private $start;
     private $end;
     private $calendarArray;
@@ -21,10 +24,10 @@ class Calendar
      * @var array
      */
     private $lists = [
-        'separatedList'     => ['destroyed_date'],
-        'travelsList'       => ['leave_date', 'return_date'],
-        'trainingUsersList' => ['due_date'],
-        'newUserList'       => ['created_at'],
+        Separated::class     => ['destroyed_date'],
+        Travels::class       => ['leave_date', 'return_date'],
+        TrainingUsers::class => ['due_date'],
+        NewUser::class       => ['created_at'],
     ];
 
     public function __construct()
@@ -46,9 +49,9 @@ class Calendar
 
         //Let's build that calendar.
         $date = $this->start;
-        $i = 0;
+        $iterator = 0;
 
-        $list = $this->callFunctionsFromLookup();
+        $list = $this->callClass();
 
         while ($date <= $this->end) {
             $currentDate = $date->format('Y-m-d');
@@ -60,17 +63,17 @@ class Calendar
             }
 
             if ($this->test || $currentDate == Carbon::today()->format('Y-m-d')) {
-                $this->calendarArray[$i] = [
+                $this->calendarArray[$iterator] = [
                     'date'         => $currentDate,
-                    'separated'    => $list2['separatedList'],
-                    'travel'       => $list2['travelsList'],
-                    'trainingUser' => $this->groupUsersForTraining($list2['trainingUsersList']),
-                    'newUser'      => $list2['newUserList'],
+                    'separated'    => $list2[Separated::class],
+                    'travel'       => $list2[Travels::class],
+                    'trainingUser' => $this->groupUsersForTraining($list2[TrainingUsers::class]),
+                    'newUser'      => $list2[NewUser::class],
                 ];
             }
 
             $date->addDay();
-            $i++;
+            $iterator++;
         }
     }
 
@@ -80,7 +83,7 @@ class Calendar
 
         foreach ($list as $item) {
             foreach ($columnName as $column) {
-                $dbDate = $this->testForCarbonObject($item[$column]);
+                $dbDate = $this->dateFormat($item[$column]);
                 if ($date == $dbDate) {
                     $this->test = true;
                     array_push($array, $item);
@@ -89,25 +92,6 @@ class Calendar
         }
 
         return $array;
-    }
-
-    /**
-     * If a carbon object, convert it to our date string. Otherwise leave it alone.
-     *
-     * @param date
-     *
-     * @return mixed
-     */
-    private function testForCarbonObject($date)
-    {
-        //check if format is YYYY-MM-DD
-        if (preg_match('/^[0-9]{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2][0-9]|3[0-1])$/', $date)) {
-            return $date;
-        } elseif (get_class($date) == 'Carbon\Carbon') {
-            return $date->format('Y-m-d');
-        } else {
-            return 'Something went horribly wrong with testForCarbonObject.';
-        }
     }
 
     private function groupUsersForTraining($trainingUsers)
@@ -128,55 +112,13 @@ class Calendar
     }
 
     /**
-     * @return mixed
-     */
-    private function separatedList()
-    {
-        return User::where(function ($q) {
-            $q->where('status', 'separated')->orWhere('status', 'destroyed');
-        })
-            ->whereBetween('destroyed_date', [$this->start, $this->end])
-            ->get();
-    }
-
-    /**
-     * @return \Illuminate\Database\Eloquent\Collection|static[]
-     */
-    private function travelsList()
-    {
-        return Travel::with('user')
-            ->where(function ($query) {
-                $query->whereBetween('leave_date', [$this->start, $this->end])
-                    ->orWhereBetween('return_date', [$this->start, $this->end]);
-            })
-            ->get();
-    }
-
-    /**
-     * @return mixed
-     */
-    private function trainingUsersList()
-    {
-        return TrainingUser::with('user', 'training')
-            ->whereBetween('due_date', [$this->start, $this->end])
-            ->whereNull('completed_date')
-            ->orderBy('training_id')
-            ->get();
-    }
-
-    private function newUserList()
-    {
-        return User::whereBetween('created_at', [$this->start, $this->end])->get();
-    }
-
-    /**
      * @return array
      */
-    private function callFunctionsFromLookup()
+    private function callClass()
     {
         $array = [];
-        foreach ($this->lists as $functionName => $columns) {
-            $array[$functionName] = $this->$functionName();
+        foreach ($this->lists as $class => $columns) {
+            $array[$class] = (new $class($this->start, $this->end))->getList();
         }
 
         return $array;

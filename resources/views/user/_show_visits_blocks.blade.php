@@ -3,7 +3,7 @@
         <div class="collapsible-title">Visits</div>
     </li>
 
-    @foreach ($visits as $visit)
+    @foreach ($user->visits as $visit)
         <?php $diffInWeeks = \Carbon\Carbon::createFromFormat('Y-m-d', $visit->expiration_date)->diffinWeeks(\Carbon\Carbon::today(), false); ?>
         @if( $diffInWeeks <= 1)
         <li>

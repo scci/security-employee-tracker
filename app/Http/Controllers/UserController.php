@@ -77,8 +77,11 @@ class UserController extends Controller
     {
         $user = User::with(['subordinates' => function ($query) {
             $query->active();
-        }, 'supervisor', 'groups', 'duties', 'attachments'])
-            ->findOrFail($userId);
+        },
+                            'groups', 'duties', 'attachments',
+                            'visits', 'notes.author', 'notes.attachments',
+                            'travels.author', 'travels.attachments', ])
+                    ->findOrFail($userId);
 
         //Make sure the user can't access other people's pages.
         $this->authorize('show_user', $user);
@@ -86,10 +89,7 @@ class UserController extends Controller
         $user['clearance'] = $this->spellOutClearance($user['clearance']);
         $user['access_level'] = $this->spellOutClearance($user['access_level']);
 
-        $trainings = $user->assignedTrainings()->with('author', 'training', 'attachments')->orderBy('completed_date', 'DESC')->get();
-        $notes = $user->notes()->with('author', 'attachments')->get();
-        $visits = $user->visits()->with('author')->get();
-        $travels = $user->travels()->with('author', 'attachments')->get();
+        $trainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')->orderBy('completed_date', 'DESC')->get();
 
         $activityLog = [];
         if (Gate::allows('view')) {
@@ -105,7 +105,8 @@ class UserController extends Controller
             $q->where('id', $userId);
         })->get();
 
-        return view('user.show', compact('user', 'duties', 'previous', 'next', 'trainings', 'notes', 'visits', 'travels', 'activityLog'));
+        return view('user.show', compact('user', 'duties', 'previous', 'next', 'trainings', 'activityLog'));
+
     }
 
     public function edit(User $user)
@@ -124,14 +125,7 @@ class UserController extends Controller
 
         $data = Input::all();
 
-        //Set the date when the account will be destroyed.
-        if ($data['status'] == 'destroyed') {
-            $data['destroyed_date'] = Carbon::today()->addWeek()->startOfWeek();
-        } elseif ($data['status'] == 'separated') {
-            $data['destroyed_date'] = Carbon::today()->addYears(2)->startOfWeek();
-        } else {
-            $data['destroyed_date'] = null;
-        }
+        $data['destroyed_date'] = $user->getDestroyDate($data['status']);
 
         $user->update($data);
 
@@ -158,6 +152,8 @@ class UserController extends Controller
      */
     public function destroy($userId)
     {
+        $this->authorize('edit');
+
         Storage::deleteDirectory('user_'.$userId);
         User::findOrFail($userId)->delete();
 

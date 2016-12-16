@@ -25,11 +25,12 @@ class DutyUsers extends DutyHelper
         $newCollection = new Collection();
 
         foreach ($this->list as $entry) {
+            $rowvalue = $entry['user']->userFullName;
+
             if (Gate::allows('view')) {
                 $rowvalue = "<a href='".url('user', $entry['user']->id)."'>".$entry['user']->userFullName.'</a>';
-            } else {
-                $rowvalue = $entry['user']->userFullName;
             }
+
             $newCollection->push([
                 'row'  => $rowvalue,
                 'id'   => $entry['user']->id,
@@ -99,7 +100,7 @@ class DutyUsers extends DutyHelper
      */
     public function queryList()
     {
-        $this->list = $this->duty->users()->orderBy('last_name')->get();
+        $this->list = $this->duty->users()->active()->orderBy('last_name')->get();
 
         return $this;
     }
