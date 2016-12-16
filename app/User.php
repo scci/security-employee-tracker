@@ -265,6 +265,5 @@ class User extends Authenticatable
         }
 
         return Carbon::today()->addWeek()->startOfWeek();
-
     }
 }
