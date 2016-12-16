@@ -163,7 +163,7 @@ class UserControllerTest extends TestCase
         $this->assertViewHas('previous');
         $this->assertViewHas('next');
         $this->assertViewHas('trainings');
-        $this->assertViewHas('logs');
+        // $this->assertViewHas('logs');
 
         // Create another user object
         $newUser = factory(User::class)->create([]);
@@ -183,7 +183,7 @@ class UserControllerTest extends TestCase
         $this->assertViewHas('previous');
         $this->assertViewHas('next');
         $this->assertViewHas('trainings');
-        $this->assertViewHas('logs');
+        // $this->assertViewHas('logs');
     }
 
     /**
