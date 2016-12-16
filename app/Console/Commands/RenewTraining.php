@@ -19,7 +19,6 @@ class RenewTraining extends Command
      */
     protected $offset = 30;
 
-
     /**
      * List of all renewed notes.
      *

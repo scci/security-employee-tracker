@@ -1,6 +1,5 @@
 <?php
 
-use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
 class InsertSystemUser extends Migration
@@ -14,8 +13,8 @@ class InsertSystemUser extends Migration
     {
         //
         $user = DB::table('users')->where('username', 'system')->get();
-        if ( $user ){
-          \SET\User::create([
+        if ($user) {
+            \SET\User::create([
               'username'   => 'system',
               'first_name' => 'system',
               'last_name'  => 'system',
@@ -34,8 +33,8 @@ class InsertSystemUser extends Migration
     {
         //
         $user = DB::table('users')->where('username', 'system');
-        if ( !is_null($user) ){
-          DB::table('users')->where('username', 'system')->delete();
+        if (!is_null($user)) {
+            DB::table('users')->where('username', 'system')->delete();
         }
     }
 }

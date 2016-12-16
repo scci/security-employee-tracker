@@ -4,7 +4,6 @@ namespace SET;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-
 use Spatie\Activitylog\Models\Activity;
 use Spatie\Activitylog\Traits\LogsActivity;
 
@@ -34,15 +33,14 @@ class User extends Authenticatable
      */
     protected $hidden = ['username', 'password', 'remember_token'];
 
-
-    /**
+    /*
      * @var array $logAttributes defines will log the changed attributes
      */
      use LogsActivity;
-     protected static $logAttributes = ['username', 'emp_num', 'first_name', 'nickname',
+    protected static $logAttributes = ['username', 'emp_num', 'first_name', 'nickname',
          'last_name', 'email', 'phone', 'jpas_name', 'status', 'clearance',
          'elig_date', 'inv', 'inv_close', 'destroyed_date', 'role', 'supervisor_id', 'access_level',
-         'last_logon', 'ip',];
+         'last_logon', 'ip', ];
 
     /**
      * make destroyed_date a Carbon instance.
@@ -191,32 +189,38 @@ class User extends Authenticatable
      *
      * @return Log collection
      */
-    public function getUserLog($user=NULL) {
-      $ignoreList = ['password', 'last_logon', 'remember_token', 'ip'];
-      $record = $logs = []; // define arrays
+    public function getUserLog($user = null)
+    {
+        $ignoreList = ['password', 'last_logon', 'remember_token', 'ip'];
+        $record = $logs = []; // define arrays
 
-      foreach ( ($user) ? $user->activity : Activity::all() as $entry) {
-        $record['updated_at'] = $entry->updated_at;
-        $record['user_fullname'] = $entry->properties['attributes']['last_name']
+      foreach (($user) ? $user->activity : Activity::all() as $entry) {
+          $record['updated_at'] = $entry->updated_at;
+          $record['user_fullname'] = $entry->properties['attributes']['last_name']
             .', '.$entry->properties['attributes']['first_name'];
 
-        $record['comment'] = '';
-        if ($entry->description == 'updated' ) { // Report all changes on each update
-          $result=$this->arrayRecursiveDiff( $entry->changes->get('attributes'),
-              $entry->changes->get('old') );
-          foreach ($result as $key => $value) {
-            if (!in_array($key, $ignoreList)) $record['comment'] .=
-                ucfirst($key)." ".$entry->description." from '"
-                .$entry->changes->get('old')[$key]."' to '". $value ."'.\n";
-          }
-        } else { // description == 'created' ||  'deleted'
+          $record['comment'] = '';
+          if ($entry->description == 'updated') { // Report all changes on each update
+          $result = $this->arrayRecursiveDiff($entry->changes->get('attributes'),
+              $entry->changes->get('old'));
+              foreach ($result as $key => $value) {
+                  if (!in_array($key, $ignoreList)) {
+                      $record['comment'] .=
+                ucfirst($key).' '.$entry->description." from '"
+                .$entry->changes->get('old')[$key]."' to '".$value."'.\n";
+                  }
+              }
+          } else { // description == 'created' ||  'deleted'
             $record['comment'] .= $entry->description." user '".$record['user_fullname']."'.\n";
-        }
+          }
 
         // Append only non-ignored record entries to log
-        if ($record['comment']) array_push($logs, $record);
+        if ($record['comment']) {
+            array_push($logs, $record);
+        }
       }
-      return collect($logs)->sortByDesc('updated_at');  // return latest -> earliest
+
+        return collect($logs)->sortByDesc('updated_at');  // return latest -> earliest
     }
 
     /**
@@ -224,26 +228,32 @@ class User extends Authenticatable
      * As array_diff function only checks one dimension of a n-dimensional array.
      * arrayRecursiveDiff will compare n-dimensional.
      * Will insure compared objects are arrays.
+     *
      * @return DiffsArray
      */
-    private function arrayRecursiveDiff($aArray1, $aArray2) {
-      $aReturn = array();
-      if ( !is_array($aArray1) || !is_array($aArray2))  return $aReturn;
-      foreach ($aArray1 as $mKey => $mValue) {
-          if (array_key_exists($mKey, $aArray2)) {
-              if (is_array($mValue)) {
-                  $aRecursiveDiff = $this->arrayRecursiveDiff($mValue, $aArray2[$mKey]);
-                  if (count($aRecursiveDiff)) { $aReturn[$mKey] = $aRecursiveDiff; }
-              } else {
-                  if ($mValue != $aArray2[$mKey]) {
-                      $aReturn[$mKey] = $mValue;
-                  }
-              }
-          } else {
-              $aReturn[$mKey] = $mValue;
-          }
-      }
+    private function arrayRecursiveDiff($aArray1, $aArray2)
+    {
+        $aReturn = [];
+        if (!is_array($aArray1) || !is_array($aArray2)) {
+            return $aReturn;
+        }
+        foreach ($aArray1 as $mKey => $mValue) {
+            if (array_key_exists($mKey, $aArray2)) {
+                if (is_array($mValue)) {
+                    $aRecursiveDiff = $this->arrayRecursiveDiff($mValue, $aArray2[$mKey]);
+                    if (count($aRecursiveDiff)) {
+                        $aReturn[$mKey] = $aRecursiveDiff;
+                    }
+                } else {
+                    if ($mValue != $aArray2[$mKey]) {
+                        $aReturn[$mKey] = $mValue;
+                    }
+                }
+            } else {
+                $aReturn[$mKey] = $mValue;
+            }
+        }
 
-      return $aReturn;
-  }
+        return $aReturn;
+    }
 }

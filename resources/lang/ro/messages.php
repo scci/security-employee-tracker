@@ -10,7 +10,6 @@ return [
     'title' => 'Procesul de instalare Laravel',
     'next'  => 'Pasul următor',
 
-
     /*
      *
      * Home page translations.
@@ -21,7 +20,6 @@ return [
         'message' => 'Bun venit în configurarea asistată.',
     ],
 
-
     /*
      *
      * Requirements page translations.
@@ -31,7 +29,6 @@ return [
         'title' => 'Cerințe',
     ],
 
-
     /*
      *
      * Permissions page translations.
@@ -40,7 +37,6 @@ return [
     'permissions' => [
         'title' => 'Permisiuni',
     ],
-
 
     /*
      *
@@ -53,7 +49,6 @@ return [
         'success' => 'Setările tale au fost salvate în fișierul .env.',
         'errors'  => 'Nu am putut salva fișierul .env, Te rugăm să-l creezi manual.',
     ],
-
 
     /*
      *
