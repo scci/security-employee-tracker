@@ -6,11 +6,11 @@
             <tr><th>Modified</th><th>User</th><th>Note</th></tr>
             </thead>
             <tbody>
-            @foreach($log as $note)
+            @foreach($activityLog as $log)
                 <tr>
-                    <td style="white-space: nowrap;">{{ $note->updated_at->format('Y-m-d') }}</td>
-                    <td><a href="{{ url('user', $note->user_id) }}">{{ $note->user->userFullName }}</a></td>
-                    <td>{{ $note->comment }}</td>
+                    <td style="white-space: nowrap;">{{ $log['updated_at']->format('Y-m-d') }}</td>
+                    <td>{{ $log['user_fullname'] }}</td>
+                    <td>{{ ucfirst(str_replace("_"," ",$log['comment'])) }}</td>
                 </tr>
             @endforeach
             </tbody>

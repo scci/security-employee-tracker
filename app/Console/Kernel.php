@@ -41,6 +41,9 @@ class Kernel extends ConsoleKernel
         $schedule->command('emails:news')->withoutOverlapping()
             ->daily()->at('6:00');
 
+        //clear activitylog entries
+        $schedule->command('activitylog:clean')->daily();
+
         if (config('auth.providers.users.driver') == 'adldap') {
             $schedule->command('users:sync')->withoutOverlapping()->hourly();
         }

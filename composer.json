@@ -23,7 +23,8 @@
         "pusher/pusher-php-server": "^2.6",
         "rachidlaasri/laravel-installer": "~1.5",
         "graham-campbell/markdown": "^7.0",
-        "barryvdh/laravel-debugbar": "^2.1"
+        "barryvdh/laravel-debugbar": "^2.1",
+        "spatie/laravel-activitylog": "^1.10"
     },
     "require-dev": {
         "symfony/dom-crawler": "~3.0",

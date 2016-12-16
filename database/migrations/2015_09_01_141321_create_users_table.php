@@ -7,6 +7,7 @@ class CreateUsersTable extends Migration
 {
     public function up()
     {
+
         Schema::create('users', function (Blueprint $table) {
             $table->increments('id');
             $table->timestamps();
@@ -32,13 +33,6 @@ class CreateUsersTable extends Migration
             $table->string('ip')->nullable();
             $table->string('password')->nullable();
         });
-        \SET\User::create([
-            'username'   => 'system',
-            'first_name' => 'system',
-            'last_name'  => 'system',
-            'emp_num'    => 0,
-            'email'      => 'system@test.com',
-        ]);
     }
 
     public function down()

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Request;
 use SET\Duty;
 use SET\Handlers\Calendar\Calendar;
-use SET\Log;
 use SET\Training;
 use SET\TrainingUser;
 use SET\User;
@@ -34,10 +33,7 @@ class HomeController extends Controller
             ->orderBy('updated_at', 'DESC')
             ->get();
 
-        $log = Log::with('user')
-            ->where('updated_at', '>=', Carbon::today()->subWeek(1))
-            ->orderBy('updated_at', 'DESC')
-            ->get();
+        $activityLog = (new User())->getUserLog();
 
         $calendar = (new Calendar())->getCalendar();
 
@@ -49,7 +45,7 @@ class HomeController extends Controller
                 $query->orderBy('duty_group.last_worked', 'desc');
             }, ])->get();
 
-        return view('home.index', compact('trainingUser', 'log', 'calendar', 'duties'));
+        return view('home.index', compact('trainingUser', 'activityLog', 'calendar', 'duties'));
     }
 
     /**
