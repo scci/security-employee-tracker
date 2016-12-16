@@ -106,7 +106,6 @@ class UserController extends Controller
         })->get();
 
         return view('user.show', compact('user', 'duties', 'previous', 'next', 'trainings', 'activityLog'));
-
     }
 
     public function edit(User $user)
