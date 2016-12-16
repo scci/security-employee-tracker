@@ -252,6 +252,7 @@ class User extends Authenticatable
         }
 
         return $aReturn;
+    }
 
     public function getDestroyDate($status)
     {
