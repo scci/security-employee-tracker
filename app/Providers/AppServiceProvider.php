@@ -27,9 +27,4 @@ class AppServiceProvider extends ServiceProvider
             $this->app->register('Laracasts\Generators\GeneratorsServiceProvider');
         }
     }
-
-    private function nullToEmptyString($oldValue, $newValue)
-    {
-        return $oldValue === null && $newValue == '';
-    }
 }
