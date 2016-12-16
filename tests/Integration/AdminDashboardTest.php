@@ -104,6 +104,6 @@ class AdminDashboardTest extends TestCase
     {
         $emp_num = $this->user->emp_num;
         $this->user->update(['emp_num' => 995]);
-        $this->visit('/')->see("Emp_num changed from '".$emp_num."' to '995'.");
+        $this->visit('/')->see("Emp_num updated from '".$emp_num."' to '995'.");
     }
 }

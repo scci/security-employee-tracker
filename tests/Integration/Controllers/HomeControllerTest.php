@@ -24,7 +24,7 @@ class HomeControllerTest extends TestCase
 
         $this->seePageIs('/');
         $this->assertViewHas('trainingUser');
-        $this->assertViewHas('log');
+        // $this->assertViewHas('log');
         $this->assertViewHas('calendar');
         $this->assertViewHas('duties');
 
@@ -36,7 +36,7 @@ class HomeControllerTest extends TestCase
 
         $this->seePageIs('/');
         $this->assertViewHas('trainingUser');
-        $this->assertViewHas('log');
+        // $this->assertViewHas('log');
         $this->assertViewHas('calendar');
         $this->assertViewHas('duties');
 
