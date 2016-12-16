@@ -16,13 +16,11 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-
         DBConfigs::execute();
 
         Setting::saving(function ($setting) {
             Cache::forever($setting->key, $setting->value);
         });
-
     }
 
     /**
