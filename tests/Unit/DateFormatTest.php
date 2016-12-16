@@ -20,7 +20,7 @@ class DateFormatTest extends TestCase
     {
         $mock = $this->getMockForTrait(DateFormat::class);
 
-        $date = Carbon::today()->format('Y-m-d');
+        $date = date('Y-m-d');
 
         $this->assertEquals($mock->dateFormat($date), $date);
     }
@@ -30,7 +30,17 @@ class DateFormatTest extends TestCase
     {
         $mock = $this->getMockForTrait(DateFormat::class);
 
-        $date = Carbon::today()->format('Y-m-d H:i:s');
+        $date = date('Y-m-d H:i:s');
+
+        $this->assertEquals($mock->dateFormat($date), Carbon::today()->format('Y-m-d'));
+    }
+
+    /** @test */
+    public function it_returns_the_correct_format_when_giving_a_JPAS_datetime()
+    {
+        $mock = $this->getMockForTrait(DateFormat::class);
+
+        $date = date('n/j/Y G:i');
 
         $this->assertEquals($mock->dateFormat($date), Carbon::today()->format('Y-m-d'));
     }

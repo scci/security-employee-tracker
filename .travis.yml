@@ -7,3 +7,9 @@ before_install: phpenv config-add travis-composer-php.ini
 before_script:
   - touch storage/database.sqlite
   - php artisan migrate --force
+
+script: phpunit --coverage-clover=coverage.clover
+
+after_script:
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover coverage.clover

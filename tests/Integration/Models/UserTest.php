@@ -1,33 +1,49 @@
 <?php
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use SET\Setting;
 use SET\User;
 
 class UserTest extends TestCase
 {
     use DatabaseTransactions;
 
-        /** @test */
-        /*
+    /** @test */
+    /*
      Test the User::getUserFullNameAttribute method
     */
-        public function get_userfullname()
-        {
-            // Create a user(by default status should be active)
-            $createdUser = factory(SET\User::class)->create();
+    public function get_users_full_name_with_nickname()
+    {
+        // Create a user(by default status should be active)
+        $createdUser = factory(SET\User::class)->create();
 
-            // Query the database using the scopeActive method in the user model and filter by the above created username
-            $userFullName = $createdUser['last_name']
-                            .', '.$createdUser['first_name']
-                            .' ('.$createdUser['nickname'].')';
+        // Query the database using the scopeActive method in the user model and filter by the above created username
+        $userFullName = $createdUser['last_name']
+                        .', '.$createdUser['first_name']
+                        .' ('.$createdUser['nickname'].')';
 
-            $this->assertEquals($userFullName, $createdUser->userFullName);
+        $this->assertEquals($userFullName, $createdUser->userFullName);
+    }
 
-            $createdUser = factory(SET\User::class)->create(['nickname' => null]);
-            $userFullName = $createdUser['last_name'].', '.$createdUser['first_name'];
+    /** @test */
+    public function get_user_full_name_without_nickname()
+    {
+        $createdUser = factory(SET\User::class)->create(['nickname' => null]);
+        $userFullName = $createdUser['last_name'].', '.$createdUser['first_name'];
 
-            $this->assertEquals($userFullName, $createdUser->userFullName);
-        }
+        $this->assertEquals($userFullName, $createdUser->userFullName);
+    }
+
+    /** @test */
+    public function get_user_full_name_in_reverse_format()
+    {
+        Setting::set('full_name_format', 'first_last');
+        $createdUser = factory(SET\User::class)->create(['nickname' => null]);
+        $userFullName = $createdUser['first_name'].' '.$createdUser['last_name'];
+
+        $this->assertEquals($userFullName, $createdUser->userFullName);
+    }
 
     /** @test */
     /*
@@ -118,5 +134,26 @@ class UserTest extends TestCase
 
             // Ensure that the collection does not contain a username named 'system'
             $this->assertNotContains('system', $usersCollection->pluck('username'));
+    }
+
+    /** @test */
+    public function it_gets_the_destroyed_date_of_a_separated_user()
+    {
+        $date = (new User())->getDestroyDate('separated');
+        $this->assertEquals($date, Carbon::today()->addYears(2)->startOfWeek());
+    }
+
+    /** @test */
+    public function it_gets_the_destroyed_date_of_a_destroyed_user()
+    {
+        $date = (new User())->getDestroyDate('destroyed');
+        $this->assertEquals($date, Carbon::today()->addWeek()->startOfWeek());
+    }
+
+    /** @test */
+    public function it_gets_the_destroyed_date_of_an_active_user()
+    {
+        $date = (new User())->getDestroyDate('active');
+        $this->assertNull($date);
     }
 }
