@@ -11,7 +11,6 @@ return [
     'next'   => 'Próximo Passo',
     'finish' => 'Instalar',
 
-
     /*
      *
      * Home page translations.
@@ -22,7 +21,6 @@ return [
         'message' => 'Bem-vindo ao assistente de configuração.',
     ],
 
-
     /*
      *
      * Requirements page translations.
@@ -32,7 +30,6 @@ return [
         'title' => 'Requisitos',
     ],
 
-
     /*
      *
      * Permissions page translations.
@@ -41,7 +38,6 @@ return [
     'permissions' => [
         'title' => 'Permissões',
     ],
-
 
     /*
      *
@@ -54,7 +50,6 @@ return [
         'success' => 'Suas configurações de arquivo .env foram salvas.',
         'errors'  => 'Não foi possível salvar o arquivo .env, por favor crie-o manualmente.',
     ],
-
 
     /*
      *
