@@ -32,13 +32,6 @@ class CreateUsersTable extends Migration
             $table->string('ip')->nullable();
             $table->string('password')->nullable();
         });
-        \SET\User::create([
-            'username'   => 'system',
-            'first_name' => 'system',
-            'last_name'  => 'system',
-            'emp_num'    => 0,
-            'email'      => 'system@test.com',
-        ]);
     }
 
     public function down()

@@ -20,7 +20,7 @@
 
         @include('home.duty')
 
-        @if($log->count())
+        @if($activityLog->count())
             @include('home.user_changes')
         @endif
 

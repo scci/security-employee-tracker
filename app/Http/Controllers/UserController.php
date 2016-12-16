@@ -91,9 +91,9 @@ class UserController extends Controller
 
         $trainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')->orderBy('completed_date', 'DESC')->get();
 
-        $logs = [];
+        $activityLog = [];
         if (Gate::allows('view')) {
-            $logs = $user->logs()->orderBy('created_at', 'desc')->get();
+            $activityLog = $user->getUserLog($user);
         }
 
         $this->previousAndNextUsers($user, $previous, $next);
@@ -105,7 +105,7 @@ class UserController extends Controller
             $q->where('id', $userId);
         })->get();
 
-        return view('user.show', compact('user', 'duties', 'previous', 'next', 'trainings', 'logs'));
+        return view('user.show', compact('user', 'duties', 'previous', 'next', 'trainings', 'activityLog'));
     }
 
     public function edit(User $user)
