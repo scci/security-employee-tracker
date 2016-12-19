@@ -17,8 +17,8 @@ class AppServiceProvider extends ServiceProvider
     public function boot()
     {
         // Ensure installation is not in progress
-        if ( ! strpos(url()->current(),'install') ) {
-          DBConfigs::execute();
+        if (!strpos(url()->current(), 'install')) {
+            DBConfigs::execute();
         }
 
         Setting::saving(function ($setting) {
