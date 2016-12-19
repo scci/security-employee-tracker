@@ -79,7 +79,7 @@ class DutyUpcoming extends Mailable implements ShouldQueue
         $dtend = gmdate('Ymd\THis\Z', $meetingstamp + $meetingDuration);
         $todaystamp = gmdate('Ymd\THis\Z');
         $title = "You have $this->duty->name security check";
-        $organizer = 'MAILTO:'.$reportAddress->secondary;
+        $organizer = 'MAILTO:'.$reportAddress;
 
         // ICS
         $mail = [];
