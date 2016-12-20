@@ -13,7 +13,7 @@ class InsertSystemUser extends Migration
     {
         //
         $user = DB::table('users')->where('username', 'system')->get();
-        if (!$user) {
+        if (!$user->count()) {
             \SET\User::create([
               'username'   => 'system',
               'first_name' => 'system',
