@@ -25,12 +25,6 @@
     </div>
 </div>
 <div class="row">
-    <div class="col s12 input-field" id="training_textarea">
-        {!! Form::label('comment', 'Optional Comments:') !!}<br />
-        {!! Form::textarea('comment', null, array('class' => 'materialize-textarea')) !!}
-    </div>
-</div>
-<div class="row">
     <div class="col s12">
         {!! Form::submit('Save and return to profile', array('class' => 'btn-flat right')) !!}
     </div>
