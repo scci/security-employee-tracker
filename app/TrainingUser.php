@@ -18,7 +18,7 @@ class TrainingUser extends Model
     /**
      * @var array
      */
-    protected $fillable = ['training_id', 'due_date', 'completed_date', 'comment', 'author_id', 'user_id'];
+    protected $fillable = ['training_id', 'due_date', 'completed_date', 'comment', 'author_id', 'user_id', 'stop_renewal'];
 
     public function user()
     {

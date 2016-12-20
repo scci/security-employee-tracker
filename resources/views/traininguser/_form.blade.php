@@ -1,8 +1,17 @@
 <div class="row">
-    <div class="input-field col s12" id="training_select">
+    <div class="input-field col m8 s12" id="training_select">
         {!! Form::select('training_id', [null => 'Pick a Training'] + $training, null, array($disabled)) !!}
         {!! Form::label('training_id', 'Training:') !!}
     </div>
+    @can('edit')
+        <div class="col m4 s12" id="stop_renewal_field">
+            <p style="margin-top: 2em">
+                {!! Form::hidden('stop_renewal', false) !!}
+                <input type="checkbox" name="stop_renewal" value=1 class="filled-in" id="stop_renewal" />
+                <label for="stop_renewal">Don't Auto-renew.</label>
+            </p>
+        </div>
+    @endcan('edit')
 </div>
 <div class="row">
     <div class="col m6 s12" id="completed_date_field">

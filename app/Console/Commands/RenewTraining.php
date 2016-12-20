@@ -58,6 +58,7 @@ class RenewTraining extends Command
     {
         $trainingUsers = TrainingUser::with('user', 'training')
             ->where('due_date', '<', Carbon::today())
+            ->where('stop_renewal', 0)
             ->activeUsers()
             ->orderBy(DB::raw('CASE WHEN completed_date IS NULL THEN 0 ELSE 1 END'))
             ->orderBy('completed_date', 'desc')
