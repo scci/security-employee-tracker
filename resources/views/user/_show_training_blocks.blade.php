@@ -18,6 +18,11 @@
                             <i class="material-icons red-text">warning</i>
                         </span>
                     @endif
+                    @if($trainingUser->stop_renewal)
+                        <span class="tooltipped" data-tooltip="Don't Auto-renew">
+                            <i class="material-icons">sync_disabled</i>
+                        </span>
+                    @endif
                     {{ $trainingUser->training->name }}
                 </div>
 

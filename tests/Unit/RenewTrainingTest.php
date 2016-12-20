@@ -132,4 +132,24 @@ class RenewTrainingTest extends TestCase
 
         $this->assertCount(0, $trainingUser);
     }
+
+    /** @test */
+    public function it_does_not_renew_if_previous_training_has_been_marked_not_to_renew()
+    {
+        $this->doesntExpectEvents(TrainingAssigned::class);
+
+        $training = factory(Training::class)->create(['renews_in' => 300]);
+        $user = factory(User::class)->create();
+
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subYear()->subYear()->format('Y-m-d'),
+            'stop_renewal'   => 1,
+        ]);
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+
+        $this->assertCount(0, $trainingUser);
+    }
 }
