@@ -1,7 +1,6 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\Setting;
 use SET\User;
 
 class SettingControllerTest extends TestCase
@@ -41,5 +40,4 @@ class SettingControllerTest extends TestCase
 
         $this->seeStatusCode(403);
     }
-
 }
