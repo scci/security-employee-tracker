@@ -17,7 +17,6 @@ return [
         'pdo',
         'mbstring',
         'tokenizer',
-        'ldap',
     ],
 
     /*
