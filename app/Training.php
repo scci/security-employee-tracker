@@ -51,8 +51,8 @@ class Training extends Model
     }
 
     /**
-    * Get the training type for the training.
-    */
+     * Get the training type for the training.
+     */
     public function trainingType()
     {
         return $this->belongsTo('SET\TrainingType', 'training_type_id'); // One To Many (Inverse)

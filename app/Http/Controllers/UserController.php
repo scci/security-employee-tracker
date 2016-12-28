@@ -97,7 +97,7 @@ class UserController extends Controller
             if (is_null($trainingUser->completed_date)) {
                 $training_block_type_list = array_add($training_block_type_list, 'AAA', 'Scheduled');
                 $training_user_types = array_add($training_user_types, $trainingUser->id, 'Scheduled');
-            } else if ( $trainingUser->Training->trainingType) {
+            } elseif ($trainingUser->Training->trainingType) {
                 $training_block_type_list = array_add($training_block_type_list, $trainingUser->Training->trainingType->name, $trainingUser->Training->trainingType->name);
                 $training_user_types = array_add($training_user_types, $trainingUser->id, $trainingUser->Training->trainingType->name);
             } else { // No training type
