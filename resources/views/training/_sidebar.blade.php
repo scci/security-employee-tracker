@@ -1,3 +1,18 @@
+
+{{-- Training Type --}}
+@if ($training->trainingType)
+  <div class="card">
+      <div class="card-content">
+          <div class="card-title">Training Type
+              <a tabindex="0" role="button" data-trigger="focus" class="pull-right tooltipped"
+              data-position="top" data-tooltip="This is the category type of the training." 
+              aria-hidden="true"><i class="material-icons">live_help</i></a>
+          </div>
+          <span class="browser-default">{!! $training->trainingType->name !!}</span>
+      </div>
+  </div>
+@endif
+
 {{-- Auto Renew --}}
 <div class="card">
         <div class="card-content">

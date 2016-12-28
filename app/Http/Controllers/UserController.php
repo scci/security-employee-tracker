@@ -91,6 +91,22 @@ class UserController extends Controller
 
         $trainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')->orderBy('completed_date', 'DESC')->get();
 
+        // This provides view list of training blocks and list of User's training types
+        $training_block_type_list = $training_user_types = [];
+        foreach ($trainings as $trainingUser) {
+            if (is_null($trainingUser->completed_date)) {
+                $training_block_type_list = array_add($training_block_type_list, 'AAA', 'Scheduled');
+                $training_user_types = array_add($training_user_types, $trainingUser->id, 'Scheduled');
+            } else if ( $trainingUser->Training->trainingType) {
+                $training_block_type_list = array_add($training_block_type_list, $trainingUser->Training->trainingType->name, $trainingUser->Training->trainingType->name);
+                $training_user_types = array_add($training_user_types, $trainingUser->id, $trainingUser->Training->trainingType->name);
+            } else { // No training type
+                $training_block_type_list = array_add($training_block_type_list, '999', 'Miscellaneous');
+                $training_user_types = array_add($training_user_types, $trainingUser->id, 'Miscellaneous');
+            }
+        }
+        ksort($training_block_type_list);  // Sort by key
+
         $activityLog = [];
         if (Gate::allows('view')) {
             $activityLog = $user->getUserLog($user);
@@ -105,7 +121,8 @@ class UserController extends Controller
             $q->where('id', $userId);
         })->get();
 
-        return view('user.show', compact('user', 'duties', 'previous', 'next', 'trainings', 'activityLog'));
+        return view('user.show', compact('user', 'duties', 'previous', 'next',
+            'trainings', 'activityLog', 'training_block_type_list', 'training_user_types'));
     }
 
     public function edit(User $user)

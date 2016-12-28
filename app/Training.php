@@ -9,7 +9,7 @@ class Training extends Model
     protected $table = 'trainings';
     public $timestamps = true;
 
-    protected $fillable = ['name', 'renews_in', 'description', 'administrative'];
+    protected $fillable = ['name', 'renews_in', 'description', 'administrative', 'training_type_id'];
     protected $dates = ['created_at', 'updated_at'];
     protected $appends = ['incompleted'];
 
@@ -48,5 +48,13 @@ class Training extends Model
     public function scopeSearchTraining($query, $input)
     {
         return $query->where('name', 'LIKE', "%$input%");
+    }
+
+    /**
+    * Get the training type for the training.
+    */
+    public function trainingType()
+    {
+        return $this->belongsTo('SET\TrainingType', 'training_type_id'); // One To Many (Inverse)
     }
 }

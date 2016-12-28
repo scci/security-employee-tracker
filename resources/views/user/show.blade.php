@@ -21,9 +21,9 @@
 
         <h2 style="margin-left:1.5rem" class="hide-on-small-only">{{$user->userFullName}}</h2>
 
-        @include('user._show_training_blocks', ['sectionId' => 'scheduled'])
-
-        @include('user._show_training_blocks', ['sectionId' => 'completed'])
+        @foreach ($training_block_type_list as $block_type)
+            @include('user._show_training_blocks',['sectionId' => $block_type])
+        @endforeach
 
         @include('user._show_travels_blocks')
 
