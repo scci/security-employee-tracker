@@ -14,7 +14,7 @@ class AddStopRenewalToTrainingUserTable extends Migration
     public function up()
     {
         Schema::table('training_user', function (Blueprint $table) {
-            $table->boolean('stop_renewal')->default(0);
+            $table->boolean('stop_renewal')->default(0)->nullable();
         });
     }
 
@@ -26,7 +26,7 @@ class AddStopRenewalToTrainingUserTable extends Migration
     public function down()
     {
         Schema::table('training_user', function (Blueprint $table) {
-            //
+            $table->dropColumn('stop_renewal');
         });
     }
 }
