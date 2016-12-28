@@ -5,23 +5,31 @@ namespace PhpParser;
 class NodeTraverser implements NodeTraverserInterface
 {
     /**
-     * @var NodeVisitor[] Visitors
+     * If NodeVisitor::enterNode() returns DONT_TRAVERSE_CHILDREN, child nodes
+     * of the current node will not be traversed for any visitors.
+     *
+     * For subsequent visitors enterNode() will still be called on the current
+     * node and leaveNode() will also be invoked for the current node.
      */
+    const DONT_TRAVERSE_CHILDREN = 1;
+
+    /**
+     * If NodeVisitor::leaveNode() returns REMOVE_NODE for a node that occurs
+     * in an array, it will be removed from the array.
+     *
+     * For subsequent visitors leaveNode() will still be invoked for the
+     * removed node.
+     */
+    const REMOVE_NODE = false;
+
+    /** @var NodeVisitor[] Visitors */
     protected $visitors;
 
     /**
-     * @var bool
-     */
-    private $cloneNodes;
-
-    /**
      * Constructs a node traverser.
-     *
-     * @param bool $cloneNodes Should the traverser clone the nodes when traversing the AST
      */
-    public function __construct($cloneNodes = false) {
+    public function __construct() {
         $this->visitors = array();
-        $this->cloneNodes = $cloneNodes;
     }
 
     /**
@@ -73,10 +81,6 @@ class NodeTraverser implements NodeTraverserInterface
     }
 
     protected function traverseNode(Node $node) {
-        if ($this->cloneNodes) {
-            $node = clone $node;
-        }
-
         foreach ($node->getSubNodeNames() as $name) {
             $subNode =& $node->$name;
 
