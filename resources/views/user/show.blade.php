@@ -21,7 +21,7 @@
 
         <h2 style="margin-left:1.5rem" class="hide-on-small-only">{{$user->userFullName}}</h2>
 
-        @foreach ($training_block_type_list as $block_type)
+        @foreach ($training_block_list as $block_type)
             @include('user._show_training_blocks',['sectionId' => $block_type])
         @endforeach
 
