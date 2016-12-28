@@ -1,19 +1,22 @@
 <ul class="collapsible popout" data-collapsible="accordion">
     <li><div class="collapsible-title">{{ucfirst($sectionId)}} Training</div></li>
     @foreach ($trainings as $trainingUser)
-        @if (!$trainingUser->training->administrative && ($sectionId == 'scheduled' ? is_null($trainingUser->completed_date) : !is_null($trainingUser->completed_date)))
+        @if (!$trainingUser->training->administrative
+            && $training_user_types[$trainingUser->id] == $sectionId)
             <li>
                 <div class="collapsible-header" >
                     <div class="right">
-                        @if($sectionId == 'scheduled')
+                        @if($trainingUser->completed_date)
+                            Completed: {{ $trainingUser->completed_date }}
+                        @elseif($trainingUser->due_date)
                             Due Date: {{ $trainingUser->due_date }}
                             <a type="button" class="btn-flat btn-sm tooltipped" href="{{url('training/reminder', $trainingUser->id)}}" data-position="top" data-tooltip="Send Reminder">
                                 <i class="material-icons training-user-icon">email</i>
                             </a>
                         @endif
-                        @if($sectionId == 'completed') Completed: {{ $trainingUser->completed_date }} @endif
                     </div>
-                    @if($sectionId == 'scheduled' && \Carbon\Carbon::today() > \Carbon\Carbon::createFromFormat('Y-m-d', $trainingUser->due_date))
+                    @if(!$trainingUser->completed_date
+                        && \Carbon\Carbon::today() > \Carbon\Carbon::createFromFormat('Y-m-d', $trainingUser->due_date))
                         <span class="tooltipped" data-tooltip="Past Due">
                             <i class="material-icons red-text">warning</i>
                         </span>

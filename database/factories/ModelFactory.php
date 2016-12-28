@@ -32,6 +32,15 @@ $factory->define(SET\Training::class, function (Faker\Generator $faker) {
    ];
 });
 
+$factory->define(SET\TrainingType::class, function (Faker\Generator $faker) {
+    return [
+        'name'           => $faker->text(50),
+        'description'    => $faker->text(120),
+        'sidebar'        => rand(0, 1),
+        'status'         => rand(0, 1),
+    ];
+});
+
 $factory->define(SET\Duty::class, function (Faker\Generator $faker) {
     return [
         'name'        => $faker->text(25),

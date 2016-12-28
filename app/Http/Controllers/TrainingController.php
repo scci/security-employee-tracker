@@ -15,6 +15,7 @@ use SET\Handlers\Excel\CompletedTrainingExport;
 use SET\Http\Requests\AssignTrainingRequest;
 use SET\Http\Requests\StoreTrainingRequest;
 use SET\Training;
+use SET\TrainingType;
 use SET\TrainingUser;
 use SET\User;
 
@@ -43,8 +44,9 @@ class TrainingController extends Controller
 
         $users = User::skipSystem()->active()->orderBy('last_name')->get()->pluck('UserFullName', 'id');
         $groups = Group::orderBy('name')->get()->pluck('name', 'id');
+        $training_types = TrainingType::whereStatus(true)->orderBy('name')->get()->pluck('name', 'id');
 
-        return view('training.create', compact('users', 'groups'));
+        return view('training.create', compact('users', 'groups', 'training_types'));
     }
 
     /**
@@ -103,8 +105,9 @@ class TrainingController extends Controller
 
         $users = User::skipSystem()->active()->orderBy('last_name')->get()->pluck('UserFullName', 'id');
         $groups = Group::orderBy('name')->get()->pluck('name', 'id');
+        $training_types = TrainingType::whereStatus(true)->orderBy('name')->get()->pluck('name', 'id');
 
-        return view('training.edit', compact('training', 'users', 'groups'));
+        return view('training.edit', compact('training', 'users', 'groups', 'training_types'));
     }
 
     public function update(Request $request, Training $training)

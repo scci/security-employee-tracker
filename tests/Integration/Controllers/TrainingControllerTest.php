@@ -55,6 +55,9 @@ class TrainingControllerTest extends TestCase
         $this->seePageIs('training/create');
         $this->assertViewHas('users');
         $this->assertViewHas('groups');
+        $this->assertViewHas('training_types');
+
+        $this->see('Training Type');
 
         // Logged in as a regular user - Cannot access the training create page
         $newuser = factory(User::class)->create();
@@ -160,6 +163,8 @@ class TrainingControllerTest extends TestCase
         $this->assertViewHas('training');
         $this->assertViewHas('users');
         $this->assertViewHas('groups');
+        $this->assertViewHas('training_types');
+        $this->see('Training Type');
 
         // Logged in as a regular user - Cannot edit the training details
         $newuser = factory(User::class)->create();
