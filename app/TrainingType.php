@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TrainingType extends Model
 {
-  /**
+    /**
    * @var string
    */
   protected $table = 'training_types';
@@ -24,11 +24,10 @@ class TrainingType extends Model
   protected $dates = ['created_at', 'updated_at'];
 
   /**
- * Get the trainings that have the training type.
- */
+   * Get the trainings that have the training type.
+   */
   public function trainings()
   {
       return $this->hasMany('SET\Training', 'training_type_id'); // One To Many
   }
-
 }
