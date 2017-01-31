@@ -25,8 +25,8 @@ class ComposerServiceProvider extends ServiceProvider
         view()->composer(['layouts._navbar', 'home._last_login'], function ($view) {
             $view->with('logged_in_user', Auth::user());
             $view->with('duties', Duty::all());
-            $view->with('trainingTypes', TrainingType::where('status','1')
-                    ->select('id','name')->orderBy('name')->get());
+            $view->with('trainingTypes', TrainingType::where('status', '1')
+                    ->select('id', 'name')->orderBy('name')->get());
         });
 
         // Pass our action items if we have the sidebar.

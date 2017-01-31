@@ -164,26 +164,26 @@ class UserController extends Controller
         return 'success';
     }
 
-
     /**
      * @param $trainings[]
      * From the User's trainings, a list of the training types is determined and
      * a list of the training block titles is determined.
+     *
      * @return user_training_types[], training_block_titles[]
      */
-    public function getUserTrainingTypes($trainings=[])
+    public function getUserTrainingTypes($trainings = [])
     {
         $training_block_titles = $user_training_types = [];
         foreach ($trainings as $trainingUser) {
             if (is_null($trainingUser->completed_date)) {
-                $training_block_titles['AAA']='Scheduled';
+                $training_block_titles['AAA'] = 'Scheduled';
                 $user_training_types[$trainingUser->id] = 'Scheduled';
             } elseif ($trainingUser->Training->trainingType) {
                 $typeName = $trainingUser->Training->trainingType->name;
                 $training_block_titles[$typeName] = $typeName;
                 $user_training_types[$trainingUser->id] = $typeName;
             } else { // No training type
-                $training_block_titles['999']='Miscellaneous';
+                $training_block_titles['999'] = 'Miscellaneous';
                 $user_training_types[$trainingUser->id] = 'Miscellaneous';
             }
         }

@@ -22,7 +22,7 @@ class TrainingTypeControllerTest extends TestCase
      */
     public function it_displays_the_index_page()
     {
-        $createdTrainingTypes = factory(SET\TrainingType::class,5)->create([]);
+        $createdTrainingTypes = factory(SET\TrainingType::class, 5)->create([]);
 
         // Logged in as admin - Can access the page
         $this->action('GET', 'TrainingTypeController@index');
@@ -125,7 +125,7 @@ class TrainingTypeControllerTest extends TestCase
         $data = ['name'        => 'Sample Training Type',
                  'status'      => 1,
                  'sidebar'     => 0,
-                 'description' => null];
+                 'description' => null, ];
         $response = $this->call('POST', 'trainingtype', $data);
 
         $this->seeStatusCode(302); // Redirection status code
@@ -139,7 +139,7 @@ class TrainingTypeControllerTest extends TestCase
         $response = $this->call('POST', 'trainingtype', $data);
 
         $this->seeStatusCode(403); // Forbidden status code
-        $this->assertEquals($response->content(),'Forbidden');
+        $this->assertEquals($response->content(), 'Forbidden');
         $this->assertFalse($response->isRedirection()); // Redirected
 
         // Logged in as a user with role view - Does not store the training
@@ -148,7 +148,7 @@ class TrainingTypeControllerTest extends TestCase
         $response = $this->call('POST', 'trainingtype', $data);
 
         $this->seeStatusCode(403); // Forbidden status code
-        $this->assertEquals($response->content(),'Forbidden');
+        $this->assertEquals($response->content(), 'Forbidden');
         $this->assertFalse($response->isRedirection()); // Redirected
 
         // Logged in as a user with edit view - Does store the training
@@ -209,13 +209,13 @@ class TrainingTypeControllerTest extends TestCase
         $createdTrainingTypeId = $createdTrainingType->id;
 
         // Create trainings
-        $createdTrainings = factory(SET\Training::class,6)->create([]);
+        $createdTrainings = factory(SET\Training::class, 6)->create([]);
         foreach ($createdTrainings as $createdTraining) {
             // Associating trainingtype to a Training
             $createdTraining->trainingType()->associate($createdTrainingType);
             $createdTraining->save();
         }
-        $this->assertEquals($createdTrainingType->trainings()->count(),$createdTrainings->count());
+        $this->assertEquals($createdTrainingType->trainings()->count(), $createdTrainings->count());
 
         // Logged in as admin - Can see the trainingtype details
         // Logged in as a regular user - Does not store the training
@@ -317,7 +317,7 @@ class TrainingTypeControllerTest extends TestCase
         $data = ['name'        => 'Sample Training Type',
                  'status'      => 1,
                  'sidebar'     => 0,
-                 'description' => 'Sample Trainging Type Descripiton'];
+                 'description' => 'Sample Trainging Type Descripiton', ];
 
         $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
         $this->assertRedirectedTo("/trainingtype/$createdTrainingTypeId");
@@ -329,43 +329,44 @@ class TrainingTypeControllerTest extends TestCase
         $this->assertEquals($createdTrainingType->description, $data['description']);
         $this->assertEquals($createdTrainingType->status, $data['status']);
         $this->assertEquals($createdTrainingType->sidebar, $data['sidebar']);
-}
+    }
+
 /**
  * @test
  */
 public function it_updates_the_trainingtype_if_edit_role()
 {
-        // Create a trainingtype object
+    // Create a trainingtype object
         $trainingTypeToCreate = factory(TrainingType::class)->create();
-        $createdTrainingTypeId = $trainingTypeToCreate->id;
+    $createdTrainingTypeId = $trainingTypeToCreate->id;
 
         // Logged in as admin - Can update the training
         $data = ['name'        => 'Sample Training Type',
                  'status'      => 1,
                  'sidebar'     => 0,
-                 'description' => 'Sample Trainging Type Descripiton'];
+                 'description' => 'Sample Trainging Type Descripiton', ];
         // Logged in as a regular user - Cannot update the training
         $newuser = factory(User::class)->create();
-        $this->actingAs($newuser);
-        $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
-        $this->seeStatusCode(403); // Forbidden status code
+    $this->actingAs($newuser);
+    $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
+    $this->seeStatusCode(403); // Forbidden status code
 
         // Logged in as a user with role view - Cannot update the training
         $newuser = factory(User::class)->create(['role' => 'view']);
-        $this->actingAs($newuser);
-        $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
-        $this->seeStatusCode(403); // Forbidden status code
+    $this->actingAs($newuser);
+    $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
+    $this->seeStatusCode(403); // Forbidden status code
 
         // Logged in as a user with edit view - Can update the training
         $newuser = factory(User::class)->create(['role' => 'edit']);
-        $this->actingAs($newuser);
-        $response = $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
+    $this->actingAs($newuser);
+    $response = $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
 
-        $this->assertTrue($response->isRedirection()); // Make sure you've been redirected.
+    $this->assertTrue($response->isRedirection()); // Make sure you've been redirected.
         $this->assertFalse($response->isOk()); // Just check that you don't get a 200 OK response.
         $this->seeStatusCode(302); // Redirection status code
         $this->assertRedirectedTo('trainingtype/'.$createdTrainingTypeId); // Only check that you're redirecting to a specific URI
-    }
+}
 
     /**
      * @test
@@ -384,7 +385,7 @@ public function it_updates_the_trainingtype_if_edit_role()
         // Delete the created trainingtype as admin
         $response = $this->call('DELETE', "trainingtype/$createdTrainingTypeId");
 
-        $this->assertEquals($response->content(),'');
+        $this->assertEquals($response->content(), '');
         $this->seeStatusCode(200);  // OK status code
         // Assert that a null object is returned.
         $deletedTrainingType = TrainingType::find($createdTrainingTypeId);
@@ -413,11 +414,11 @@ public function it_updates_the_trainingtype_if_edit_role()
         $trainingCreated->save();
 
         // Ensure trainingtype is associated with training
-        $this->assertEquals(TrainingType::first()->id,Training::first()->training_type_id);
+        $this->assertEquals(TrainingType::first()->id, Training::first()->training_type_id);
         $this->assertEquals(Training::has('trainingType')->count(), 1);
-        $this->assertEquals(TrainingType::first()->id,Training::has('trainingType')->first()->id);
-        $this->assertEquals(TrainingType::first()->id,Training::first()->trainingtype->id);
-        $this->assertEquals(TrainingType::first()->name,Training::first()->trainingtype->name);
+        $this->assertEquals(TrainingType::first()->id, Training::has('trainingType')->first()->id);
+        $this->assertEquals(TrainingType::first()->id, Training::first()->trainingtype->id);
+        $this->assertEquals(TrainingType::first()->name, Training::first()->trainingtype->name);
 
         // Ensure training is associated with trainingtype
         $this->assertEquals(TrainingType::has('trainings')->count(), 1);
@@ -441,6 +442,7 @@ public function it_updates_the_trainingtype_if_edit_role()
         $this->assertEquals(Training::has('trainingType')->count(), 0);
         $this->assertNull(Training::first()->trainingtype);
     }
+
     /**
      * @test
      */

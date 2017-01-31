@@ -60,7 +60,7 @@ class TrainingControllerTest extends TestCase
     {
         // MIMIC call when there are no training types
         // Logged in as admin - Can access the training page
-        $response = $this->call('GET', "training/");
+        $response = $this->call('GET', 'training/');
         $this->seeStatusCode(200); // OK status code
         $this->seePageIs('training/'); // Route '/training/trainingtype/{trainingTypeID}'
         //  Verify page components when no Training Types (views\layouts\_navbar.blade.php)
@@ -81,7 +81,7 @@ class TrainingControllerTest extends TestCase
         $createdTraining->trainingType()->associate($createdTrainingType);
         $createdTraining->save();
         // Ensure trainingtype is associated with training
-        $this->assertEquals($createdTrainingType->id,$createdTraining->training_type_id);
+        $this->assertEquals($createdTrainingType->id, $createdTraining->training_type_id);
 
         // Logged in as admin - Can access the training page
         $response = $this->call('GET', "training/trainingtype/$createdTrainingTypeId");
@@ -109,7 +109,7 @@ class TrainingControllerTest extends TestCase
         $this->dontSee('data-tooltip="Manage Training Types"'); // Training Type button
 
         // Verify page components when there are no active Training Types
-        $createdTrainingType->status=0;
+        $createdTrainingType->status = 0;
         $createdTrainingType->save();
         // Logged in as admin - Can access the training page
         $response = $this->call('GET', "training/trainingtype/$createdTrainingTypeId");
@@ -233,7 +233,7 @@ class TrainingControllerTest extends TestCase
         $createdTraining->trainingType()->associate($createdTrainingType);
         $createdTraining->save();
         // Ensure trainingtype is associated with training
-        $this->assertEquals($createdTrainingType->id,$createdTraining->training_type_id);
+        $this->assertEquals($createdTrainingType->id, $createdTraining->training_type_id);
 
         // Logged in as admin - Can access the training page
         $this->call('GET', "training/$createdTrainingId");
