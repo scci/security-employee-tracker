@@ -20,12 +20,14 @@
     </div>
 </div>
 <div class="row">
-    <div class="col s12 m6">
-        <div class="input-field" id="training_type">
-            {!! Form::select('training_type_id', array('null'=>'None') + $training_types->toArray(), null) !!}
-            {!! Form::label('training_type_id', 'Training Type:') !!}
+    @if ($training_types->count()>0)
+        <div class="col s12 m6">
+            <div class="input-field" id="training_type">
+                {!! Form::select('training_type_id', array('null'=>'None') + $training_types->toArray(), null) !!}
+                {!! Form::label('training_type_id', 'Training Type:') !!}
+            </div>
         </div>
-    </div>
+    @endif
     <div class="input-field col s12" id="training_description">
         {{-- Form::label('description', 'Instructions:', ['class' => 'active']) --}}
         {!! Form::textarea('description', null, ['class' => 'wysiwyg']) !!}

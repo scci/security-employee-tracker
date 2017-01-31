@@ -31,6 +31,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('training/{trainingID}/assign', ['as' => 'training.assignForm', 'uses' => 'TrainingController@assignForm']);
     Route::post('training/{trainingID}/assign', ['as' => 'training.assign', 'uses' => 'TrainingController@assign']);
     Route::get('/training/completed', ['uses' => 'TrainingController@showCompleted']);
+    // Pass the Training Type to the Training index
+    Route::get('/training/trainingtype/{trainingTypeID}', ['uses' => 'TrainingController@index']);
     Route::get('/training/reminder/{noteID}', ['uses' => 'TrainingController@sendReminder']);
     Route::resource('user', 'UserController');
     Route::post('user-import', ['as' => 'user.import', 'uses' => 'UserController@import']);
@@ -40,6 +42,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('user.visit', 'VisitController');
     Route::resource('user.travel', 'TravelController');
     Route::resource('training', 'TrainingController');
+    Route::resource('trainingtype', 'TrainingTypeController');
     Route::resource('attachment', 'AttachmentController');
     Route::resource('group', 'GroupController');
     Route::post('group-user-id', 'GroupController@getUserIDs');

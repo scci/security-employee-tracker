@@ -2,10 +2,17 @@
 
 @section('title', 'Training Directory')
 
-
 @section('content')
 
     @can('edit')
+        @if (!$isTrainingType)
+            <div class="fixed-action-btn" style="bottom: 45px; right: 100px;">
+                <a class="btn-floating btn-large amber tooltipped modal-trigger" href="{{ url('/trainingtype') }}"
+                    data-position="left" data-tooltip="Manage Training Types">
+                    <i class="large material-icons">mode_edit</i>
+                </a>
+            </div>
+        @endif
         <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
             <a class="btn-floating btn-large red tooltipped modal-trigger" href="{{ url('/training/create') }}" data-position="left" data-tooltip="New Training">
                 <i class="large material-icons">add</i>
@@ -20,6 +27,9 @@
                 <thead>
                     <tr>
                         <th>Name</th>
+                        @if ($hasTrainingType)
+                            <th>Type</th>
+                        @endif
                         <th>Incomplete</th>
                         <th>Completed</th>
                         <th></th>
@@ -29,6 +39,13 @@
                     @foreach ($trainings as $training)
                         <tr class="training-{{$training->id}}">
                             <td><a href="{{ url('/training', $training->id) }}">{{ $training->name }}</a></td>
+                            @if ($hasTrainingType)
+                                @if ($training->trainingtype)
+                                  <td><a href="{{ url('/trainingtype', $training->trainingtype->id) }}">{{ $training->trainingtype->name }}</a></td>
+                                @else
+                                  <td></td>
+                                @endif
+                            @endif
                             <td class="text-right">
                                 @if($training->users->count())
                                     {{ $training->incompleted }}/{{$training->users->groupby('id')->count()}}
@@ -71,13 +88,21 @@
     <strong>Searching</strong>
     <p>When searching, the table will automatically hide any rows that are not part of the search criteria. All columns are searched.</p>
 
-    <strong>Complete Column</strong>
-    <p>This column indicates the number of assigned training that has not been completed. If there is no outstanding training to be completed, it is marked with a check. </p>
+    <strong>Incomplete Column</strong>
+    <p>This column indicates a ratio of the number of completed training over the
+        number of assigned training that has not been completed.</p>
+
+    <strong>Completed Column</strong>
+    <p>This column indicates the percentage of completed training over the assigned training.
+        If there is no outstanding training to be completed, it is marked 100%. </p>
+
+    @if (!$isTrainingType)
+        <strong>Managing training types</strong>
+        <p>To manage training types, click on the Manage Training Type button (big amber button) on the bottom right of your screen.
+            The Manage Training Type button is available from the Training->All option</p>
+    @endif
 
     <strong>Creating a new training</strong>
     <p>To create a new training, click on the New Training button (big red button) on the bottom right of your screen.</p>
-
-    <strong>Making edits</strong>
-    <p>You may attach and remove files via the file button on the left. Changes to the name, description and review dates (along with adding more attachments) MUST be done via editing the training (edit icon next to the training name).</p>
 
 @stop
