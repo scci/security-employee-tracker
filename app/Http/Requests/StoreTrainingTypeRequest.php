@@ -37,7 +37,7 @@ class StoreTrainingTypeRequest extends Request
     public function messages()
     {
         return [
-            'name' => 'A name is required.',
+            'name'   => 'A name is required.',
             'status' => 'A active status is required.',
         ];
     }
