@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Http\Controllers\TrainingController;
 use SET\Training;
+use SET\TrainingType;
 use SET\TrainingUser;
 use SET\User;
 
@@ -26,7 +27,6 @@ class TrainingControllerTest extends TestCase
         $this->action('GET', 'TrainingController@index');
 
         $this->seePageIs('training');
-        $this->assertViewHas('trainings');
 
         // Logged in as a regular user - Cannot access the training page
         $newuser = factory(User::class)->create();
@@ -40,8 +40,83 @@ class TrainingControllerTest extends TestCase
         $this->actingAs($newuser);
         $this->call('GET', '/training');
 
+        $this->seeStatusCode(200); // OK status code
         $this->seePageIs('training');
         $this->assertViewHas('trainings');
+        $this->assertViewHas('isTrainingType');
+        $this->assertViewHas('hasTrainingType');
+
+        // Verify trainingtype page components do not appear (tests views\layouts\_navbar.blade.php)
+        $this->see('/training">Trainings</a>'); // Navbar item
+        $this->dontSee('<th>Type</th>'); // Table column
+        $this->dontSee('data-tooltip="Manage Training Types"'); // Training Type button (tests views\training\index.blade.php)
+    }
+
+    /**
+     * @test Passing of the Training Type to the Training index
+     * web.php Route::get('/training/trainingtype/{trainingTypeID}', ['uses' => 'TrainingController@index']);
+     */
+    public function it_shows_the_index_page_for_specific_trainingtype()
+    {
+        // MIMIC call when there are no training types
+        // Logged in as admin - Can access the training page
+        $response = $this->call('GET', "training/");
+        $this->seeStatusCode(200); // OK status code
+        $this->seePageIs('training/'); // Route '/training/trainingtype/{trainingTypeID}'
+        //  Verify page components when no Training Types (views\layouts\_navbar.blade.php)
+        $this->see('/training">Trainings</a>'); // Navbar item
+        $this->dontSee('<th>Type</th>'); // Table column
+        $this->see('data-tooltip="Manage Training Types"'); // Training Type button (tests views\training\index.blade.php)
+
+        // MIMIC call when there are training types
+        // Create a trainingtype object
+        $createdTrainingType = factory(TrainingType::class)->create([]);
+        $createdTrainingTypeId = $createdTrainingType->id;
+
+        // Create a training object
+        $createdTraining = factory(Training::class)->create([]);
+        $createdTrainingId = $createdTraining->id;
+
+        // Associating trainingtype to a Training
+        $createdTraining->trainingType()->associate($createdTrainingType);
+        $createdTraining->save();
+        // Ensure trainingtype is associated with training
+        $this->assertEquals($createdTrainingType->id,$createdTraining->training_type_id);
+
+        // Logged in as admin - Can access the training page
+        $response = $this->call('GET', "training/trainingtype/$createdTrainingTypeId");
+
+        $this->seeStatusCode(200); // OK status code
+        $this->seePageIs('training/trainingtype/'.$createdTrainingTypeId); // Route '/training/trainingtype/{trainingTypeID}'
+        $this->assertViewHas('trainings');
+        $this->assertViewHas('isTrainingType');
+        $this->assertViewHas('hasTrainingType');
+
+        // Verify page components
+        $this->see('<title>SET - Training Directory</title>'); // Page Title
+        $this->see('Training, Credentials and Briefings</span>'); // Block Title
+        $this->see('<th>Name</th>'); // Table header
+        $this->see('<th>Type</th>'); // Table header
+        $this->see('<th>Incomplete</th>'); // Table header
+        $this->see('<th>Completed</th>'); // Table header
+
+        // Verify page components when there are Training Types (views\layouts\_navbar.blade.php)
+        $this->see('data-activates="training-lists2">Trainings<'); // Navbar item
+        $this->see('/training">All</a>'); // Navbar menu item link
+        $this->see($createdTrainingType->name.'</a>'); // Navbar menu item link (app\Providers\ComposerServiceProvider.php)
+        $this->see('<th>Type</th>'); // Table column
+        // (tests views\training\index.blade.php)
+        $this->dontSee('data-tooltip="Manage Training Types"'); // Training Type button
+
+        // Verify page components when there are no active Training Types
+        $createdTrainingType->status=0;
+        $createdTrainingType->save();
+        // Logged in as admin - Can access the training page
+        $response = $this->call('GET', "training/trainingtype/$createdTrainingTypeId");
+        $this->seeStatusCode(200); // OK status code
+        $this->seePageIs('training/trainingtype/'.$createdTrainingTypeId);
+        // Verify page components for inactive training types (app\Providers\ComposerServiceProvider.php)
+        $this->see('/training">Trainings</a>'); // Navbar item displays if no active training types
     }
 
     /**
@@ -56,8 +131,6 @@ class TrainingControllerTest extends TestCase
         $this->assertViewHas('users');
         $this->assertViewHas('groups');
         $this->assertViewHas('training_types');
-
-        $this->see('Training Type');
 
         // Logged in as a regular user - Cannot access the training create page
         $newuser = factory(User::class)->create();
@@ -145,6 +218,29 @@ class TrainingControllerTest extends TestCase
         $this->assertViewHas('notes');
         $this->assertViewHas('training');
         $this->assertViewHas('showAll');
+
+        //  Verify page components
+        $this->see('Auto Renew'); // Block title
+        $this->see('Attachments'); // Block title
+        $this->see('Description'); // Block title
+        // When there are no training types (views\layouts\_new_training.blade.php)
+        $this->dontSee('Training Type'); // Block title
+
+        // MIMIC call when there are training types
+        // Create trainingtype object
+        $createdTrainingType = factory(TrainingType::class)->create([]);
+        // Associating trainingtype to a Training
+        $createdTraining->trainingType()->associate($createdTrainingType);
+        $createdTraining->save();
+        // Ensure trainingtype is associated with training
+        $this->assertEquals($createdTrainingType->id,$createdTraining->training_type_id);
+
+        // Logged in as admin - Can access the training page
+        $this->call('GET', "training/$createdTrainingId");
+        $this->seePageIs('/training/'.$createdTrainingId);
+        $this->seeStatusCode(200); // OK status code
+        // Verify page components - When there are no training types (views\layouts\_new_training.blade.php)
+        $this->see('Training Type'); // Block title
     }
 
     /**
@@ -164,7 +260,6 @@ class TrainingControllerTest extends TestCase
         $this->assertViewHas('users');
         $this->assertViewHas('groups');
         $this->assertViewHas('training_types');
-        $this->see('Training Type');
 
         // Logged in as a regular user - Cannot edit the training details
         $newuser = factory(User::class)->create();

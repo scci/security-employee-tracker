@@ -27,15 +27,25 @@ class TrainingController extends Controller
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index()
+    public function index(Request $request, $trainingTypeID=NULL)
     {
         $this->authorize('view');
 
-        $trainings = Training::with(['users' => function ($q) {
-            $q->active();
-        }])->get()->sortBy('name');
+        $hasTrainingType = TrainingType::count()>0;
+        $isTrainingType = (strpos($request->path(),'/trainingtype/'));
 
-        return view('training.index', compact('trainings'));
+        if ($trainingTypeID) {
+            $trainings = Training::with(['users' => function ($q) {  $q->active();  }])
+                          ->where('training_type_id',$trainingTypeID)
+                          ->get()
+                          ->sortBy('name');
+        } else {
+            $trainings = Training::with(['users' => function ($q) {
+                $q->active();
+            }])->get()->sortBy('name');
+        }
+
+        return view('training.index', compact('trainings', 'isTrainingType', 'hasTrainingType'));
     }
 
     public function create()

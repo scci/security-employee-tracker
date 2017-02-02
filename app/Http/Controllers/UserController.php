@@ -91,21 +91,9 @@ class UserController extends Controller
 
         $trainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')->orderBy('completed_date', 'DESC')->get();
 
-        // This provides view list of training blocks and list of User's training types
-        $training_block_list = $training_user_types = [];
-        foreach ($trainings as $trainingUser) {
-            if (is_null($trainingUser->completed_date)) {
-                $training_block_list = array_add($training_block_list, 'AAA', 'Scheduled');
-                $training_user_types = array_add($training_user_types, $trainingUser->id, 'Scheduled');
-            } elseif ($trainingUser->Training->trainingType) {
-                $training_block_list = array_add($training_block_list, $trainingUser->Training->trainingType->name, $trainingUser->Training->trainingType->name);
-                $training_user_types = array_add($training_user_types, $trainingUser->id, $trainingUser->Training->trainingType->name);
-            } else { // No training type
-                $training_block_list = array_add($training_block_list, '999', 'Miscellaneous');
-                $training_user_types = array_add($training_user_types, $trainingUser->id, 'Miscellaneous');
-            }
-        }
-        ksort($training_block_list);  // Sort by key
+        $user_training_types = $this->getUserTrainingTypes($trainings);
+        $training_user_types = $user_training_types[0]; // List of the user's training types
+        $training_blocks = $user_training_types[1]; // List of training block titles for user
 
         $activityLog = [];
         if (Gate::allows('view')) {
@@ -122,7 +110,7 @@ class UserController extends Controller
         })->get();
 
         return view('user.show', compact('user', 'duties', 'previous', 'next',
-            'trainings', 'activityLog', 'training_block_list', 'training_user_types'));
+            'trainings', 'activityLog', 'training_blocks', 'training_user_types'));
     }
 
     public function edit(User $user)
@@ -174,6 +162,33 @@ class UserController extends Controller
         User::findOrFail($userId)->delete();
 
         return 'success';
+    }
+
+
+    /**
+     * @param $trainings[]
+     * From the User's trainings, a list of the training types is determined and
+     * a list of the training block titles is determined.
+     * @return user_training_types[], training_block_titles[]
+     */
+    public function getUserTrainingTypes($trainings=[])
+    {
+        $training_block_titles = $user_training_types = [];
+        foreach ($trainings as $trainingUser) {
+            if (is_null($trainingUser->completed_date)) {
+                $training_block_titles['AAA']='Scheduled';
+                $user_training_types[$trainingUser->id] = 'Scheduled';
+            } elseif ($trainingUser->Training->trainingType) {
+                $typeName = $trainingUser->Training->trainingType->name;
+                $training_block_titles[$typeName] = $typeName;
+                $user_training_types[$trainingUser->id] = $typeName;
+            } else { // No training type
+                $training_block_titles['999']='Miscellaneous';
+                $user_training_types[$trainingUser->id] = 'Miscellaneous';
+            }
+        }
+        ksort($training_block_titles);  // Order by key
+        return [$user_training_types, $training_block_titles];
     }
 
     /**

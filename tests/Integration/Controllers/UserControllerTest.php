@@ -3,6 +3,7 @@
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Http\Controllers\UserController;
 use SET\User;
+use Carbon\Carbon;
 
 /**
  * Class UserControllerTest.
@@ -139,6 +140,8 @@ class UserControllerTest extends TestCase
         $this->assertViewHas('next');
         $this->assertViewHas('trainings');
         $this->assertViewHas('activityLog');
+        $this->assertViewHas('training_blocks');
+        $this->assertViewHas('training_user_types');
 
         // Create a user object
         $createdUser = factory(User::class)->create([]);
@@ -184,6 +187,80 @@ class UserControllerTest extends TestCase
         $this->assertViewHas('next');
         $this->assertViewHas('trainings');
         $this->assertViewHas('activityLog');
+
+    }
+
+    /**
+     * @test
+     */
+    public function it_shows_the_user_trainings_by_blocktype()
+    {
+        // Create a trainingtype object
+        $users = factory(SET\User::class, 5)->create(['role' => 'edit']);
+        $createdTrainingTypes = factory(SET\TrainingType::class,5)->create();
+        $createdTrainings = factory(SET\Training::class,25)->create();
+
+        foreach ($createdTrainings as $createdTraining) {
+            for ($x=$createdTrainingTypes->first()->id; $x<=$createdTrainingTypes->last()->id; $x++) {
+                // Associating trainingtype to a Training
+                $createdTraining->trainingType()->associate($createdTrainingTypes->where('id',$x)->first());
+                $createdTraining->save();
+            }
+        }
+
+        foreach ($users as $user) {
+            foreach ($createdTrainings as $createdTraining) {
+                $createdTraining->users()->attach($user, ['due_date' => Carbon::tomorrow()->format('Y-m-d'),
+                  'author_id'=>$this->user->id,
+                  'completed_date'=>null]);
+            }
+        }
+
+        // Logged in as admin - Check that every scheduled training is listed
+        $userId = $users->last()->id;
+        $this->call('GET', "user/$userId");
+        $this->seeStatusCode(200); // OK status code
+        $this->seePageIs('/user/'.$userId);
+
+        // Verify page components (views\user\show.blade.php)
+        $this->see('Scheduled Training'); // Block Title
+        foreach ($createdTrainings as $createdTraining) {
+          $this->see($createdTraining->name);
+        }
+        $this->see('Due Date: '.Carbon::tomorrow()->format('Y-m-d')); // Field
+        $this->see('ADD TRAINING'); // Button
+        foreach ($createdTrainingTypes as $createdTrainingType) {
+           $this->dontSee($createdTrainingType->name. " Training");  // Doesn't seem to be working
+        }
+        $this->dontsee('Completed: '.Carbon::today()->format('Y-m-d')); // Field
+
+        // Set all trainings to complete
+        foreach ($users as $user) {
+            foreach ($user->assignedTrainings as $traininguser) {
+                // $result = $user->assignedTrainings()->save($traininguser, ['completed_date'=>Carbon::today()->format('Y-m-d')]);
+                $traininguser->completed_date=Carbon::today()->format('Y-m-d');
+                $result = $user->assignedTrainings()->save($traininguser);
+            }
+        }
+        // Ensure completed data is set
+        foreach ($createdTrainings as $createdTraining) {
+            foreach ($createdTraining->assignedUsers as $traininguser) {
+                $this->assertEquals($traininguser->completed_date, Carbon::today()->format('Y-m-d'));
+            }
+        }
+
+        // Repload the the page reflecting completed training
+        $this->call('GET', "user/$userId");
+
+        $this->seeStatusCode(200); // OK status code
+        $this->seePageIs('/user/'.$userId);
+
+        // Verify page components (views\user\show.blade.php)
+        foreach ($createdTrainingTypes as $createdTrainingType) {
+            $this->see($createdTrainingType->name);  // This was not working
+        }
+        $this->see('Completed: '.Carbon::today()->format('Y-m-d')); // Field
+
     }
 
     /**
@@ -323,5 +400,77 @@ class UserControllerTest extends TestCase
 
         $this->call('DELETE', "user/$createdUserId");
         $this->seeStatusCode(403);
+    }
+
+    /** @test Call getUserTrainingTypes() without an argument */
+    public function it_gets_the_users_trainingTypes_with_no_trainingUser()
+    {
+      $createdUser = factory(SET\User::class)->create();
+
+      $user_training_types = with(new UserController)->getUserTrainingTypes();
+      $training_user_types = $user_training_types[0]; // List of the user's training types
+      $training_blocks = $user_training_types[1]; // List of training block titles for user
+
+      $this->assertTrue(is_array($training_user_types));
+      $this->assertTrue(is_array($training_blocks));
+      $this->assertTrue(empty($training_user_types));
+      $this->assertTrue(empty($training_blocks));
+    }
+
+    /** @test Call getUserTrainingTypes() with an argument */
+    public function it_gets_the_users_trainingTypes()
+    {
+        // Create users, trainings, and training types
+        $createdUsers = factory(SET\User::class,2)->create();
+        $createdTrainingTypes = factory(SET\TrainingType::class,5)->create([]);
+        $createdTrainings = factory(SET\Training::class,25)->create([]);
+        $n=0;
+        // Create User Trainings (completed and incomplete) Trainings with types
+        foreach ($createdUsers as $createdUser) {
+            foreach ($createdTrainings as $createdTraining) {
+                // Assign users to trainings (both incomplete and completed)
+                if ($createdTraining->id % 2 == 0){
+                    $createdTraining->users()->attach($createdUser, ['due_date' => Carbon::tomorrow()->format('Y-m-d'),
+                      'author_id'=>1, 'completed_date'=>null]);
+                } else {
+                    $createdTraining->users()->attach($createdUser, ['due_date' => Carbon::tomorrow()->format('Y-m-d'),
+                      'author_id'=>1, 'completed_date'=>Carbon::yesterday()->format('Y-m-d')]);
+                }
+                // Associating trainingtype to 2/3 Trainings
+                if ($createdTraining->id % 3 != 0){
+                    if (++$n > $createdTrainingTypes->count()) {$n=1;}
+                    // Associating trainingtype to a Training
+                    $createdTraining->trainingType()->associate($createdTrainingTypes->where('id',$n)->first());
+                    $createdTraining->save();
+                }
+            }
+        }
+        // Make method call and evaluate returned values
+        foreach ($createdUsers as $createdUser) {
+            $trainings = $createdUser->assignedTrainings()->get();
+            $this->assertEquals($trainings->count(),$createdTrainings->count());
+            // Make method call
+            $user_training_types = with(new UserController)->getUserTrainingTypes($trainings);
+
+            $this->assertEquals(gettype($user_training_types),'array');
+            $training_user_types = $user_training_types[0]; // List of the user's training types
+            $training_blocks = $user_training_types[1]; // List of training block titles for user
+            $this->assertTrue(is_array($training_user_types));
+            $this->assertTrue(is_array($training_blocks));
+            // Ensure each user training has has proper type
+            $this->assertEquals(count($training_user_types),$createdTrainings->count());
+            $this->assertEquals(count(array_unique($training_user_types)),$createdTrainingTypes->count()+2);
+            foreach ($createdTrainingTypes as $createdTrainingType) {
+                $this->assertTrue(is_int(array_search($createdTrainingType->name,$training_user_types)));
+            }
+            $this->assertTrue(is_int(array_search("Scheduled",$training_user_types)));
+            $this->assertTrue(is_int(array_search("Miscellaneous",$training_user_types)));
+            // Ensure training block titles exists (Scheduled, XXXs, Miscellaneous)
+            $this->assertEquals(count($training_blocks),$createdTrainingTypes->count()+2);
+            $this->assertEquals(array_search("Scheduled",$training_blocks),'AAA', true);
+            $this->assertEquals(array_search("Miscellaneous",$training_blocks),'999', true);
+            $this->assertEquals(array_pop($training_blocks), 'Miscellaneous');  // last array element
+            $this->assertEquals(array_shift($training_blocks), 'Scheduled');  // first array element
+        }
     }
 }
