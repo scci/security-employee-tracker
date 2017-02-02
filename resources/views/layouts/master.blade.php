@@ -27,6 +27,11 @@
 
     <script type="text/javascript" src="{{ url('/js/lib.js') }}"></script>
     <script type="text/javascript" src="{{ url('/js/custom.js') }}"></script>
+
+    <!--bring arrow_drop_down closer to dropdown-button -->
+    <style>
+        i.custom {margin-left: 0px;}
+    </style>
 </head>
 <body>
     <header class="header @can('view')handle-action-item-sidebar @endcan">

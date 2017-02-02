@@ -50,6 +50,9 @@ $(document).ready(function(){
     $(".delete-training").click(function(){
         deleteRecord(this, "training");
     });
+    $(".delete-training-type").click(function(){
+        deleteRecord(this, "trainingtype");
+    });
     $(".delete-training-user").click(function(){
         deleteRecord(this, "training-user");
     });

@@ -37,7 +37,7 @@ $factory->define(SET\TrainingType::class, function (Faker\Generator $faker) {
         'name'           => $faker->text(50),
         'description'    => $faker->text(120),
         'sidebar'        => rand(0, 1),
-        'status'         => rand(0, 1),
+        'status'         => 1,
     ];
 });
 
