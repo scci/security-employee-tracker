@@ -58,7 +58,7 @@ class RenewTraining extends Command
     {
         $trainingUsers = TrainingUser::with('user', 'training')
             ->where('due_date', '<', Carbon::today())
-            ->where('stop_renewal', 0)
+            ->where('renews_in','>',0)  // Training is renewed (positive renews_in)
             ->activeUsers()
             ->orderBy(DB::raw('CASE WHEN completed_date IS NULL THEN 0 ELSE 1 END'))
             ->orderBy('completed_date', 'desc')
@@ -94,9 +94,10 @@ class RenewTraining extends Command
             return true;
         }
 
+        // Where due_date is in future or withing past renewal period
         $trainingRecord = TrainingUser::where('training_id', $trainingUser->training_id)
             ->where('user_id', $trainingUser->user_id)
-            ->where('due_date', '>', Carbon::today())
+            ->where('due_date', '>', Carbon::today()->subDays($trainingUser->training->renews_in))
             ->get();
 
         return !$trainingRecord->isEmpty();

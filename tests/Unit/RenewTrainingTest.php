@@ -5,6 +5,7 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Console\Commands\RenewTraining;
 use SET\Events\TrainingAssigned;
 use SET\Training;
+use SET\TrainingUser;
 use SET\User;
 
 class RenewTrainingTest extends TestCase
@@ -18,15 +19,18 @@ class RenewTrainingTest extends TestCase
 
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
+        $this->assertCount(0, TrainingUser::all(),'Should be no pre-existing user trainings');
         $training->users()->attach($user, [
             'author_id'      => $user->first()->id,
             'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
             'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d'),
         ]);
+        $this->assertCount(1, TrainingUser::all(),'Should only be one user training');
 
         $trainingUser = (new RenewTraining())->handle()->getList();
 
         $this->assertCount(1, $trainingUser);
+        $this->assertCount(2, TrainingUser::all(),'Should be a new second user training');
     }
 
     /** @test */
@@ -133,23 +137,48 @@ class RenewTrainingTest extends TestCase
         $this->assertCount(0, $trainingUser);
     }
 
-    /** @test */
-    public function it_does_not_renew_if_previous_training_has_been_marked_not_to_renew()
+    /** @test
+     * Issue appeared creating a new renewed training even though the renewed
+     * training had already been completed.
+     * However this is/was because of conditions
+     *    1. The stop_renewal on the evaluated Training User is 'null'
+     *    2. The due_date on the evaluated Training User is in the past
+     */
+    public function it_does_not_renew_if_completed_with_stop_renewal_as_null()
     {
-        $this->doesntExpectEvents(TrainingAssigned::class);
+        $this->expectsEvents(TrainingAssigned::class);
 
-        $training = factory(Training::class)->create(['renews_in' => 300]);
+        $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
+        $this->assertCount(0, TrainingUser::all(),'Should be no existing user trainings');
 
+        // Create Prior user training; ensure completed date causes new due_date for today/past (over 365)
         $training->users()->attach($user, [
             'author_id'      => $user->first()->id,
-            'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
-            'completed_date' => Carbon::today()->subYear()->subYear()->format('Y-m-d'),
-            'stop_renewal'   => 1,
+            'due_date'       => Carbon::today()->subDays(365)->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subDays(365)->format('Y-m-d'),
         ]);
 
+        // Create new renewal
+        $this->assertCount(1, TrainingUser::all(), 'Should only be the initial user training.');
         $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(1, $trainingUser, 'User training should be renewed.');
+        $this->assertCount(2, TrainingUser::all(), 'Creates an additional user training.');
 
-        $this->assertCount(0, $trainingUser);
+        // Now mimic user completing current course
+        $latestTrainingUser = TrainingUser::where('id',TrainingUser::count())->first();
+        $latestTrainingUser->completed_date = Carbon::today()->subWeek(1)->format('Y-m-d');
+        $latestTrainingUser->stop_renewal = null; // Mimic problematic samples
+        $latestTrainingUser->save();
+
+        // The latest Training User now has two components that caused the false renewal problem
+        //   1. The stop_renewal = null
+        //   2. The due_date (prior completed_date + 365) is today or in past
+
+        // Subsequent RenewTraining should not create new training
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'User training should NOT be renewed.');
+        $this->assertCount(2, TrainingUser::all(), 'No change in user training.');
     }
+
 }
