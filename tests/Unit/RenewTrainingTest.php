@@ -19,18 +19,18 @@ class RenewTrainingTest extends TestCase
 
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
-        $this->assertCount(0, TrainingUser::all(), 'Should be no pre-existing user trainings');
+        $this->assertCount(0, TrainingUser::all(),'Should be no pre-existing user trainings');
         $training->users()->attach($user, [
             'author_id'      => $user->first()->id,
             'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
             'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d'),
         ]);
-        $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
+        $this->assertCount(1, TrainingUser::all(),'Should only be one user training');
 
         $trainingUser = (new RenewTraining())->handle()->getList();
 
         $this->assertCount(1, $trainingUser);
-        $this->assertCount(2, TrainingUser::all(), 'Should be a new second user training');
+        $this->assertCount(2, TrainingUser::all(),'Should be a new second user training');
     }
 
     /** @test */
@@ -150,7 +150,7 @@ class RenewTrainingTest extends TestCase
 
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
-        $this->assertCount(0, TrainingUser::all(), 'Should be no existing user trainings');
+        $this->assertCount(0, TrainingUser::all(),'Should be no existing user trainings');
 
         // Create Prior user training; ensure completed date causes new due_date for today/past (over 365)
         $training->users()->attach($user, [
@@ -166,7 +166,7 @@ class RenewTrainingTest extends TestCase
         $this->assertCount(2, TrainingUser::all(), 'Creates an additional user training.');
 
         // Now mimic user completing current course
-        $latestTrainingUser = TrainingUser::where('id', TrainingUser::count())->first();
+        $latestTrainingUser = TrainingUser::where('id',TrainingUser::count())->first();
         $latestTrainingUser->completed_date = Carbon::today()->subWeek(1)->format('Y-m-d');
         $latestTrainingUser->stop_renewal = null; // Mimic problematic samples
         $latestTrainingUser->save();
@@ -179,5 +179,27 @@ class RenewTrainingTest extends TestCase
         $trainingUser = (new RenewTraining())->handle()->getList();
         $this->assertCount(0, $trainingUser, 'User training should NOT be renewed.');
         $this->assertCount(2, TrainingUser::all(), 'No change in user training.');
+    }
+
+    /** @test */
+    public function it_does_not_renew_if_renews_in_is_null()
+    {
+        $this->doesntExpectEvents(TrainingAssigned::class);
+
+        $training = factory(Training::class)->create(['renews_in' => null]);
+        // dump($training);
+        $user = factory(User::class)->create();
+        $this->assertCount(0, TrainingUser::all(),'Should be no pre-existing user trainings');
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subYear()->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subYear()->subMonth()->format('Y-m-d'),
+        ]);
+        $this->assertCount(1, TrainingUser::all(),'Should only be one user training');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+
+        $this->assertCount(0, $trainingUser,'Should not be renewed.');
+        $this->assertCount(1, TrainingUser::all(),'Should not be a new user training');
     }
 }

@@ -69,4 +69,15 @@ class TrainingUser extends Model
 
         return parent::setAttribute($key, $value);
     }
+
+    /**
+     * @param $query
+     * @param $input
+     */
+    public function scopeRenewTrainings($query)
+    {
+        return $query->whereHas('training', function ($q) {
+            $q->where('renews_in','>',0);
+        });
+    }
 }
