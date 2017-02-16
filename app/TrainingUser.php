@@ -77,7 +77,7 @@ class TrainingUser extends Model
     public function scopeRenewTrainings($query)
     {
         return $query->whereHas('training', function ($q) {
-            $q->where('renews_in','>',0);
+            $q->where('renews_in', '>', 0);
         });
     }
 }
