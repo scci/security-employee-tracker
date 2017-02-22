@@ -114,6 +114,10 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         return new PHPUnit_Framework_TestResult;
     }
 
+    /**
+     * @param PHPUnit_Framework_TestSuite $suite
+     * @param array                       $arguments
+     */
     private function processSuiteFilters(PHPUnit_Framework_TestSuite $suite, array $arguments)
     {
         if (!$arguments['filter'] &&
@@ -180,7 +184,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             $suite->setbeStrictAboutChangesToGlobalState(true);
         }
 
-        if (is_integer($arguments['repeat'])) {
+        if (is_int($arguments['repeat'])) {
             $test = new PHPUnit_Extensions_RepeatedTest(
                 $suite,
                 $arguments['repeat'],
@@ -379,16 +383,10 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
             $codeCoverageReports = 0;
         }
 
-        if ($codeCoverageReports > 0) {
-            if (!$this->runtime->canCollectCodeCoverage()) {
-                $this->writeMessage('Error', 'No code coverage driver is available');
+        if ($codeCoverageReports > 0 && !$this->runtime->canCollectCodeCoverage()) {
+            $this->writeMessage('Error', 'No code coverage driver is available');
 
-                $codeCoverageReports = 0;
-            } elseif (!isset($arguments['whitelist']) && !$this->codeCoverageFilter->hasWhitelist()) {
-                $this->writeMessage('Error', 'No whitelist configured, no code coverage will be generated');
-
-                $codeCoverageReports = 0;
-            }
+            $codeCoverageReports = 0;
         }
 
         if (!$this->printer instanceof PHPUnit_Util_Log_TAP) {
@@ -405,20 +403,12 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 [SebastianBergmann\Comparator\Comparator::class]
             );
 
-            $codeCoverage->setAddUncoveredFilesFromWhitelist(
-                $arguments['addUncoveredFilesFromWhitelist']
-            );
-
             $codeCoverage->setCheckForUnintentionallyCoveredCode(
                 $arguments['strictCoverage']
             );
 
             $codeCoverage->setCheckForMissingCoversAnnotation(
                 $arguments['strictCoverage']
-            );
-
-            $codeCoverage->setProcessUncoveredFilesFromWhitelist(
-                $arguments['processUncoveredFilesFromWhitelist']
             );
 
             if (isset($arguments['forceCoversAnnotation'])) {
@@ -435,11 +425,55 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 $this->codeCoverageFilter->addDirectoryToWhitelist($arguments['whitelist']);
             }
 
-            $result->setCodeCoverage($codeCoverage);
+            if (isset($arguments['configuration'])) {
+                $filterConfiguration = $arguments['configuration']->getFilterConfiguration();
+
+                $codeCoverage->setAddUncoveredFilesFromWhitelist(
+                    $filterConfiguration['whitelist']['addUncoveredFilesFromWhitelist']
+                );
+
+                $codeCoverage->setProcessUncoveredFilesFromWhitelist(
+                    $filterConfiguration['whitelist']['processUncoveredFilesFromWhitelist']
+                );
+
+                foreach ($filterConfiguration['whitelist']['include']['directory'] as $dir) {
+                    $this->codeCoverageFilter->addDirectoryToWhitelist(
+                        $dir['path'],
+                        $dir['suffix'],
+                        $dir['prefix']
+                    );
+                }
+
+                foreach ($filterConfiguration['whitelist']['include']['file'] as $file) {
+                    $this->codeCoverageFilter->addFileToWhitelist($file);
+                }
+
+                foreach ($filterConfiguration['whitelist']['exclude']['directory'] as $dir) {
+                    $this->codeCoverageFilter->removeDirectoryFromWhitelist(
+                        $dir['path'],
+                        $dir['suffix'],
+                        $dir['prefix']
+                    );
+                }
+
+                foreach ($filterConfiguration['whitelist']['exclude']['file'] as $file) {
+                    $this->codeCoverageFilter->removeFileFromWhitelist($file);
+                }
+            }
+
+            if (!$this->codeCoverageFilter->hasWhitelist()) {
+                $this->writeMessage('Error', 'No whitelist configured, no code coverage will be generated');
+
+                $codeCoverageReports = 0;
+
+                unset($codeCoverage);
+            }
         }
 
-        if ($codeCoverageReports > 1) {
-            if (isset($arguments['cacheTokens'])) {
+        if (isset($codeCoverage)) {
+            $result->setCodeCoverage($codeCoverage);
+
+            if ($codeCoverageReports > 1 && isset($arguments['cacheTokens'])) {
                 $codeCoverage->setCacheTokens($arguments['cacheTokens']);
             }
         }
@@ -615,7 +649,7 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
         }
 
         if ($exit) {
-            if ($result->wasSuccessful()) {
+            if ($result->wasSuccessful(false)) {
                 if ($arguments['failOnRisky'] && !$result->allHarmless()) {
                     exit(self::FAILURE_EXIT);
                 }
@@ -1039,40 +1073,16 @@ class PHPUnit_TextUI_TestRunner extends PHPUnit_Runner_BaseTestRunner
                 $arguments['testdoxXMLFile'] = $loggingConfiguration['testdox-xml'];
             }
 
-            if ((isset($arguments['coverageClover']) ||
-                isset($arguments['coverageCrap4J']) ||
-                isset($arguments['coverageHtml']) ||
-                isset($arguments['coveragePHP']) ||
-                isset($arguments['coverageText']) ||
-                isset($arguments['coverageXml'])) &&
-                $this->runtime->canCollectCodeCoverage()) {
-                $filterConfiguration                             = $arguments['configuration']->getFilterConfiguration();
-                $arguments['addUncoveredFilesFromWhitelist']     = $filterConfiguration['whitelist']['addUncoveredFilesFromWhitelist'];
-                $arguments['processUncoveredFilesFromWhitelist'] = $filterConfiguration['whitelist']['processUncoveredFilesFromWhitelist'];
+            $testdoxGroupConfiguration = $arguments['configuration']->getTestdoxGroupConfiguration();
 
-                foreach ($filterConfiguration['whitelist']['include']['directory'] as $dir) {
-                    $this->codeCoverageFilter->addDirectoryToWhitelist(
-                        $dir['path'],
-                        $dir['suffix'],
-                        $dir['prefix']
-                    );
-                }
+            if (isset($testdoxGroupConfiguration['include']) &&
+                !isset($arguments['testdoxGroups'])) {
+                $arguments['testdoxGroups'] = $testdoxGroupConfiguration['include'];
+            }
 
-                foreach ($filterConfiguration['whitelist']['include']['file'] as $file) {
-                    $this->codeCoverageFilter->addFileToWhitelist($file);
-                }
-
-                foreach ($filterConfiguration['whitelist']['exclude']['directory'] as $dir) {
-                    $this->codeCoverageFilter->removeDirectoryFromWhitelist(
-                        $dir['path'],
-                        $dir['suffix'],
-                        $dir['prefix']
-                    );
-                }
-
-                foreach ($filterConfiguration['whitelist']['exclude']['file'] as $file) {
-                    $this->codeCoverageFilter->removeFileFromWhitelist($file);
-                }
+            if (isset($testdoxGroupConfiguration['exclude']) &&
+                !isset($arguments['testdoxExcludeGroups'])) {
+                $arguments['testdoxExcludeGroups'] = $testdoxGroupConfiguration['exclude'];
             }
         }
 

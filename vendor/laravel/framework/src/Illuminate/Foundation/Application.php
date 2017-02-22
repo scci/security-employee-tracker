@@ -25,7 +25,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    const VERSION = '5.3.28';
+    const VERSION = '5.3.30';
 
     /**
      * The base path for the Laravel installation.
@@ -130,7 +130,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
      *
      * @var string
      */
-    protected $namespace = null;
+    protected $namespace;
 
     /**
      * Create a new Illuminate application instance.
@@ -576,7 +576,7 @@ class Application extends Container implements ApplicationContract, HttpKernelIn
 
         // If the application has already booted, we will call this boot method on
         // the provider class so it has an opportunity to do its boot logic and
-        // will be ready for any usage by the developer's application logics.
+        // will be ready for any usage by this developer's application logic.
         if ($this->booted) {
             $this->bootProvider($provider);
         }

@@ -182,6 +182,11 @@ class Framework_AssertTest extends PHPUnit_Framework_TestCase
         $this->assertArraySubset(['a' => 'item a', 'c' => ['a2' => 'item a2']], $array);
         $this->assertArraySubset(['a' => 'item a', 'd' => ['a2' => ['b3' => 'item b3']]], $array);
 
+        $arrayAccessData = new ArrayObject($array);
+
+        $this->assertArraySubset(['a' => 'item a', 'c' => ['a2' => 'item a2']], $arrayAccessData);
+        $this->assertArraySubset(['a' => 'item a', 'd' => ['a2' => ['b3' => 'item b3']]], $arrayAccessData);
+
         try {
             $this->assertArraySubset(['a' => 'bad value'], $array);
         } catch (PHPUnit_Framework_AssertionFailedError $e) {
@@ -473,6 +478,39 @@ class Framework_AssertTest extends PHPUnit_Framework_TestCase
     }
 
     /**
+     * @covers PHPUnit_Framework_Assert::assertContains
+     */
+    public function testAssertStringContainsStringForUtf8()
+    {
+        $this->assertContains('oryginał', 'oryginał');
+
+        try {
+            $this->assertContains('ORYGINAŁ', 'oryginał');
+        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            return;
+        }
+
+        $this->fail();
+    }
+
+    /**
+     * @covers PHPUnit_Framework_Assert::assertContains
+     */
+    public function testAssertStringContainsStringForUtf8WhenIgnoreCase()
+    {
+        $this->assertContains('oryginał', 'oryginał', '', true);
+        $this->assertContains('ORYGINAŁ', 'oryginał', '', true);
+
+        try {
+            $this->assertContains('foo', 'oryginał', '', true);
+        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            return;
+        }
+
+        $this->fail();
+    }
+
+    /**
      * @covers            PHPUnit_Framework_Assert::assertNotContains
      * @expectedException PHPUnit_Framework_Exception
      */
@@ -562,6 +600,36 @@ class Framework_AssertTest extends PHPUnit_Framework_TestCase
 
         try {
             $this->assertNotContains('foo', 'foo');
+        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            return;
+        }
+
+        $this->fail();
+    }
+
+    /**
+     * @covers PHPUnit_Framework_Assert::assertNotContains
+     */
+    public function testAssertStringNotContainsStringForUtf8()
+    {
+        $this->assertNotContains('ORYGINAŁ', 'oryginał');
+
+        try {
+            $this->assertNotContains('oryginał', 'oryginał');
+        } catch (PHPUnit_Framework_AssertionFailedError $e) {
+            return;
+        }
+
+        $this->fail();
+    }
+
+    /**
+     * @covers PHPUnit_Framework_Assert::assertNotContains
+     */
+    public function testAssertStringNotContainsStringForUtf8WhenIgnoreCase()
+    {
+        try {
+            $this->assertNotContains('ORYGINAŁ', 'oryginał', '', true);
         } catch (PHPUnit_Framework_AssertionFailedError $e) {
             return;
         }
@@ -3445,7 +3513,9 @@ XML;
     {
         $this->assertThat(
             null,
-            $this->callback(function ($other) { return true; })
+            $this->callback(function ($other) {
+                return true;
+            })
         );
     }
 

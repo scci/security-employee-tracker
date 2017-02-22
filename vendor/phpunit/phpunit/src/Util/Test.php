@@ -379,8 +379,8 @@ class PHPUnit_Util_Test
      * @param string $className
      * @param string $methodName
      *
-     * @return array|Iterator when a data provider is specified and exists
-     *                        null           when no data provider is specified
+     * @return array When a data provider is specified and exists
+     *         null  When no data provider is specified
      *
      * @throws PHPUnit_Framework_Exception
      *
@@ -390,21 +390,18 @@ class PHPUnit_Util_Test
     {
         $reflector  = new ReflectionMethod($className, $methodName);
         $docComment = $reflector->getDocComment();
-        $data       = null;
 
-        if ($dataProviderData = self::getDataFromDataProviderAnnotation($docComment, $className, $methodName)) {
-            $data = $dataProviderData;
+        $data = self::getDataFromDataProviderAnnotation($docComment, $className, $methodName);
+
+        if ($data === null) {
+            $data = self::getDataFromTestWithAnnotation($docComment);
         }
 
-        if ($testWithData = self::getDataFromTestWithAnnotation($docComment)) {
-            $data = $testWithData;
+        if (is_array($data) && empty($data)) {
+            throw new PHPUnit_Framework_SkippedTestError;
         }
 
         if ($data !== null) {
-            if (is_object($data)) {
-                $data = iterator_to_array($data);
-            }
-
             foreach ($data as $key => $value) {
                 if (!is_array($value)) {
                     throw new PHPUnit_Framework_Exception(
@@ -477,6 +474,9 @@ class PHPUnit_Util_Test
 
                 if (is_array($data)) {
                     $result = array_merge($result, $data);
+                } elseif ($data instanceof \Iterator) {
+                    $data   = iterator_to_array($data);
+                    $result = array_merge($result, $data);
                 }
             }
 
@@ -495,6 +495,7 @@ class PHPUnit_Util_Test
     public static function getDataFromTestWithAnnotation($docComment)
     {
         $docComment = self::cleanUpMultiLineAnnotation($docComment);
+
         if (preg_match(self::REGEX_TEST_WITH, $docComment, $matches, PREG_OFFSET_CAPTURE)) {
             $offset            = strlen($matches[0][0]) + $matches[0][1];
             $annotationContent = substr($docComment, $offset);
@@ -618,7 +619,7 @@ class PHPUnit_Util_Test
             $numMatches = count($matches[0]);
 
             for ($i = 0; $i < $numMatches; ++$i) {
-                $annotations[$matches['name'][$i]][] = $matches['value'][$i];
+                $annotations[$matches['name'][$i]][] = (string) $matches['value'][$i];
             }
         }
 

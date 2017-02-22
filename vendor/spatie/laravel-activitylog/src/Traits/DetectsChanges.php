@@ -3,6 +3,7 @@
 namespace Spatie\Activitylog\Traits;
 
 use Illuminate\Database\Eloquent\Model;
+use Spatie\Activitylog\Exceptions\CouldNotLogChanges;
 
 trait DetectsChanges
 {
@@ -50,6 +51,27 @@ trait DetectsChanges
 
     public static function logChanges(Model $model): array
     {
-        return collect($model)->only($model->attributesToBeLogged())->toArray();
+        return collect($model->attributesToBeLogged())->mapWithKeys(
+            function ($attribute) use ($model) {
+                if (str_contains($attribute, '.')) {
+                    return self::getRelatedModelAttributeValue($model, $attribute);
+                }
+
+                return collect($model)->only($attribute);
+            }
+        )->toArray();
+    }
+
+    protected static function getRelatedModelAttributeValue(Model $model, string $attribute): array
+    {
+        if (substr_count($attribute, '.') > 1) {
+            throw CouldNotLogChanges::invalidAttribute($attribute);
+        }
+
+        list($relatedModelName, $relatedAttribute) = explode('.', $attribute);
+
+        $relatedModel = $model->$relatedModelName ?? $model->$relatedModelName();
+
+        return ["{$relatedModelName}.{$relatedAttribute}" => $relatedModel->$relatedAttribute];
     }
 }

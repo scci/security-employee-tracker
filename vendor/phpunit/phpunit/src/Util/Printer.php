@@ -46,7 +46,7 @@ class PHPUnit_Util_Printer
                 if (strpos($out, 'socket://') === 0) {
                     $out = explode(':', str_replace('socket://', '', $out));
 
-                    if (sizeof($out) != 2) {
+                    if (count($out) != 2) {
                         throw new PHPUnit_Framework_Exception;
                     }
 
@@ -108,7 +108,7 @@ class PHPUnit_Util_Printer
             }
         } else {
             if (PHP_SAPI != 'cli' && PHP_SAPI != 'phpdbg') {
-                $buffer = htmlspecialchars($buffer);
+                $buffer = htmlspecialchars($buffer, ENT_SUBSTITUTE);
             }
 
             print $buffer;
