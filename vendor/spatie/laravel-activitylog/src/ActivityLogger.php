@@ -3,11 +3,11 @@
 namespace Spatie\Activitylog;
 
 use Illuminate\Auth\AuthManager;
-use Illuminate\Contracts\Config\Repository;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Traits\Macroable;
-use Spatie\Activitylog\Exceptions\CouldNotLogActivity;
 use Spatie\Activitylog\Models\Activity;
+use Illuminate\Support\Traits\Macroable;
+use Illuminate\Contracts\Config\Repository;
+use Spatie\Activitylog\Exceptions\CouldNotLogActivity;
 
 class ActivityLogger
 {
@@ -183,6 +183,10 @@ class ActivityLogger
             $propertyName = substr($match, strpos($match, '.') + 1);
 
             $attributeValue = $activity->$attribute;
+
+            if (is_null($attributeValue)) {
+                return $match;
+            }
 
             $attributeValue = $attributeValue->toArray();
 

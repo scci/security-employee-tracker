@@ -620,7 +620,13 @@ class Validator implements ValidatorContract
     protected function passesOptionalCheck($attribute)
     {
         if ($this->hasRule($attribute, ['Sometimes'])) {
-            return array_key_exists($attribute, Arr::dot($this->data))
+            $data = Arr::dot($this->initializeAttributeOnData($attribute));
+
+            $data = array_merge($data, $this->extractValuesForWildcards(
+                $data, $attribute
+            ));
+
+            return array_key_exists($attribute, $data)
                 || in_array($attribute, array_keys($this->data));
         }
 
@@ -1332,8 +1338,10 @@ class Validator implements ValidatorContract
 
         $attributeData = $this->extractDataFromPath($explicitPath);
 
-        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $attributeName) {
-            return $key != $attribute && Str::is($attributeName, $key);
+        $pattern = str_replace('\*', '[^.]+', preg_quote($attributeName, '#'));
+
+        $data = Arr::where(Arr::dot($attributeData), function ($value, $key) use ($attribute, $attributeName, $pattern) {
+            return $key != $attribute && (bool) preg_match('#^'.$pattern.'\z#u', $key);
         });
 
         return ! in_array($value, array_values($data));
@@ -1835,9 +1843,9 @@ class Validator implements ValidatorContract
             return false;
         }
 
-        $date = DateTime::createFromFormat($parameters[0], $value);
+        $parsed = date_parse_from_format($parameters[0], $value);
 
-        return $date && $date->format($parameters[0]) === $value;
+        return $parsed['error_count'] === 0 && $parsed['warning_count'] === 0;
     }
 
     /**

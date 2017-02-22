@@ -1578,6 +1578,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
         // are. These attribute arrays must contain an "id" column previously placed
         // there by the developer as the manually determined key for these models.
         else {
+            if (empty($attributes)) {
+                return true;
+            }
+
             $query->insert($attributes);
         }
 
@@ -2975,7 +2979,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
          // when checking the field. We will just return the DateTime right away.
         if ($value instanceof DateTimeInterface) {
             return new Carbon(
-                $value->format('Y-m-d H:i:s.u'), $value->getTimeZone()
+                $value->format('Y-m-d H:i:s.u'), $value->getTimezone()
             );
         }
 
@@ -3551,12 +3555,10 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
     public function __call($method, $parameters)
     {
         if (in_array($method, ['increment', 'decrement'])) {
-            return call_user_func_array([$this, $method], $parameters);
+            return $this->$method(...$parameters);
         }
 
-        $query = $this->newQuery();
-
-        return call_user_func_array([$query, $method], $parameters);
+        return $this->newQuery()->$method(...$parameters);
     }
 
     /**
@@ -3568,9 +3570,7 @@ abstract class Model implements ArrayAccess, Arrayable, Jsonable, JsonSerializab
      */
     public static function __callStatic($method, $parameters)
     {
-        $instance = new static;
-
-        return call_user_func_array([$instance, $method], $parameters);
+        return (new static)->$method(...$parameters);
     }
 
     /**

@@ -10,17 +10,17 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
         '1d1b89d124cc9cb8219922c9d5569199' => __DIR__ . '/..' . '/hamcrest/hamcrest-php/hamcrest/Hamcrest.php',
-        '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
+        '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         'bd9634f2d41831496de0d3dfe4c94881' => __DIR__ . '/..' . '/symfony/polyfill-php56/bootstrap.php',
         'e91d0dc994644828154ae2387ede1ca8' => __DIR__ . '/..' . '/spatie/string/src/string_functions.php',
         'e7223560d890eab89cda23685e711e2c' => __DIR__ . '/..' . '/psy/psysh/src/Psy/functions.php',
-        'f18cc91337d49233e5754e93f3ed9ec3' => __DIR__ . '/..' . '/laravelcollective/html/src/helpers.php',
         '644eac6922bf02ccca749aef9ce048bb' => __DIR__ . '/..' . '/rachidlaasri/laravel-installer/src/functions.php',
-        '4a1f389d6ce373bda9e57857d3b61c84' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/helpers.php',
-        '72b1e3f4a2af9b30b3f137b3ec2057fc' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/helpers.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
+        'f18cc91337d49233e5754e93f3ed9ec3' => __DIR__ . '/..' . '/laravelcollective/html/src/helpers.php',
+        '4a1f389d6ce373bda9e57857d3b61c84' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/helpers.php',
+        '72b1e3f4a2af9b30b3f137b3ec2057fc' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -114,6 +114,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         ),
         'C' => 
         array (
+            'Cron\\' => 5,
             'Collective\\Html\\' => 16,
             'ClassPreloader\\' => 15,
             'Carbon\\' => 7,
@@ -317,6 +318,10 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         array (
             0 => __DIR__ . '/..' . '/maximebf/debugbar/src/DebugBar',
         ),
+        'Cron\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/mtdowling/cron-expression/src/Cron',
+        ),
         'Collective\\Html\\' => 
         array (
             0 => __DIR__ . '/..' . '/laravelcollective/html/src',
@@ -401,13 +406,6 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
             'Doctrine\\Common\\Collections\\' => 
             array (
                 0 => __DIR__ . '/..' . '/doctrine/collections/lib',
-            ),
-        ),
-        'C' => 
-        array (
-            'Cron' => 
-            array (
-                0 => __DIR__ . '/..' . '/mtdowling/cron-expression/src',
             ),
         ),
     );
@@ -521,6 +519,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'Barryvdh\\Debugbar\\Twig\\TokenParser\\StopwatchTokenParser' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/Twig/TokenParser/StopwatchTokenParser.php',
         'Carbon\\Carbon' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Carbon.php',
         'Carbon\\CarbonInterval' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/CarbonInterval.php',
+        'Carbon\\Exceptions\\InvalidDateException' => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon/Exceptions/InvalidDateException.php',
         'ClassPreloader\\ClassList' => __DIR__ . '/..' . '/classpreloader/classpreloader/src/ClassList.php',
         'ClassPreloader\\ClassLoader' => __DIR__ . '/..' . '/classpreloader/classpreloader/src/ClassLoader.php',
         'ClassPreloader\\ClassNode' => __DIR__ . '/..' . '/classpreloader/classpreloader/src/ClassNode.php',
@@ -624,10 +623,12 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'DeepCopy\\Exception\\CloneException' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Exception/CloneException.php',
         'DeepCopy\\Filter\\Doctrine\\DoctrineCollectionFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Filter/Doctrine/DoctrineCollectionFilter.php',
         'DeepCopy\\Filter\\Doctrine\\DoctrineEmptyCollectionFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Filter/Doctrine/DoctrineEmptyCollectionFilter.php',
+        'DeepCopy\\Filter\\Doctrine\\DoctrineProxyFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Filter/Doctrine/DoctrineProxyFilter.php',
         'DeepCopy\\Filter\\Filter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Filter/Filter.php',
         'DeepCopy\\Filter\\KeepFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Filter/KeepFilter.php',
         'DeepCopy\\Filter\\ReplaceFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Filter/ReplaceFilter.php',
         'DeepCopy\\Filter\\SetNullFilter' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Filter/SetNullFilter.php',
+        'DeepCopy\\Matcher\\Doctrine\\DoctrineProxyMatcher' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Matcher/Doctrine/DoctrineProxyMatcher.php',
         'DeepCopy\\Matcher\\Matcher' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Matcher/Matcher.php',
         'DeepCopy\\Matcher\\PropertyMatcher' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Matcher/PropertyMatcher.php',
         'DeepCopy\\Matcher\\PropertyNameMatcher' => __DIR__ . '/..' . '/myclabs/deep-copy/src/DeepCopy/Matcher/PropertyNameMatcher.php',
@@ -802,6 +803,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'Doctrine\\DBAL\\Driver\\PDOSqlite\\Driver' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOSqlite/Driver.php',
         'Doctrine\\DBAL\\Driver\\PDOSqlsrv\\Connection' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOSqlsrv/Connection.php',
         'Doctrine\\DBAL\\Driver\\PDOSqlsrv\\Driver' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOSqlsrv/Driver.php',
+        'Doctrine\\DBAL\\Driver\\PDOSqlsrv\\Statement' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOSqlsrv/Statement.php',
         'Doctrine\\DBAL\\Driver\\PDOStatement' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PDOStatement.php',
         'Doctrine\\DBAL\\Driver\\PingableConnection' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/PingableConnection.php',
         'Doctrine\\DBAL\\Driver\\ResultStatement' => __DIR__ . '/..' . '/doctrine/dbal/lib/Doctrine/DBAL/Driver/ResultStatement.php',
@@ -1865,6 +1867,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'Illuminate\\Mail\\Message' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Message.php',
         'Illuminate\\Mail\\SendQueuedMailable' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/SendQueuedMailable.php',
         'Illuminate\\Mail\\TransportManager' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/TransportManager.php',
+        'Illuminate\\Mail\\Transport\\ArrayTransport' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Transport/ArrayTransport.php',
         'Illuminate\\Mail\\Transport\\LogTransport' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Transport/LogTransport.php',
         'Illuminate\\Mail\\Transport\\MailgunTransport' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Transport/MailgunTransport.php',
         'Illuminate\\Mail\\Transport\\MandrillTransport' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Mail/Transport/MandrillTransport.php',
@@ -1886,6 +1889,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'Illuminate\\Notifications\\Events\\NotificationSending' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Notifications/Events/NotificationSending.php',
         'Illuminate\\Notifications\\Events\\NotificationSent' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Notifications/Events/NotificationSent.php',
         'Illuminate\\Notifications\\HasDatabaseNotifications' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Notifications/HasDatabaseNotifications.php',
+        'Illuminate\\Notifications\\Messages\\BroadcastMessage' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Notifications/Messages/BroadcastMessage.php',
         'Illuminate\\Notifications\\Messages\\DatabaseMessage' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Notifications/Messages/DatabaseMessage.php',
         'Illuminate\\Notifications\\Messages\\MailMessage' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Notifications/Messages/MailMessage.php',
         'Illuminate\\Notifications\\Messages\\NexmoMessage' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Notifications/Messages/NexmoMessage.php',
@@ -2704,7 +2708,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'PHPUnit_Framework_Constraint_TraversableContains' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/TraversableContains.php',
         'PHPUnit_Framework_Constraint_TraversableContainsOnly' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/TraversableContainsOnly.php',
         'PHPUnit_Framework_Constraint_Xor' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Constraint/Xor.php',
-        'PHPUnit_Framework_CoveredCodeNotExecutedException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/PHPUnit_Framework_CoveredCodeNotExecutedException.php',
+        'PHPUnit_Framework_CoveredCodeNotExecutedException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/CoveredCodeNotExecutedException.php',
         'PHPUnit_Framework_Error' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Error.php',
         'PHPUnit_Framework_Error_Deprecated' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Error/Deprecated.php',
         'PHPUnit_Framework_Error_Notice' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/Error/Notice.php',
@@ -2716,7 +2720,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'PHPUnit_Framework_IncompleteTestCase' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/IncompleteTestCase.php',
         'PHPUnit_Framework_IncompleteTestError' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/IncompleteTestError.php',
         'PHPUnit_Framework_InvalidCoversTargetException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/InvalidCoversTargetException.php',
-        'PHPUnit_Framework_MissingCoversAnnotationException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/PHPUnit_Framework_MissingCoversAnnotationException.php',
+        'PHPUnit_Framework_MissingCoversAnnotationException' => __DIR__ . '/..' . '/phpunit/phpunit/src/Framework/MissingCoversAnnotationException.php',
         'PHPUnit_Framework_MockObject_BadMethodCallException' => __DIR__ . '/..' . '/phpunit/phpunit-mock-objects/src/Framework/MockObject/Exception/BadMethodCallException.php',
         'PHPUnit_Framework_MockObject_Builder_Identity' => __DIR__ . '/..' . '/phpunit/phpunit-mock-objects/src/Framework/MockObject/Builder/Identity.php',
         'PHPUnit_Framework_MockObject_Builder_InvocationMocker' => __DIR__ . '/..' . '/phpunit/phpunit-mock-objects/src/Framework/MockObject/Builder/InvocationMocker.php',
@@ -3827,6 +3831,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'SET\\Http\\Controllers\\NoteController' => __DIR__ . '/../..' . '/app/Http/Controllers/NoteController.php',
         'SET\\Http\\Controllers\\SettingController' => __DIR__ . '/../..' . '/app/Http/Controllers/SettingController.php',
         'SET\\Http\\Controllers\\TrainingController' => __DIR__ . '/../..' . '/app/Http/Controllers/TrainingController.php',
+        'SET\\Http\\Controllers\\TrainingTypeController' => __DIR__ . '/../..' . '/app/Http/Controllers/TrainingTypeController.php',
         'SET\\Http\\Controllers\\TrainingUserController' => __DIR__ . '/../..' . '/app/Http/Controllers/TrainingUserController.php',
         'SET\\Http\\Controllers\\TravelController' => __DIR__ . '/../..' . '/app/Http/Controllers/TravelController.php',
         'SET\\Http\\Controllers\\UserController' => __DIR__ . '/../..' . '/app/Http/Controllers/UserController.php',
@@ -3844,6 +3849,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'SET\\Http\\Requests\\Request' => __DIR__ . '/../..' . '/app/Http/Requests/Request.php',
         'SET\\Http\\Requests\\StoreNoteRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreNoteRequest.php',
         'SET\\Http\\Requests\\StoreTrainingRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreTrainingRequest.php',
+        'SET\\Http\\Requests\\StoreTrainingTypeRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreTrainingTypeRequest.php',
         'SET\\Http\\Requests\\StoreUserRequest' => __DIR__ . '/../..' . '/app/Http/Requests/StoreUserRequest.php',
         'SET\\Http\\Requests\\TrainingUserRequest' => __DIR__ . '/../..' . '/app/Http/Requests/TrainingUserRequest.php',
         'SET\\Http\\Requests\\TravelRequest' => __DIR__ . '/../..' . '/app/Http/Requests/TravelRequest.php',
@@ -3956,6 +3962,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'Spatie\\Activitylog\\ActivitylogServiceProvider' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/ActivitylogServiceProvider.php',
         'Spatie\\Activitylog\\CleanActivitylogCommand' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/CleanActivitylogCommand.php',
         'Spatie\\Activitylog\\Exceptions\\CouldNotLogActivity' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/Exceptions/CouldNotLogActivity.php',
+        'Spatie\\Activitylog\\Exceptions\\CouldNotLogChanges' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/Exceptions/CouldNotLogChanges.php',
         'Spatie\\Activitylog\\Exceptions\\InvalidConfiguration' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/Exceptions/InvalidConfiguration.php',
         'Spatie\\Activitylog\\Models\\Activity' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/Models/Activity.php',
         'Spatie\\Activitylog\\Traits\\CausesActivity' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/Traits/CausesActivity.php',
