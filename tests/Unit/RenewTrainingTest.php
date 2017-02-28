@@ -60,7 +60,6 @@ class RenewTrainingTest extends TestCase
         $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
     }
 
-
     /** @test Test renewedAlready() method with a null completed_date */
     public function it_doesnt_renew_if_renewedAlready_training_still_outstanding()
     {
@@ -136,7 +135,7 @@ class RenewTrainingTest extends TestCase
     /** @test Test renewedAlready() method with a even completed_date value*/
     public function it_doesnt_renew_if_renewedAlready_match_completed_date_offset()
     {
-      $this->doesntExpectEvents(TrainingAssigned::class);
+        $this->doesntExpectEvents(TrainingAssigned::class);
 
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
