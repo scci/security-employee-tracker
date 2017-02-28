@@ -12,6 +12,151 @@ class RenewTrainingTest extends TestCase
 {
     use DatabaseTransactions;
 
+    /** @test Test a False timeToRenew() call */
+    public function it_doesnt_renew_before_timeToRenew()
+    {
+        $this->doesntExpectEvents(TrainingAssigned::class);
+
+        $training = factory(Training::class)->create(['renews_in' => 365]);
+        $user = factory(User::class)->create();
+        $this->assertCount(0, TrainingUser::all(), 'Should be no pre-existing user trainings');
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subday(365)->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subday(335)->format('Y-m-d'), // at with offset
+        ]);
+        $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'Should be no new user training');
+        $this->assertCount(1, TrainingUser::all(), 'Should still only be one user training');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'Should be no new user training');
+        $this->assertCount(1, TrainingUser::all(), 'Should still only be one user training');
+    }
+
+    /** @test Test a True timeToRenew() call */
+    public function it_renews_if_timeToRenew()
+    {
+        $this->expectsEvents(TrainingAssigned::class);
+
+        $training = factory(Training::class)->create(['renews_in' => 365]);
+        $user = factory(User::class)->create();
+        $this->assertCount(0, TrainingUser::all(), 'Should be no pre-existing user trainings');
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subday(365)->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subday(336)->format('Y-m-d'),  // Withing the offset
+        ]);
+        $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(1, $trainingUser, 'Should be new user training');
+        $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'No new user training');
+        $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
+    }
+
+
+    /** @test Test renewedAlready() method with a null completed_date */
+    public function it_doesnt_renew_if_renewedAlready_training_still_outstanding()
+    {
+        $this->doesntExpectEvents(TrainingAssigned::class);
+
+        $training = factory(Training::class)->create(['renews_in' => 365]);
+        $user = factory(User::class)->create();
+        $this->assertCount(0, TrainingUser::all(), 'Should be no pre-existing user trainings');
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subday(365)->format('Y-m-d'),
+            'completed_date' => null,
+        ]);
+        $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'Should be no new user training');
+        $this->assertCount(1, TrainingUser::all(), 'Should still only be one user training');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'Should be no new user training');
+        $this->assertCount(1, TrainingUser::all(), 'Should still only be one user training');
+    }
+
+    /** @test Test renewedAlready() method with a valid completed_date value*/
+    public function it_renews_if_renewedAlready_has_completed_date()
+    {
+        $this->expectsEvents(TrainingAssigned::class);
+
+        $training = factory(Training::class)->create(['renews_in' => 365]);
+        $user = factory(User::class)->create();
+        $this->assertCount(0, TrainingUser::all(), 'Should be no pre-existing user trainings');
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subday(365)->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subday(500)->format('Y-m-d'), // way before offset
+        ]);
+        $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(1, $trainingUser, 'Should be new user training');
+        $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'No new user training');
+        $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
+    }
+
+    /** @test Test renewedAlready() method with a past completed_date value*/
+    public function it_renews_if_renewedAlready_past_completed_date_offset()
+    {
+        $this->expectsEvents(TrainingAssigned::class);
+
+        $training = factory(Training::class)->create(['renews_in' => 365]);
+        $user = factory(User::class)->create();
+        $this->assertCount(0, TrainingUser::all(), 'Should be no pre-existing user trainings');
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subday(365)->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subday(336)->format('Y-m-d'), // day before offset
+        ]);
+        $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(1, $trainingUser, 'Should be new user training');
+        $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'No new user training');
+        $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
+    }
+
+    /** @test Test renewedAlready() method with a even completed_date value*/
+    public function it_doesnt_renew_if_renewedAlready_match_completed_date_offset()
+    {
+      $this->doesntExpectEvents(TrainingAssigned::class);
+
+        $training = factory(Training::class)->create(['renews_in' => 365]);
+        $user = factory(User::class)->create();
+        $this->assertCount(0, TrainingUser::all(), 'Should be no pre-existing user trainings');
+        $training->users()->attach($user, [
+            'author_id'      => $user->first()->id,
+            'due_date'       => Carbon::today()->subday(365)->format('Y-m-d'),
+            'completed_date' => Carbon::today()->subday(335)->format('Y-m-d'), // day of offset
+        ]);
+        $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'No new user training');
+        $this->assertCount(1, TrainingUser::all(), 'Still user trainings');
+
+        $trainingUser = (new RenewTraining())->handle()->getList();
+        $this->assertCount(0, $trainingUser, 'No new user training');
+        $this->assertCount(1, TrainingUser::all(), 'Still user trainings');
+    }
+
     /** @test */
     public function it_renews_training_when_it_is_time_to_renew()
     {
@@ -187,7 +332,6 @@ class RenewTrainingTest extends TestCase
         $this->doesntExpectEvents(TrainingAssigned::class);
 
         $training = factory(Training::class)->create(['renews_in' => null]);
-        // dump($training);
         $user = factory(User::class)->create();
         $this->assertCount(0, TrainingUser::all(), 'Should be no pre-existing user trainings');
         $training->users()->attach($user, [
