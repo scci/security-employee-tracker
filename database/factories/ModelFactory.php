@@ -18,6 +18,7 @@ $factory->define(SET\User::class, function (Faker\Generator $faker) {
         'nickname'      => $faker->firstName,
         'last_name'     => $faker->lastName,
         'email'         => $faker->email,
+        'phone'         => $faker->phoneNumber,
         'status'        => 'active',
         'username'      => $faker->unique()->userName,
         'password'      => $faker->password,
@@ -26,15 +27,15 @@ $factory->define(SET\User::class, function (Faker\Generator $faker) {
 
 $factory->define(SET\Training::class, function (Faker\Generator $faker) {
     return [
-       'name'        => $faker->text(25),
-       'renews_in'   => rand(30, 400),
+       'name'        => $faker->text(5).' training '.$faker->text(15),
+       'renews_in'   => $faker->randomElement($array = array ('90','180','365')),
        'description' => $faker->text(),
    ];
 });
 
 $factory->define(SET\TrainingType::class, function (Faker\Generator $faker) {
     return [
-        'name'           => $faker->text(50),
+        'name'           => $faker->text(5).' type '.$faker->text(15),
         'description'    => $faker->text(120),
         'sidebar'        => rand(0, 1),
         'status'         => 1,
@@ -43,7 +44,7 @@ $factory->define(SET\TrainingType::class, function (Faker\Generator $faker) {
 
 $factory->define(SET\Duty::class, function (Faker\Generator $faker) {
     return [
-        'name'        => $faker->text(25),
+        'name'        => $faker->catchphrase,
         'cycle'       => 'weekly',
         'description' => $faker->text(),
         'has_groups'  => 0,
@@ -52,7 +53,7 @@ $factory->define(SET\Duty::class, function (Faker\Generator $faker) {
 
 $factory->define(SET\Group::class, function (Faker\Generator $faker) {
     return [
-       'name'        => $faker->text(25),
+       'name'        =>  $faker->text(5).' grp '.$faker->text(15),
        'closed_area' => 0,
    ];
 });
@@ -67,7 +68,7 @@ $factory->define(SET\Log::class, function (Faker\Generator $faker) use ($factory
 
 $factory->define(SET\News::class, function (Faker\Generator $faker) use ($factory) {
     return [
-        'title'        => $faker->text(25),
+        'title'        => $faker->text(5).' news '.$faker->text(15),
         'description'  => $faker->text(),
         'author_id'    => $factory->create(SET\User::class)->id,
         'publish_date' => $faker->date(),
@@ -76,14 +77,36 @@ $factory->define(SET\News::class, function (Faker\Generator $faker) use ($factor
     ];
 });
 
+$factory->defineAs(SET\News::class, 'seeder', function (Faker\Generator $faker) use ($factory) {
+    return [
+        'title'        => $faker->text(5).' news '.$faker->text(rand(30,90)),
+        'description'  => $faker->text(),
+        'author_id'    => $faker->randomDigitNotNull(),
+        'publish_date' => $faker->date(),
+        'expire_date'  => null,
+        'send_email'   => rand(0,1),
+    ];
+});
+
 $factory->define(SET\Note::class, function (Faker\Generator $faker) use ($factory) {
     return [
-        'title'     => $faker->text(25),
+        'title'     => $faker->text(5).' note '.$faker->text(30),
         'comment'   => $faker->text(),
         'author_id' => $factory->create(SET\User::class)->id,
         'user_id'   => $factory->create(SET\User::class)->id,
         'alert'     => 0,
         'private'   => 0,
+    ];
+});
+
+$factory->defineAs(SET\Note::class, 'seeder',function (Faker\Generator $faker) use ($factory) {
+    return [
+        'title'     => $faker->text(5).' note '.$faker->text(15),
+        'comment'   => $faker->text(),
+        'author_id' => $faker->randomDigitNotNull(),
+        'user_id'   => $faker->randomDigitNotNull(),
+        'alert'     => rand(0,1),
+        'private'   => rand(0,1),
     ];
 });
 
@@ -110,6 +133,18 @@ $factory->define(SET\Travel::class, function (Faker\Generator $faker) use ($fact
     ];
 });
 
+$factory->defineAs(SET\Travel::class, 'seeder', function (Faker\Generator $faker) use ($factory) {
+    return [
+        'comment'     => $faker->text(),
+        'author_id'   => $faker->randomDigitNotNull(),
+        'user_id'     => $faker->randomDigitNotNull(),
+        'location'    => $faker->city.', '.$faker->stateAbbr,
+        'leave_date'  => $faker->date(),
+        'return_date' => $faker->date('Y-m-d', '+ 2 weeks'),
+        'brief_date'  => $faker->date(),
+    ];
+});
+
 $factory->define(SET\Visit::class, function (Faker\Generator $faker) use ($factory) {
     return [
         'smo_code'        => $faker->word.$faker->randomNumber(),
@@ -120,6 +155,19 @@ $factory->define(SET\Visit::class, function (Faker\Generator $faker) use ($facto
         'expiration_date' => $faker->date('Y-m-d', '+ 2 Months'),
         'author_id'       => $factory->create(SET\User::class)->id,
         'user_id'         => $factory->create(SET\User::class)->id,
+    ];
+});
+
+$factory->defineAs(SET\Visit::class, 'seeder', function (Faker\Generator $faker) use ($factory) {
+    return [
+        'smo_code'        => $faker->word.$faker->randomNumber(),
+        'comment'         => $faker->text(),
+        'poc'             => $faker->name(),
+        'phone'           => $faker->phoneNumber,
+        'visit_date'      => $faker->date(),
+        'expiration_date' => $faker->date('Y-m-d', '+ 2 Months'),
+        'author_id'       => $faker->randomDigitNotNull(),
+        'user_id'         => $faker->randomDigitNotNull(),
     ];
 });
 
