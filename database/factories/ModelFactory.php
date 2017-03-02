@@ -28,7 +28,7 @@ $factory->define(SET\User::class, function (Faker\Generator $faker) {
 $factory->define(SET\Training::class, function (Faker\Generator $faker) {
     return [
        'name'        => $faker->text(5).' training '.$faker->text(15),
-       'renews_in'   => $faker->randomElement($array = array ('90','180','365')),
+       'renews_in'   => $faker->randomElement($array = ['90', '180', '365']),
        'description' => $faker->text(),
    ];
 });
@@ -53,7 +53,7 @@ $factory->define(SET\Duty::class, function (Faker\Generator $faker) {
 
 $factory->define(SET\Group::class, function (Faker\Generator $faker) {
     return [
-       'name'        =>  $faker->text(5).' grp '.$faker->text(15),
+       'name'        => $faker->text(5).' grp '.$faker->text(15),
        'closed_area' => 0,
    ];
 });
@@ -79,12 +79,12 @@ $factory->define(SET\News::class, function (Faker\Generator $faker) use ($factor
 
 $factory->defineAs(SET\News::class, 'seeder', function (Faker\Generator $faker) use ($factory) {
     return [
-        'title'        => $faker->text(5).' news '.$faker->text(rand(30,90)),
+        'title'        => $faker->text(5).' news '.$faker->text(rand(30, 90)),
         'description'  => $faker->text(),
         'author_id'    => $faker->randomDigitNotNull(),
         'publish_date' => $faker->date(),
         'expire_date'  => null,
-        'send_email'   => rand(0,1),
+        'send_email'   => rand(0, 1),
     ];
 });
 
@@ -99,14 +99,14 @@ $factory->define(SET\Note::class, function (Faker\Generator $faker) use ($factor
     ];
 });
 
-$factory->defineAs(SET\Note::class, 'seeder',function (Faker\Generator $faker) use ($factory) {
+$factory->defineAs(SET\Note::class, 'seeder', function (Faker\Generator $faker) use ($factory) {
     return [
         'title'     => $faker->text(5).' note '.$faker->text(15),
         'comment'   => $faker->text(),
         'author_id' => $faker->randomDigitNotNull(),
         'user_id'   => $faker->randomDigitNotNull(),
-        'alert'     => rand(0,1),
-        'private'   => rand(0,1),
+        'alert'     => rand(0, 1),
+        'private'   => rand(0, 1),
     ];
 });
 
