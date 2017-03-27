@@ -12,8 +12,8 @@ use SET\Duty;
 use SET\Group;
 use SET\Handlers\Excel\JpasImport;
 use SET\Http\Requests\StoreUserRequest;
-use SET\User;
 use SET\Training;
+use SET\User;
 
 /**
  * Class UserController.
@@ -74,8 +74,8 @@ class UserController extends Controller
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function show($userId, $sectionId=null)
-    {        
+    public function show($userId, $sectionId = null)
+    {
         $user = User::with(['subordinates' => function ($query) {
             $query->active();
         },
@@ -89,8 +89,8 @@ class UserController extends Controller
 
         $user['clearance'] = $this->spellOutClearance($user['clearance']);
         $user['access_level'] = $this->spellOutClearance($user['access_level']);
-      
-        $trainings = $this->getUserTrainings($user, $sectionId);        
+
+        $trainings = $this->getUserTrainings($user, $sectionId);
         $user_training_types = $this->getUserTrainingTypes($trainings);
         $training_user_types = $user_training_types[0]; // List of the user's training types
         $training_blocks = $user_training_types[1]; // List of training block titles for user
@@ -167,10 +167,10 @@ class UserController extends Controller
     /**
      * Get all the scheduled trainings for the user and either the most recent completed
      * trainings or all completed trainings for the desired training type based on data values.
-     * 
+     *
      * @param $user
      * @param $data
-     * 
+     *
      * @return array trainings
      */
     private function getUserTrainings($user, $sectionId)
@@ -181,22 +181,23 @@ class UserController extends Controller
                                 ->whereNull('completed_date');
         $recentCompletedTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
                                     ->whereNotNull('completed_date')->orderBy('completed_date', 'DESC')->groupBy('training_id');
-        
+
         // If the user clicks the showAll button for a particular type of training,
-        // show all the trainings completed by that user for that training type.           
+        // show all the trainings completed by that user for that training type.
         if ($sectionId != null) {
             $selectedTraining = Training::trainingByType($sectionId)->get()->pluck('id')->toArray();
-            
+
             $completedTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
                                     ->whereIn('training_id', $selectedTraining);
-            
+
             $trainings = $scheduledTrainings->union($completedTrainings)->union($recentCompletedTrainings)->get();
         } else {
             $trainings = $scheduledTrainings->union($recentCompletedTrainings)->get();
-        } 
+        }
+
         return $trainings;
     }
-    
+
     /**
      * @param $trainings[]
      * From the User's trainings, a list of the training types is determined and
@@ -308,5 +309,4 @@ class UserController extends Controller
 
         return $clearance;
     }
-    
 }

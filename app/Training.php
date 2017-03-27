@@ -57,18 +57,18 @@ class Training extends Model
     {
         return $this->belongsTo('SET\TrainingType', 'training_type_id'); // One To Many (Inverse)
     }
-   
+
     /**
-     * 
      * @param type $query
      * @param type $type
+     *
      * @return type Training
-     * 
+     *
      * Get the training for the specified training_type
      */
     public function scopeTrainingByType($query, $type)
     {
-        return $query->whereHas('trainingType', function ($q) use($type) {
+        return $query->whereHas('trainingType', function ($q) use ($type) {
             $q->where('name', $type);
         });
     }
