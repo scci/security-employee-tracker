@@ -22,12 +22,12 @@ class EvalDbSeeder extends Seeder
             'created_at'                                           => Carbon\Carbon::today()->addDays(-2), ]); // audit users
         $supervisorID = $supervisors->first()->id;
         $supervisors = factory(SET\User::class, rand(10, 10))->create(['role' => '', 'status' => 'active',
-            'created_at'                                                     => Carbon\Carbon::today()->addWeeks(-9),
-            'supervisor_id'                                                  => $supervisorID,
-            'elig_date'                                                      => Carbon\Carbon::today()->addMonths(-6)->format('Y-m-d'),
-            'clearance'                                                      => 'interim secret',
-            'inv'                                                            => 'N/A',
-            'inv_close'                                                      => null,
+            'created_at'                                                      => Carbon\Carbon::today()->addWeeks(-9),
+            'supervisor_id'                                                   => $supervisorID,
+            'elig_date'                                                       => Carbon\Carbon::today()->addMonths(-6)->format('Y-m-d'),
+            'clearance'                                                       => 'interim secret',
+            'inv'                                                             => 'N/A',
+            'inv_close'                                                       => null,
         ]); // Regular active users
         $supervisorIds = $supervisors->pluck('id')->toArray();
         $supervisorID2 = array_pop($supervisorIds);
@@ -43,8 +43,8 @@ class EvalDbSeeder extends Seeder
             ]); // Regular active users
         }
         factory(SET\User::class, 3)->create(['role' => '', 'status' => 'destroyed',
-          'destroyed_date'                        => Carbon\Carbon::tomorrow()->addDays(rand(0, 4)),
-          'created_at'                            => Carbon\Carbon::today()->addWeeks(-9), ]); // Regular destroyed users
+          'destroyed_date'                          => Carbon\Carbon::tomorrow()->addDays(rand(0, 4)),
+          'created_at'                              => Carbon\Carbon::today()->addWeeks(-9), ]); // Regular destroyed users
       factory(SET\User::class, 3)->create(['role' => '', 'status' => 'separated',
           'destroyed_date'                        => Carbon\Carbon::today()->addMonths(rand(3, 9)),
           'created_at'                            => Carbon\Carbon::today()->addWeeks(-9), ]); // Regular separated users

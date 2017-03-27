@@ -194,138 +194,70 @@ class UserControllerTest extends TestCase
      */
     public function it_shows_the_user_trainings_by_blocktype()
     {
-        // Create trainingtype objects        
+        // Create trainingtype objects
         $createdTrainingTypes = factory(SET\TrainingType::class, 5)->create();
-        
+
         // Create a non-admin user object
         $createdUser = factory(User::class)->create([]);
         $createdUserId = $createdUser->id;
-        
+
         // Logged in as the created user
         $this->actingAs($createdUser);
-        
+
         // Access the user page - No trainings have been assigned to user yet
         $this->call('GET', "user/$createdUserId");
         $this->seeStatusCode(200); // OK status code
-        
+
         // Verify page components (views\user\show.blade.php)
         $this->seePageIs('/user/'.$createdUserId)
              ->dontSee('Scheduled Training') // Block Title
              ->dontSee('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
              ->dontSee('ADD TRAINING') // button
-             ->dontSee('SHOW ALL') // button 
+             ->dontSee('SHOW ALL') // button
              ->dontsee('Completed: '.Carbon::today()->format('Y-m-d'));
-        
+
         // For each training type, create a training and add the current user to it.
         foreach ($createdTrainingTypes as $trainingType) {
             $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $trainingType->id]);
             $trainingUser = factory(SET\TrainingUser::class)->create(
-                    ['training_id' => $createdTraining->id,
-                     'user_id' => $createdUserId,
-                     'due_date' => Carbon::tomorrow()->format('Y-m-d'),
-                     'author_id' => $this->user->id,
+                    ['training_id'    => $createdTraining->id,
+                     'user_id'        => $createdUserId,
+                     'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
+                     'author_id'      => $this->user->id,
                      'completed_date' => null, ]);
         }
-        
+
         $this->call('GET', "user/$createdUserId");
         $this->seeStatusCode(200); // OK status code
-        
+
         // Verify page components (views\user\show.blade.php)
         $this->seePageIs('/user/'.$createdUserId)
              ->see('Scheduled Training') // Block Title
              ->see('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
              ->dontSee('ADD TRAINING') // button
-             ->dontSee('SHOW ALL') // button 
+             ->dontSee('SHOW ALL') // button
              ->dontsee('Completed: '.Carbon::today()->format('Y-m-d'));
-        
+
         // Ensure the training type blocks are not displayed since the completed date is set to null.
         // Only Scheduled Training block is displayed in this case
         foreach ($createdTrainingTypes as $createdTrainingType) {
-            $this->dontSee($createdTrainingType->name.' Training'); 
+            $this->dontSee($createdTrainingType->name.' Training');
         }
-        
+
         // Ensure completed date is set for all trainings for all users
         foreach ($createdUser->assignedTrainings as $traininguser) {
             $this->see($traininguser->training->name);
-            $traininguser->completed_date = Carbon::today()->format('Y-m-d'); 
-            $createdUser->assignedTrainings()->save($traininguser);              
+            $traininguser->completed_date = Carbon::today()->format('Y-m-d');
+            $createdUser->assignedTrainings()->save($traininguser);
         }
-       
+
         // Reload the the page reflecting completed training
         $this->call('GET', "user/$createdUserId");
         $this->seeStatusCode(200); // OK status code
-        
+
         $this->seePageIs('/user/'.$createdUserId)
              ->dontSee('Scheduled Training') // Block Title
-             ->dontSee('ADD TRAINING') // button         
-             ->see('SHOW ALL') // Button
-             ->see('Completed: '.Carbon::today()->format('Y-m-d')); // Field
-        
-        // Ensure the training type blocks are displayed since all trainings are marked completed
-        foreach ($createdTrainingTypes as $createdTrainingType) {
-            $this->see($createdTrainingType->name.' Training'); 
-        }  
-    }
-    
-    /**
-     * @test
-     */
-    public function it_shows_the_user_trainings_by_blocktype_for_admin()
-    {
-        // Create trainingtype objects        
-        $createdTrainingTypes = factory(SET\TrainingType::class, 5)->create();
-        
-        // For each training type, create a training and add the admin user to it.
-        foreach ($createdTrainingTypes as $trainingType) {
-            $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $trainingType->id]);
-            $trainingUser = factory(SET\TrainingUser::class)->create(
-                    ['training_id' => $createdTraining->id,
-                     'user_id' => $this->user->id,
-                     'due_date' => Carbon::tomorrow()->format('Y-m-d'),
-                     'author_id' => $this->user->id,
-                     'completed_date' => null, ]);
-        }       
-        
-        // Logged in as admin - Check that every scheduled training is listed
-        $this->actingAs($this->user);
-        $userId = $this->user->id;        
-        $this->call('GET', "user/$userId");
-        $this->seeStatusCode(200); // OK status code
-        
-        // Verify page components (views\user\show.blade.php)
-        $this->seePageIs('/user/'.$userId)
-             ->see('Scheduled Training') // Block Title
-             ->see('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
-             ->see('ADD TRAINING') // button
-             ->dontSee('SHOW ALL') // button 
-             ->dontsee('Completed: '.Carbon::today()->format('Y-m-d'));
-        
-        // Ensure the training type blocks are not displayed since the completed date is set to null.
-        // Only Scheduled Training block is displayed in this case
-        foreach ($createdTrainingTypes as $createdTrainingType) {
-            $this->dontSee($createdTrainingType->name.' Training'); 
-        }  
-        
-        // Ensure all the training names are displayed and then set the completed date to today
-        foreach ($this->user->assignedTrainings as $traininguser) {            
-            $this->see($traininguser->training->name);
-            $traininguser->completed_date = Carbon::today()->format('Y-m-d'); 
-            $this->user->assignedTrainings()->save($traininguser);
-        }
-        
-        // Ensure completed date is set for all trainings for all users
-        foreach ($this->user->assignedTrainings as $traininguser) {
-            $this->assertEquals($traininguser->completed_date, Carbon::today()->format('Y-m-d'));              
-        }
-       
-        // Reload the the page reflecting completed training
-        $this->call('GET', "user/$userId");
-        $this->seeStatusCode(200); // OK status code
-        
-        // Verify page components (views\user\show.blade.php)
-        $this->seePageIs('/user/'.$userId)
-             ->dontSee('Scheduled Training') // Block Title
-             ->dontSee('ADD TRAINING') // button         
+             ->dontSee('ADD TRAINING') // button
              ->see('SHOW ALL') // Button
              ->see('Completed: '.Carbon::today()->format('Y-m-d')); // Field
 
@@ -333,18 +265,85 @@ class UserControllerTest extends TestCase
         foreach ($createdTrainingTypes as $createdTrainingType) {
             $this->see($createdTrainingType->name.' Training');
         }
-        
-        // Add another set of trainings to the user with completed date set different past dates
-        for ($i=1; $i<4; $i++)
-        {
+    }
+
+    /**
+     * @test
+     */
+    public function it_shows_the_user_trainings_by_blocktype_for_admin()
+    {
+        // Create trainingtype objects
+        $createdTrainingTypes = factory(SET\TrainingType::class, 5)->create();
+
+        // For each training type, create a training and add the admin user to it.
+        foreach ($createdTrainingTypes as $trainingType) {
+            $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $trainingType->id]);
             $trainingUser = factory(SET\TrainingUser::class)->create(
-                        ['training_id' => $createdTraining->id,
-                         'user_id' => $this->user->id,
-                         'due_date' => Carbon::tomorrow()->format('Y-m-d'),
-                         'author_id' => $this->user->id,
-                         'completed_date' => Carbon::today()->subYear($i)->format('Y-m-d') ]);
+                    ['training_id'    => $createdTraining->id,
+                     'user_id'        => $this->user->id,
+                     'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
+                     'author_id'      => $this->user->id,
+                     'completed_date' => null, ]);
         }
-        
+
+        // Logged in as admin - Check that every scheduled training is listed
+        $this->actingAs($this->user);
+        $userId = $this->user->id;
+        $this->call('GET', "user/$userId");
+        $this->seeStatusCode(200); // OK status code
+
+        // Verify page components (views\user\show.blade.php)
+        $this->seePageIs('/user/'.$userId)
+             ->see('Scheduled Training') // Block Title
+             ->see('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
+             ->see('ADD TRAINING') // button
+             ->dontSee('SHOW ALL') // button
+             ->dontsee('Completed: '.Carbon::today()->format('Y-m-d'));
+
+        // Ensure the training type blocks are not displayed since the completed date is set to null.
+        // Only Scheduled Training block is displayed in this case
+        foreach ($createdTrainingTypes as $createdTrainingType) {
+            $this->dontSee($createdTrainingType->name.' Training');
+        }
+
+        // Ensure all the training names are displayed and then set the completed date to today
+        foreach ($this->user->assignedTrainings as $traininguser) {
+            $this->see($traininguser->training->name);
+            $traininguser->completed_date = Carbon::today()->format('Y-m-d');
+            $this->user->assignedTrainings()->save($traininguser);
+        }
+
+        // Ensure completed date is set for all trainings for all users
+        foreach ($this->user->assignedTrainings as $traininguser) {
+            $this->assertEquals($traininguser->completed_date, Carbon::today()->format('Y-m-d'));
+        }
+
+        // Reload the the page reflecting completed training
+        $this->call('GET', "user/$userId");
+        $this->seeStatusCode(200); // OK status code
+
+        // Verify page components (views\user\show.blade.php)
+        $this->seePageIs('/user/'.$userId)
+             ->dontSee('Scheduled Training') // Block Title
+             ->dontSee('ADD TRAINING') // button
+             ->see('SHOW ALL') // Button
+             ->see('Completed: '.Carbon::today()->format('Y-m-d')); // Field
+
+        // Ensure the training type blocks are displayed since all trainings are marked completed
+        foreach ($createdTrainingTypes as $createdTrainingType) {
+            $this->see($createdTrainingType->name.' Training');
+        }
+
+        // Add another set of trainings to the user with completed date set different past dates
+        for ($i = 1; $i < 4; $i++) {
+            $trainingUser = factory(SET\TrainingUser::class)->create(
+                        ['training_id'    => $createdTraining->id,
+                         'user_id'        => $this->user->id,
+                         'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
+                         'author_id'      => $this->user->id,
+                         'completed_date' => Carbon::today()->subYear($i)->format('Y-m-d'), ]);
+        }
+
         // Reload the the page to see all the completed trainings for the specified training block
         $trainingBlock = $createdTraining->trainingType->name;
         $this->call('GET', "user/$userId/$trainingBlock/show");
@@ -355,8 +354,8 @@ class UserControllerTest extends TestCase
              ->see('Completed: '.Carbon::today()->subYear(1)->format('Y-m-d'))
              ->see('Completed: '.Carbon::today()->subYear(2)->format('Y-m-d'))
              ->see('Completed: '.Carbon::today()->subYear(3)->format('Y-m-d'));
-    }    
-    
+    }
+
     /**
      * @test
      */
