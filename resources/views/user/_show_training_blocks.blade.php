@@ -74,7 +74,15 @@
             </li>
         @endif
     @endforeach
-    @can('edit')
-        <li><div class="collapsible-footer right-align"><a class="btn" href="{{ action('TrainingUserController@create', $user->id) }}">Add Training</a></div></li>
-    @endcan
+    <li>
+        <div class="collapsible-footer left-align">
+            @if(ucfirst($sectionId != "") && ucfirst($sectionId) != "Scheduled")                
+                <a class="right btn" href="{{ action('UserController@show', $user->id) }}/{{$sectionId}}/show">Show All</a>
+            @else 
+                @can('edit')        
+                    <a class="right btn" href="{{ action('TrainingUserController@create', $user->id) }}">Add Training</a>        
+                @endcan
+            @endif
+        </div>    
+    </li>
 </ul>

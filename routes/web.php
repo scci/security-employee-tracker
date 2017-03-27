@@ -30,6 +30,7 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/search', 'HomeController@search');
     Route::get('training/{trainingID}/assign', ['as' => 'training.assignForm', 'uses' => 'TrainingController@assignForm']);
     Route::post('training/{trainingID}/assign', ['as' => 'training.assign', 'uses' => 'TrainingController@assign']);
+    Route::get('user/{userID}/{sectionID}/show', ['uses' => 'UserController@show']);
     Route::get('/training/completed', ['uses' => 'TrainingController@showCompleted']);
     // Pass the Training Type to the Training index
     Route::get('/training/trainingtype/{trainingTypeID}', ['uses' => 'TrainingController@index']);
