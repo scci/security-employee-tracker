@@ -42,8 +42,8 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
 
         return $this;
     }
-    
-    /**
+
+   /**
     * Call protected/private method of a class.
     *
     * @param object &$object    Instantiated object that we will run method on.
@@ -52,7 +52,7 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
     *
     * @return mixed Method return.
     */
-   public function invokeMethod(&$object, $methodName, array $parameters = array())
+   public function invokeMethod(&$object, $methodName, array $parameters = [])
    {
        $reflection = new \ReflectionClass(get_class($object));
        $method = $reflection->getMethod($methodName);
