@@ -60,20 +60,20 @@ class TrainingTest extends TestCase
         $query = Training::findOrFail($training->id);
 
         $this->assertEquals($query->incompleted, 2);
-    }    
-    
+    }
+
     /** @test */
     /*
      Test the Training::scopeSearchTrainingByType method
     */
     public function search_for_valid_training_by_type()
     {
-        // Create a trainingtype object        
+        // Create a trainingtype object
         $createdTrainingType = factory(SET\TrainingType::class)->create();
-        
+
         // Create a training
         $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $createdTrainingType->id]);
-        
+
         // Query the database for a training with the created training type
         // using the scopeSearchTrainingByType method in the training model
         $qInput = Request::input('q', $createdTrainingType->name);
@@ -81,14 +81,14 @@ class TrainingTest extends TestCase
 
          // Filter the obtained collection to retrieve the just created training matching the id.
          $foundTraining = $trainingCollection->filter(function ($item) use ($createdTraining) {
-            return $item->id == $createdTraining->id;
-        })->first();
-        
+             return $item->id == $createdTraining->id;
+         })->first();
+
         // Assert that the correct training is returned
         $this->assertNotEmpty($trainingCollection);
-        $this->assertEquals($foundTraining->training_type_id, $createdTrainingType->id);        
+        $this->assertEquals($foundTraining->training_type_id, $createdTrainingType->id);
     }
-    
+
     /** @test */
     /*
      Test the Training::scopeSearchTrainingByType method
@@ -101,6 +101,6 @@ class TrainingTest extends TestCase
         $trainingCollection = Training::trainingByType($qInput)->get(['id', 'name', 'renews_in', 'description']);
 
         // Ensure that the query returns an empty collection
-        $this->assertEmpty($trainingCollection);        
-    }    
+        $this->assertEmpty($trainingCollection);
+    }
 }
