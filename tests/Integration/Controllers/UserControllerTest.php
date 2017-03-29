@@ -568,4 +568,62 @@ class UserControllerTest extends TestCase
             $this->assertEquals(array_shift($training_blocks), 'Scheduled');  // first array element
         }
     }
+    
+    /**
+     * @test
+     */
+    public function it_gets_the_user_trainings()
+    {
+        // Create a user object
+        $createdUser = factory(User::class)->create([]);
+        $createdUserId = $createdUser->id;
+
+        // Create trainingtype objects
+        $createdTrainingTypes = factory(SET\TrainingType::class, 2)->create();
+
+        // For each training type, create a training and add the created user to it.
+        foreach ($createdTrainingTypes as $trainingType) {
+            $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $trainingType->id]);
+            
+            // Schedule created Training
+            $trainingUser = factory(SET\TrainingUser::class)->create(
+                    ['training_id'    => $createdTraining->id,
+                     'user_id'        => $createdUserId,
+                     'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
+                     'author_id'      => $createdUserId,
+                     'completed_date' => null ]);
+            // Created Training completed today
+            $trainingUser = factory(SET\TrainingUser::class)->create(
+                    ['training_id'    => $createdTraining->id,
+                     'user_id'        => $createdUserId,
+                     'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
+                     'author_id'      => $createdUserId,
+                     'completed_date' => Carbon::today()->format('Y-m-d') ]);
+            // Created Training completed a year ago
+            $trainingUser = factory(SET\TrainingUser::class)->create(
+                    ['training_id'    => $createdTraining->id,
+                     'user_id'        => $createdUserId,
+                     'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
+                     'author_id'      => $createdUserId,
+                     'completed_date' => Carbon::today()->subYear(1)->format('Y-m-d') ]);            
+        }
+        
+        // GetUserTrainings when training type is null
+        $userController = new UserController();
+        $trainings = $this->invokeMethod($userController, 'getUserTrainings', array($createdUser, null));
+        $this->assertNotNull($trainings);
+        $this->assertCount(4, $trainings);
+        
+        // GetUserTrainings when training type is of the first created training type
+        $trainings = $this->invokeMethod($userController, 'getUserTrainings', array($createdUser, $createdTrainingTypes->first()->name));
+        $this->assertNotNull($trainings);
+        $this->assertCount(5, $trainings);
+        Log::Info($trainings);
+        
+        // GetUserTrainings when training type is an invalid value
+        $userController = new UserController();
+        $trainings = $this->invokeMethod($userController, 'getUserTrainings', array($createdUser, "sometype"));
+        $this->assertNotNull($trainings);
+        $this->assertCount(4, $trainings);
+    }
 }

@@ -15,20 +15,20 @@ class TrainingTest extends TestCase
     public function search_for_valid_training()
     {
         // Create a training
-    $createdTraining = factory(SET\Training::class)->create();
+        $createdTraining = factory(SET\Training::class)->create();
 
-    // Query the database for the first 3 letters of the createdTraining name
-    // using the scopeSearchTraining method in the training model
-    $qInput = Request::input('q', str_limit($createdTraining->name, 3, ''));
+        // Query the database for the first 3 letters of the createdTraining name
+        // using the scopeSearchTraining method in the training model
+        $qInput = Request::input('q', str_limit($createdTraining->name, 3, ''));
         $trainingCollection = Training::searchTraining($qInput)->get(['id', 'name', 'renews_in', 'description']);
 
-    // Filter the obtained collection to retrieve the just created training matching the id.
-    $foundTraining = $trainingCollection->filter(function ($item) use ($createdTraining) {
-        return $item->id == $createdTraining->id;
-    })->first();
+        // Filter the obtained collection to retrieve the just created training matching the id.
+        $foundTraining = $trainingCollection->filter(function ($item) use ($createdTraining) {
+            return $item->id == $createdTraining->id;
+        })->first();
 
-    // Assert that the correct training is returned
-    $this->assertEquals($foundTraining->name, $createdTraining->name);
+        // Assert that the correct training is returned
+        $this->assertEquals($foundTraining->name, $createdTraining->name);
         $this->assertEquals($foundTraining->renews_in, $createdTraining->renews_in);
         $this->assertEquals($foundTraining->description, $createdTraining->description);
     }
@@ -40,12 +40,12 @@ class TrainingTest extends TestCase
     public function search_for_invalid_training()
     {
         // Query the database for a training with yyy in the name
-    // using the scopeSearchTraining method in the training model
-    $qInput = Request::input('q', 'yyy');
+        // using the scopeSearchTraining method in the training model
+        $qInput = Request::input('q', 'yyy');
         $trainingCollection = Training::searchTraining($qInput)->get(['id', 'name', 'renews_in', 'description']);
 
-    // Ensure that the query returns an empty collection
-    $this->assertEmpty($trainingCollection);
+        // Ensure that the query returns an empty collection
+        $this->assertEmpty($trainingCollection);
     }
 
     /** @test */
@@ -60,5 +60,47 @@ class TrainingTest extends TestCase
         $query = Training::findOrFail($training->id);
 
         $this->assertEquals($query->incompleted, 2);
+    }    
+    
+    /** @test */
+    /*
+     Test the Training::scopeSearchTrainingByType method
+    */
+    public function search_for_valid_training_by_type()
+    {
+        // Create a trainingtype object        
+        $createdTrainingType = factory(SET\TrainingType::class)->create();
+        
+        // Create a training
+        $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $createdTrainingType->id]);
+        
+        // Query the database for a training with the created training type
+        // using the scopeSearchTrainingByType method in the training model
+        $qInput = Request::input('q', $createdTrainingType->name);
+        $trainingCollection = Training::trainingByType($qInput)->get();
+
+         // Filter the obtained collection to retrieve the just created training matching the id.
+         $foundTraining = $trainingCollection->filter(function ($item) use ($createdTraining) {
+            return $item->id == $createdTraining->id;
+        })->first();
+        
+        // Assert that the correct training is returned
+        $this->assertNotEmpty($trainingCollection);
+        $this->assertEquals($foundTraining->training_type_id, $createdTrainingType->id);        
     }
+    
+    /** @test */
+    /*
+     Test the Training::scopeSearchTrainingByType method
+    */
+    public function search_for_invalid_training_by_type()
+    {
+        // Query the database for a training with training type sometype
+        // using the scopeSearchTrainingByType method in the training model
+        $qInput = Request::input('q', 'sometype');
+        $trainingCollection = Training::trainingByType($qInput)->get(['id', 'name', 'renews_in', 'description']);
+
+        // Ensure that the query returns an empty collection
+        $this->assertEmpty($trainingCollection);        
+    }    
 }
