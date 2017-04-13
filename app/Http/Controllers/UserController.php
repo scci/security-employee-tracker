@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
 use Krucas\Notification\Facades\Notification;
 use SET\Duty;
 use SET\Group;
@@ -179,9 +180,20 @@ class UserController extends Controller
         // the full list of completed trainings or the most recently completed training for each training type.
         $scheduledTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
                                 ->whereNull('completed_date');
+        
+        // Get the ids for each of the most recently completed trainings
+        // Need to go this roundabout route due to unpredictable results with Laravel's groupBy clause.
+        $recentCompletedIds = DB::table('training_user as t1')
+                                ->join(DB::raw('(select max(completed_date) AS completed_date, training_id '
+                                        . 'from training_user group by training_id) t2'), function ($join) { 
+                                    $join->on('t1.completed_date', '=', 't2.completed_date')
+                                         ->on('t1.training_id',  '=', 't2.training_id');       
+                                })->get()->pluck('id');
+        
+        // Now fetch the recently completed training records for the specified  user,
         $recentCompletedTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
-                                    ->whereNotNull('completed_date')->orderBy('completed_date', 'DESC')->groupBy('training_id');
-
+                                ->whereIn('id', $recentCompletedIds);
+        
         // If the user clicks the showAll button for a particular type of training,
         // show all the trainings completed by that user for that training type.
         if ($sectionId != null) {
@@ -190,11 +202,11 @@ class UserController extends Controller
             $completedTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
                                     ->whereIn('training_id', $selectedTraining);
 
-            $trainings = $scheduledTrainings->union($completedTrainings)->union($recentCompletedTrainings)->get();
-        } else {
-            $trainings = $scheduledTrainings->union($recentCompletedTrainings)->get();
-        }
-
+            $trainings = $scheduledTrainings->union($completedTrainings)->union($recentCompletedTrainings)
+                                        ->orderBy('completed_date', 'DESC')->get();
+        } else {           
+            $trainings = $scheduledTrainings->union($recentCompletedTrainings)->orderBy('completed_date', 'DESC')->get();
+        } 
         return $trainings;
     }
 
