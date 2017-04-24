@@ -50,7 +50,7 @@ class EmailTraining implements ShouldQueue
      */
     private function sendEmail($user, $training, $dueDate, $trainingUser)
     {
-        $reportAddress = Setting::get('sender_address', 'set@yourcompany.com');
+        $reportAddress = Setting::get('mail_from_address', 'set@yourcompany.com');
 
         Mail::send(
             'emails.training',
