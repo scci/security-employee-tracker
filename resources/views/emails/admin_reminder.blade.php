@@ -50,11 +50,11 @@
         <th>Due Date</th>
     </tr>
     <?php $i = 0; ?>
-    @foreach($records as $record)
-        <tr class="{{ ($i % 2 == 0 ? 'even' : 'odd') }}">
-            <td>{{ $record['name'] }}</td>
-            <td>{{ $record['training'] }}</td>
-            <td style="white-space: nowrap">{{ $record['due_date'] }}</td>
+    @foreach($records as $traininguser)
+	<tr class="{{ ($i % 2 == 0 ? 'even' : 'odd') }}">
+            <td>{{ $traininguser->user->userFullName }}</td>
+            <td>{{ $traininguser->training->name }}</td>
+            <td style="white-space: nowrap">{{ $traininguser->due_date }}</td>
         </tr>
         <?php $i++; ?>
     @endforeach

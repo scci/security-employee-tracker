@@ -21,7 +21,7 @@ class RenewTraining extends Command
     protected $offset = 30;
 
     /**
-     * List of all renewed notes.
+     * List of all renewed trainings.
      *
      * @var Collection
      */
@@ -151,12 +151,8 @@ class RenewTraining extends Command
             'due_date'      => $assignedTraining->due_date,
         ]);
 
-        //
-        $this->trainingAdminRecord->push([
-            'name'     => $assignedTraining->user->userFullName,
-            'training' => $assignedTraining->training->name,
-            'due_date' => $dueDate->toDateString(),
-        ]);
+        // Add the created traininguser record to trainingAdminRecord    
+        $this->trainingAdminRecord->push($assignedTraining);
     }
 
     /**
