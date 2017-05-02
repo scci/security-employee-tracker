@@ -151,7 +151,7 @@ class RenewTraining extends Command
             'due_date'      => $assignedTraining->due_date,
         ]);
 
-        // Add the created traininguser record to trainingAdminRecord    
+        // Add the created traininguser record to trainingAdminRecord
         $this->trainingAdminRecord->push($assignedTraining);
     }
 
