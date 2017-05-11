@@ -379,7 +379,7 @@ class TrainingControllerTest extends TestCase
 
         $this->action('GET', 'TrainingController@assignForm', $createdTrainingId);
 
-        $this->assertEquals("training/{trainingID}/assign", Route::getCurrentRoute()->getPath());
+        $this->assertEquals('training/{trainingID}/assign', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('training');
         $this->assertViewHas('users');
         $this->assertViewHas('groups');
