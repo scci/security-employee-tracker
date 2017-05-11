@@ -23,11 +23,11 @@ class AppServiceProvider extends ServiceProvider
 
             // Force SSL Secure Routes
             if (!$this->app->environment('local')) {
-               if (app()::VERSION >= 5.4) {
-                  \URL::forceScheme('https'); 	## Method changed in Laravel 5.4
-               } else {
-                  \URL::forceSchema('https');
-               }
+                if (app()::VERSION >= 5.4) {
+                    \URL::forceScheme('https');    //# Method changed in Laravel 5.4
+                } else {
+                    \URL::forceSchema('https');
+                }
             }
         }
 
