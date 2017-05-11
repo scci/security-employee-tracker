@@ -25,7 +25,7 @@ class GroupControllerTest extends TestCase
         // Logged in as admin - Can access the groups page
         $this->action('GET', 'GroupController@index');
 
-        $this->seePageIs('group');
+        $this->assertEquals('group', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('groups');
 
         // Logged in as a user with role view - Can still access the groups page
@@ -33,7 +33,7 @@ class GroupControllerTest extends TestCase
         $this->actingAs($newuser);
         $this->action('GET', 'GroupController@index');
 
-        $this->seePageIs('group');
+        $this->assertEquals('group', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('groups');
 
         // Logged in as a regular user - Cannot access the groups page

@@ -23,7 +23,7 @@ class NewsControllerTest extends TestCase
         // Logged in as admin - Can access the news page
         $this->action('GET', 'NewsController@index');
 
-        $this->seePageIs('news');
+        $this->assertEquals('news', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('allNews');
 
         // Logged in as a regular user - Can still access the news page
@@ -31,7 +31,7 @@ class NewsControllerTest extends TestCase
         $this->actingAs($newuser);
         $this->call('GET', '/news');
 
-        $this->seePageIs('news');
+        $this->assertEquals('news', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('allNews');
     }
 

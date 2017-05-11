@@ -46,8 +46,7 @@ class LoginTest extends TestCase
     {
         $user = factory(SET\User::class)->create();
 
-        $this->actingAs($user)
-            ->visit('/')
-            ->seePageIs('/user/'.$user->id);
+        $this->actingAs($user)->visit('/');
+        $this->assertEquals('user/{user}', Route::getCurrentRoute()->getPath());
     }
 }

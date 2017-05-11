@@ -27,7 +27,7 @@ class TrainingTypeControllerTest extends TestCase
         // Logged in as admin - Can access the page
         $this->action('GET', 'TrainingTypeController@index');
 
-        $this->seePageIs('trainingtype');
+        $this->assertEquals('trainingtype', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('trainingtypes');
 
         // Logged in as a regular user - Cannot access the page

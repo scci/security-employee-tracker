@@ -22,7 +22,7 @@ class HomeControllerTest extends TestCase
         // Logged in as admin - Can access the home page and display calendar, duties, etc
         $this->action('GET', 'HomeController@index');
 
-        $this->seePageIs('/');
+        $this->assertEquals('/', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('trainingUser');
         // $this->assertViewHas('log');
         $this->assertViewHas('calendar');
@@ -34,7 +34,7 @@ class HomeControllerTest extends TestCase
         $this->actingAs($newuser);
         $this->action('GET', 'HomeController@index');
 
-        $this->seePageIs('/');
+        $this->assertEquals('/', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('trainingUser');
         // $this->assertViewHas('log');
         $this->assertViewHas('calendar');

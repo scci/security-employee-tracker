@@ -27,7 +27,7 @@ class SettingControllerTest extends TestCase
         // Logged in as admin - Can access the settings page
         $this->action('GET', 'SettingController@index');
 
-        $this->seePageIs('settings');
+        $this->assertEquals('settings', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('userList');
         $this->assertViewHas('admins');
         $this->assertViewHas('configAdmins');

@@ -26,7 +26,7 @@ class UserControllerTest extends TestCase
         // Logged in as admin - Can access the user page
         $this->action('GET', 'UserController@index');
 
-        $this->seePageIs('user');
+        $this->assertEquals('user', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('users');
 
         // Logged in as a regular user - Cannot access the user page

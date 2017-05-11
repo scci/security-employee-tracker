@@ -22,7 +22,7 @@ class DutyControllerTest extends TestCase
         // Logged in as admin - Can access the duty page
         $this->action('GET', 'DutyController@index');
 
-        $this->seePageIs('duty');
+        $this->assertEquals('duty', Route::getCurrentRoute()->getPath());
         $this->assertViewHas('duties');
 
         // Logged in as a regular user - Can still access the duty page

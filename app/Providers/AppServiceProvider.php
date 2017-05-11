@@ -20,6 +20,15 @@ class AppServiceProvider extends ServiceProvider
         if (!strpos(url()->current(), 'install')) {
             DBConfigs::execute();
             $this->setupLdap();
+
+            // Force SSL Secure Routes
+            if (!$this->app->environment('local')) {
+               if (app()::VERSION >= 5.4) {
+                  \URL::forceScheme('https'); 	## Method changed in Laravel 5.4
+               } else {
+                  \URL::forceSchema('https');
+               }
+            }
         }
 
         Setting::saving(function ($setting) {

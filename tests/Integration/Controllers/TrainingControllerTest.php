@@ -26,7 +26,7 @@ class TrainingControllerTest extends TestCase
         // Logged in as admin - Can access the training page
         $this->action('GET', 'TrainingController@index');
 
-        $this->seePageIs('training');
+        $this->assertEquals('training', Route::getCurrentRoute()->getPath());
 
         // Logged in as a regular user - Cannot access the training page
         $newuser = factory(User::class)->create();
@@ -379,7 +379,7 @@ class TrainingControllerTest extends TestCase
 
         $this->action('GET', 'TrainingController@assignForm', $createdTrainingId);
 
-        $this->seePageIs("training/{$createdTrainingId}/assign");
+        $this->assertEquals("training/{trainingID}/assign", Route::getCurrentRoute()->getPath());
         $this->assertViewHas('training');
         $this->assertViewHas('users');
         $this->assertViewHas('groups');
