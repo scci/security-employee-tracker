@@ -180,19 +180,16 @@ class UserController extends Controller
         // the full list of completed trainings or the most recently completed training for each training type.
         $scheduledTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
                                 ->whereNull('completed_date');
-
-        // Get the ids for each of the most recently completed trainings
-        // Need to go this roundabout route due to unpredictable results with Laravel's groupBy clause.
-        $recentCompletedIds = DB::table('training_user as t1')
-                                ->join(DB::raw('(select max(completed_date) AS completed_date, training_id '
-                                        .'from training_user group by training_id) t2'), function ($join) {
-                                            $join->on('t1.completed_date', '=', 't2.completed_date')
-                                         ->on('t1.training_id', '=', 't2.training_id');
-                                        })->get()->pluck('id');
-
-        // Now fetch the recently completed training records for the specified  user,
-        $recentCompletedTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
-                                ->whereIn('id', $recentCompletedIds);
+                
+        // Now fetch the recently completed training records for the specified  user
+        $recentCompletedTrainings = DB::table('training_user as t1')
+                                    ->where('id', function($query) use ($user) {
+                                        $query->from('training_user as t2')
+                                              ->selectRaw('t2.id')
+                                              ->where('t2.user_id', '=', $user->id)
+                                              ->whereRaw('t1.training_id = t2.training_id')
+                                              ->orderBy('completed_date', 'DESC')->limit(1);
+                                    });
 
         // If the user clicks the showAll button for a particular type of training,
         // show all the trainings completed by that user for that training type.
