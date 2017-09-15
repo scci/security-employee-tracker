@@ -98,10 +98,10 @@ class RenewTraining extends Command
         // Where due_date is in future or withing past renewal period
         $trainingRecord = TrainingUser::where('training_id', $trainingUser->training_id)
             ->where('user_id', $trainingUser->user_id)
-            ->where('due_date', '>', Carbon::today()->subDays($trainingUser->training->renews_in))
+            ->where('due_date', '>', Carbon::today())
             ->get();
 
-        return !$trainingRecord->isEmpty();
+        return !($trainingRecord->isEmpty());
     }
 
     /**
@@ -123,10 +123,9 @@ class RenewTraining extends Command
         $today = Carbon::today();
 
         $renewalDate = Carbon::createFromFormat('Y-m-d', $trainingUser->completed_date)
-            ->addDays($trainingUser->training->renews_in)
-            ->subDays($this->offset);
+            ->addDays($trainingUser->training->renews_in);
 
-        return !($renewalDate >= $today);
+        return ($renewalDate <= $today->addDays($this->offset));
     }
 
     /**
@@ -138,7 +137,7 @@ class RenewTraining extends Command
     {
         $dueDate = Carbon::createFromFormat('Y-m-d', $trainingUser->completed_date)
             ->addDays($trainingUser->training->renews_in);
-
+    
         $assignedTraining = $this->createRecord($trainingUser, $dueDate);
 
         //Email user of new training is due
