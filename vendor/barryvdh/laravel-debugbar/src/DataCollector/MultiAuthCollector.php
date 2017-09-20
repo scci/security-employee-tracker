@@ -1,8 +1,10 @@
 <?php
 
 namespace Barryvdh\Debugbar\DataCollector;
-use Illuminate\Contracts\Auth\Guard;
+
 use Illuminate\Auth\SessionGuard;
+use Illuminate\Contracts\Auth\Guard;
+use Illuminate\Support\Str;
 
 /**
  * Collector for Laravel's Auth provider
@@ -32,7 +34,11 @@ class MultiAuthCollector extends AuthCollector
         $names = '';
 
         foreach($this->guards as $guardName) {
-            $user = $this->resolveUser($this->auth->guard($guardName));
+            try {
+                $user = $this->resolveUser($this->auth->guard($guardName));
+            } catch (\Exception $e) {
+                continue;
+            }
 
             $data['guards'][$guardName] = $this->getUserInformation($user);
 
@@ -58,17 +64,19 @@ class MultiAuthCollector extends AuthCollector
         // then we must resolve user „manually”
         // to prevent csrf token regeneration
 
-        $usingSession = $guard instanceof SessionGuard;
-        $recaller = $usingSession ? $guard->getRequest()->cookies->get($guard->getRecallerName()) : null;
+        $recaller = $guard instanceof SessionGuard
+            ? $guard->getRequest()->cookies->get($guard->getRecallerName())
+            : null;
 
-        if($usingSession && !is_null($recaller)) {
-            list($id, $token) = explode('|', $recaller);
-            return $guard->getProvider()->retrieveByToken($id, $token);
-        } else {
-            return $guard->user();
+        if (is_string($recaller) && Str::contains($recaller, '|')) {
+            $segments = explode('|', $recaller);
+            if (count($segments) == 2 && trim($segments[0]) !== '' && trim($segments[1]) !== '') {
+                return $guard->getProvider()->retrieveByToken($segments[0], $segments[1]);
+            }
         }
+        return $guard->user();
     }
-    
+
     /**
      * @{inheritDoc}
      */

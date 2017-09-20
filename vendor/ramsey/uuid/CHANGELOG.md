@@ -1,5 +1,30 @@
 # ramsey/uuid Changelog
 
+## 3.7.0
+
+_Released: 2017-08-04_
+
+  * Add UUID version constants [#173](https://github.com/ramsey/uuid/issues/173), [#177](https://github.com/ramsey/uuid/pull/177)
+    * `Uuid::UUID_TYPE_TIME`
+    * `Uuid::UUID_TYPE_IDENTIFIER`
+    * `Uuid::UUID_TYPE_HASH_MD5`
+    * `Uuid::UUID_TYPE_RANDOM`
+    * `Uuid::UUID_TYPE_HASH_SHA1`
+
+## 3.6.1
+
+_Released: 2017-03-26_
+
+  * Optimize UUID string decoding [#164](https://github.com/ramsey/uuid/pull/164)
+
+## 3.6.0
+
+_Released: 2017-03-18_
+
+  * Add `InvalidUuidStringException`, thrown when attempting to decode an invalid string UUID; this does not introduce any BC issues, since the new exception inherits from the previously used `InvalidArgumentException` [#162](https://github.com/ramsey/uuid/pull/162)
+  * Improve memory usage when generating large quantities of UUIDs (use `str_pad()` and `dechex()` instead of `sprintf()`) [#160](https://github.com/ramsey/uuid/pull/160)
+  * Minor test and documentation updates
+
 ## 3.5.2
 
 _Released: 2016-11-22_

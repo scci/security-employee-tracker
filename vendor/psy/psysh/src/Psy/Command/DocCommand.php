@@ -3,7 +3,7 @@
 /*
  * This file is part of Psy Shell.
  *
- * (c) 2012-2015 Justin Hileman
+ * (c) 2012-2017 Justin Hileman
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
@@ -74,11 +74,14 @@ HELP
             if (empty($doc) && !$db) {
                 $output->writeln('<warning>PHP manual not found</warning>');
                 $output->writeln('    To document core PHP functionality, download the PHP reference manual:');
-                $output->writeln('    https://github.com/bobthecow/psysh#downloading-the-manual');
+                $output->writeln('    https://github.com/bobthecow/psysh/wiki/PHP-manual');
             } else {
                 $output->writeln($doc);
             }
         });
+
+        // Set some magic local variables
+        $this->setCommandScopeVariables($reflector);
     }
 
     private function getManualDoc($reflector)

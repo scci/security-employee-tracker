@@ -32,13 +32,22 @@ trait DetectsChanges
         return static::$logAttributes;
     }
 
+    public function shouldlogOnlyDirty(): bool
+    {
+        if (! isset(static::$logOnlyDirty)) {
+            return false;
+        }
+
+        return static::$logOnlyDirty;
+    }
+
     public function attributeValuesToBeLogged(string $processingEvent): array
     {
         if (! count($this->attributesToBeLogged())) {
             return [];
         }
 
-        $properties['attributes'] = static::logChanges($this);
+        $properties['attributes'] = static::logChanges($this->exists ? $this->fresh() : $this);
 
         if (static::eventsToBeRecorded()->contains('updated') && $processingEvent == 'updated') {
             $nullProperties = array_fill_keys(array_keys($properties['attributes']), null);
@@ -46,20 +55,32 @@ trait DetectsChanges
             $properties['old'] = array_merge($nullProperties, $this->oldAttributes);
         }
 
+        if ($this->shouldlogOnlyDirty() && isset($properties['old'])) {
+            $properties['attributes'] = array_udiff_assoc(
+                                            $properties['attributes'],
+                                            $properties['old'],
+                                            function ($new, $old) {
+                                                return $new <=> $old;
+                                            }
+                                        );
+            $properties['old'] = collect($properties['old'])->only(array_keys($properties['attributes']))->all();
+        }
+
         return $properties;
     }
 
     public static function logChanges(Model $model): array
     {
-        return collect($model->attributesToBeLogged())->mapWithKeys(
-            function ($attribute) use ($model) {
-                if (str_contains($attribute, '.')) {
-                    return self::getRelatedModelAttributeValue($model, $attribute);
-                }
-
-                return collect($model)->only($attribute);
+        $changes = [];
+        foreach ($model->attributesToBeLogged() as $attribute) {
+            if (str_contains($attribute, '.')) {
+                $changes += self::getRelatedModelAttributeValue($model, $attribute);
+            } else {
+                $changes += collect($model)->only($attribute)->toArray();
             }
-        )->toArray();
+        }
+
+        return $changes;
     }
 
     protected static function getRelatedModelAttributeValue(Model $model, string $attribute): array

@@ -72,6 +72,22 @@ class LaravelExcelWriter {
     public $ext = 'xls';
 
     /**
+     * Valid file extensions.
+     * @var array
+     */
+    private $validExtensions = [
+        'xlsx', 'xlsm', 'xltx', 'xltm', //Excel 2007
+        'xls', 'xlt', //Excel5
+        'ods', 'ots', //OOCalc
+        'slk', //SYLK
+        'xml', //Excel2003XML
+        'gnumeric', //gnumeric
+        'htm', 'html', //HTML
+        'csv','txt' //CSV
+        ,'pdf' //PDF
+    ];
+
+    /**
      * Path the file will be stored to
      * @var string
      */
@@ -254,13 +270,27 @@ class LaravelExcelWriter {
     public function export($ext = 'xls', Array $headers = [])
     {
         // Set the extension
-        $this->ext = $ext;
+        $this->ext = mb_strtolower($ext);
 
         // Render the file
         $this->_render();
 
         // Download the file
         $this->_download($headers);
+    }
+
+    /**
+     * Check if input file extension is valid.
+     * @param $ext
+     */
+    private function checkExtensionIsValid($ext)
+    {
+        // Check file extension is valid
+        if (!in_array($ext, $this->validExtensions))
+        {
+            throw new \InvalidArgumentException("Invalid file extension `$ext`, expected "
+                .implode(", ", $this->validExtensions).".");
+        }
     }
 
     /**
@@ -354,13 +384,13 @@ class LaravelExcelWriter {
         $this->_setStoragePath($path);
 
         // Set the extension
-        $this->ext = $ext;
+        $this->ext = mb_strtolower($ext);
 
         // Render the XLS
         $this->_render();
 
         // Set the storage path and file
-        $toStore = $this->storagePath . '/' . $this->filename . '.' . $this->ext;
+        $toStore = $this->storagePath . DIRECTORY_SEPARATOR . $this->filename . '.' . $this->ext;
 
         // Save the file to specified location
         $this->writer->save($toStore);
@@ -413,6 +443,11 @@ class LaravelExcelWriter {
     {
         // Preserve any existing active sheet index
         $activeIndex = $this->getExcel()->getActiveSheetIndex();
+
+        // getAllSheets() returns $this if no sheets were added to the excel file
+        if ($this->getAllSheets() instanceof $this) {
+            throw new LaravelExcelException('[ERROR] Aborting spreadsheet render: a minimum of 1 sheet is required.');
+        }
 
         //Fix borders for merged cells
         foreach($this->getAllSheets() as $sheet){
@@ -525,6 +560,9 @@ class LaravelExcelWriter {
      */
     protected function _setWriter()
     {
+        // Check if input file extension is valid
+        $this->checkExtensionIsValid($this->ext);
+
         // Set pdf renderer
         if ($this->format == 'PDF')
         {
@@ -607,7 +645,7 @@ class LaravelExcelWriter {
         $path = $path ? $path : config('excel.export.store.path', storage_path($this->storagePath));
 
         // Trim of slashes, to makes sure we won't add them double
-        $this->storagePath = rtrim($path, '/');
+        $this->storagePath = rtrim($path, DIRECTORY_SEPARATOR);
 
         // Make sure the storage path exists
         if (!$this->filesystem->exists($this->storagePath)) {
@@ -656,4 +694,14 @@ class LaravelExcelWriter {
 
         throw new LaravelExcelException('[ERROR] Writer method [' . $method . '] does not exist.');
     }
+
+    /**
+     * Valid file extensions.
+     * @return array
+     */
+    public function getValidExtensions()
+    {
+        return $this->validExtensions;
+    }
+
 }

@@ -10,7 +10,7 @@
 [![Quality Score](https://img.shields.io/scrutinizer/g/thephpleague/commonmark.svg?style=flat-square)](https://scrutinizer-ci.com/g/thephpleague/commonmark)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/126/badge)](https://bestpractices.coreinfrastructure.org/projects/126)
 
-**league/commonmark** is a Markdown parser for PHP which supports the full [CommonMark] spec.  It is based on the [CommonMark JS reference implementation][commonmark.js] by [John MacFarlane] \([@jgm]\).
+**league/commonmark** is a PHP-based Markdown parser created by [Colin O'Dell][@colinodell] which supports the full [CommonMark] spec.  It is based on the [CommonMark JS reference implementation][commonmark.js] by [John MacFarlane] \([@jgm]\).
 
 ## Goals
 
@@ -114,6 +114,7 @@ Custom parsers/renderers can be bundled into extensions which extend CommonMark.
  - [CommonMark Table Extension](https://github.com/webuni/commonmark-table-extension) - Adds the ability to create tables in CommonMark documents.
  - [CommonMark Attributes Extension](https://github.com/webuni/commonmark-attributes-extension) - Adds a syntax to define attributes on the various HTML elements.
  - [Alt Three Emoji](https://github.com/AltThree/Emoji) An emoji parser for CommonMark.
+ - [uafrica/commonmark-ext](https://github.com/uafrica/commonmark-ext) - Adds strikethrough support.
 
 If you build your own, feel free to submit a PR to add it to this list!
 
@@ -136,8 +137,12 @@ The following table shows which versions of league/commonmark are compatible wit
     </thead>
     <tbody>
         <tr>
-            <td><strong>0.15.3</strong><br>0.15.2</td>
-            <td><strong><a href="http://spec.commonmark.org/0.27/">0.27</a></strong></td>
+            <td><strong>0.15.6</strong><br>0.15.5</td>
+            <td><strong><a href="http://spec.commonmark.org/0.28/">0.28</a></strong></td>
+        </tr>
+        <tr>
+            <td>0.15.4<br>0.15.3<br>0.15.2</td>
+            <td><a href="http://spec.commonmark.org/0.27/">0.27</a></td>
         </tr>
         <tr>
             <td>0.15.1<br>0.15.0</td>
@@ -267,7 +272,7 @@ Also a huge thank you to [JetBrains](https://www.jetbrains.com/) for supporting 
 [docs-example-twitter]: https://commonmark.thephpleague.com/customization/inline-parsing#example-1---twitter-handles
 [docs-example-smilies]: https://commonmark.thephpleague.com/customization/inline-parsing#example-2---emoticons
 [All Contributors]: https://github.com/thephpleague/commonmark/contributors
-[@colinodell]: https://github.com/colinodell
+[@colinodell]: https://www.twitter.com/colinodell
 [@jgm]: https://github.com/jgm
 [jgm/stmd]: https://github.com/jgm/stmd
 [Composer]: https://getcomposer.org/

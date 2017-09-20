@@ -4,6 +4,69 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 
 ## [Unreleased][unreleased]
 
+## [0.15.6] - 2017-08-08
+
+### Fixed
+
+ - Fixed URI normalization not properly encoding/decoding special characters in certain cases (#287)
+
+## [0.15.5] - 2017-08-05
+
+This release bumps spec compliance to 0.28 without breaking changes to the API.
+
+### Added
+
+ - Project is now tested against PHP 7.2
+
+### Changed
+
+ - Bumped CommonMark spec target to 0.28
+ - Changed internal implementation of `LinkParserHelper::parseLinkDestination()` to allow nested parens
+ - Changed precedence of strong/emph when both nestings are possible (rule 14)
+ - Allow tabs before and after ATX closing header
+
+### Fixed
+
+ - Fixed HTML type 6 block regex matching against `<pre>` (it shouldn't) and not matching `<iframe>` (it should)
+ - Fixed reference parser incorrectly handling escaped `]` characters
+ - Fixed "multiple of 3" delimiter run calculations
+
+### Deprecated
+
+An unused constant and static method were deprecated and will be removed in a future release.  See <UPGRADE.md> for more information.
+
+ - Deprecated `RegexHelper::REGEX_UNICODE_WHITESPACE` (no longer used)
+ - Deprecated `RegexHelper::getLinkDestinationRegex()` (no longer used)
+
+## [0.15.4] - 2017-05-09
+
+### Added
+
+ - Added new methods to `Cursor` (#280):
+   - `advanceToNextNonSpaceOrNewline()` - Identical replacement for the (now-deprecated) `advanceToFirstNonSpace()` method
+   - `advanceToNextNonSpaceOrTab()` - Similar replacement for `advanceToFirstNonSpace()` but with proper tab handling
+   - `getNextNonSpaceCharacter()` - Identical replacement for the (now-deprecated) `getFirstNonSpaceCharacter()` method
+   - `getNextNonSpacePosition()` - Identical replacement for the (now-deprecated) `getFirstNonSpacePosition()` method
+ - Added new method to `CursorState` (#280):
+   - `getNextNonSpaceCache()` - Identical replacement for the (now-deprecated) `getFirstNonSpaceCache()` method
+
+### Fixed
+
+ - Fixed duplicate characters in non-intended lines containing tabs (#279)
+
+### Deprecated
+
+**All deprecations listed here will be removed in a future 0.x release.** See [UPGRADE.md](UPGRADE.md) for instructions on preparing your code for the eventual removal of these methods.
+
+ - Deprecated `Cursor::advanceToFirstNonSpace()` (#280)
+   - Use `advanceToNextNonSpaceOrTab()` or `advanceToNextNonSpaceOrNewline()` instead, depending on your requirements
+ - Deprecated `Cursor::getFirstNonSpaceCharacter()` (#280)
+   - Use `Cursor::getNextNonSpaceCharacter()` instead
+ - Deprecated `Cursor::getFirstNonSpacePosition()` (#280)
+   - Use `Cursor::getNextNonSpacePosition()` instead
+ - Deprecated `CursorState::getFirstNonSpaceCache()` (#280)
+   - Use `CursorState::getNextNonSpaceCache()` instead
+
 ## [0.15.3] - 2016-12-18
 
 ### Fixed
@@ -467,7 +530,10 @@ Updates should follow the [Keep a CHANGELOG](http://keepachangelog.com/) princip
 ### Added
  - Initial commit (compatible with jgm/stmd:spec.txt @ 0275f34)
 
-[unreleased]: https://github.com/thephpleague/commonmark/compare/0.15.3...HEAD
+[unreleased]: https://github.com/thephpleague/commonmark/compare/0.15.6...HEAD
+[0.15.6]: https://github.com/thephpleague/commonmark/compare/0.15.5...0.15.6
+[0.15.5]: https://github.com/thephpleague/commonmark/compare/0.15.4...0.15.5
+[0.15.4]: https://github.com/thephpleague/commonmark/compare/0.15.3...0.15.4
 [0.15.3]: https://github.com/thephpleague/commonmark/compare/0.15.2...0.15.3
 [0.15.2]: https://github.com/thephpleague/commonmark/compare/0.15.1...0.15.2
 [0.15.1]: https://github.com/thephpleague/commonmark/compare/0.15.0...0.15.1

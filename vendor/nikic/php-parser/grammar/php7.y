@@ -59,6 +59,10 @@ no_comma:
     | ',' { $this->emitError(new Error('A trailing comma is not allowed here', attributes())); }
 ;
 
+optional_comma:
+      /* empty */
+    | ','
+
 top_statement:
       statement                                             { $$ = $1; }
     | function_declaration_statement                        { $$ = $1; }
@@ -95,7 +99,7 @@ group_use_declaration:
 ;
 
 unprefixed_use_declarations:
-      non_empty_unprefixed_use_declarations no_comma        { $$ = $1; }
+      non_empty_unprefixed_use_declarations optional_comma  { $$ = $1; }
 ;
 
 non_empty_unprefixed_use_declarations:
@@ -114,7 +118,7 @@ non_empty_use_declarations:
 ;
 
 inline_use_declarations:
-      non_empty_inline_use_declarations no_comma            { $$ = $1; }
+      non_empty_inline_use_declarations optional_comma      { $$ = $1; }
 ;
 
 non_empty_inline_use_declarations:
@@ -763,7 +767,7 @@ constant:
     /* We interpret and isolated FOO:: as an unfinished class constant fetch. It could also be
        an unfinished static property fetch or unfinished scoped call. */
     | class_name_or_var T_PAAMAYIM_NEKUDOTAYIM error
-          { $$ = Expr\ClassConstFetch[$1, Expr\Error[]]; $this->errorState = 2; }
+          { $$ = Expr\ClassConstFetch[$1, new Expr\Error(stackAttributes(#3))]; $this->errorState = 2; }
 ;
 
 array_short_syntax:

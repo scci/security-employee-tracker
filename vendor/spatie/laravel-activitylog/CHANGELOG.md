@@ -2,6 +2,33 @@
 
 All notable changes to `spatie/laravel-activitylog` will be documented in this file
 
+## 1.15.5 - 2017-08-08
+- fix model scope
+
+## 1.15.4 - 2017-08-05
+- fix detecting `SoftDeletes`
+
+## 1.15.3 - 2017-06-23
+- fix for when there is no 'web' guard
+
+## 1.15.2 - 2017-06-15
+- fixes errors in `DetectsChanges`
+
+## 1.15.1 - 2017-04-28
+- fixes error in `DetectsChanges`
+
+## 1.15.0 - 2017-04-28
+- add compatibility with L5.1 and L5.2
+
+## 1.14.0 - 2017-04-16
+- add support array/collection casted attributes when using `logDirtyOnly`
+
+## 1.13.0 - 2017-04-16
+- add `logDirtyOnly`
+
+## 1.12.2 - 2017-03-22
+- fix a bug where changes to a related model would not be logged
+
 ## 1.12.1 - 2017-02-12
 - avoid PHP error when dealing with placeholders that cannot be filled
 

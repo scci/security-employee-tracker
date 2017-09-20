@@ -41,7 +41,7 @@ Excel::create('Laravel Excel', function($excel) {
 
 [![Help the project](http://www.pledgie.com/campaigns/30385.png?skin_name=chrome)](http://pledgie.com/campaigns/30385)
 
-#Installation
+# Installation
 
 Require this package in your `composer.json` and update composer. This will download the package and PHPExcel of PHPOffice.
 
@@ -92,3 +92,9 @@ More about contributing can be found at: [http://www.maatwebsite.nl/laravel-exce
 # License
 
 This package is licensed under LGPL. You are free to use it in personal and commercial projects. The code can be forked and modified, but the original copyright author should always be included!
+
+# FAQ
+
+1) Chunk importer only imports the first row
+
+Check that auto_detect_line_endings in your php.ini is set to true.
