@@ -12,6 +12,16 @@
     <testsuites>
         <testsuite name="Application Test Suite">
             <directory>./tests/</directory>
+			<exclude>./tests/Unit/AppServiceProviderTest.php</exclude>
+			<exclude>./tests/Unit/EmailTrainingTest.php</exclude>
+        </testsuite>
+		<testsuite name="only_integration_tests">
+			<directory>tests/Integration/</directory>
+		</testsuite>
+		<testsuite name="only_unit_tests">
+			<directory>tests/Unit/</directory>
+			<exclude>./tests/Unit/AppServiceProviderTest.php</exclude>
+			<exclude>./tests/Unit/EmailTrainingTest.php</exclude>
         </testsuite>
     </testsuites>
     <filter>
