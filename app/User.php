@@ -37,7 +37,7 @@ class User extends Authenticatable
     /*
      * @var array $logAttributes defines will log the changed attributes
      */
-     use LogsActivity;
+    use LogsActivity;
     protected static $logAttributes = ['username', 'emp_num', 'first_name', 'nickname',
          'last_name', 'email', 'phone', 'jpas_name', 'status', 'clearance',
          'elig_date', 'inv', 'inv_close', 'destroyed_date', 'role', 'supervisor_id', 'access_level',
@@ -191,31 +191,31 @@ class User extends Authenticatable
         $ignoreList = ['password', 'last_logon', 'remember_token', 'ip'];
         $record = $logs = []; // define arrays
 
-      foreach (($user) ? $user->activity : Activity::all() as $entry) {
-          $record['updated_at'] = $entry->updated_at;
-          $record['user_fullname'] = $entry->properties['attributes']['last_name']
+        foreach (($user) ? $user->activity : Activity::all() as $entry) {
+            $record['updated_at'] = $entry->updated_at;
+            $record['user_fullname'] = $entry->properties['attributes']['last_name']
             .', '.$entry->properties['attributes']['first_name'];
 
-          $record['comment'] = '';
-          if ($entry->description == 'updated') { // Report all changes on each update
-          $result = $this->arrayRecursiveDiff($entry->changes->get('attributes'),
+            $record['comment'] = '';
+            if ($entry->description == 'updated') { // Report all changes on each update
+                $result = $this->arrayRecursiveDiff($entry->changes->get('attributes'),
               $entry->changes->get('old'));
-              foreach ($result as $key => $value) {
-                  if (!in_array($key, $ignoreList)) {
-                      $record['comment'] .=
+                foreach ($result as $key => $value) {
+                    if (!in_array($key, $ignoreList)) {
+                        $record['comment'] .=
                 ucfirst($key).' '.$entry->description." from '"
                 .$entry->changes->get('old')[$key]."' to '".$value."'.\n";
-                  }
-              }
-          } else { // description == 'created' ||  'deleted'
-            $record['comment'] .= $entry->description." user '".$record['user_fullname']."'.\n";
-          }
+                    }
+                }
+            } else { // description == 'created' ||  'deleted'
+                $record['comment'] .= $entry->description." user '".$record['user_fullname']."'.\n";
+            }
 
-        // Append only non-ignored record entries to log
-        if ($record['comment']) {
-            array_push($logs, $record);
+            // Append only non-ignored record entries to log
+            if ($record['comment']) {
+                array_push($logs, $record);
+            }
         }
-      }
 
         return collect($logs)->sortByDesc('updated_at');  // return latest -> earliest
     }

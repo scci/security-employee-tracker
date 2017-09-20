@@ -79,10 +79,10 @@ class TrainingTest extends TestCase
         $qInput = Request::input('q', $createdTrainingType->name);
         $trainingCollection = Training::trainingByType($qInput)->get();
 
-         // Filter the obtained collection to retrieve the just created training matching the id.
-         $foundTraining = $trainingCollection->filter(function ($item) use ($createdTraining) {
-             return $item->id == $createdTraining->id;
-         })->first();
+        // Filter the obtained collection to retrieve the just created training matching the id.
+        $foundTraining = $trainingCollection->filter(function ($item) use ($createdTraining) {
+            return $item->id == $createdTraining->id;
+        })->first();
 
         // Assert that the correct training is returned
         $this->assertNotEmpty($trainingCollection);
