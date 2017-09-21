@@ -1,10 +1,11 @@
 language: php
 php:
-  - '7.0.23'
+  - '7.0'
 
 before_install: phpenv config-add travis-composer-php.ini
 
 before_script:
+  - composer install --no-interaction
   - touch storage/database.sqlite
   - php artisan migrate --force
 
