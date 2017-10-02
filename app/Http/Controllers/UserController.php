@@ -180,10 +180,10 @@ class UserController extends Controller
         // the full list of completed trainings or the most recently completed training for each training type.
         $scheduledTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
                                 ->whereNull('completed_date');
-                
+
         // Now fetch the recently completed training records for the specified  user
         $recentCompletedTrainings = DB::table('training_user as t1')
-                                    ->where('id', function($query) use ($user) {
+                                    ->where('id', function ($query) use ($user) {
                                         $query->from('training_user as t2')
                                               ->selectRaw('t2.id')
                                               ->where('t2.user_id', '=', $user->id)

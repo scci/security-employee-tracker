@@ -33,7 +33,7 @@ class VisitControllerTest extends TestCase
         $this->call('GET', "/user/$userId/visit/create");
         $this->seePageIs("/user/$userId/visit/create");
 
-         // Logged in as a regular user - Cannot access the visit create page
+        // Logged in as a regular user - Cannot access the visit create page
         $this->actingAs($newuser);
         $this->call('GET', "/user/$userId/visit/create");
         $this->seeStatusCode(403);
@@ -47,37 +47,37 @@ class VisitControllerTest extends TestCase
         $this->seeStatusCode(403);
     }
 
-   /**
-    * @test
-    */
-   public function it_stores_the_visit_by_testing_each_user_role()
-   {
-       // Logged in as admin - Can store the visit
+    /**
+     * @test
+     */
+    public function it_stores_the_visit_by_testing_each_user_role()
+    {
+        // Logged in as admin - Can store the visit
         $userId = $this->user->id;
-       $data = ['smo_code'          => 'A SMO Code',
+        $data = ['smo_code'          => 'A SMO Code',
                  'visit_date'       => '2016-12-10',
                  'expiration_date'  => '2016-12-20',
                  'poc'              => 'A point of contact',
                  'phone'            => '12345',
                  'comment'          => 'Comment on visit', ];
 
-       $this->call('POST', "/user/$userId/visit/", $data);
-       $this->assertRedirectedToRoute('user.show', $userId);
+        $this->call('POST', "/user/$userId/visit/", $data);
+        $this->assertRedirectedToRoute('user.show', $userId);
 
         // Logged in as a regular user - Does not store the visit
         $newuser = factory(User::class)->create();
-       $this->actingAs($newuser);
-       $userId = $newuser->id;
-       $this->call('POST', "/user/$userId/visit/", $data);
-       $this->seeStatusCode(403);
+        $this->actingAs($newuser);
+        $userId = $newuser->id;
+        $this->call('POST', "/user/$userId/visit/", $data);
+        $this->seeStatusCode(403);
 
         // Logged in as a user with role view - Does not store the visit
         $newuser = factory(User::class)->create(['role' => 'view']);
-       $this->actingAs($newuser);
-       $userId = $newuser->id;
-       $this->call('POST', "/user/$userId/visit/", $data);
-       $this->seeStatusCode(403);
-   }
+        $this->actingAs($newuser);
+        $userId = $newuser->id;
+        $this->call('POST', "/user/$userId/visit/", $data);
+        $this->seeStatusCode(403);
+    }
 
     /**
      * @test
@@ -153,9 +153,9 @@ class VisitControllerTest extends TestCase
         $data = ['smo_code'         => 'A SMO Code',
                  'visit_date'       => '2016-12-11',
                  'expiration_date'  => '2016-12-28', ];
-                 //'poc'              => "A point of contact",
-                 //'phone'            => "12345",
-                 //'comment'          => 'Comment on visit'];
+        //'poc'              => "A point of contact",
+        //'phone'            => "12345",
+        //'comment'          => 'Comment on visit'];
 
         $this->call('PATCH', "/user/$userId/visit/$createdVisitId", $data);
 

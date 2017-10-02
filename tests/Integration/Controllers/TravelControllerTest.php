@@ -33,7 +33,7 @@ class TravelControllerTest extends TestCase
         $this->call('GET', "/user/$userId/travel/create");
         $this->seePageIs("/user/$userId/travel/create");
 
-         // Logged in as a regular user - Cannot access the travel create page
+        // Logged in as a regular user - Cannot access the travel create page
         $this->actingAs($newuser);
         $this->call('GET', "/user/$userId/travel/create");
         $this->seeStatusCode(403);

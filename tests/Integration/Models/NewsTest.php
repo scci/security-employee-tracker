@@ -38,7 +38,7 @@ class NewsTest extends TestCase
     {
         $createdNews1 = factory(SET\News::class)->create(
                         ['publish_date' => Carbon::tomorrow()->format('Y-m-d')]); //,
-                        // 'expire_date'=>Carbon::yesterday()->format('Y-m-d')]);
+        // 'expire_date'=>Carbon::yesterday()->format('Y-m-d')]);
 
         // Query the database using the scopePublishedNews method in the news model
         $newsPublished = News::publishedNews()->where('id', $createdNews1->id)->get();
