@@ -1,7 +1,6 @@
 <?php
 
 namespace Tests\Integration\Models;
-use Tests\TestCase;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -9,6 +8,7 @@ use Illuminate\Support\Facades\Mail;
 use SET\Mail\SendNewsEmail;
 use SET\News;
 use SET\User;
+use Tests\TestCase;
 
 class NewsTest extends TestCase
 {
@@ -41,7 +41,7 @@ class NewsTest extends TestCase
     {
         $createdNews1 = factory(News::class)->create(
                         ['publish_date' => Carbon::tomorrow()->format('Y-m-d')]); //,
-                        // 'expire_date'=>Carbon::yesterday()->format('Y-m-d')]);
+        // 'expire_date'=>Carbon::yesterday()->format('Y-m-d')]);
 
         // Query the database using the scopePublishedNews method in the news model
         $newsPublished = News::publishedNews()->where('id', $createdNews1->id)->get();

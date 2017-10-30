@@ -107,7 +107,7 @@ class TrainingTypeController extends Controller
     {
         $this->authorize('edit');
         $trainingtype = TrainingType::findOrFail($id);
-        $trainingtype->trainings()->update(['training_type_id'=>null]);
+        $trainingtype->trainings()->update(['training_type_id' => null]);
         $trainingtype->delete();
     }
 }

@@ -1,10 +1,10 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Console\Commands\DeleteUsers;
 use SET\User;
+use Tests\Testcase;
 
 class DeleteUsersTest extends TestCase
 {

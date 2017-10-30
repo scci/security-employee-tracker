@@ -1,10 +1,10 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Console\Commands\ExpiringVisits;
 use SET\Visit;
+use Tests\Testcase;
 
 class ExpiringVisitsTest extends TestCase
 {

@@ -1,11 +1,11 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\User;
 use SET\Visit;
+use Tests\TestCase;
 
 class VisitControllerTest extends TestCase
 {
@@ -46,7 +46,7 @@ class VisitControllerTest extends TestCase
         $response->assertSee('Point of Contact');
         $response->assertSee('PoC Phone Number');
 
-         // Logged in as a regular user - Cannot access the visit create page
+        // Logged in as a regular user - Cannot access the visit create page
         $this->actingAs($newuser);
         $response = $this->get("/user/$userId/visit/create");
         $response->assertStatus(403);
@@ -60,37 +60,37 @@ class VisitControllerTest extends TestCase
         $response->assertStatus(403);
     }
 
-   /**
-    * @test
-    */
-   public function it_stores_the_visit_by_testing_each_user_role()
-   {
-       // Logged in as admin - Can store the visit
-       $userId = $this->user->id;
-       $data = ['smo_code'          => 'A SMO Code',
-                 'visit_date'       => '2016-12-10',
-                 'expiration_date'  => '2016-12-20',
-                 'poc'              => 'A point of contact',
-                 'phone'            => '12345',
-                 'comment'          => 'Comment on visit', ];
+    /**
+     * @test
+     */
+    public function it_stores_the_visit_by_testing_each_user_role()
+    {
+        // Logged in as admin - Can store the visit
+        $userId = $this->user->id;
+        $data = ['smo_code'         => 'A SMO Code',
+                 'visit_date'      => '2016-12-10',
+                 'expiration_date' => '2016-12-20',
+                 'poc'             => 'A point of contact',
+                 'phone'           => '12345',
+                 'comment'         => 'Comment on visit', ];
 
-       $response = $this->post("/user/$userId/visit/", $data);
-       $response->assertRedirect('user/'.$userId);
+        $response = $this->post("/user/$userId/visit/", $data);
+        $response->assertRedirect('user/'.$userId);
 
-       // Logged in as a regular user - Does not store the visit
-       $newuser = factory(User::class)->create();
-       $this->actingAs($newuser);
-       $userId = $newuser->id;
-       $response = $this->post("/user/$userId/visit/", $data);
-       $response->assertStatus(403);
+        // Logged in as a regular user - Does not store the visit
+        $newuser = factory(User::class)->create();
+        $this->actingAs($newuser);
+        $userId = $newuser->id;
+        $response = $this->post("/user/$userId/visit/", $data);
+        $response->assertStatus(403);
 
-       // Logged in as a user with role view - Does not store the visit
-       $newuser = factory(User::class)->create(['role' => 'view']);
-       $this->actingAs($newuser);
-       $userId = $newuser->id;
-       $response = $this->post("/user/$userId/visit/", $data);
-       $response->assertStatus(403);
-   }
+        // Logged in as a user with role view - Does not store the visit
+        $newuser = factory(User::class)->create(['role' => 'view']);
+        $this->actingAs($newuser);
+        $userId = $newuser->id;
+        $response = $this->post("/user/$userId/visit/", $data);
+        $response->assertStatus(403);
+    }
 
     /**
      * @test
@@ -107,12 +107,12 @@ class VisitControllerTest extends TestCase
         $response->assertSessionHasErrors('smo_code', 'The smo_code field is required.');
         $response->assertSessionHasErrors('expiration_date', 'The expiration date field is required.');
 
-        $data = ['smo_code'         => '',
-                 'visit_date'       => '',
-                 'expiration_date'  => '',
-                 'poc'              => '',
-                 'phone'            => '',
-                 'comment'          => '', ];
+        $data = ['smo_code'        => '',
+                 'visit_date'      => '',
+                 'expiration_date' => '',
+                 'poc'             => '',
+                 'phone'           => '',
+                 'comment'         => '', ];
 
         $response = $this->post("/user/$userId/visit/", $data);
         $response->assertSessionHasErrors();
@@ -134,7 +134,7 @@ class VisitControllerTest extends TestCase
         // Logged in as admin - Can edit the visit
         $response = $this->get("/user/$userId/visit/$createdVisitId/edit");
         $response->assertStatus(200);
-        $response->assertSee("Update a Visit");
+        $response->assertSee('Update a Visit');
         $response->assertViewHas('user');
         $response->assertViewHas('visit');
 
@@ -164,12 +164,12 @@ class VisitControllerTest extends TestCase
         $createdVisitId = $visitToCreate->id;
 
         // Logged in as admin - Can update the visit
-        $data = ['smo_code'         => 'A SMO Code',
-                 'visit_date'       => '2016-12-11',
-                 'expiration_date'  => '2016-12-28', ];
-                 //'poc'              => "A point of contact",
-                 //'phone'            => "12345",
-                 //'comment'          => 'Comment on visit'];
+        $data = ['smo_code'        => 'A SMO Code',
+                 'visit_date'      => '2016-12-11',
+                 'expiration_date' => '2016-12-28', ];
+        //'poc'              => "A point of contact",
+        //'phone'            => "12345",
+        //'comment'          => 'Comment on visit'];
 
         $response = $this->patch("/user/$userId/visit/$createdVisitId", $data);
 

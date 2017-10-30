@@ -1,11 +1,11 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Travel;
 use SET\User;
+use Tests\TestCase;
 
 class TravelControllerTest extends TestCase
 {
@@ -27,7 +27,7 @@ class TravelControllerTest extends TestCase
 
         $response = $this->get("/user/$userId/travel/create");
         $response->assertStatus(200);
-        $response->assertSeeText("Add a Travel");
+        $response->assertSeeText('Add a Travel');
 
         // Create a regular user - Still logged in as admin
         $newuser = factory(User::class)->create();
@@ -36,9 +36,9 @@ class TravelControllerTest extends TestCase
         // Admin can access another user's travel create page
         $response = $this->get("/user/$userId/travel/create");
         $response->assertStatus(200);
-        $response->assertSeeText("Add a Travel");
+        $response->assertSeeText('Add a Travel');
 
-         // Logged in as a regular user - Cannot access the travel create page
+        // Logged in as a regular user - Cannot access the travel create page
         $this->actingAs($newuser);
         $response = $this->get("/user/$userId/travel/create");
         $response->assertStatus(403);
@@ -59,13 +59,13 @@ class TravelControllerTest extends TestCase
     {
         // Logged in as admin - Can store the travel
         $userId = $this->user->id;
-        $data = ['location'      => 'Test travel',
-                 'leave_date'    => '2016-12-10',
-                 'return_date'   => '2016-12-20',
-                 'brief_date'    => '2016-12-08',
-                 'debrief_date'  => '2016-12-21',
-                 'comment'       => 'Description For travel',
-                 'encrypt'       => '', ];
+        $data = ['location'     => 'Test travel',
+                 'leave_date'   => '2016-12-10',
+                 'return_date'  => '2016-12-20',
+                 'brief_date'   => '2016-12-08',
+                 'debrief_date' => '2016-12-21',
+                 'comment'      => 'Description For travel',
+                 'encrypt'      => '', ];
 
         $response = $this->post("/user/$userId/travel/", $data);
         $response->assertStatus(302);
@@ -149,10 +149,10 @@ class TravelControllerTest extends TestCase
         $createdTravelId = $travelToCreate->id;
 
         // Logged in as admin - Can update the travel
-        $data = ['location'     => 'Travel to this place',
-                 'comment'      => 'This is a travel comment',
-                 'leave_date'   => '2016-12-10',
-                 'return_date'  => '2016-12-20', ];
+        $data = ['location'    => 'Travel to this place',
+                 'comment'     => 'This is a travel comment',
+                 'leave_date'  => '2016-12-10',
+                 'return_date' => '2016-12-20', ];
 
         $response = $this->patch("/user/$userId/travel/$createdTravelId", $data);
 

@@ -1,11 +1,11 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Training;
 use SET\User;
+use Tests\TestCase;
 
 class HomeControllerTest extends TestCase
 {

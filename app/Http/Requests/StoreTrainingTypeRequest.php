@@ -24,8 +24,8 @@ class StoreTrainingTypeRequest extends Request
     public function rules()
     {
         return [
-            'name'      => 'required',
-            'status'    => 'required',
+            'name'   => 'required',
+            'status' => 'required',
         ];
     }
 

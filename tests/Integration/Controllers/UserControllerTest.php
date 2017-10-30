@@ -1,15 +1,15 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Http\Controllers\UserController;
-use SET\User;
 use SET\Training;
 use SET\TrainingType;
 use SET\TrainingUser;
+use SET\User;
+use Tests\TestCase;
 
 /**
  * Class UserControllerTest.
@@ -73,20 +73,20 @@ class UserControllerTest extends TestCase
      */
     public function it_stores_the_user_by_testing_each_user_role()
     {
-        $data = ['first_name'       => 'John',
-                 'nickname'         => 'Johnny',
-                 'last_name'        => 'Smith',
-                 'email'            => 'jsmith@test.com',
-                 'username'         => 'jsmith',
-                 'phone'            => '1234567890',
-                 'emp_num'          => '321',
-                 'supervisor_id'    => '21',
-                 'access_level'     => 'secret',
-                 'clearance'        => 'interim',
-                 'elig_date'        => '2016-12-20',
-                 'inv'              => 'investigation',
-                 'inv_close'        => '2016-12-29',
-                 'status'           => 'active', ];
+        $data = ['first_name'    => 'John',
+                 'nickname'      => 'Johnny',
+                 'last_name'     => 'Smith',
+                 'email'         => 'jsmith@test.com',
+                 'username'      => 'jsmith',
+                 'phone'         => '1234567890',
+                 'emp_num'       => '321',
+                 'supervisor_id' => '21',
+                 'access_level'  => 'secret',
+                 'clearance'     => 'interim',
+                 'elig_date'     => '2016-12-20',
+                 'inv'           => 'investigation',
+                 'inv_close'     => '2016-12-29',
+                 'status'        => 'active', ];
 
         $response = $this->post('user', $data);
         $response->assertRedirect('/user');
@@ -123,8 +123,8 @@ class UserControllerTest extends TestCase
         $response->assertSessionHasErrors('last_name', 'The last_name field is required.');
         $response->assertSessionHasErrors('email', 'The email field is required.');
 
-        $data = ['first_name'   => 'Jane',
-                 'last_name'    => 'Doe', ];
+        $data = ['first_name' => 'Jane',
+                 'last_name'  => 'Doe', ];
 
         $response = $this->post('user', $data);
         $response->assertSessionHasErrors();
@@ -414,20 +414,20 @@ class UserControllerTest extends TestCase
         $createdUserId = $createdUser->id;
 
         // Logged in as admin - Can update the user
-        $data = ['first_name'       => 'John',
-                 'last_name'        => 'Doe',
-                 'nickname'         => 'Johnny',
-                 'email'            => $createdUser->email,
-                 'username'         => $createdUser->username,
-                 'phone'            => $createdUser->phone,
-                 'emp_num'          => $createdUser->emp_num,
-                 'supervisor_id'    => $createdUser->supervisor_id,
-                 'access_level'     => $createdUser->access_level,
-                 'clearance'        => $createdUser->clearance,
-                 'elig_date'        => $createdUser->elig_date,
-                 'inv'              => $createdUser->inv,
-                 'inv_close'        => $createdUser->inv_close,
-                 'status'           => $createdUser->status, ];
+        $data = ['first_name'    => 'John',
+                 'last_name'     => 'Doe',
+                 'nickname'      => 'Johnny',
+                 'email'         => $createdUser->email,
+                 'username'      => $createdUser->username,
+                 'phone'         => $createdUser->phone,
+                 'emp_num'       => $createdUser->emp_num,
+                 'supervisor_id' => $createdUser->supervisor_id,
+                 'access_level'  => $createdUser->access_level,
+                 'clearance'     => $createdUser->clearance,
+                 'elig_date'     => $createdUser->elig_date,
+                 'inv'           => $createdUser->inv,
+                 'inv_close'     => $createdUser->inv_close,
+                 'status'        => $createdUser->status, ];
 
         $response = $this->patch("/user/$createdUserId", $data);
 
@@ -531,10 +531,10 @@ class UserControllerTest extends TestCase
                 // Assign users to trainings (both incomplete and completed)
                 if ($createdTraining->id % 2 == 0) {
                     $createdTraining->users()->attach($createdUser, ['due_date' => Carbon::tomorrow()->format('Y-m-d'),
-                      'author_id'                                               => 1, 'completed_date'=>null, ]);
+                      'author_id'                                               => 1, 'completed_date' => null, ]);
                 } else {
                     $createdTraining->users()->attach($createdUser, ['due_date' => Carbon::tomorrow()->format('Y-m-d'),
-                      'author_id'                                               => 1, 'completed_date'=>Carbon::yesterday()->format('Y-m-d'), ]);
+                      'author_id'                                               => 1, 'completed_date' => Carbon::yesterday()->format('Y-m-d'), ]);
                 }
                 // Associating trainingtype to 2/3 Trainings
                 if ($createdTraining->id % 3 != 0) {

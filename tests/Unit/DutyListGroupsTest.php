@@ -1,12 +1,12 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Duty;
 use SET\Group;
 use SET\Handlers\Duty\DutyList;
 use SET\User;
+use Tests\Testcase;
 
 class DutyListGroupsTest extends TestCase
 {

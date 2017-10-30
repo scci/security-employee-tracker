@@ -1,13 +1,13 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Illuminate\Support\Facades\Event;
+use SET\Events\TrainingAssigned;
 use SET\Training;
 use SET\TrainingUser;
 use SET\User;
-use SET\Events\TrainingAssigned;
+use Tests\TestCase;
 
 class TrainingUserControllerTest extends TestCase
 {
@@ -28,7 +28,7 @@ class TrainingUserControllerTest extends TestCase
         $response = $this->get("/user/$userId/training/create");
         $response->assertStatus(200);
 
-        $response->assertSeeText("Assign Training");
+        $response->assertSeeText('Assign Training');
         $response->assertViewHas('user');
         $response->assertViewHas('training');
         $response->assertViewHas('disabled');
@@ -58,15 +58,15 @@ class TrainingUserControllerTest extends TestCase
         // Logged in as admin - Can store the training user
         Event::fake();
         $userId = $this->user->id;
-        $data = ['training_id'      => factory(Training::class)->create()->id,
-                 'completed_date'   => '',
-                 'due_date'         => '2017-01-23',
-                 'encrypt'          => '',
-                 'comment'          => 'Training user notes', ];
+        $data = ['training_id'    => factory(Training::class)->create()->id,
+                 'completed_date' => '',
+                 'due_date'       => '2017-01-23',
+                 'encrypt'        => '',
+                 'comment'        => 'Training user notes', ];
 
         $response = $this->post("/user/$userId/training/", $data);
         $response->assertStatus(302);
-        $response->assertRedirect('/user/'.$userId);        
+        $response->assertRedirect('/user/'.$userId);
         //$this->expectsEvents(SET\Events\TrainingAssigned::class);
         Event::assertDispatched(TrainingAssigned::class);
 
@@ -185,7 +185,7 @@ class TrainingUserControllerTest extends TestCase
         // Logged in as admin - Can edit the training
         $response = $this->get("/user/$userId/training/$trainingUserId/edit");
         $response->assertStatus(200);
-        $response->assertSeeText("Update Training");
+        $response->assertSeeText('Update Training');
         $response->assertViewHas('user');
         $response->assertViewHas('trainingUser');
         $response->assertViewHas('training');
@@ -198,7 +198,7 @@ class TrainingUserControllerTest extends TestCase
         // Able to edit the new user's training
         $response = $this->get("/user/$userId/training/$trainingUserId/edit");
         $response->assertStatus(200);
-        $response->assertSeeText("Update Training");
+        $response->assertSeeText('Update Training');
         $response->assertViewHas('user');
         $response->assertViewHas('trainingUser');
         $response->assertViewHas('training');
@@ -209,7 +209,7 @@ class TrainingUserControllerTest extends TestCase
 
         $response = $this->get("/user/$userId/training/$trainingUserId/edit");
         $response->assertStatus(200);
-        $response->assertSeeText("Update Training");
+        $response->assertSeeText('Update Training');
         $response->assertViewHas('user');
         $response->assertViewHas('trainingUser');
         $response->assertViewHas('training');
@@ -246,10 +246,10 @@ class TrainingUserControllerTest extends TestCase
         $createdTrainingUserId = $trainingUserToCreate->id;
 
         // Logged in as admin - Can update the training user
-        $data = ['training_id'      => $createdTrainingUserId,
-                 'completed_date'   => '',
-                 'due_date'         => '2016-12-29',
-                 'comment'          => 'Training User Notes',
+        $data = ['training_id'    => $createdTrainingUserId,
+                 'completed_date' => '',
+                 'due_date'       => '2016-12-29',
+                 'comment'        => 'Training User Notes',
                 ];
 
         $response = $this->patch("/user/$userId/training/$createdTrainingUserId", $data);

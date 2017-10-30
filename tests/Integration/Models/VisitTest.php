@@ -1,11 +1,11 @@
 <?php
 
 namespace Tests\Integration\Models;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\Visit;
 use SET\User;
+use SET\Visit;
+use Tests\TestCase;
 
 class VisitTest extends TestCase
 {
@@ -18,7 +18,7 @@ class VisitTest extends TestCase
         for ($i = 0; $i < 5; $i++) {
             $user = factory(User::class)->create();
             $visit = factory(Visit::class)->create();
-            
+
             $visit->user_id = $user->id;
             $visit->save();
             $visits[] = $visit->id;

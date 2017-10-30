@@ -1,11 +1,11 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Duty;
 use SET\User;
+use Tests\TestCase;
 
 class DutySwapControllerTest extends TestCase
 {
