@@ -1,6 +1,5 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Console\Commands\RenewTraining;
@@ -8,6 +7,7 @@ use SET\Events\TrainingAssigned;
 use SET\Training;
 use SET\TrainingUser;
 use SET\User;
+use Tests\Testcase;
 
 class RenewTrainingTest extends TestCase
 {

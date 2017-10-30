@@ -1,10 +1,10 @@
 <?php
 
 namespace Tests\Integration\Models;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Travel;
+use Tests\TestCase;
 
 class TravelTest extends TestCase
 {

@@ -1,9 +1,9 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
-use SET\User;
 use Illuminate\Support\Facades\Log;
+use SET\User;
+use Tests\Testcase;
 
 class GetLogUsersTest extends TestCase
 {
@@ -71,10 +71,10 @@ class GetLogUsersTest extends TestCase
         $user1->save();
 
         $user1 = User::where('username', 'ssample')->first();
-        
+
         $obj = new SET\User();
         $changes = $obj->getUserLog($user1)->last();  // Sample first record
-        
+
         $this->assertStringStartsWith("created user 'Sample", $changes['comment']);
     }
 
@@ -87,14 +87,14 @@ class GetLogUsersTest extends TestCase
     {
         usleep(1000000); // delay to allow update_at to differ
         $user1 = User::where('username', 'ssample')->first();
-        
+
         $obj = new SET\User();
         $user1->inv = 'XYZ';
         $user1->save();
         $user1 = User::where('username', 'ssample')->first();
 
         $changes = $obj->getUserLog($user1)->first(); // Sample last entry for user
-        
+
         // Test against ssample investigation changes
         $this->assertStringStartsWith('Sample, Susan', $changes['user_fullname']);
         $this->assertStringStartsWith("Inv updated from 'ABCD' to 'XYZ'.", $changes['comment']);
@@ -114,7 +114,7 @@ class GetLogUsersTest extends TestCase
 
         $obj = new SET\User();
         $changes = $obj->getUserLog()->first(); // Sample last entry
-        
+
         // Test against most recent eexample access level changes
         $this->assertStringStartsWith('Yahoo, Apple', $changes['user_fullname']);
         $this->assertStringStartsWith("Access_level updated from 'S' to 'Unclass'.",

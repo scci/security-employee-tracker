@@ -1,6 +1,5 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Console\Commands\ProcessMonday;
@@ -10,6 +9,7 @@ use SET\Setting;
 use SET\Training;
 use SET\User;
 use SET\Visit;
+use Tests\Testcase;
 
 class ProcessMondayTest extends TestCase
 {

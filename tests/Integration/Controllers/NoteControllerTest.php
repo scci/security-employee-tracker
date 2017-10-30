@@ -1,11 +1,11 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Note;
 use SET\User;
+use Tests\TestCase;
 
 class NoteControllerTest extends TestCase
 {
@@ -29,7 +29,7 @@ class NoteControllerTest extends TestCase
         $response->assertSee('Add a Note');
         $response->assertSee('Private');
         $response->assertSee('File has PII/Encrypt File');
-        
+
         // Logged in as a regular user - Cannot access the note create page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
@@ -54,10 +54,10 @@ class NoteControllerTest extends TestCase
     {
         // Logged in as admin - Can store the note
         $userId = $this->user->id;
-        $data = ['title'    => 'Test Note',
-                 'comment'  => 'Description For Note',
-                 'private'  => '1',
-                 'alert'    => 0, ];
+        $data = ['title'   => 'Test Note',
+                 'comment' => 'Description For Note',
+                 'private' => '1',
+                 'alert'   => 0, ];
 
         $response = $this->post("/user/$userId/note/", $data);
         $response->assertRedirect('user/'.$userId);
@@ -137,10 +137,10 @@ class NoteControllerTest extends TestCase
         $createdNoteId = $noteToCreate->id;
 
         // Logged in as admin - Can update the note
-        $data = ['title'    => 'Test Note',
-                 'comment'  => 'Description For Note',
-                 'private'  => '1', ]; //,
-                 //'alert'   => 0, ];
+        $data = ['title'   => 'Test Note',
+                 'comment' => 'Description For Note',
+                 'private' => '1', ]; //,
+        //'alert'   => 0, ];
 
         $response = $this->patch("/user/$userId/note/$createdNoteId", $data);
 

@@ -1,12 +1,12 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\News;
 use SET\User;
+use Tests\TestCase;
 
 class NewsControllerTest extends TestCase
 {
@@ -159,12 +159,12 @@ class NewsControllerTest extends TestCase
 
         // Logged in as admin - Can edit the news details
         $response = $this->get("news/$createdNewsId/edit");
-        $response->assertStatus(200);        
-        $response->assertSee("Edit News");
-        $response->assertSee("Title");
-        $response->assertSee("Publish Date:");
+        $response->assertStatus(200);
+        $response->assertSee('Edit News');
+        $response->assertSee('Title');
+        $response->assertSee('Publish Date:');
         $response->assertSee($createdNews->publish_date);
-        $response->assertSee("Expires On:");
+        $response->assertSee('Expires On:');
 
         // Logged in as a regular user - Cannot edit the news details
         $newuser = factory(User::class)->create();

@@ -1,8 +1,8 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
 use SET\Handlers\DateFormat;
+use Tests\Testcase;
 
 class DateFormatTest extends TestCase
 {

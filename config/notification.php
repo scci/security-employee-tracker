@@ -10,7 +10,7 @@ return [
     | Session key for messages.
     |
     */
-    'session_key'                           => 'notifications',
+    'session_key' => 'notifications',
 
     /*
     |--------------------------------------------------------------------------
@@ -20,7 +20,7 @@ return [
     | This name will be used to name default container (when calling it with null value).
     |
     */
-    'default_container'                     => 'default',
+    'default_container' => 'default',
 
     /*
     |--------------------------------------------------------------------------
@@ -30,7 +30,7 @@ return [
     | These types will be added for new containers.
     |
     */
-    'default_types'                         => ['info', 'success', 'warning', 'error'],
+    'default_types' => ['info', 'success', 'warning', 'error'],
 
     /*
     |--------------------------------------------------------------------------
@@ -40,7 +40,7 @@ return [
     | Specify available types for each container separately.
     |
     */
-    'types'                                 => [],
+    'types' => [],
 
     /*
     |--------------------------------------------------------------------------
@@ -54,7 +54,7 @@ return [
     | :message - message text.
     |
     */
-    'default_format'                        => '<script>Materialize.toast(\':message\', 4000)</script>',
+    'default_format' => '<script>Materialize.toast(\':message\', 4000)</script>',
 
     /*
     |--------------------------------------------------------------------------
@@ -74,7 +74,7 @@ return [
     | :message - message text.
     |
     */
-    'format'                                => [],
+    'format' => [],
 
     /*
     |--------------------------------------------------------------------------
@@ -88,11 +88,11 @@ return [
     | :message - message text.
     |
     */
-    'default_formats'                       => [
-        'info'                  => '<div class="card-panel light-blue accent-1">:message</div>',
-        'success'               => '<script>Materialize.toast(\':message\', 4000)</script>',
-        'warning'               => '<div class="card-panel yellow accent-1">:message</div>',
-        'error'                 => '<div class="card-panel red accent-2">:message</div>',
+    'default_formats' => [
+        'info'    => '<div class="card-panel light-blue accent-1">:message</div>',
+        'success' => '<script>Materialize.toast(\':message\', 4000)</script>',
+        'warning' => '<div class="card-panel yellow accent-1">:message</div>',
+        'error'   => '<div class="card-panel red accent-2">:message</div>',
     ],
 
     /*
@@ -115,6 +115,6 @@ return [
     | :message - message text.
     |
     */
-    'formats'                       => [],
+    'formats' => [],
 
 ];

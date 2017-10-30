@@ -1,12 +1,12 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
 use SET\Console\Commands\SendNews;
 use SET\Mail\SendNewsEmail;
 use SET\News;
+use Tests\Testcase;
 
 class SendNewsTest extends TestCase
 {

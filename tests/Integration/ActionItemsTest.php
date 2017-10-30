@@ -1,13 +1,13 @@
 <?php
 
 namespace Tests\Integration;
-use Tests\TestCase;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Training;
 use SET\User;
 use SET\Visit;
+use Tests\TestCase;
 
 /**
  * Class ActionItemsTest.
