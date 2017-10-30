@@ -1,18 +1,18 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
+use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Notification;
-use Carbon\Carbon;
+use SET\Events\TrainingAssigned;
+use SET\Note;
 use SET\Training;
 use SET\TrainingType;
 use SET\TrainingUser;
 use SET\User;
-use SET\Note;
-use SET\Events\TrainingAssigned;
+use Tests\TestCase;
 
 class TrainingControllerTest extends TestCase
 {
@@ -40,13 +40,12 @@ class TrainingControllerTest extends TestCase
         $response = $this->get('training');
         $response->assertStatus(403);
 
-
         // Logged in as a user with role view - Can access the training page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $response = $this->get('training');
         $response->assertStatus(200); // OK status code
-        $response->assertSee("Training, Credentials and Briefings");        
+        $response->assertSee('Training, Credentials and Briefings');
         $response->assertViewHas('trainings');
         $response->assertViewHas('isTrainingType');
         $response->assertViewHas('hasTrainingType');
@@ -67,11 +66,11 @@ class TrainingControllerTest extends TestCase
         // Logged in as admin - Can access the training page
         $response = $this->get('training');
         $response->assertStatus(200); // OK status code
-        $response->assertSee("Training, Credentials and Briefings");        
+        $response->assertSee('Training, Credentials and Briefings');
         $response->assertViewHas('trainings');
         $response->assertViewHas('isTrainingType');
         $response->assertViewHas('hasTrainingType');
-        
+
         //  Verify page components when no Training Types (views\layouts\_navbar.blade.php)
         $response->assertSee('/training">Trainings</a>'); // Navbar item
         $response->assertDontSee('<th>Type</th>'); // Table column
@@ -83,7 +82,7 @@ class TrainingControllerTest extends TestCase
         $createdTrainingTypeId = $createdTrainingType->id;
 
         // Create a training object
-        $createdTraining = factory(Training::class)->create([]);        
+        $createdTraining = factory(Training::class)->create([]);
 
         // Associating trainingtype to a Training
         $createdTraining->trainingType()->associate($createdTrainingType);
@@ -121,7 +120,7 @@ class TrainingControllerTest extends TestCase
         // Logged in as admin - Can access the training page
         $response = $this->get("training/trainingtype/$createdTrainingTypeId");
         $response->assertStatus(200); // OK status code
-        
+
         // Verify page components for inactive training types (app\Providers\ComposerServiceProvider.php)
         $response->assertSee('/training">Trainings</a>'); // Navbar item displays if no active training types
     }
@@ -134,7 +133,7 @@ class TrainingControllerTest extends TestCase
         // Logged in as admin - Can access the training create page
         $response = $this->get('training/create');
         $response->assertStatus(200);
-        
+
         $response->assertViewHas('users');
         $response->assertViewHas('groups');
         $response->assertViewHas('training_types');
@@ -235,19 +234,19 @@ class TrainingControllerTest extends TestCase
 
         // MIMIC call when there are training types
         // Create trainingtype object
-        $createdTrainingType = factory(TrainingType::class)->create([]);        
+        $createdTrainingType = factory(TrainingType::class)->create([]);
         // Associating trainingtype to a Training
-        $createdTraining->trainingType()->associate($createdTrainingType);                
+        $createdTraining->trainingType()->associate($createdTrainingType);
         $createdTraining->save();
         // Ensure trainingtype is associated with training
-        $this->assertEquals($createdTrainingType->id, $createdTraining->training_type_id);        
-        
+        $this->assertEquals($createdTrainingType->id, $createdTraining->training_type_id);
+
         // Logged in as admin - Can access the training page
-        $response= $this->get("training/$createdTrainingId");
-        
+        $response = $this->get("training/$createdTrainingId");
+
         $response->assertStatus(200); // OK status code
         $response->assertViewHas('training');
-        
+
         // Verify page components - When there are no training types (views\layouts\_new_training.blade.php)
         $response->assertSee('Auto Renew'); // Block title
         $response->assertSee('Attachments'); // Block title
@@ -265,7 +264,7 @@ class TrainingControllerTest extends TestCase
         $createdTrainingId = $createdTraining->id;
 
         // Logged in as admin - Can edit the training details
-        $response= $this->get("training/$createdTrainingId/edit");
+        $response = $this->get("training/$createdTrainingId/edit");
 
         $response->assertStatus(200);
         $response->assertViewHas('training');
@@ -276,13 +275,13 @@ class TrainingControllerTest extends TestCase
         // Logged in as a regular user - Cannot edit the training details
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $response= $this->get("training/$createdTrainingId/edit");
+        $response = $this->get("training/$createdTrainingId/edit");
         $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot edit the training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $response= $this->get("training/$createdTrainingId/edit");
+        $response = $this->get("training/$createdTrainingId/edit");
         $response->assertStatus(403);
     }
 
@@ -302,7 +301,7 @@ class TrainingControllerTest extends TestCase
                  'assign'      => 'None',
                  'due_date'    => '2016-11-28', ];
 
-        $response= $this->patch("training/$createdTrainingId", $data);
+        $response = $this->patch("training/$createdTrainingId", $data);
 
         $response->assertRedirect("/training/$createdTrainingId");
 
@@ -323,13 +322,13 @@ class TrainingControllerTest extends TestCase
         // Logged in as a regular user - Cannot update the training
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $response= $this->patch("training/$createdTrainingId", $data);
+        $response = $this->patch("training/$createdTrainingId", $data);
         $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot update the training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $response= $this->patch("training/$createdTrainingId", $data);
+        $response = $this->patch("training/$createdTrainingId", $data);
         $response->assertStatus(403);
     }
 
@@ -392,7 +391,7 @@ class TrainingControllerTest extends TestCase
         //$response = $this->get('TrainingController@assignForm', $createdTrainingId);
         $response = $this->get('training/'.$createdTrainingId.'/assign');
 
-        $response->assertStatus(200);        
+        $response->assertStatus(200);
         $response->assertViewHas('training');
         $response->assertViewHas('users');
         $response->assertViewHas('groups');
@@ -460,22 +459,22 @@ class TrainingControllerTest extends TestCase
     {
         Event::fake();
         Notification::fake();
-        
+
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $createdTrainingId = $training->id;
-        
+
         $trainingUser = factory(TrainingUser::class)->create(
-                     ['training_id'    => $createdTrainingId,
+                     ['training_id'   => $createdTrainingId,
                      'user_id'        => $this->user->id,
                      'due_date'       => Carbon::today()->subday(365)->format('Y-m-d'),
                      'author_id'      => $this->user->id,
-                     'completed_date' => Carbon::today()->subday(336)->format('Y-m-d'),]);
+                     'completed_date' => Carbon::today()->subday(336)->format('Y-m-d'), ]);
         $trainingUserId = $trainingUser->id;
-        
+
         $response = $this->actingAs($this->user)->get('training/reminder/'.$trainingUserId);
         $response->assertStatus(302);
-        
-        Event::shouldReceive('fire')->with(new TrainingAssigned($trainingUser));        
+
+        Event::shouldReceive('fire')->with(new TrainingAssigned($trainingUser));
         Notification::shouldReceive('Reminder sent to');
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
-use Tests\Testcase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Setting;
+use Tests\Testcase;
 
 class SettingsTest extends TestCase
 {

@@ -13,15 +13,15 @@
 
 $factory->define(SET\User::class, function (Faker\Generator $faker) {
     return [
-        'emp_num'       => $faker->unique()->randomNumber(4),
-        'first_name'    => $faker->firstName,
-        'nickname'      => $faker->firstName,
-        'last_name'     => $faker->lastName,
-        'email'         => $faker->email,
-        'phone'         => $faker->phoneNumber,
-        'status'        => 'active',
-        'username'      => $faker->unique()->userName,
-        'password'      => $faker->password,
+        'emp_num'    => $faker->unique()->randomNumber(4),
+        'first_name' => $faker->firstName,
+        'nickname'   => $faker->firstName,
+        'last_name'  => $faker->lastName,
+        'email'      => $faker->email,
+        'phone'      => $faker->phoneNumber,
+        'status'     => 'active',
+        'username'   => $faker->unique()->userName,
+        'password'   => $faker->password,
     ];
 });
 
@@ -35,10 +35,10 @@ $factory->define(SET\Training::class, function (Faker\Generator $faker) {
 
 $factory->define(SET\TrainingType::class, function (Faker\Generator $faker) {
     return [
-        'name'           => $faker->text(5).' type '.$faker->text(15),
-        'description'    => $faker->text(120),
-        'sidebar'        => rand(0, 1),
-        'status'         => 1,
+        'name'        => $faker->text(5).' type '.$faker->text(15),
+        'description' => $faker->text(120),
+        'sidebar'     => rand(0, 1),
+        'status'      => 1,
     ];
 });
 

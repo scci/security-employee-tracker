@@ -1,6 +1,5 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
@@ -8,6 +7,7 @@ use SET\Console\Commands\UpdateDuty;
 use SET\Duty;
 use SET\Mail\DutyToday;
 use SET\User;
+use Tests\Testcase;
 
 class UpdateDutyTest extends TestCase
 {

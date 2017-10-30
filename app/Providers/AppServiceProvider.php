@@ -4,8 +4,8 @@ namespace SET\Providers;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
-use SET\Handlers\DBConfigs\DBConfigs;
 use Laravel\Dusk\DuskServiceProvider;
+use SET\Handlers\DBConfigs\DBConfigs;
 use SET\Setting;
 
 class AppServiceProvider extends ServiceProvider

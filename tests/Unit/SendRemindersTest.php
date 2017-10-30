@@ -1,6 +1,5 @@
 <?php
 
-use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
@@ -9,6 +8,7 @@ use SET\Events\TrainingAssigned;
 use SET\Mail\EmailSupervisorReminder;
 use SET\Training;
 use SET\User;
+use Tests\Testcase;
 
 class SendRemindersTest extends TestCase
 {

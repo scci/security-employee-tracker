@@ -1,9 +1,9 @@
 <?php
 
 namespace Tests\Integration;
-use Tests\DuskTestCase;
-use Laravel\Dusk\Browser;
+
 use SET\User;
+use Tests\DuskTestCase;
 
 class LoginTest extends DuskTestCase
 {
@@ -11,7 +11,7 @@ class LoginTest extends DuskTestCase
     {
         parent::setUp();
     }
-    
+
     /** @test */
     public function it_loads_the_login_page()
     {
@@ -45,12 +45,12 @@ class LoginTest extends DuskTestCase
         });
     }
 
-    /** @test */
+    /* @test */
     /*public function it_loads_the_user_page_when_logged_in()
-    {       
+    {
         $newUser = factory(User::class)->create();
-        
-        $this->browse(function ($browser) use ($newUser) {  
+
+        $this->browse(function ($browser) use ($newUser) {
                 $browser//->loginAs($newUser)
                     ->visit('/login')
                     ->type('username', '$newUser->username')

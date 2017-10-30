@@ -1,7 +1,6 @@
 <?php
 
 namespace Tests\Integration;
-use Tests\TestCase;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -10,6 +9,7 @@ use SET\Training;
 use SET\TrainingUser;
 use SET\Travel;
 use SET\User;
+use Tests\TestCase;
 
 class AdminDashboardTest extends TestCase
 {
@@ -114,13 +114,13 @@ class AdminDashboardTest extends TestCase
     /** @test */
     public function it_shows_when_changes_are_made_to_a_users_profile()
     {
-        $emp_num = $this->user->emp_num;        
+        $emp_num = $this->user->emp_num;
         $response = $this->get('/user/'.$this->user->id);
         $response->assertSee("$emp_num");
-        
+
         $this->user->update(['emp_num' => 995]);
-        
-        $response = $this->get('/user/'.$this->user->id);        
+
+        $response = $this->get('/user/'.$this->user->id);
         $response->assertSee('995');
     }
 }

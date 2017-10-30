@@ -1,10 +1,10 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\User;
+use Tests\TestCase;
 
 class SettingControllerTest extends TestCase
 {
@@ -33,7 +33,7 @@ class SettingControllerTest extends TestCase
         // Logged in as a regular user - Cannot access the settings page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $response = $this->get( '/settings');
+        $response = $this->get('/settings');
 
         $response->assertStatus(403);
     }

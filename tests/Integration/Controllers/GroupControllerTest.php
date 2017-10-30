@@ -1,13 +1,13 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Group;
 use SET\Http\Controllers\GroupController;
 use SET\Training;
 use SET\User;
+use Tests\TestCase;
 
 class GroupControllerTest extends TestCase
 {
@@ -297,7 +297,7 @@ class GroupControllerTest extends TestCase
         $groupController->assignTraining($group, $users);
         $this->assertEmpty($training->users()->get());
 
-         // Users attached to group
+        // Users attached to group
         $users = factory(User::class, 3)->create();
         $group->users()->attach($users);
 

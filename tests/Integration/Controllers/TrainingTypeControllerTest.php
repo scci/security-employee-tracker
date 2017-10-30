@@ -1,12 +1,12 @@
 <?php
 
 namespace Tests\Integration\Controllers;
-use Tests\TestCase;
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Training;
 use SET\TrainingType;
 use SET\User;
+use Tests\TestCase;
 
 class TrainingTypeControllerTest extends TestCase
 {
@@ -44,9 +44,9 @@ class TrainingTypeControllerTest extends TestCase
         $this->actingAs($newuser);
         $response = $this->get('/trainingtype');
 
-        $response->assertStatus(200); // Ok status code        
+        $response->assertStatus(200); // Ok status code
         $response->assertViewHas('trainingtypes');
-        
+
         // Verify page components (views\trainingtype\index.blade.php)
         $response->assertSee('<span class="card-title">Training Types</span>');
         $response->assertSee('<th>Name</th>'); // Table column
@@ -64,9 +64,9 @@ class TrainingTypeControllerTest extends TestCase
         $this->actingAs($newuser);
         $response = $this->get('/trainingtype');
 
-        $response->assertStatus(200); // Ok status code        
+        $response->assertStatus(200); // Ok status code
         $response->assertViewHas('trainingtypes');
-        
+
         // Verify page components (views\trainingtype\index.blade.php)
         $response->assertSee('data-tooltip="Create Training Type">'); // Title
         $response->assertSee('<th>Description</th'); // Table column
@@ -105,7 +105,7 @@ class TrainingTypeControllerTest extends TestCase
         $this->actingAs($newuser);
         $response = $this->get('/trainingtype/create');
 
-        $response->assertStatus(200); // OK status code        
+        $response->assertStatus(200); // OK status code
 
         // Verify page components (views\trainingtype\create.blade.php, views\trainingtype\_trainingtype_form.blade.php)
         $response->assertSee('Create Training Type'); // Title
@@ -222,7 +222,7 @@ class TrainingTypeControllerTest extends TestCase
         $newuser = factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
         $response = $this->get("trainingtype/$createdTrainingTypeId");
-        
+
         $response->assertStatus(200);
         $response->assertSee('/trainingtype/'.$createdTrainingTypeId);
         $response->assertViewHas('trainingtype');
@@ -245,7 +245,7 @@ class TrainingTypeControllerTest extends TestCase
 
         $response->assertStatus(200); // OK status code
         $response->assertSee('/trainingtype/'.$createdTrainingTypeId);
-        
+
         // Verify page components (views\trainingtype\show.blade.php)
         $response->assertDontSee('<i class="material-icons">mode_edit</i>'); // Edit icon
 
@@ -334,8 +334,8 @@ class TrainingTypeControllerTest extends TestCase
     }
 
     /**
-    * @test
-    */
+     * @test
+     */
     public function it_updates_the_trainingtype_if_edit_role()
     {
         // Create a trainingtype object

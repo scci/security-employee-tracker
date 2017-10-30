@@ -1,13 +1,13 @@
 <?php
 
 namespace Tests\Integration\Models;
-use Tests\TestCase;
 
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Training;
-use SET\User;
 use SET\TrainingUser;
+use SET\User;
+use Tests\TestCase;
 
 class TrainingUserTest extends TestCase
 {

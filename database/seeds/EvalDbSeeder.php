@@ -45,7 +45,7 @@ class EvalDbSeeder extends Seeder
         factory(SET\User::class, 3)->create(['role' => '', 'status' => 'destroyed',
           'destroyed_date'                          => Carbon\Carbon::tomorrow()->addDays(rand(0, 4)),
           'created_at'                              => Carbon\Carbon::today()->addWeeks(-9), ]); // Regular destroyed users
-      factory(SET\User::class, 3)->create(['role' => '', 'status' => 'separated',
+        factory(SET\User::class, 3)->create(['role' => '', 'status' => 'separated',
           'destroyed_date'                        => Carbon\Carbon::today()->addMonths(rand(3, 9)),
           'created_at'                            => Carbon\Carbon::today()->addWeeks(-9), ]); // Regular separated users
         DB::table('activity_log')->truncate();
@@ -102,7 +102,7 @@ class EvalDbSeeder extends Seeder
                     } // Do not attach trainings
                     $trainingDate = Carbon\Carbon::today()->AddWeeks(rand(-26, 52));
                     if (rand(1, 10) == 1) { //Due
-                          $due_date = Carbon\Carbon::today()->addWeeks(rand(1, 12))->format('Y-m-d');
+                        $due_date = Carbon\Carbon::today()->addWeeks(rand(1, 12))->format('Y-m-d');
                         $completed_date = null;
                     } elseif (rand(1, 25) == 1) { // Late
                         $due_date = Carbon\Carbon::today()->addWeeks(rand(-8, 0))->format('Y-m-d');
@@ -113,11 +113,11 @@ class EvalDbSeeder extends Seeder
                         $completed_date = Carbon\Carbon::today()->addWeeks($pastWeeks)->format('Y-m-d');
                     }
                     $data = [
-                        'author_id'       => 2,
-                        'user_id'         => $groupUser->id,
-                        'due_date'        => $due_date,
-                        'completed_date'  => $completed_date,
-                        'training_id'     => $createdTraining->id,
+                        'author_id'      => 2,
+                        'user_id'        => $groupUser->id,
+                        'due_date'       => $due_date,
+                        'completed_date' => $completed_date,
+                        'training_id'    => $createdTraining->id,
                     ];
                     $trainingUser = SET\TrainingUser::create($data);
                 }
@@ -156,11 +156,11 @@ class EvalDbSeeder extends Seeder
         DB::table('duty_group')->truncate();
         DB::table('duty_swaps')->truncate();
         $duty = factory(SET\Duty::class)->create([
-            'name'  => 'Officer of the Day', 'cycle'  => 'daily', ]);
+            'name' => 'Officer of the Day', 'cycle' => 'daily', ]);
         $duty = factory(SET\Duty::class)->create([
-            'name'  => 'End of Day Check', 'cycle'  => 'weekly', ]);
+            'name' => 'End of Day Check', 'cycle' => 'weekly', ]);
         $duty = factory(SET\Duty::class)->create([
-            'name'  => 'Fire systems monthly check', 'cycle'  => 'monthly', ]);
+            'name' => 'Fire systems monthly check', 'cycle' => 'monthly', ]);
         $createdDuties = SET\Duty::all();
         // Assign individual users to duties
         foreach ($createdDuties as $duty) {
@@ -169,20 +169,20 @@ class EvalDbSeeder extends Seeder
                 if ($createdUser->id < 3) {
                     continue;
                 } // Exclude admin
-                    if ($createdUser->destroyed_date) {
-                        continue;
-                    } // do not assign
-                    if (rand(1, 4) != 1) {
-                        continue;
-                    } // So not all get one
-                    array_push($userIDs, $createdUser->id);
+                if ($createdUser->destroyed_date) {
+                    continue;
+                } // do not assign
+                if (rand(1, 4) != 1) {
+                    continue;
+                } // So not all get one
+                array_push($userIDs, $createdUser->id);
             }
             $duty->users()->attach($userIDs);
         }
         // Assign group(s) to duties
         for ($i = 0; $i < 3; $i++) {
             $duty = factory(SET\Duty::class)->create([
-                'cycle'  => 'weekly', 'has_groups' => '1', ]);
+                'cycle' => 'weekly', 'has_groups' => '1', ]);
             $groupIDs = [];
             foreach ($createdGroups as $createdGroup) {
                 if (rand(1, 2) != 1) {
@@ -252,8 +252,8 @@ class EvalDbSeeder extends Seeder
                 continue;
             } // So not all get one
             factory(SET\Note::class, 'seeder')->create([
-                'author_id'   => 2,
-                'user_id'     => $createdUser->id,
+                'author_id' => 2,
+                'user_id'   => $createdUser->id,
             ]);
         }
         $createdNotes = SET\Note::all();
