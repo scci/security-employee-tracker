@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration;
+use Tests\TestCase;
+
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Training;
@@ -32,10 +35,11 @@ class ActionItemsTest extends TestCase
         $training->users()->attach($userOne, ['due_date' => Carbon::yesterday(), 'author_id' => $this->user->id]);
         $training->users()->attach($userTwo, ['due_date' => Carbon::tomorrow(), 'author_id' => $this->user->id]);
 
-        $this->visit('duty') //visit some page that won't have the user nor the training.
-            ->see($training->name)
-            ->see($userOne->userFullName)
-            ->dontSee($userTwo->userFullName);
+        $response = $this->get('/duty'); //visit some page that won't have the user nor the training.
+        $response->assertStatus(200);
+        $response->assertSee($training->name);
+        $response->assertSee($userOne->userFullName);
+        $response->assertDontSee($userTwo->userFullName);
     }
 
     /** @test */
@@ -44,9 +48,10 @@ class ActionItemsTest extends TestCase
         $visitOne = factory(Visit::class)->create(['expiration_date' => Carbon::tomorrow()]);
         $visitTwo = factory(Visit::class)->create(['expiration_date' => Carbon::today()->subWeek()]);
 
-        $this->visit('duty')
-            ->see($visitOne->smo_code)
-            ->dontSee($visitTwo->smo_code);
+        $response = $this->get('/duty');
+        $response->assertStatus(200);
+        $response->assertSee($visitOne->smo_code);
+        $response->assertDontSee($visitTwo->smo_code);
     }
 
     /** @test */
@@ -74,11 +79,11 @@ class ActionItemsTest extends TestCase
             'elig_date'    => Carbon::today()->subYears(6)->format('Y-m-d'),
         ]);
 
-        $this->visit('duty')
-            ->see($expiringSecretUser->userFullName)
-            ->see($expiringTopSecretUser->userFullName)
-            ->dontSee($topSecretUser->userFullName)
-            ->dontSee($secretUser->userFullName)
-            ->dontSee($secretAccessLevelUser->userFullName);
+        $response = $this->get('/duty');
+        $response->assertSee($expiringSecretUser->userFullName);
+        $response->assertSee($expiringTopSecretUser->userFullName);
+        $response->assertDontSee($topSecretUser->userFullName);
+        $response->assertDontSee($secretUser->userFullName);
+        $response->assertDontSee($secretAccessLevelUser->userFullName);
     }
 }

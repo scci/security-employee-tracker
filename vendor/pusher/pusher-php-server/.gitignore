@@ -1,4 +1,0 @@
-*.DS_Store
-test/config.php
-vendor
-composer.lock

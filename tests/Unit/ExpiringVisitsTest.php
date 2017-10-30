@@ -1,5 +1,6 @@
 <?php
 
+use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Console\Commands\ExpiringVisits;

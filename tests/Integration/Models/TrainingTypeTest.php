@@ -1,12 +1,15 @@
 <?php
 
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+namespace Tests\Integration\Models;
+use Tests\TestCase;
+
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Training;
 use SET\TrainingType;
 
 class TrainingTypeTest extends TestCase
-{
-    use DatabaseMigrations;  // Reset The Database After Each Test
+{    
+    use DatabaseTransactions;
 
     /**
      * A basic test example.
@@ -17,14 +20,14 @@ class TrainingTypeTest extends TestCase
     {
         // Populate table
         factory(TrainingType::class, 4)->create();
-        $this->assertCount(4, SET\TrainingType::all());
+        $this->assertCount(4, TrainingType::all());
 
         // Set records with values
         factory(TrainingType::class)->create(['name'=> 'Information Systems',
             'sidebar'                               => '1', 'status'=>'1', 'description'=>'description 1', ]);
         factory(TrainingType::class)->create(['name'=> 'Security',
             'sidebar'                               => '2', 'status'=>'0', 'description'=>'description 2', ]);
-        $this->assertCount(6, SET\TrainingType::all());
+        $this->assertCount(6, TrainingType::all());
         // $training_types = SET\TrainingType::all();
         // foreach ($training_types as $key => $value) {
         //     $result1 = $value->name;

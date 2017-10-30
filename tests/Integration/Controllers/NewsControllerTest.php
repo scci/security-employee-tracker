@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\News;
@@ -21,18 +24,15 @@ class NewsControllerTest extends TestCase
     public function it_shows_the_index_page()
     {
         // Logged in as admin - Can access the news page
-        $this->action('GET', 'NewsController@index');
-
-        $this->assertEquals('news', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('allNews');
+        $response = $this->get('/news');
+        $response->assertStatus(200);
+        $response->assertViewHas('allNews');
 
         // Logged in as a regular user - Can still access the news page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', '/news');
-
-        $this->assertEquals('news', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('allNews');
+        $response = $this->call('GET', '/news');
+        $response->assertViewHas('allNews');
     }
 
     /**
@@ -41,23 +41,22 @@ class NewsControllerTest extends TestCase
     public function it_shows_the_create_page()
     {
         // Logged in as admin - Can access the news create page
-        $this->call('GET', 'news/create');
-
-        $this->seePageIs('news/create');
+        $response = $this->get('/news/create');
+        $response->assertSee('Add News');
+        $response->assertSee('Publish Date');
+        $response->assertSee('Expires On:');
 
         // Logged in as a regular user - Cannot access the news create page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser); //->visit('/news');
-        $this->call('GET', '/news/create');
-
-        $this->seeStatusCode(403);
+        $response = $this->get('/news/create');
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the news create page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', '/news/create');
-
-        $this->seeStatusCode(403);
+        $response = $this->get('/news/create');
+        $response->assertStatus(403);
     }
 
     /**
@@ -71,20 +70,21 @@ class NewsControllerTest extends TestCase
                  'publish_date' => '2016-10-28',
                  'send_email'   => 0, ];
 
-        $this->call('POST', 'news', $data);
-        $this->assertRedirectedToRoute('news.index');
+        $response = $this->post('news', $data);
+        //$this->call('POST', 'news', $data);
+        $response->assertRedirect('news');
 
         // Logged in as a regular user - Does not store the news
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('POST', 'news', $data);
-        $this->seeStatusCode(403);
+        $response = $this->post('news', $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Does not store the news
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('POST', 'news', $data);
-        $this->seeStatusCode(403);
+        $response = $this->post('news', $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -95,28 +95,28 @@ class NewsControllerTest extends TestCase
         // Logged in as admin - No data provided
         $data = [];
 
-        $this->call('POST', 'news', $data);
+        $response = $this->post('news', $data);
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['title', 'description', 'publish_date']);
-        $this->assertSessionHasErrors('title', 'The title field is required.');
-        $this->assertSessionHasErrors('description', 'The description field is required.');
-        $this->assertSessionHasErrors('publish_date', 'The publish_date field is required.');
+        //$this->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['title', 'description', 'publish_date']);
+        $response->assertSessionHasErrors('title', 'The title field is required.');
+        $response->assertSessionHasErrors('description', 'The description field is required.');
+        $response->assertSessionHasErrors('publish_date', 'The publish_date field is required.');
 
         // Logged in as admin - Only publish_date is entered.
         $data = ['publish_date' => '2016-10-28'];
-        $this->call('POST', 'news', $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['title', 'description']);
+        $response = $this->post('news', $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['title', 'description']);
 
         // Logged in as admin - Invalid expire_date is provided
         $data = ['title'        => 'My Title',
                  'description'  => 'A Description',
                  'publish_date' => '2016-10-28',
                  'expire_date'  => '2016-10-22', ];
-        $this->call('POST', 'news', $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors('expire_date', 'The expire date must be a date after publish date.');
+        $response = $this->post('news', $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors('expire_date', 'The expire date must be a date after publish date.');
     }
 
     /**
@@ -129,8 +129,10 @@ class NewsControllerTest extends TestCase
         $createdNewsId = $createdNews->id;
 
         // Logged in as admin - Can see the news details
-        $this->call('GET', "news/$createdNewsId");
-        $this->seePageIs('/news/'.$createdNewsId);
+        $response = $this->get("news/$createdNewsId");
+        $response->assertStatus(200);
+        $response->assertSee('/news/'.$createdNewsId);
+        $response->assertSee($createdNews->title);
     }
 
     /** @test */
@@ -142,8 +144,8 @@ class NewsControllerTest extends TestCase
         // Logged in as a regular user - Cannot see the news details
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', "news/$createdNewsId");
-        $this->seeStatusCode(403);
+        $response = $this->get("news/$createdNewsId");
+        $response->assertStatus(403);
     }
 
     /**
@@ -156,14 +158,19 @@ class NewsControllerTest extends TestCase
         $createdNewsId = $createdNews->id;
 
         // Logged in as admin - Can edit the news details
-        $this->call('GET', "news/$createdNewsId/edit");
-        $this->seePageIs('/news/'.$createdNewsId.'/edit');
+        $response = $this->get("news/$createdNewsId/edit");
+        $response->assertStatus(200);        
+        $response->assertSee("Edit News");
+        $response->assertSee("Title");
+        $response->assertSee("Publish Date:");
+        $response->assertSee($createdNews->publish_date);
+        $response->assertSee("Expires On:");
 
         // Logged in as a regular user - Cannot edit the news details
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', "news/$createdNewsId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("news/$createdNewsId/edit");
+        $response->assertStatus(403);
     }
 
     /**
@@ -180,9 +187,9 @@ class NewsControllerTest extends TestCase
                  'description'  => 'A Description',
                  'publish_date' => '2016-10-28', ];
 
-        $this->call('PATCH', "news/$createdNewsId", $data);
+        $response = $this->patch("news/$createdNewsId", $data);
 
-        $this->assertRedirectedToRoute('news.index');
+        $response->assertRedirect('news');
 
         $createdNews = News::find($newsToCreate->id);
         $this->assertNotEquals($createdNews->title, $newsToCreate->title);
@@ -195,14 +202,14 @@ class NewsControllerTest extends TestCase
         // Logged in as a regular user - Cannot update the news
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('PATCH', "news/$createdNewsId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("news/$createdNewsId", $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot update the news
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('PATCH', "news/$createdNewsId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("news/$createdNewsId", $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -220,7 +227,7 @@ class NewsControllerTest extends TestCase
         $this->assertEquals($createdNews->id, $createdNewsId);
 
         // Delete the created news. Assert that a null object is returned.
-        $this->call('DELETE', "news/$createdNewsId");
+        $response = $this->delete("news/$createdNewsId");
         $deletedNews = News::find($createdNewsId);
         $this->assertNull($deletedNews);
 
@@ -230,13 +237,13 @@ class NewsControllerTest extends TestCase
 
         // Cannot access the delete news page since the news with
         // the provided Id has already been deleted
-        $this->call('DELETE', "news/$createdNewsId");
-        $this->seeStatusCode(404);
+        $response = $this->delete("news/$createdNewsId");
+        $response->assertStatus(404);
 
         // Create a new news and try to delete. Get forbidden status code
         $newsToCreate = factory(News::class)->create();
         $createdNewsId = $newsToCreate->id;
-        $this->call('DELETE', "news/$createdNewsId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("news/$createdNewsId");
+        $response->assertStatus(403);
     }
 }

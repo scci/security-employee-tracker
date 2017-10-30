@@ -27,7 +27,7 @@ class NewsController extends Controller
         } else {
             $allNews = News::orderBy('publish_date', 'desc')->get();
         }
-
+        
         return view('news.index', compact('allNews'));
     }
 

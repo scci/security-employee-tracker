@@ -1,5 +1,6 @@
 <?php
 
+use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
@@ -40,7 +41,7 @@ class SendRemindersTest extends TestCase
 
         (new SendReminders())->handle();
 
-        Mail::assertSentTo([$this->user->supervisor()->first()], EmailSupervisorReminder::class);
+        Mail::assertQueued(EmailSupervisorReminder::class);
     }
 
     /** @test */

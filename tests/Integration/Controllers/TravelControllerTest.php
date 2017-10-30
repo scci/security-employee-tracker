@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Travel;
 use SET\User;
@@ -22,29 +25,31 @@ class TravelControllerTest extends TestCase
         // Logged in as admin - Can access the travel create page
         $userId = $this->user->id;
 
-        $this->call('GET', "/user/$userId/travel/create");
-        $this->seePageIs("/user/$userId/travel/create");
+        $response = $this->get("/user/$userId/travel/create");
+        $response->assertStatus(200);
+        $response->assertSeeText("Add a Travel");
 
         // Create a regular user - Still logged in as admin
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
 
         // Admin can access another user's travel create page
-        $this->call('GET', "/user/$userId/travel/create");
-        $this->seePageIs("/user/$userId/travel/create");
+        $response = $this->get("/user/$userId/travel/create");
+        $response->assertStatus(200);
+        $response->assertSeeText("Add a Travel");
 
          // Logged in as a regular user - Cannot access the travel create page
         $this->actingAs($newuser);
-        $this->call('GET', "/user/$userId/travel/create");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/travel/create");
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the travel create page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('GET', "/user/$userId/travel/create");
+        $response = $this->get("/user/$userId/travel/create");
 
-        $this->seeStatusCode(403);
+        $response->assertStatus(403);
     }
 
     /**
@@ -62,22 +67,23 @@ class TravelControllerTest extends TestCase
                  'comment'       => 'Description For travel',
                  'encrypt'       => '', ];
 
-        $this->call('POST', "/user/$userId/travel/", $data);
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->post("/user/$userId/travel/", $data);
+        $response->assertStatus(302);
+        $response->assertRedirect('user/'.$userId);
 
         // Logged in as a regular user - Does not store the travel
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('POST', "/user/$userId/travel/", $data);
-        $this->seeStatusCode(403);
+        $response = $this->post("/user/$userId/travel/", $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Does not store the travel
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('POST', "/user/$userId/travel/", $data);
-        $this->seeStatusCode(403);
+        $response = $this->post("/user/$userId/travel/", $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -89,21 +95,21 @@ class TravelControllerTest extends TestCase
         $userId = $this->user->id;
         $data = [];
 
-        $this->call('POST', "/user/$userId/travel/", $data);
+        $response = $this->post("/user/$userId/travel/", $data);
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['location', 'leave_date', 'return_date']);
-        $this->assertSessionHasErrors('location', 'The location field is required.');
-        $this->assertSessionHasErrors('leave_date', 'The leave date field is required.');
-        $this->assertSessionHasErrors('return_date', 'The return date field is required.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['location', 'leave_date', 'return_date']);
+        $response->assertSessionHasErrors('location', 'The location field is required.');
+        $response->assertSessionHasErrors('leave_date', 'The leave date field is required.');
+        $response->assertSessionHasErrors('return_date', 'The return date field is required.');
 
         // Logged in as admin - Only comment is entered.
         $data = ['comment' => 'Travel Notes'];
-        $this->call('POST', "/user/$userId/travel/", $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors('location', 'The location field is required.');
-        $this->assertSessionHasErrors('leave_date', 'The leave date field is required.');
-        $this->assertSessionHasErrors('return_date', 'The return date field is required.');
+        $response = $this->post("/user/$userId/travel/", $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors('location', 'The location field is required.');
+        $response->assertSessionHasErrors('leave_date', 'The leave date field is required.');
+        $response->assertSessionHasErrors('return_date', 'The return date field is required.');
     }
 
     /**
@@ -117,19 +123,19 @@ class TravelControllerTest extends TestCase
         $createdTravelId = $travelToCreate->id;
 
         // Logged in as admin - Can edit the travel
-        $this->call('GET', "/user/$userId/travel/$createdTravelId/edit");
-        $this->seePageIs("/user/$userId/travel/$createdTravelId/edit");
-        $this->assertViewHas('user');
-        $this->assertViewHas('travel');
+        $response = $this->get("/user/$userId/travel/$createdTravelId/edit");
+        $response->assertStatus(200);
+        $response->assertViewHas('user');
+        $response->assertViewHas('travel');
 
         // Logged in as a regular user - Can edit the own's travel page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('GET', "/user/$userId/travel/$createdTravelId/edit");
-        $this->seePageIs("/user/$userId/travel/$createdTravelId/edit");
-        $this->assertViewHas('user');
-        $this->assertViewHas('travel');
+        $response = $this->get("/user/$userId/travel/$createdTravelId/edit");
+        $response->assertStatus(200);
+        $response->assertViewHas('user');
+        $response->assertViewHas('travel');
     }
 
     /**
@@ -148,9 +154,9 @@ class TravelControllerTest extends TestCase
                  'leave_date'   => '2016-12-10',
                  'return_date'  => '2016-12-20', ];
 
-        $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
+        $response = $this->patch("/user/$userId/travel/$createdTravelId", $data);
 
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response->assertRedirect('user/'.$userId);
 
         $createdTravel = Travel::find($createdTravelId);
         $this->assertNotEquals($createdTravel->location, $travelToCreate->location);
@@ -163,24 +169,24 @@ class TravelControllerTest extends TestCase
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
 
-        $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->patch("/user/$userId/travel/$createdTravelId", $data);
+        $response->assertRedirect('user/'.$userId);
 
         // Logged in as new user. User should be able to edit own travel
         $this->actingAs($newuser);
-        $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->patch("/user/$userId/travel/$createdTravelId", $data);
+        $response->assertRedirect('user/'.$userId);
 
         // Logged in as a user with role view - Cannot update the travel for previous user
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("/user/$userId/travel/$createdTravelId", $data);
+        $response->assertStatus(403);
 
         // Get userId for user with role view and try to update travel for the same user
         $userId = $newuser->id;
-        $this->call('PATCH', "/user/$userId/travel/$createdTravelId", $data);
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->patch("/user/$userId/travel/$createdTravelId", $data);
+        $response->assertRedirect('user/'.$userId);
     }
 
     /**
@@ -199,7 +205,7 @@ class TravelControllerTest extends TestCase
         $this->assertEquals($createdTravel->id, $createdTravelId);
 
         // Delete the created travel. Assert that a null object is returned.
-        $this->call('DELETE', "/user/$userId/travel/$createdTravelId");
+        $response = $this->delete("/user/$userId/travel/$createdTravelId");
         $deletedTravel = Travel::find($createdTravelId);
         $this->assertNull($deletedTravel);
 
@@ -209,13 +215,13 @@ class TravelControllerTest extends TestCase
 
         // Cannot access the delete travel page since the travel with
         // the provided Id has already been deleted
-        $this->call('DELETE', "/user/$userId/travel/$createdTravelId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("/user/$userId/travel/$createdTravelId");
+        $response->assertStatus(403);
 
         // Create a new training user and try to delete. Get forbidden status code
         $travelToCreate = factory(Travel::class)->create();
         $createdTravelId = $travelToCreate->id;
-        $this->call('DELETE', "/user/$userId/travel/$createdTravelId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("/user/$userId/travel/$createdTravelId");
+        $response->assertStatus(403);
     }
 }

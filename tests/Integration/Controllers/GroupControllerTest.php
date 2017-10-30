@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Group;
 use SET\Http\Controllers\GroupController;
@@ -23,25 +26,25 @@ class GroupControllerTest extends TestCase
     public function it_shows_the_index_page()
     {
         // Logged in as admin - Can access the groups page
-        $this->action('GET', 'GroupController@index');
+        $response = $this->get('group');
 
-        $this->assertEquals('group', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('groups');
+        $response->assertStatus(200);
+        $response->assertViewHas('groups');
 
         // Logged in as a user with role view - Can still access the groups page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->action('GET', 'GroupController@index');
+        $response = $this->get('group');
 
-        $this->assertEquals('group', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('groups');
+        $response->assertStatus(200);
+        $response->assertViewHas('groups');
 
         // Logged in as a regular user - Cannot access the groups page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->action('GET', 'GroupController@index');
+        $response = $this->get('group');
 
-        $this->seeStatusCode(403);
+        $response->assertStatus(403);
     }
 
     /**
@@ -50,27 +53,27 @@ class GroupControllerTest extends TestCase
     public function it_shows_the_create_page()
     {
         // Logged in as admin - Can access the group create page
-        $this->call('GET', 'group/create');
+        $response = $this->get('group/create');
 
-        $this->seePageIs('group/create');
-        $this->assertViewHas('users');
-        $this->assertViewHas('training');
-        $this->assertViewHas('selectedUsers');
-        $this->assertViewHas('selectedTraining');
+        $response->assertStatus(200);
+        $response->assertViewHas('users');
+        $response->assertViewHas('training');
+        $response->assertViewHas('selectedUsers');
+        $response->assertViewHas('selectedTraining');
 
         // Logged in as a regular user - Cannot access the group create page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', '/group/create');
+        $response = $this->get('/group/create');
 
-        $this->seeStatusCode(403);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the group create page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', '/group/create');
+        $response = $this->get('/group/create');
 
-        $this->seeStatusCode(403);
+        $response->assertStatus(403);
     }
 
     /**
@@ -84,20 +87,21 @@ class GroupControllerTest extends TestCase
                  'users'       => [factory(User::class)->create()->id, factory(User::class)->create()->id],
                  'trainings'   => [factory(Training::class)->create()->id], ];
 
-        $this->call('POST', 'group', $request);
-        $this->assertRedirectedToRoute('group.index');
+        $response = $this->post('group', $request);
+        $response->assertStatus(302);
+        $response->assertRedirect('group');
 
         // Logged in as a regular user - Does not store the group
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('POST', 'group', $request);
-        $this->seeStatusCode(403);
+        $response = $this->post('group', $request);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Does not store the group
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('POST', 'group', $request);
-        $this->seeStatusCode(403);
+        $response = $this->post('group', $request);
+        $response->assertStatus(403);
     }
 
     /**
@@ -108,19 +112,19 @@ class GroupControllerTest extends TestCase
         // Logged in as admin - No data provided
         $request = [];
 
-        $this->call('POST', 'group', $request);
+        $response = $this->post('group', $request);
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['name']);
-        $this->assertSessionHasErrors('name', 'The name field is required.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['name']);
+        $response->assertSessionHasErrors('name', 'The name field is required.');
 
         // Logged in as admin - Only description is entered.
         $request = ['users' => factory(User::class)->create()->id];
-        $this->call('POST', 'group', $request);
+        $response = $this->post('group', $request);
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['name']);
-        $this->assertSessionHasErrors('name', 'The name field is required.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['name']);
+        $response->assertSessionHasErrors('name', 'The name field is required.');
     }
 
     /**
@@ -133,27 +137,27 @@ class GroupControllerTest extends TestCase
         $createdGroupId = $createdGroup->id;
 
         // Logged in as admin - Can edit the group details
-        $this->call('GET', "group/$createdGroupId/edit");
+        $response = $this->get("group/$createdGroupId/edit");
 
-        $this->seePageIs('/group/'.$createdGroupId.'/edit');
-        $this->assertViewHas('group');
-        $this->assertViewHas('users');
-        $this->assertViewHas('training');
-        $this->assertViewHas('selectedUsers');
-        $this->assertViewHas('selectedTraining');
+        $response->assertStatus(200);
+        $response->assertViewHas('group');
+        $response->assertViewHas('users');
+        $response->assertViewHas('training');
+        $response->assertViewHas('selectedUsers');
+        $response->assertViewHas('selectedTraining');
 
         // Logged in as a regular user - Cannot edit the group details
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', "group/$createdGroupId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("group/$createdGroupId/edit");
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the group create page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', "group/$createdGroupId/edit");
+        $response = $this->get("group/$createdGroupId/edit");
 
-        $this->seeStatusCode(403);
+        $response->assertStatus(403);
     }
 
     /**
@@ -171,9 +175,9 @@ class GroupControllerTest extends TestCase
                  'users'       => [factory(User::class)->create()->id],
                  'trainings'   => [factory(Training::class)->create()->id], ];
 
-        $this->call('PATCH', "group/$createdGroupId", $request);
+        $response = $this->patch("group/$createdGroupId", $request);
 
-        $this->assertRedirectedToRoute('group.index');
+        $response->assertRedirect('group');
 
         $createdGroup = Group::find($groupToCreate->id);
 
@@ -189,23 +193,23 @@ class GroupControllerTest extends TestCase
                  'users'       => [factory(User::class)->create()->id],
                  'trainings'   => [factory(Training::class)->create()->id], ];
 
-        $this->call('PATCH', "group/$createdGroupId", $request);
+        $response = $this->patch("group/$createdGroupId", $request);
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['name']);
-        $this->assertSessionHasErrors('name', 'The name field is required.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['name']);
+        $response->assertSessionHasErrors('name', 'The name field is required.');
 
         // Logged in as a regular user - Cannot update the group
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('PATCH', "group/$createdGroupId", $request);
-        $this->seeStatusCode(403);
+        $response = $this->patch("group/$createdGroupId", $request);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot update the group
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('PATCH', "group/$createdGroupId", $request);
-        $this->seeStatusCode(403);
+        $response = $this->patch("group/$createdGroupId", $request);
+        $response->assertStatus(403);
     }
 
     /**
@@ -224,7 +228,7 @@ class GroupControllerTest extends TestCase
 
         // The ids in the response array are not in any order. So, ensure that
         // the first userid is present in the array
-        $response = $this->call('POST', '/group-user-id', $request);
+        $response = $this->post('/group-user-id', $request);
 
         $this->assertEquals(count($users->pluck('id')), count($response->getOriginalContent()));
         $this->assertContains($users->first()->id, $response->getOriginalContent());
@@ -245,7 +249,7 @@ class GroupControllerTest extends TestCase
         $this->assertEquals($createdGroup->id, $createdGroupId);
 
         // Delete the created group. Assert that a null object is returned.
-        $this->call('DELETE', "group/$createdGroupId");
+        $response = $this->delete("group/$createdGroupId");
         $deletedGroup = Group::find($createdGroupId);
         $this->assertNull($deletedGroup);
 
@@ -255,8 +259,8 @@ class GroupControllerTest extends TestCase
 
         // Cannot access the delete group page since the group with
         // the provided Id has already been deleted
-        $this->call('DELETE', "group/$createdGroupId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("group/$createdGroupId");
+        $response->assertStatus(403);
 
         // Create a new group(Only user with edit permission can create)
         factory(User::class)->create(['role' => 'edit']);
@@ -267,15 +271,15 @@ class GroupControllerTest extends TestCase
         // Try to delete as a regular user. Get forbidden status code
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('DELETE', "group/$createdGroupId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("group/$createdGroupId");
+        $response->assertStatus(403);
 
         // Try to delete as a user with view permissions. Get forbidden status code
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
 
-        $this->call('DELETE', "group/$createdGroupId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("group/$createdGroupId");
+        $response->assertStatus(403);
     }
 
     /**

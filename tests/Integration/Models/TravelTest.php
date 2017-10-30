@@ -1,6 +1,10 @@
 <?php
 
+namespace Tests\Integration\Models;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use SET\Travel;
 
 class TravelTest extends TestCase
 {
@@ -9,7 +13,7 @@ class TravelTest extends TestCase
     /** @test */
     public function it_sets_values_to_null_if_empty_string_is_passed()
     {
-        $travel = factory(SET\Travel::class)->create([
+        $travel = factory(Travel::class)->create([
             'brief_date'   => '',
             'debrief_date' => '',
             'return_date'  => '',

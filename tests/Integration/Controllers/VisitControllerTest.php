@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\User;
 use SET\Visit;
@@ -22,29 +25,39 @@ class VisitControllerTest extends TestCase
         // Logged in as admin - Can access the visit create page
         $userId = $this->user->id;
 
-        $this->call('GET', "/user/$userId/visit/create");
-        $this->seePageIs("/user/$userId/visit/create");
+        $response = $this->get("/user/$userId/visit/create");
+        $response->assertStatus(200);
+        $response->assertSee('Add a Visit');
+        $response->assertSee('Visit date');
+        $response->assertSee('Expiration date');
+        $response->assertSee('Point of Contact');
+        $response->assertSee('PoC Phone Number');
 
         // Create a regular user - Still logged in as admin
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
 
         // Admin can access another user's visit create page
-        $this->call('GET', "/user/$userId/visit/create");
-        $this->seePageIs("/user/$userId/visit/create");
+        $response = $this->get("/user/$userId/visit/create");
+        $response->assertStatus(200);
+        $response->assertSee('Add a Visit');
+        $response->assertSee('Visit date');
+        $response->assertSee('Expiration date');
+        $response->assertSee('Point of Contact');
+        $response->assertSee('PoC Phone Number');
 
          // Logged in as a regular user - Cannot access the visit create page
         $this->actingAs($newuser);
-        $this->call('GET', "/user/$userId/visit/create");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/visit/create");
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the visit create page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('GET', "/user/$userId/visit/create");
+        $response = $this->get("/user/$userId/visit/create");
 
-        $this->seeStatusCode(403);
+        $response->assertStatus(403);
     }
 
    /**
@@ -53,7 +66,7 @@ class VisitControllerTest extends TestCase
    public function it_stores_the_visit_by_testing_each_user_role()
    {
        // Logged in as admin - Can store the visit
-        $userId = $this->user->id;
+       $userId = $this->user->id;
        $data = ['smo_code'          => 'A SMO Code',
                  'visit_date'       => '2016-12-10',
                  'expiration_date'  => '2016-12-20',
@@ -61,22 +74,22 @@ class VisitControllerTest extends TestCase
                  'phone'            => '12345',
                  'comment'          => 'Comment on visit', ];
 
-       $this->call('POST', "/user/$userId/visit/", $data);
-       $this->assertRedirectedToRoute('user.show', $userId);
+       $response = $this->post("/user/$userId/visit/", $data);
+       $response->assertRedirect('user/'.$userId);
 
-        // Logged in as a regular user - Does not store the visit
-        $newuser = factory(User::class)->create();
+       // Logged in as a regular user - Does not store the visit
+       $newuser = factory(User::class)->create();
        $this->actingAs($newuser);
        $userId = $newuser->id;
-       $this->call('POST', "/user/$userId/visit/", $data);
-       $this->seeStatusCode(403);
+       $response = $this->post("/user/$userId/visit/", $data);
+       $response->assertStatus(403);
 
-        // Logged in as a user with role view - Does not store the visit
-        $newuser = factory(User::class)->create(['role' => 'view']);
+       // Logged in as a user with role view - Does not store the visit
+       $newuser = factory(User::class)->create(['role' => 'view']);
        $this->actingAs($newuser);
        $userId = $newuser->id;
-       $this->call('POST', "/user/$userId/visit/", $data);
-       $this->seeStatusCode(403);
+       $response = $this->post("/user/$userId/visit/", $data);
+       $response->assertStatus(403);
    }
 
     /**
@@ -88,11 +101,11 @@ class VisitControllerTest extends TestCase
         $userId = $this->user->id;
         $data = [];
 
-        $this->call('POST', "/user/$userId/visit/", $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['smo_code', 'expiration_date']);
-        $this->assertSessionHasErrors('smo_code', 'The smo_code field is required.');
-        $this->assertSessionHasErrors('expiration_date', 'The expiration date field is required.');
+        $response = $this->post("/user/$userId/visit/", $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['smo_code', 'expiration_date']);
+        $response->assertSessionHasErrors('smo_code', 'The smo_code field is required.');
+        $response->assertSessionHasErrors('expiration_date', 'The expiration date field is required.');
 
         $data = ['smo_code'         => '',
                  'visit_date'       => '',
@@ -101,11 +114,11 @@ class VisitControllerTest extends TestCase
                  'phone'            => '',
                  'comment'          => '', ];
 
-        $this->call('POST', "/user/$userId/visit/", $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['smo_code', 'expiration_date']);
-        $this->assertSessionHasErrors('smo_code', 'The smo_code field is required.');
-        $this->assertSessionHasErrors('expiration_date', 'The expiration date field is required.');
+        $response = $this->post("/user/$userId/visit/", $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['smo_code', 'expiration_date']);
+        $response->assertSessionHasErrors('smo_code', 'The smo_code field is required.');
+        $response->assertSessionHasErrors('expiration_date', 'The expiration date field is required.');
     }
 
     /**
@@ -119,24 +132,25 @@ class VisitControllerTest extends TestCase
         $createdVisitId = $visitToCreate->id;
 
         // Logged in as admin - Can edit the visit
-        $this->call('GET', "/user/$userId/visit/$createdVisitId/edit");
-        $this->seePageIs("/user/$userId/visit/$createdVisitId/edit");
-        $this->assertViewHas('user');
-        $this->assertViewHas('visit');
+        $response = $this->get("/user/$userId/visit/$createdVisitId/edit");
+        $response->assertStatus(200);
+        $response->assertSee("Update a Visit");
+        $response->assertViewHas('user');
+        $response->assertViewHas('visit');
 
         // Logged in as a regular user - Cannot access the visit edit page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('GET', "/user/$userId/visit/$createdVisitId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/visit/$createdVisitId/edit");
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the visit edit page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('GET', "/user/$userId/visit/$createdVisitId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/visit/$createdVisitId/edit");
+        $response->assertStatus(403);
     }
 
     /**
@@ -157,9 +171,9 @@ class VisitControllerTest extends TestCase
                  //'phone'            => "12345",
                  //'comment'          => 'Comment on visit'];
 
-        $this->call('PATCH', "/user/$userId/visit/$createdVisitId", $data);
+        $response = $this->patch("/user/$userId/visit/$createdVisitId", $data);
 
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response->assertRedirect('user/'.$userId);
 
         $createdVisit = Visit::find($createdVisitId);
         $this->assertNotEquals($createdVisit->smo_code, $visitToCreate->smo_code);
@@ -171,20 +185,20 @@ class VisitControllerTest extends TestCase
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
 
-        $this->call('PATCH', "/user/$userId/visit/$createdVisitId", $data);
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->patch("/user/$userId/visit/$createdVisitId", $data);
+        $response->assertRedirect('user/'.$userId);
 
         // Logged in as new user. User cannot edit own visit
         $this->actingAs($newuser);
-        $this->call('PATCH', "/user/$userId/visit/$createdVisitId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("/user/$userId/visit/$createdVisitId", $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot edit visit
         $newuser = factory(User::class)->create(['role' => 'view']);
         $userId = $newuser->id;
         $this->actingAs($newuser);
-        $this->call('PATCH', "/user/$userId/visit/$createdVisitId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("/user/$userId/visit/$createdVisitId", $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -203,7 +217,7 @@ class VisitControllerTest extends TestCase
         $this->assertEquals($createdVisit->id, $createdVisitId);
 
         // Delete the created visit. Assert that a null object is returned.
-        $this->call('DELETE', "/user/$userId/visit/$createdVisitId");
+        $response = $this->delete("/user/$userId/visit/$createdVisitId");
         $deletedVisit = Visit::find($createdVisitId);
         $this->assertNull($deletedVisit);
 
@@ -213,13 +227,13 @@ class VisitControllerTest extends TestCase
         $this->actingAs($newuser);
 
         // Cannot access the delete visit page since the visit is already deleted
-        $this->call('DELETE', "/user/$userId/visit/$createdVisitId");
-        $this->seeStatusCode(404);
+        $response = $this->delete("/user/$userId/visit/$createdVisitId");
+        $response->assertStatus(404);
 
         // Create a new visit and try to delete. Get forbidden status code
         $visitToCreate = factory(Visit::class)->create();
         $createdVisitId = $visitToCreate->id;
-        $this->call('DELETE', "/user/$userId/visit/$createdVisitId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("/user/$userId/visit/$createdVisitId");
+        $response->assertStatus(403);
     }
 }

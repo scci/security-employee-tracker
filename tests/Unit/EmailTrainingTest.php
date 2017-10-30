@@ -2,6 +2,7 @@
 
 namespace SET\Listeners;
 
+use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;

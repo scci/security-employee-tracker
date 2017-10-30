@@ -1,7 +1,13 @@
 <?php
 
+namespace Tests\Integration\Models;
+use Tests\TestCase;
+
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use SET\Training;
+use SET\User;
+use SET\TrainingUser;
 
 class TrainingUserTest extends TestCase
 {
@@ -10,21 +16,21 @@ class TrainingUserTest extends TestCase
     /** @test */
     public function it_can_get_all_records_with_active_users()
     {
-        $activeUsers = factory(SET\User::class, 4)->create();
-        $inactiveUsers = factory(SET\User::class, 3)->create(['status' => 'separated']);
-        $training = factory(SET\Training::class)->create();
+        $activeUsers = factory(User::class, 4)->create();
+        $inactiveUsers = factory(User::class, 3)->create(['status' => 'separated']);
+        $training = factory(Training::class)->create();
 
         $training->users()->attach($activeUsers, ['author_id' => $activeUsers->first()->id, 'due_date' => Carbon::today()]);
         $training->users()->attach($inactiveUsers, ['author_id' => $activeUsers->first()->id, 'due_date' => Carbon::today()]);
 
-        $trainingUsers = SET\TrainingUser::where('training_id', $training->id)->activeUsers()->get();
+        $trainingUsers = TrainingUser::where('training_id', $training->id)->activeUsers()->get();
 
         $this->assertEquals(4, $trainingUsers->count());
     }
 
     public function it_sets_values_to_null_if_empty_string_is_passed()
     {
-        $note = factory(SET\TrainingUser::class)->create([
+        $note = factory(TrainingUser::class)->create([
             'due_date'       => '',
             'completed_date' => '',
         ]);

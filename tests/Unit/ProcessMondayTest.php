@@ -1,5 +1,6 @@
 <?php
 
+use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Console\Commands\ProcessMonday;
@@ -26,11 +27,11 @@ class ProcessMondayTest extends TestCase
 
         Setting::set('summary_recipient', null);
         (new ProcessMonday())->handle();
-        Mail::assertNotSent(EmailAdminSummary::class);
+        Mail::assertNotQueued(EmailAdminSummary::class);
 
         Setting::set('summary_recipient', 'fake@email.com');
         (new ProcessMonday())->handle();
-        Mail::assertSentTo(['fake@email.com'], EmailAdminSummary::class);
+        Mail::assertQueued(EmailAdminSummary::class);
     }
 
     private function setupForTrainings()

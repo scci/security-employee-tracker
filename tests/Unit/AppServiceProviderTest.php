@@ -1,14 +1,16 @@
 <?php
 
+use Tests\Testcase;
+
 /**
  * Class AppServiceProvider Test.
  *
  * Note: The TestCase.php includes the refreshApplication() which sets APP_ENV to 'testing'
  *   and calls createApplication() which calls the AppServiceProvider object.
- *   The refreshApplication() gets called everay testcase.
+ *   The refreshApplication() gets called every testcase.
  */
 class AppServiceProviderTest extends TestCase
-{
+{    
     /**
      * @test
      */
@@ -41,7 +43,7 @@ class AppServiceProviderTest extends TestCase
      * @test
      */
     public function it_does_not_apply_ssl_to_local_env()
-    {
+    {        
         putenv('APP_ENV=local');                      // Set local environment
 
         // Test non-Install, local, non-Secure
@@ -53,7 +55,7 @@ class AppServiceProviderTest extends TestCase
 
         $response = $this->action('GET', 'HomeController@index');     // Home page
         $this->assertEquals(302, $response->getStatusCode());         // Status Redirects
-
+       
         // Test non-Secure
         $this->assertFalse(Request::secure(), 'Still not Secured Route');
     }

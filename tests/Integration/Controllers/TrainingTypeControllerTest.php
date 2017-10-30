@@ -1,7 +1,9 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\Http\Controllers\TrainingTypeController;
 use SET\Training;
 use SET\TrainingType;
 use SET\User;
@@ -22,56 +24,56 @@ class TrainingTypeControllerTest extends TestCase
      */
     public function it_displays_the_index_page()
     {
-        $createdTrainingTypes = factory(SET\TrainingType::class, 5)->create([]);
+        $createdTrainingTypes = factory(TrainingType::class, 5)->create([]);
 
         // Logged in as admin - Can access the page
-        $this->action('GET', 'TrainingTypeController@index');
+        $response = $this->get('trainingtype');
 
-        $this->assertEquals('trainingtype', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('trainingtypes');
+        $response->assertStatus(200);
+        $response->assertViewHas('trainingtypes');
 
         // Logged in as a regular user - Cannot access the page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', '/trainingtype');
+        $response = $this->get('/trainingtype');
 
-        $this->seeStatusCode(403); // Forbidden status code
+        $response->assertStatus(403); // Forbidden status code
 
         // Logged in as a user with role view - Can access the page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', '/trainingtype');
+        $response = $this->get('/trainingtype');
 
-        $this->seeStatusCode(200); // Ok status code
-        $this->seePageIs('trainingtype');
-        $this->assertViewHas('trainingtypes');
+        $response->assertStatus(200); // Ok status code        
+        $response->assertViewHas('trainingtypes');
+        
         // Verify page components (views\trainingtype\index.blade.php)
-        $this->see('<span class="card-title">Training Types</span>');
-        $this->see('<th>Name</th>'); // Table column
-        $this->see('<th>Status</th>'); // Table column
-        $this->dontSee('<th>Modify</th>'); // Table column
+        $response->assertSee('<span class="card-title">Training Types</span>');
+        $response->assertSee('<th>Name</th>'); // Table column
+        $response->assertSee('<th>Status</th>'); // Table column
+        $response->assertDontSee('<th>Modify</th>'); // Table column
         foreach ($createdTrainingTypes as $key => $createdTrainingType) {
-            $this->see($createdTrainingType->name); // Table items of types
+            $response->assertSee($createdTrainingType->name); // Table items of types
         }
-        $this->dontSee('class="material-icons">mode_edit</i>'); // Table item edit
-        $this->dontSee('class="material-icons">delete</i>'); // Table item delete
-        $this->dontSee('data-tooltip="Create Training Type">'); // NEW icon button
+        $response->assertDontSee('class="material-icons">mode_edit</i>'); // Table item edit
+        $response->assertDontSee('class="material-icons">delete</i>'); // Table item delete
+        $response->assertDontSee('data-tooltip="Create Training Type">'); // NEW icon button
 
         // Logged in as a user with role edit - Can access the page
         $newuser = factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
-        $this->call('GET', '/trainingtype');
+        $response = $this->get('/trainingtype');
 
-        $this->seeStatusCode(200); // Ok status code
-        $this->seePageIs('trainingtype');
-        $this->assertViewHas('trainingtypes');
+        $response->assertStatus(200); // Ok status code        
+        $response->assertViewHas('trainingtypes');
+        
         // Verify page components (views\trainingtype\index.blade.php)
-        $this->see('data-tooltip="Create Training Type">'); // Title
-        $this->see('<th>Description</th'); // Table column
-        $this->see('<th>Modify</th>'); // Table column
-        $this->see('class="material-icons">mode_edit</i>'); // Table item edit
-        $this->see('class="material-icons">delete</i>'); // Table item delete
-        $this->see('data-tooltip="Create Training Type">'); // NEW icon button
+        $response->assertSee('data-tooltip="Create Training Type">'); // Title
+        $response->assertSee('<th>Description</th'); // Table column
+        $response->assertSee('<th>Modify</th>'); // Table column
+        $response->assertSee('class="material-icons">mode_edit</i>'); // Table item edit
+        $response->assertSee('class="material-icons">delete</i>'); // Table item delete
+        $response->assertSee('data-tooltip="Create Training Type">'); // NEW icon button
     }
 
     /**
@@ -80,40 +82,38 @@ class TrainingTypeControllerTest extends TestCase
     public function it_displays_the_create_page()
     {
         // Logged in as admin - Can access the training create page
-        $this->call('GET', 'trainingtype/create');
+        $response = $this->get('trainingtype/create');
 
-        $this->seePageIs('trainingtype/create');
+        $response->assertStatus(200);
 
         // Logged in as a regular user - Cannot access the page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', '/trainingtype/create');
+        $response = $this->get('/trainingtype/create');
 
-        $this->seeStatusCode(403); // Forbidden status code
+        $response->assertStatus(403); // Forbidden status code
 
         // Logged in as a user with role view - Cannot access the page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', '/trainingtype/create');
+        $response = $this->get('/trainingtype/create');
 
-        $this->seeStatusCode(403); // Forbidden status code
+        $response->assertStatus(403); // Forbidden status code
 
         // Logged in as a user with role edit - Can access the page
         $newuser = factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
-        $this->call('GET', '/trainingtype/create');
+        $response = $this->get('/trainingtype/create');
 
-        $this->seeStatusCode(200); // OK status code
-        $this->seePageIs('trainingtype/create');
+        $response->assertStatus(200); // OK status code        
 
         // Verify page components (views\trainingtype\create.blade.php, views\trainingtype\_trainingtype_form.blade.php)
-        $this->see('Create Training Type'); // Title
-        $this->see('Name:'); // Field
-        $this->see('Status:'); // Field
-        $this->see('Description:'); // Field
-
-        $this->see('type="submit" value="Create"'); // Button
-        $this->see('<strong>Create/Update button</strong>'); // Help Text (views\trainingtype\_form.blade.php)
+        $response->assertSee('Create Training Type'); // Title
+        $response->assertSee('Name:'); // Field
+        $response->assertSee('Status:'); // Field
+        $response->assertSee('Description:'); // Field
+        $response->assertSee('type="submit" value="Create"'); // Button
+        $response->assertSee('<strong>Create/Update button</strong>'); // Help Text (views\trainingtype\_form.blade.php)
     }
 
     /**
@@ -126,40 +126,40 @@ class TrainingTypeControllerTest extends TestCase
                  'status'      => 1,
                  'sidebar'     => 0,
                  'description' => null, ];
-        $response = $this->call('POST', 'trainingtype', $data);
+        $response = $this->post('trainingtype', $data);
 
-        $this->seeStatusCode(302); // Redirection status code
-        $this->assertRedirectedTo('trainingtype'); // Only check that you're redirecting to a specific URI
+        $response->assertStatus(302); // Redirection status code
+        $response->assertRedirect('trainingtype'); // Only check that you're redirecting to a specific URI
         $this->assertFalse($response->isOk()); // Just check that you don't get a 200 OK response.
         $this->assertTrue($response->isRedirection()); // Make sure you've been redirected.
 
         // Logged in as a regular user - Does not store the training
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $response = $this->call('POST', 'trainingtype', $data);
+        $response = $this->post('trainingtype', $data);
 
-        $this->seeStatusCode(403); // Forbidden status code
-        $this->assertEquals($response->content(), 'Forbidden');
+        $response->assertStatus(403); // Forbidden status code
+        $response->assertSeeText('AccessDeniedHttpException');
         $this->assertFalse($response->isRedirection()); // Redirected
 
         // Logged in as a user with role view - Does not store the training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $response = $this->call('POST', 'trainingtype', $data);
+        $response = $this->post('trainingtype', $data);
 
-        $this->seeStatusCode(403); // Forbidden status code
-        $this->assertEquals($response->content(), 'Forbidden');
+        $response->assertStatus(403); // Forbidden status code
+        $response->assertSeeText('AccessDeniedHttpException');
         $this->assertFalse($response->isRedirection()); // Redirected
 
         // Logged in as a user with edit view - Does store the training
         $newuser = factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
-        $response = $this->call('POST', 'trainingtype', $data);
+        $response = $this->post('trainingtype', $data);
 
         $this->assertTrue($response->isRedirection()); // Make sure you've been redirected.
         $this->assertFalse($response->isOk()); // Just check that you don't get a 200 OK response.
-        $this->seeStatusCode(302); // Redirection status code
-        $this->assertRedirectedTo('trainingtype'); // Only check that you're redirecting to a specific URI
+        $response->assertStatus(302); // Redirection status code
+        $response->assertRedirect('trainingtype'); // Only check that you're redirecting to a specific URI
     }
 
     /**
@@ -169,34 +169,34 @@ class TrainingTypeControllerTest extends TestCase
     {
         // Logged in as admin - No data provided
         $data = []; // Required data not provided
-        $response = $this->call('POST', 'trainingtype', $data);
+        $response = $this->post('trainingtype', $data);
 
         // Handle error redirection
         $this->assertTrue($response->isRedirection()); // Make sure you've been redirected.
         $this->assertFalse($response->isOk()); // Just check that you don't get a 200 OK response.
-        $this->seeStatusCode(302); // Redirection status code
+        $response->assertStatus(302); // Redirection status code
 
         // Test the StoreTrainingTypeRequest handling
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['name']);
-        $this->assertSessionHasErrors('name', 'The name field is required.');
-        $this->assertSessionHasErrors(['status']);
-        $this->assertSessionHasErrors('status', 'The name field is required.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['name']);
+        $response->assertSessionHasErrors('name', 'The name field is required.');
+        $response->assertSessionHasErrors(['status']);
+        $response->assertSessionHasErrors('status', 'The name field is required.');
 
         // Test when only name value is entered.
         $data = ['name' => 'Sample Name'];
-        $this->call('POST', 'trainingtype', $data);
-        $this->seeStatusCode(302); // Redirection status code
+        $response = $this->post('trainingtype', $data);
+        $response->assertStatus(302); // Redirection status code
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['status']);
-        $this->assertSessionHasErrors('status', 'The status field is required.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['status']);
+        $response->assertSessionHasErrors('status', 'The status field is required.');
 
         // Test when name & status value is entered. (all required data is entered)
         $data = ['name' => 'Sample Name', 'status' => 1];
-        $response = $this->call('POST', 'trainingtype', $data);
-        $this->seeStatusCode(302); // Redirection status code
-        $this->assertRedirectedTo('trainingtype'); // Only check that you're redirecting to a specific URI
+        $response = $this->post('trainingtype', $data);
+        $response->assertStatus(302); // Redirection status code
+        $response->assertRedirect('trainingtype'); // Only check that you're redirecting to a specific URI
     }
 
     /**
@@ -209,7 +209,7 @@ class TrainingTypeControllerTest extends TestCase
         $createdTrainingTypeId = $createdTrainingType->id;
 
         // Create trainings
-        $createdTrainings = factory(SET\Training::class, 6)->create([]);
+        $createdTrainings = factory(Training::class, 6)->create([]);
         foreach ($createdTrainings as $createdTraining) {
             // Associating trainingtype to a Training
             $createdTraining->trainingType()->associate($createdTrainingType);
@@ -221,38 +221,40 @@ class TrainingTypeControllerTest extends TestCase
         // Logged in as a regular user - Does not store the training
         $newuser = factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
-        $this->call('GET', "trainingtype/$createdTrainingTypeId");
-
-        $this->seePageIs('/trainingtype/'.$createdTrainingTypeId);
-        $this->assertViewHas('trainingtype');
-        $this->assertViewHas('trainings');
+        $response = $this->get("trainingtype/$createdTrainingTypeId");
+        
+        $response->assertStatus(200);
+        $response->assertSee('/trainingtype/'.$createdTrainingTypeId);
+        $response->assertViewHas('trainingtype');
+        $response->assertViewHas('trainings');
 
         // Verify page components (views\trainingtype\show.blade.php)
-        $this->see($createdTrainingType->name); // Card Title
-        $this->see('<i class="material-icons">mode_edit</i>'); // Edit icon
-        $this->see('Status'); // Field
-        $this->see('Description:'); // Field
-        $this->see('<th>Associated Trainings</th>'); // Table column
+        $response->assertSee($createdTrainingType->name); // Card Title
+        $response->assertSee('<i class="material-icons">mode_edit</i>'); // Edit icon
+        $response->assertSee('Status'); // Field
+        $response->assertSee('Description:'); // Field
+        $response->assertSee('<th>Associated Trainings</th>'); // Table column
         foreach ($createdTrainings as $key => $createdTraining) {
-            $this->see($createdTraining->name); // Table items of types
+            $response->assertSee($createdTraining->name); // Table items of types
         }
 
         // Logged in as a view user - Does not store the training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', "trainingtype/$createdTrainingTypeId");
+        $response = $this->get("trainingtype/$createdTrainingTypeId");
 
-        $this->seeStatusCode(200); // OK status code
-        $this->seePageIs('/trainingtype/'.$createdTrainingTypeId);
+        $response->assertStatus(200); // OK status code
+        $response->assertSee('/trainingtype/'.$createdTrainingTypeId);
+        
         // Verify page components (views\trainingtype\show.blade.php)
-        $this->dontSee('<i class="material-icons">mode_edit</i>'); // Edit icon
+        $response->assertDontSee('<i class="material-icons">mode_edit</i>'); // Edit icon
 
         // Logged in as a view user - Does not store the training
         $newuser = factory(User::class)->create(['role' => '']);
         $this->actingAs($newuser);
-        $response = $this->call('GET', "trainingtype/$createdTrainingTypeId");
-        $this->seeStatusCode(403); // Forbidden status code
-        $this->see('Whoops, looks like something went wrong.');
+        $response = $this->get("trainingtype/$createdTrainingTypeId");
+        $response->assertStatus(403); // Forbidden status code
+        $response->assertSee('Whoops, looks like something went wrong.');
         $this->assertFalse($response->isRedirection()); // Redirected
     }
 
@@ -266,42 +268,42 @@ class TrainingTypeControllerTest extends TestCase
         $createdTrainingTypeId = $createdTrainingType->id;
 
         // Logged in as admin - Can edit the trainingtype details
-        $this->call('GET', "trainingtype/$createdTrainingTypeId/edit");
+        $response = $this->get("trainingtype/$createdTrainingTypeId/edit");
 
-        $this->seeStatusCode(200); // OK request response
-        $this->seePageIs('/trainingtype/'.$createdTrainingTypeId.'/edit');
-        $this->assertViewHas('trainingtype');
+        $response->assertStatus(200); // OK request response
+        $response->assertSee('Edit Training Type');
+        $response->assertViewHas('trainingtype');
 
         // Logged in as a regular user - Cannot edit the trainingtype details
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', "trainingtype/$createdTrainingTypeId/edit");
+        $response = $this->get("trainingtype/$createdTrainingTypeId/edit");
 
-        $this->seeStatusCode(403); // Forbidden status code
+        $response->assertStatus(403); // Forbidden status code
 
         // Logged in as a user with role view - Cannot edit the training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', "trainingtype/$createdTrainingTypeId/edit");
+        $response = $this->get("trainingtype/$createdTrainingTypeId/edit");
 
-        $this->seeStatusCode(403); // Forbidden status code
+        $response->assertStatus(403); // Forbidden status code
 
         // Logged in as a user with edit view - Cannot edit the training
         $newuser = factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
-        $this->call('GET', "trainingtype/$createdTrainingTypeId/edit");
+        $response = $this->get("trainingtype/$createdTrainingTypeId/edit");
 
-        $this->seeStatusCode(200); // OK status code
-        $this->seePageIs('/trainingtype/'.$createdTrainingTypeId.'/edit');
-        $this->assertViewHas('trainingtype');
+        $response->assertStatus(200); // OK status code
+        $response->assertSee('Edit Training Type');
+        $response->assertViewHas('trainingtype');
 
         // Verify page components (views\trainingtype\edit.blade.php, views\trainingtype\_trainingtype_form.blade.php)
-        $this->see('Edit Training Type'); // card-title
-        $this->see('Name:'); // Field
-        $this->see('Status:'); // Field
-        $this->see('Description:'); // Field
-        $this->see('type="submit" value="Update"'); // Button
-        $this->see('Create/Update button'); // Help Text (views\trainingtype\_form.blade.php)
+        $response->assertSee('Edit Training Type'); // card-title
+        $response->assertSee('Name:'); // Field
+        $response->assertSee('Status:'); // Field
+        $response->assertSee('Description:'); // Field
+        $response->assertSee('type="submit" value="Update"'); // Button
+        $response->assertSee('Create/Update button'); // Help Text (views\trainingtype\_form.blade.php)
     }
 
     /**
@@ -319,8 +321,8 @@ class TrainingTypeControllerTest extends TestCase
                  'sidebar'     => 0,
                  'description' => 'Sample Trainging Type Descripiton', ];
 
-        $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
-        $this->assertRedirectedTo("/trainingtype/$createdTrainingTypeId");
+        $response = $this->patch("trainingtype/$createdTrainingTypeId", $data);
+        $response->assertRedirect("/trainingtype/$createdTrainingTypeId");
 
         $createdTrainingType = TrainingType::find($trainingTypeToCreate->id);
         $this->assertNotEquals($createdTrainingType->name, $trainingTypeToCreate->name);
@@ -331,14 +333,14 @@ class TrainingTypeControllerTest extends TestCase
         $this->assertEquals($createdTrainingType->sidebar, $data['sidebar']);
     }
 
-/**
- * @test
- */
-public function it_updates_the_trainingtype_if_edit_role()
-{
-    // Create a trainingtype object
+    /**
+    * @test
+    */
+    public function it_updates_the_trainingtype_if_edit_role()
+    {
+        // Create a trainingtype object
         $trainingTypeToCreate = factory(TrainingType::class)->create();
-    $createdTrainingTypeId = $trainingTypeToCreate->id;
+        $createdTrainingTypeId = $trainingTypeToCreate->id;
 
         // Logged in as admin - Can update the training
         $data = ['name'        => 'Sample Training Type',
@@ -347,26 +349,26 @@ public function it_updates_the_trainingtype_if_edit_role()
                  'description' => 'Sample Trainging Type Descripiton', ];
         // Logged in as a regular user - Cannot update the training
         $newuser = factory(User::class)->create();
-    $this->actingAs($newuser);
-    $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
-    $this->seeStatusCode(403); // Forbidden status code
+        $this->actingAs($newuser);
+        $response = $this->patch("trainingtype/$createdTrainingTypeId", $data);
+        $response->assertStatus(403); // Forbidden status code
 
         // Logged in as a user with role view - Cannot update the training
         $newuser = factory(User::class)->create(['role' => 'view']);
-    $this->actingAs($newuser);
-    $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
-    $this->seeStatusCode(403); // Forbidden status code
+        $this->actingAs($newuser);
+        $response = $this->patch("trainingtype/$createdTrainingTypeId", $data);
+        $response->assertStatus(403); // Forbidden status code
 
         // Logged in as a user with edit view - Can update the training
         $newuser = factory(User::class)->create(['role' => 'edit']);
-    $this->actingAs($newuser);
-    $response = $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
+        $this->actingAs($newuser);
+        $response = $this->patch("trainingtype/$createdTrainingTypeId", $data);
 
-    $this->assertTrue($response->isRedirection()); // Make sure you've been redirected.
+        $this->assertTrue($response->isRedirection()); // Make sure you've been redirected.
         $this->assertFalse($response->isOk()); // Just check that you don't get a 200 OK response.
-        $this->seeStatusCode(302); // Redirection status code
-        $this->assertRedirectedTo('trainingtype/'.$createdTrainingTypeId); // Only check that you're redirecting to a specific URI
-}
+        $response->assertStatus(302); // Redirection status code
+        $response->assertRedirect('trainingtype/'.$createdTrainingTypeId); // Only check that you're redirecting to a specific URI
+    }
 
     /**
      * @test
@@ -383,17 +385,17 @@ public function it_updates_the_trainingtype_if_edit_role()
         $this->assertEquals($createdTrainingType->id, $createdTrainingTypeId);
 
         // Delete the created trainingtype as admin
-        $response = $this->call('DELETE', "trainingtype/$createdTrainingTypeId");
+        $response = $this->delete("trainingtype/$createdTrainingTypeId");
 
         $this->assertEquals($response->content(), '');
-        $this->seeStatusCode(200);  // OK status code
+        $response->assertStatus(200);  // OK status code
         // Assert that a null object is returned.
         $deletedTrainingType = TrainingType::find($createdTrainingTypeId);
         $this->assertNull($deletedTrainingType);
 
         // Delete again the created trainingtype.
-        $this->call('DELETE', "trainingtype/$createdTrainingTypeId");
-        $this->seeStatusCode(404);  // Not Found status code
+        $response = $this->delete("trainingtype/$createdTrainingTypeId");
+        $response->assertStatus(404);  // Not Found status code
     }
 
     /**
@@ -430,9 +432,9 @@ public function it_updates_the_trainingtype_if_edit_role()
             TrainingType::first()->id);
 
         // Delete the created trainingtype as admin
-        $this->call('DELETE', "trainingtype/$createdTrainingTypeId");
+        $response = $this->delete("trainingtype/$createdTrainingTypeId");
 
-        $this->seeStatusCode(200);  // OK status code
+        $response->assertStatus(200);  // OK status code
         // Assert that a null object is returned.
         $deletedTrainingType = TrainingType::find($createdTrainingTypeId);
         $this->assertNull($deletedTrainingType);
@@ -460,25 +462,23 @@ public function it_updates_the_trainingtype_if_edit_role()
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         // Cannot access the delete trainingtype as regular user
-        $this->call('DELETE', "trainingtype/$createdTrainingTypeId");
-
-        $this->seeStatusCode(403); // Forbidden status code
+        $response = $this->delete("trainingtype/$createdTrainingTypeId");
+        $response->assertStatus(403); // Forbidden status code
 
         // Logged in as a view user
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         // Cannot access the delete trainingtype as view user
-        $this->call('DELETE', "trainingtype/$createdTrainingTypeId");
-
-        $this->seeStatusCode(403); // Forbidden status code
+        $response = $this->delete("trainingtype/$createdTrainingTypeId");
+        $response->assertStatus(403); // Forbidden status code
 
         // Logged in as an edit user
         $newuser = factory(User::class)->create(['role' => 'edit']);
         $this->actingAs($newuser);
         // Delete the created trainingtype. Assert that a null object is returned.
-        $response = $this->call('DELETE', "trainingtype/$createdTrainingTypeId");
+        $response = $this->delete("trainingtype/$createdTrainingTypeId");
 
-        $this->seeStatusCode(200); // OK status code
+        $response->assertStatus(200); // OK status code
         $deletedTrainingType = TrainingType::find($createdTrainingTypeId);
         $this->assertNull($deletedTrainingType);
     }

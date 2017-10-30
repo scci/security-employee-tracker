@@ -1,5 +1,6 @@
 <?php
 
+use Tests\Testcase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Setting;
 

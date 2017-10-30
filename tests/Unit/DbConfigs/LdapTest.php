@@ -1,5 +1,6 @@
 <?php
 
+use Tests\Testcase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Handlers\DBConfigs\Ldap;
 use SET\Setting;

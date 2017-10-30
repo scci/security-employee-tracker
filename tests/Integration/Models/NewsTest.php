@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Models;
+use Tests\TestCase;
+
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
@@ -18,7 +21,7 @@ class NewsTest extends TestCase
     public function get_published_news()
     {
         // Create a news
-        $createdNews = factory(SET\News::class)->create(['publish_date' => Carbon::now()->format('Y-m-d')]);
+        $createdNews = factory(News::class)->create(['publish_date' => Carbon::now()->format('Y-m-d')]);
 
         // Query the database using the scopePublishedNews method in the news model
         $newsPublished = News::publishedNews()->where('id', $createdNews->id)->get();
@@ -36,7 +39,7 @@ class NewsTest extends TestCase
     */
     public function get_unpublished_news()
     {
-        $createdNews1 = factory(SET\News::class)->create(
+        $createdNews1 = factory(News::class)->create(
                         ['publish_date' => Carbon::tomorrow()->format('Y-m-d')]); //,
                         // 'expire_date'=>Carbon::yesterday()->format('Y-m-d')]);
 
@@ -46,7 +49,7 @@ class NewsTest extends TestCase
         // Ensure that the query returns an empty collection
         $this->assertNotContains($createdNews1->title, $newsPublished->pluck('title'));
 
-        $createdNews2 = factory(SET\News::class)->create(
+        $createdNews2 = factory(News::class)->create(
                         ['publish_date' => Carbon::tomorrow()->format('Y-m-d'),
                          'expire_date'  => Carbon::yesterday()->format('Y-m-d'), ]);
 
@@ -62,12 +65,12 @@ class NewsTest extends TestCase
     {
         Mail::fake();
 
-        $news = factory(SET\News::class)->create(['publish_date' => Carbon::today(), 'send_email' => 1]);
+        $news = factory(News::class)->create(['publish_date' => Carbon::now(), 'send_email' => 1]);
 
         $news->emailNews();
 
         $users = User::skipSystem()->active()->get();
-        Mail::assertSentTo($users, SendNewsEmail::class);
+        Mail::assertQueued(SendNewsEmail::class);
     }
 
     /** @test */
@@ -75,11 +78,11 @@ class NewsTest extends TestCase
     {
         Mail::fake();
 
-        $news = factory(SET\News::class)->create(['publish_date' => Carbon::tomorrow(), 'send_email' => 1]);
+        $news = factory(News::class)->create(['publish_date' => Carbon::tomorrow(), 'send_email' => 1]);
 
         $news->emailNews();
 
-        Mail::assertNotSent(SendNewsEmail::class);
+        Mail::assertNotQueued(SendNewsEmail::class);
     }
 
     /** @test */
@@ -87,11 +90,11 @@ class NewsTest extends TestCase
     {
         Mail::fake();
 
-        $news = factory(SET\News::class)->create(['publish_date' => Carbon::today(), 'send_email' => 0]);
+        $news = factory(News::class)->create(['publish_date' => Carbon::today(), 'send_email' => 0]);
 
         $news->emailNews();
 
-        Mail::assertNotSent(SendNewsEmail::class);
+        Mail::assertNotQueued(SendNewsEmail::class);
     }
 
     /** @test */

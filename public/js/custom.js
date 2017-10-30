@@ -166,6 +166,7 @@ $(function(){
 
 $(document).ready(function($) {
     // Set the Options for "Bloodhound" suggestion engine
+    var root = '{{url("/")}}';
     var engine = new Bloodhound({
         prefetch: {
             url: root + "/search",

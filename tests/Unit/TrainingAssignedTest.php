@@ -1,6 +1,6 @@
 <?php
 
-
+use Tests\Testcase;
 use SET\Events\TrainingAssigned;
 
 class TrainingAssignedTest extends TestCase

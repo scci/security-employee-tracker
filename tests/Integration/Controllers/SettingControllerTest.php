@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\User;
 
@@ -13,31 +16,25 @@ class SettingControllerTest extends TestCase
         $this->signIn();
     }
 
-    /** @test */
-    public function it_loads()
-    {
-        return true;
-    }
-
     /**
      * @test
      */
     public function it_shows_the_index_page()
     {
         // Logged in as admin - Can access the settings page
-        $this->action('GET', 'SettingController@index');
+        $response = $this->get('settings');
 
-        $this->assertEquals('settings', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('userList');
-        $this->assertViewHas('admins');
-        $this->assertViewHas('configAdmins');
-        $this->assertViewHas('viewers');
+        $response->assertStatus(200);
+        $response->assertViewHas('userList');
+        $response->assertViewHas('admins');
+        $response->assertViewHas('configAdmins');
+        $response->assertViewHas('viewers');
 
         // Logged in as a regular user - Cannot access the settings page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', '/settings');
+        $response = $this->get( '/settings');
 
-        $this->seeStatusCode(403);
+        $response->assertStatus(403);
     }
 }

@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Training;
 use SET\User;
@@ -20,32 +23,31 @@ class HomeControllerTest extends TestCase
     public function it_shows_the_index_page()
     {
         // Logged in as admin - Can access the home page and display calendar, duties, etc
-        $this->action('GET', 'HomeController@index');
+        $response = $this->get('/');
 
-        $this->assertEquals('/', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('trainingUser');
-        // $this->assertViewHas('log');
-        $this->assertViewHas('calendar');
-        $this->assertViewHas('duties');
+        $response->assertStatus(200);
+        $response->assertViewHas('trainingUser');
+        $response->assertViewHas('calendar');
+        $response->assertViewHas('duties');
 
         // Logged in as a user with role view - Can access the home page and
         // display calendar, duties, etc
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->action('GET', 'HomeController@index');
+        $response = $this->get('/');
 
-        $this->assertEquals('/', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('trainingUser');
-        // $this->assertViewHas('log');
-        $this->assertViewHas('calendar');
-        $this->assertViewHas('duties');
+        $response->assertStatus(200);
+        $response->assertViewHas('trainingUser');
+        $response->assertViewHas('activityLog');
+        $response->assertViewHas('calendar');
+        $response->assertViewHas('duties');
 
         // Logged in as a regular user - User redirected to user's home page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->action('GET', 'HomeController@index');
+        $response = $this->get('/');
 
-        $this->assertRedirectedTo('/user/'.$newuser->id);
+        $response->assertRedirect('/user/'.$newuser->id);
     }
 
     /**
@@ -55,21 +57,21 @@ class HomeControllerTest extends TestCase
     {
         // Logged in as admin - Can search users and trainings
         $training = factory(Training::class)->create();
-        $this->action('GET', 'HomeController@search');
-        $this->seeJsonStructure(['status',
+        $response = $this->get('/search');
+        $response->assertJsonStructure(['status',
                                 'error',
                                 'data' => ['user', 'training'],
                                 ]);
 
-        $this->assertContains('"status":true', $this->response->getContent());
-        $this->assertContains('"error":null', $this->response->getContent());
-        $this->assertContains($this->user->last_name, $this->response->getContent());
-        $this->assertContains($training->name, $this->response->getContent());
+        $response->assertSee('"status":true');
+        $response->assertSee('"error":null');
+        $response->assertSee($this->user->last_name);
+        $response->assertSee($training->name);
 
         // Logged in as a regular user - User redirected to user's home page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->action('GET', 'HomeController@search');
-        $this->seeStatusCode(403);
+        $response = $this->get('/search');
+        $response->assertStatus(403);
     }
 }

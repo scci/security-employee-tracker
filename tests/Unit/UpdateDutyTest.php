@@ -1,5 +1,6 @@
 <?php
 
+use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
@@ -36,6 +37,6 @@ class UpdateDutyTest extends TestCase
 
         $users = $this->duty->users()->orderBy('duty_user.last_worked', 'DESC')->orderBy('last_name')->get();
 
-        Mail::assertSentTo([$users[0]], DutyToday::class);
+        Mail::assertQueued(DutyToday::class);
     }
 }

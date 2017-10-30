@@ -1,14 +1,16 @@
 <?php
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
+use Illuminate\Support\Facades\Event;
 use SET\Training;
 use SET\TrainingUser;
 use SET\User;
+use SET\Events\TrainingAssigned;
 
 class TrainingUserControllerTest extends TestCase
 {
-    use DatabaseTransactions;
-
     public function setUp()
     {
         parent::setUp();
@@ -23,28 +25,29 @@ class TrainingUserControllerTest extends TestCase
     {
         // Logged in as admin - Can access the training user create page
         $userId = $this->user->id;
-        $this->call('GET', "/user/$userId/training/create");
+        $response = $this->get("/user/$userId/training/create");
+        $response->assertStatus(200);
 
-        $this->seePageIs("/user/$userId/training/create");
-        $this->assertViewHas('user');
-        $this->assertViewHas('training');
-        $this->assertViewHas('disabled');
+        $response->assertSeeText("Assign Training");
+        $response->assertViewHas('user');
+        $response->assertViewHas('training');
+        $response->assertViewHas('disabled');
 
         // Logged in as a regular user - Cannot access the training user create page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
 
-        $this->call('GET', "/user/$userId/training/create");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/training/create");
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the training user create page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
 
-        $this->call('GET', "/user/$userId/training/create");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/training/create");
+        $response->assertStatus(403);
     }
 
     /**
@@ -53,6 +56,7 @@ class TrainingUserControllerTest extends TestCase
     public function it_stores_the_training_user_by_testing_each_user_role()
     {
         // Logged in as admin - Can store the training user
+        Event::fake();
         $userId = $this->user->id;
         $data = ['training_id'      => factory(Training::class)->create()->id,
                  'completed_date'   => '',
@@ -60,25 +64,27 @@ class TrainingUserControllerTest extends TestCase
                  'encrypt'          => '',
                  'comment'          => 'Training user notes', ];
 
-        $this->call('POST', "/user/$userId/training/", $data);
-        $this->assertRedirectedToRoute('user.show', $userId);
-        $this->expectsEvents(SET\Events\TrainingAssigned::class);
+        $response = $this->post("/user/$userId/training/", $data);
+        $response->assertStatus(302);
+        $response->assertRedirect('/user/'.$userId);        
+        //$this->expectsEvents(SET\Events\TrainingAssigned::class);
+        Event::assertDispatched(TrainingAssigned::class);
 
         // Logged in as a regular user - Cannot not store the training user
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
 
-        $this->call('POST', "/user/$userId/training/", $data);
-        $this->seeStatusCode(403);
+        $response = $this->post("/user/$userId/training/", $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot not store the training user
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
 
-        $this->call('POST', "/user/$userId/training/", $data);
-        $this->seeStatusCode(403);
+        $response = $this->post("/user/$userId/training/", $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -90,18 +96,18 @@ class TrainingUserControllerTest extends TestCase
         $userId = $this->user->id;
         $data = [];
 
-        $this->call('POST', "/user/$userId/training/", $data);
+        $response = $this->post("/user/$userId/training/", $data);
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['training_id', 'due_date']);
-        $this->assertSessionHasErrors('training_id', 'Please select a training.');
-        $this->assertSessionHasErrors('due_date', 'The due date field is required.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['training_id', 'due_date']);
+        $response->assertSessionHasErrors('training_id', 'Please select a training.');
+        $response->assertSessionHasErrors('due_date', 'The due date field is required.');
 
         // Logged in as admin - Only due_date is entered.
         $data = ['due_date' => '2017-01-23'];
-        $this->call('POST', "/user/$userId/training/", $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors('training_id', 'Please select a training.');
+        $response = $this->post("/user/$userId/training/", $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors('training_id', 'Please select a training.');
     }
 
     /**
@@ -121,11 +127,11 @@ class TrainingUserControllerTest extends TestCase
         $trainingUserNoCompletedDateId = $trainingUserNoCompletedDate->id;
 
         //Can see the training user details
-        $this->call('GET', "/user/$userId/training/$trainingUserId");
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->get("/user/$userId/training/$trainingUserId");
+        $response->assertRedirect('user/'.$userId);
 
-        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");
-        $this->seePageIs("/user/$userId/training/$trainingUserNoCompletedDateId");
+        $response = $this->get("/user/$userId/training/$trainingUserNoCompletedDateId");
+        $response->assertSee("/user/$userId/training/$trainingUserNoCompletedDateId");
 
         // Logged in as regular user
         $newuser = factory(User::class)->create();
@@ -133,24 +139,24 @@ class TrainingUserControllerTest extends TestCase
         $userId = $newuser->id;
 
         // Can see the training user details for the logged in user
-        $this->call('GET', "/user/$userId/training/$trainingUserId");
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->get("/user/$userId/training/$trainingUserId");
+        $response->assertRedirect('user/'.$userId);
 
         // Can see the training user details for the logged in user
-        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");
-        $this->seePageIs("/user/$userId/training/$trainingUserNoCompletedDateId");
+        $response = $this->get("/user/$userId/training/$trainingUserNoCompletedDateId");
+        $response->assertSee("/user/$userId/training/$trainingUserNoCompletedDateId");
 
         // Create another new user - But try to access the training user page for the previous user
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
 
         // Cannot see the training user details for the previously created user
-        $this->call('GET', "/user/$userId/training/$trainingUserId");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/training/$trainingUserId");
+        $response->assertStatus(403);
 
         // Cannot see the training user details for the previously created user
-        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/training/$trainingUserNoCompletedDateId");
+        $response->assertStatus(403);
 
         // Logged in as user with view permissions
         $newuser = factory(User::class)->create(['role' => 'view']);
@@ -158,12 +164,12 @@ class TrainingUserControllerTest extends TestCase
         $userId = $newuser->id;
 
         // Can see the training user details for the logged in user
-        $this->call('GET', "/user/$userId/training/$trainingUserId");
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->get("/user/$userId/training/$trainingUserId");
+        $response->assertRedirect('user/'.$userId);
 
         // Can see the training user details for the logged in user
-        $this->call('GET', "/user/$userId/training/$trainingUserNoCompletedDateId");
-        $this->seePageIs("/user/$userId/training/$trainingUserNoCompletedDateId");
+        $response = $this->get("/user/$userId/training/$trainingUserNoCompletedDateId");
+        $response->assertSee("/user/$userId/training/$trainingUserNoCompletedDateId");
     }
 
     /**
@@ -177,51 +183,54 @@ class TrainingUserControllerTest extends TestCase
         $trainingUserId = $trainingUserToCreate->id;
 
         // Logged in as admin - Can edit the training
-        $this->call('GET', "/user/$userId/training/$trainingUserId/edit");
-        $this->seePageIs("/user/$userId/training/$trainingUserId/edit");
-        $this->assertViewHas('user');
-        $this->assertViewHas('trainingUser');
-        $this->assertViewHas('training');
-        $this->assertViewHas('disabled');
+        $response = $this->get("/user/$userId/training/$trainingUserId/edit");
+        $response->assertStatus(200);
+        $response->assertSeeText("Update Training");
+        $response->assertViewHas('user');
+        $response->assertViewHas('trainingUser');
+        $response->assertViewHas('training');
+        $response->assertViewHas('disabled');
 
         // Create a new user - Still logged in as an admin
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
 
         // Able to edit the new user's training
-        $this->call('GET', "/user/$userId/training/$trainingUserId/edit");
-        $this->seePageIs("/user/$userId/training/$trainingUserId/edit");
-        $this->assertViewHas('user');
-        $this->assertViewHas('trainingUser');
-        $this->assertViewHas('training');
-        $this->assertViewHas('disabled');
+        $response = $this->get("/user/$userId/training/$trainingUserId/edit");
+        $response->assertStatus(200);
+        $response->assertSeeText("Update Training");
+        $response->assertViewHas('user');
+        $response->assertViewHas('trainingUser');
+        $response->assertViewHas('training');
+        $response->assertViewHas('disabled');
 
         // Log in as a regular user - User should be able to edit their own training page
         $this->actingAs($newuser);
 
-        $this->call('GET', "/user/$userId/training/$trainingUserId/edit");
-        $this->seePageIs("/user/$userId/training/$trainingUserId/edit");
-        $this->assertViewHas('user');
-        $this->assertViewHas('trainingUser');
-        $this->assertViewHas('training');
+        $response = $this->get("/user/$userId/training/$trainingUserId/edit");
+        $response->assertStatus(200);
+        $response->assertSeeText("Update Training");
+        $response->assertViewHas('user');
+        $response->assertViewHas('trainingUser');
+        $response->assertViewHas('training');
         // Ensure the due by field is disabled since user is not an admin.
-        $this->assertViewHas('disabled', 'disabled');
+        $response->assertViewHas('disabled', 'disabled');
 
         // Create a new user
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
 
         // Still logged in as previous user - Cannot edit the newuser's training
-        $this->call('GET', "/user/$userId/training/$trainingUserId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/training/$trainingUserId/edit");
+        $response->assertStatus(403);
 
         // Create a new user with view permissions
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
 
         // Cannot edit the previous user's training
-        $this->call('GET', "/user/$userId/training/$trainingUserId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/training/$trainingUserId/edit");
+        $response->assertStatus(403);
     }
 
     /**
@@ -243,9 +252,9 @@ class TrainingUserControllerTest extends TestCase
                  'comment'          => 'Training User Notes',
                 ];
 
-        $this->call('PATCH', "/user/$userId/training/$createdTrainingUserId", $data);
+        $response = $this->patch("/user/$userId/training/$createdTrainingUserId", $data);
 
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response->assertRedirect('user/'.$userId);
 
         // Ensure the training user is updated with the provided data
         $updatedTrainingUser = TrainingUser::find($createdTrainingUserId);
@@ -257,20 +266,20 @@ class TrainingUserControllerTest extends TestCase
         $newuser = factory(User::class)->create();
         $userId = $newuser->id;
 
-        $this->call('PATCH', "/user/$userId/training/$createdTrainingUserId", $data);
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->patch("/user/$userId/training/$createdTrainingUserId", $data);
+        $response->assertRedirect('user/'.$userId);
 
         // Logged in as new user. User should be able to edit own training
         $this->actingAs($newuser);
-        $this->call('PATCH', "/user/$userId/training/$createdTrainingUserId", $data);
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->patch("/user/$userId/training/$createdTrainingUserId", $data);
+        $response->assertRedirect('user/'.$userId);
 
         // Logged in as a user with role view - Cannot update another user's training
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
 
-        $this->call('PATCH', "/user/$userId/training/$createdTrainingUserId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("/user/$userId/training/$createdTrainingUserId", $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -289,7 +298,7 @@ class TrainingUserControllerTest extends TestCase
         $this->assertEquals($createdTrainingUser->id, $createdTrainingUserId);
 
         // Delete the created training user. Assert that a null object is returned.
-        $this->call('DELETE', "/user/$userId/training/$createdTrainingUserId");
+        $response = $this->delete("/user/$userId/training/$createdTrainingUserId");
         $deletedTrainingUser = TrainingUser::find($createdTrainingUserId);
         $this->assertNull($deletedTrainingUser);
 
@@ -299,13 +308,13 @@ class TrainingUserControllerTest extends TestCase
 
         // Cannot access the delete training user page since the training user with
         // the provided Id has already been deleted
-        $this->call('DELETE', "/user/$userId/training/$createdTrainingUserId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("/user/$userId/training/$createdTrainingUserId");
+        $response->assertStatus(403);
 
         // Create a new training user and try to delete. Get forbidden status code
         $trainingUserToCreate = factory(TrainingUser::class)->create();
         $createdTrainingUserId = $trainingUserToCreate->id;
-        $this->call('DELETE', "/user/$userId/training/$createdTrainingUserId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("/user/$userId/training/$createdTrainingUserId");
+        $response->assertStatus(403);
     }
 }

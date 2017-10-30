@@ -1,5 +1,6 @@
 <?php
 
+use Tests\Testcase;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\Mail;
@@ -21,11 +22,11 @@ class SendNewsTest extends TestCase
 
         (new SendNews())->handle();
 
-        Mail::assertSent(SendNewsEmail::class, function ($mail) use ($send_news) {
+        Mail::assertQueued(SendNewsEmail::class, function ($mail) use ($send_news) {
             return $mail->news->id == $send_news->id;
         });
 
-        Mail::assertNotSent(SendNewsEmail::class, function ($mail) use ($news) {
+        Mail::assertNotQueued(SendNewsEmail::class, function ($mail) use ($news) {
             return $mail->news->id == $news->id;
         });
     }

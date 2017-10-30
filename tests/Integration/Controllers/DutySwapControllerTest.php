@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Duty;
 use SET\User;
@@ -28,19 +31,19 @@ class DutySwapControllerTest extends TestCase
                  'date' => '2016-01-23, 2016-02-12',
                  'duty' => $createdDutyId,
                  'type' => 'User', ];
-        $this->call('POST', 'duty-swap', $data);
-        $this->assertRedirectedTo('/duty/'.$data['duty']);
+        $response = $this->post('duty-swap', $data);
+        $response->assertRedirect('/duty/'.$data['duty']);
 
         // Logged in as a regular user - Does not store the dutyswap
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('POST', 'duty-swap', $data);
-        $this->seeStatusCode(403);
+        $response = $this->post('duty-swap', $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Does not store the dutyswap
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('POST', 'duty-swap', $data);
-        $this->seeStatusCode(403);
+        $response = $this->post('duty-swap', $data);
+        $response->assertStatus(403);
     }
 }

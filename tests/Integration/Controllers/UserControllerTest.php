@@ -1,9 +1,15 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Http\Controllers\UserController;
 use SET\User;
+use SET\Training;
+use SET\TrainingType;
+use SET\TrainingUser;
 
 /**
  * Class UserControllerTest.
@@ -24,17 +30,18 @@ class UserControllerTest extends TestCase
     public function it_shows_the_index_page()
     {
         // Logged in as admin - Can access the user page
-        $this->action('GET', 'UserController@index');
+        $response = $this->get('/user');
+        $response->assertStatus(200);
 
-        $this->assertEquals('user', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('users');
+        $response->assertSee('user');
+        $response->assertViewHas('users');
 
         // Logged in as a regular user - Cannot access the user page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
 
-        $this->call('GET', '/user');
-        $this->seeStatusCode(403);
+        $response = $this->get('/user');
+        $response->assertStatus(403);
     }
 
     /**
@@ -43,22 +50,22 @@ class UserControllerTest extends TestCase
     public function it_shows_the_create_page()
     {
         // Logged in as admin - Can access the visit create page
-        $this->call('GET', '/user/create');
-        $this->seePageIs('/user/create');
-        $this->assertViewHas('supervisors');
-        $this->assertViewHas('groups');
+        $response = $this->get('/user/create');
+        $response->assertSeeText('Create User');
+        $response->assertViewHas('supervisors');
+        $response->assertViewHas('groups');
 
         // Create a regular user - Cannot access the visit create page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', '/user/create');
-        $this->seeStatusCode(403);
+        $response = $this->get('/user/create');
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the visit create page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', '/user/create');
-        $this->seeStatusCode(403);
+        $response = $this->get('/user/create');
+        $response->assertStatus(403);
     }
 
     /**
@@ -81,24 +88,24 @@ class UserControllerTest extends TestCase
                  'inv_close'        => '2016-12-29',
                  'status'           => 'active', ];
 
-        $this->call('POST', 'user', $data);
-        $this->assertRedirectedToRoute('user.index');
+        $response = $this->post('user', $data);
+        $response->assertRedirect('/user');
 
         // Retrieve the created  user and ensure that the user is created
-        $createdUser = SET\User::where('email', $data['email'])->get();
+        $createdUser = User::where('email', $data['email'])->get();
         $this->assertNotNull($createdUser);
 
         // Logged in as a regular user - Cannot store the user
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('POST', 'user', $data);
-        $this->seeStatusCode(403);
+        $response = $this->post('user', $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot store the user
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('POST', 'user', $data);
-        $this->seeStatusCode(403);
+        $response = $this->post('user', $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -109,20 +116,20 @@ class UserControllerTest extends TestCase
         // Logged in as admin - No data provided
         $data = [];
 
-        $this->call('POST', 'user', $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['first_name', 'last_name', 'email']);
-        $this->assertSessionHasErrors('first_name', 'The first_name field is required.');
-        $this->assertSessionHasErrors('last_name', 'The last_name field is required.');
-        $this->assertSessionHasErrors('email', 'The email field is required.');
+        $response = $this->post('user', $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['first_name', 'last_name', 'email']);
+        $response->assertSessionHasErrors('first_name', 'The first_name field is required.');
+        $response->assertSessionHasErrors('last_name', 'The last_name field is required.');
+        $response->assertSessionHasErrors('email', 'The email field is required.');
 
         $data = ['first_name'   => 'Jane',
                  'last_name'    => 'Doe', ];
 
-        $this->call('POST', 'user', $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['email']);
-        $this->assertSessionHasErrors('email', 'The email field is required.');
+        $response = $this->post('user', $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['email']);
+        $response->assertSessionHasErrors('email', 'The email field is required.');
     }
 
     /**
@@ -132,61 +139,61 @@ class UserControllerTest extends TestCase
     {
         // Logged in as admin - Can see the admin's user page
         $userId = $this->user->id;
-        $this->call('GET', "user/$userId");
-        $this->seePageIs('/user/'.$userId);
-        $this->assertViewHas('user');
-        $this->assertViewHas('duties');
-        $this->assertViewHas('previous');
-        $this->assertViewHas('next');
-        $this->assertViewHas('trainings');
-        $this->assertViewHas('activityLog');
-        $this->assertViewHas('training_blocks');
-        $this->assertViewHas('training_user_types');
+        $response = $this->get("user/$userId");
+        $response->assertSee('/user/'.$userId);
+        $response->assertViewHas('user');
+        $response->assertViewHas('duties');
+        $response->assertViewHas('previous');
+        $response->assertViewHas('next');
+        $response->assertViewHas('trainings');
+        $response->assertViewHas('activityLog');
+        $response->assertViewHas('training_blocks');
+        $response->assertViewHas('training_user_types');
 
         // Create a user object
         $createdUser = factory(User::class)->create([]);
         $createdUserId = $createdUser->id;
 
         // Logged in as admin - Can see the user page for the created user
-        $this->call('GET', "user/$createdUserId");
-        $this->seePageIs('/user/'.$createdUserId);
-        $this->assertViewHas('user');
-        $this->assertViewHas('duties');
-        $this->assertViewHas('previous');
-        $this->assertViewHas('next');
-        $this->assertViewHas('trainings');
-        $this->assertViewHas('activityLog');
+        $response = $this->get("user/$createdUserId");
+        $response->assertSee('/user/'.$createdUserId);
+        $response->assertViewHas('user');
+        $response->assertViewHas('duties');
+        $response->assertViewHas('previous');
+        $response->assertViewHas('next');
+        $response->assertViewHas('trainings');
+        $response->assertViewHas('activityLog');
 
         // Logged in as the created user - Can see the created user's page
         $this->actingAs($createdUser);
-        $this->call('GET', "user/$createdUserId");
-        $this->seePageIs('/user/'.$createdUserId);
-        $this->assertViewHas('user');
-        $this->assertViewHas('duties');
-        $this->assertViewHas('previous');
-        $this->assertViewHas('next');
-        $this->assertViewHas('trainings');
-        $this->assertViewHas('activityLog');
+        $response = $this->get("user/$createdUserId");
+        $response->assertSee('/user/'.$createdUserId);
+        $response->assertViewHas('user');
+        $response->assertViewHas('duties');
+        $response->assertViewHas('previous');
+        $response->assertViewHas('next');
+        $response->assertViewHas('trainings');
+        $response->assertViewHas('activityLog');
 
         // Create another user object
         $newUser = factory(User::class)->create([]);
 
         // Logged in as the newuser - Cannot see the previously created user's page
         $this->actingAs($newUser);
-        $this->call('GET', "user/$createdUserId");
-        $this->seeStatusCode(403);
+        $response = $this->get("user/$createdUserId");
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Can see the previously created user's page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', "user/$createdUserId");
-        $this->seePageIs('/user/'.$createdUserId);
-        $this->assertViewHas('user');
-        $this->assertViewHas('duties');
-        $this->assertViewHas('previous');
-        $this->assertViewHas('next');
-        $this->assertViewHas('trainings');
-        $this->assertViewHas('activityLog');
+        $response = $this->get("user/$createdUserId");
+        $response->assertStatus(200);
+        $response->assertViewHas('user');
+        $response->assertViewHas('duties');
+        $response->assertViewHas('previous');
+        $response->assertViewHas('next');
+        $response->assertViewHas('trainings');
+        $response->assertViewHas('activityLog');
     }
 
     /**
@@ -195,7 +202,7 @@ class UserControllerTest extends TestCase
     public function it_shows_the_user_trainings_by_blocktype()
     {
         // Create trainingtype objects
-        $createdTrainingTypes = factory(SET\TrainingType::class, 5)->create();
+        $createdTrainingTypes = factory(TrainingType::class, 5)->create();
 
         // Create a non-admin user object
         $createdUser = factory(User::class)->create([]);
@@ -205,21 +212,21 @@ class UserControllerTest extends TestCase
         $this->actingAs($createdUser);
 
         // Access the user page - No trainings have been assigned to user yet
-        $this->call('GET', "user/$createdUserId");
-        $this->seeStatusCode(200); // OK status code
+        $response = $this->get("user/$createdUserId");
+        $response->assertStatus(200); // OK status code
 
         // Verify page components (views\user\show.blade.php)
-        $this->seePageIs('/user/'.$createdUserId)
-             ->dontSee('Scheduled Training') // Block Title
-             ->dontSee('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
-             ->dontSee('ADD TRAINING') // button
-             ->dontSee('SHOW ALL') // button
-             ->dontsee('Completed: '.Carbon::today()->format('Y-m-d'));
+        $response->assertSee('/user/'.$createdUserId);
+        $response->assertDontSee('Scheduled Training') // Block Title
+             ->assertDontSee('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
+             ->assertDontSee('ADD TRAINING') // button
+             ->assertDontSee('SHOW ALL') // button
+             ->assertDontSee('Completed: '.Carbon::today()->format('Y-m-d'));
 
         // For each training type, create a training and add the current user to it.
         foreach ($createdTrainingTypes as $trainingType) {
-            $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $trainingType->id]);
-            $trainingUser = factory(SET\TrainingUser::class)->create(
+            $createdTraining = factory(Training::class)->create(['training_type_id' => $trainingType->id]);
+            $trainingUser = factory(TrainingUser::class)->create(
                     ['training_id'    => $createdTraining->id,
                      'user_id'        => $createdUserId,
                      'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
@@ -227,43 +234,43 @@ class UserControllerTest extends TestCase
                      'completed_date' => null, ]);
         }
 
-        $this->call('GET', "user/$createdUserId");
-        $this->seeStatusCode(200); // OK status code
+        $response = $this->get("user/$createdUserId");
+        $response->assertStatus(200); // OK status code
 
         // Verify page components (views\user\show.blade.php)
-        $this->seePageIs('/user/'.$createdUserId)
-             ->see('Scheduled Training') // Block Title
-             ->see('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
-             ->dontSee('ADD TRAINING') // button
-             ->dontSee('SHOW ALL') // button
-             ->dontsee('Completed: '.Carbon::today()->format('Y-m-d'));
+        $response->assertSee('/user/'.$createdUserId)
+             ->assertSee('Scheduled Training') // Block Title
+             ->assertSee('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
+             ->assertDontSee('ADD TRAINING') // button
+             ->assertDontSee('SHOW ALL') // button
+             ->assertDontSee('Completed: '.Carbon::today()->format('Y-m-d'));
 
         // Ensure the training type blocks are not displayed since the completed date is set to null.
         // Only Scheduled Training block is displayed in this case
         foreach ($createdTrainingTypes as $createdTrainingType) {
-            $this->dontSee($createdTrainingType->name.' Training');
+            $response->assertDontSee($createdTrainingType->name.' Training');
         }
 
         // Ensure completed date is set for all trainings for all users
         foreach ($createdUser->assignedTrainings as $traininguser) {
-            $this->see($traininguser->training->name);
+            $response->assertSee($traininguser->training->name);
             $traininguser->completed_date = Carbon::today()->format('Y-m-d');
             $createdUser->assignedTrainings()->save($traininguser);
         }
 
         // Reload the the page reflecting completed training
-        $this->call('GET', "user/$createdUserId");
-        $this->seeStatusCode(200); // OK status code
+        $response = $this->get("user/$createdUserId");
+        $response->assertStatus(200); // OK status code
 
-        $this->seePageIs('/user/'.$createdUserId)
-             ->dontSee('Scheduled Training') // Block Title
-             ->dontSee('ADD TRAINING') // button
-             ->see('SHOW ALL') // Button
-             ->see('Completed: '.Carbon::today()->format('Y-m-d')); // Field
+        $response->assertSee('/user/'.$createdUserId);
+        $response->assertDontSee('Scheduled Training'); // Block Title
+        $response->assertDontSee('ADD TRAINING'); // button
+        $response->assertSee('Show All'); // Button
+        $response->assertSee('Completed: '.Carbon::today()->format('Y-m-d')); // Field
 
         // Ensure the training type blocks are displayed since all trainings are marked completed
         foreach ($createdTrainingTypes as $createdTrainingType) {
-            $this->see($createdTrainingType->name.' Training');
+            $response->assertSee($createdTrainingType->name.' Training');
         }
     }
 
@@ -273,12 +280,12 @@ class UserControllerTest extends TestCase
     public function it_shows_the_user_trainings_by_blocktype_for_admin()
     {
         // Create trainingtype objects
-        $createdTrainingTypes = factory(SET\TrainingType::class, 5)->create();
+        $createdTrainingTypes = factory(TrainingType::class, 5)->create();
 
         // For each training type, create a training and add the admin user to it.
         foreach ($createdTrainingTypes as $trainingType) {
-            $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $trainingType->id]);
-            $trainingUser = factory(SET\TrainingUser::class)->create(
+            $createdTraining = factory(Training::class)->create(['training_type_id' => $trainingType->id]);
+            $trainingUser = factory(TrainingUser::class)->create(
                     ['training_id'    => $createdTraining->id,
                      'user_id'        => $this->user->id,
                      'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
@@ -289,26 +296,26 @@ class UserControllerTest extends TestCase
         // Logged in as admin - Check that every scheduled training is listed
         $this->actingAs($this->user);
         $userId = $this->user->id;
-        $this->call('GET', "user/$userId");
-        $this->seeStatusCode(200); // OK status code
+        $response = $this->get("user/$userId");
+        $response->assertStatus(200); // OK status code
 
         // Verify page components (views\user\show.blade.php)
-        $this->seePageIs('/user/'.$userId)
-             ->see('Scheduled Training') // Block Title
-             ->see('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
-             ->see('ADD TRAINING') // button
-             ->dontSee('SHOW ALL') // button
-             ->dontsee('Completed: '.Carbon::today()->format('Y-m-d'));
+        $response->assertSee('/user/'.$userId)
+             ->assertSee('Scheduled Training') // Block Title
+             ->assertSee('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
+             ->assertSee('Add Training') // button
+             ->assertDontSee('Show All') // button
+             ->assertDontSee('Completed: '.Carbon::today()->format('Y-m-d'));
 
         // Ensure the training type blocks are not displayed since the completed date is set to null.
         // Only Scheduled Training block is displayed in this case
         foreach ($createdTrainingTypes as $createdTrainingType) {
-            $this->dontSee($createdTrainingType->name.' Training');
+            $response->assertDontSee($createdTrainingType->name.' Training');
         }
 
         // Ensure all the training names are displayed and then set the completed date to today
         foreach ($this->user->assignedTrainings as $traininguser) {
-            $this->see($traininguser->training->name);
+            $response->assertSee($traininguser->training->name);
             $traininguser->completed_date = Carbon::today()->format('Y-m-d');
             $this->user->assignedTrainings()->save($traininguser);
         }
@@ -319,24 +326,24 @@ class UserControllerTest extends TestCase
         }
 
         // Reload the the page reflecting completed training
-        $this->call('GET', "user/$userId");
-        $this->seeStatusCode(200); // OK status code
+        $response = $this->get("user/$userId");
+        $response->assertStatus(200); // OK status code
 
         // Verify page components (views\user\show.blade.php)
-        $this->seePageIs('/user/'.$userId)
-             ->dontSee('Scheduled Training') // Block Title
-             ->dontSee('ADD TRAINING') // button
-             ->see('SHOW ALL') // Button
-             ->see('Completed: '.Carbon::today()->format('Y-m-d')); // Field
+        $response->assertSee('/user/'.$userId)
+             ->assertDontSee('Scheduled Training') // Block Title
+             ->assertDontSee('Add Training') // button
+             ->assertSee('Show All') // Button
+             ->assertSee('Completed: '.Carbon::today()->format('Y-m-d')); // Field
 
         // Ensure the training type blocks are displayed since all trainings are marked completed
         foreach ($createdTrainingTypes as $createdTrainingType) {
-            $this->see($createdTrainingType->name.' Training');
+            $response->assertSee($createdTrainingType->name.' Training');
         }
 
         // Add another set of trainings to the user with completed date set different past dates
         for ($i = 1; $i < 4; $i++) {
-            $trainingUser = factory(SET\TrainingUser::class)->create(
+            $trainingUser = factory(TrainingUser::class)->create(
                         ['training_id'    => $createdTraining->id,
                          'user_id'        => $this->user->id,
                          'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
@@ -346,14 +353,14 @@ class UserControllerTest extends TestCase
 
         // Reload the the page to see all the completed trainings for the specified training block
         $trainingBlock = $createdTraining->trainingType->name;
-        $this->call('GET', "user/$userId/$trainingBlock/show");
-        $this->seeStatusCode(200); // OK status code
-        $this->seePageIs('/user/'.$userId.'/'.$trainingBlock.'/show')
-             ->see('SHOW ALL') // Button
-             ->see('Completed: '.Carbon::today()->format('Y-m-d'))
-             ->see('Completed: '.Carbon::today()->subYear(1)->format('Y-m-d'))
-             ->see('Completed: '.Carbon::today()->subYear(2)->format('Y-m-d'))
-             ->see('Completed: '.Carbon::today()->subYear(3)->format('Y-m-d'));
+        $response = $this->get("user/$userId/$trainingBlock/show");
+        $response->assertStatus(200); // OK status code
+        $response->assertSee('/user/'.$userId.'/'.$trainingBlock.'/show')
+             ->assertSee('Show All') // Button
+             ->assertSee('Completed: '.Carbon::today()->format('Y-m-d'))
+             ->assertSee('Completed: '.Carbon::today()->subYear(1)->format('Y-m-d'))
+             ->assertSee('Completed: '.Carbon::today()->subYear(2)->format('Y-m-d'))
+             ->assertSee('Completed: '.Carbon::today()->subYear(3)->format('Y-m-d'));
     }
 
     /**
@@ -363,38 +370,38 @@ class UserControllerTest extends TestCase
     {
         // Logged in as admin - Can edit the admin's user page
         $userId = $this->user->id;
-        $this->call('GET', "user/$userId/edit");
+        $response = $this->get("user/$userId/edit");
 
-        $this->seePageIs('/user/'.$userId.'/edit');
-        $this->assertViewHas('user');
-        $this->assertViewHas('supervisors');
-        $this->assertViewHas('groups');
+        $response->assertSee('Edit User');
+        $response->assertViewHas('user');
+        $response->assertViewHas('supervisors');
+        $response->assertViewHas('groups');
 
         // Create a user object
         $createdUser = factory(User::class)->create();
         $createdUserId = $createdUser->id;
 
         // Logged in as admin - Can edit the user details
-        $this->call('GET', "user/$createdUserId/edit");
+        $response = $this->get("user/$createdUserId/edit");
 
-        $this->seePageIs('/user/'.$createdUserId.'/edit');
-        $this->assertViewHas('user');
-        $this->assertViewHas('supervisors');
-        $this->assertViewHas('groups');
+        $response->assertSee('Edit User');
+        $response->assertViewHas('user');
+        $response->assertViewHas('supervisors');
+        $response->assertViewHas('groups');
 
         // Logged in as a regular user - Cannot edit the user details
         $newuser = factory(User::class)->create();
         $newuserId = $newuser->id;
         $this->actingAs($newuser);
-        $this->call('GET', "user/$newuserId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("user/$newuserId/edit");
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot edit the user details
         $newuser = factory(User::class)->create(['role' => 'view']);
         $newuserId = $newuser->id;
         $this->actingAs($newuser);
-        $this->call('GET', "user/$newuserId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("user/$newuserId/edit");
+        $response->assertStatus(403);
     }
 
     /**
@@ -422,9 +429,9 @@ class UserControllerTest extends TestCase
                  'inv_close'        => $createdUser->inv_close,
                  'status'           => $createdUser->status, ];
 
-        $this->call('PATCH', "/user/$createdUserId", $data);
+        $response = $this->patch("/user/$createdUserId", $data);
 
-        $this->assertRedirectedToRoute('user.show', $createdUserId);
+        $response->assertRedirect('user/'.$createdUserId);
 
         $newlyCreatedUser = User::find($createdUser->id);
         $this->assertNotEquals($newlyCreatedUser->first_name, $createdUser->first_name);
@@ -437,14 +444,14 @@ class UserControllerTest extends TestCase
         // Logged in as a regular user - Cannot update the user
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('PATCH', "/user/$createdUserId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("/user/$createdUserId", $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot update the user
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('PATCH', "/user/$createdUserId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("/user/$createdUserId", $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -462,7 +469,7 @@ class UserControllerTest extends TestCase
         $this->assertEquals($createdUser->id, $createdUserId);
 
         // Delete the created user. Assert that a null object is returned.
-        $this->call('DELETE', "user/$createdUserId");
+        $response = $this->delete("user/$createdUserId");
         $deletedUser = User::find($createdUserId);
         $this->assertNull($deletedUser);
 
@@ -472,8 +479,8 @@ class UserControllerTest extends TestCase
 
         // Cannot access the delete user page since the user with
         // the provided Id has already been deleted
-        $this->call('DELETE', "user/$createdUserId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("user/$createdUserId");
+        $response->assertStatus(403);
 
         // Create a new user(Only user with edit permission can create)
         factory(User::class)->create(['role' => 'edit']);
@@ -484,15 +491,15 @@ class UserControllerTest extends TestCase
         // Try to delete as a regular user. Get forbidden status code
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('DELETE', "user/$createdUserId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("user/$createdUserId");
+        $response->assertStatus(403);
 
         // Try to delete as a user with view permissions. Get forbidden status code
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
 
-        $this->call('DELETE', "user/$createdUserId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("user/$createdUserId");
+        $response->assertStatus(403);
     }
 
     /** @test Call getUserTrainingTypes() without an argument */
@@ -502,9 +509,9 @@ class UserControllerTest extends TestCase
 
         $user_training_types = with(new UserController())->getUserTrainingTypes();
         $training_user_types = $user_training_types[0]; // List of the user's training types
-      $training_blocks = $user_training_types[1]; // List of training block titles for user
+        $training_blocks = $user_training_types[1]; // List of training block titles for user
 
-      $this->assertTrue(is_array($training_user_types));
+        $this->assertTrue(is_array($training_user_types));
         $this->assertTrue(is_array($training_blocks));
         $this->assertTrue(empty($training_user_types));
         $this->assertTrue(empty($training_blocks));
@@ -514,9 +521,9 @@ class UserControllerTest extends TestCase
     public function it_gets_the_users_trainingTypes()
     {
         // Create users, trainings, and training types
-        $createdUsers = factory(SET\User::class, 2)->create();
-        $createdTrainingTypes = factory(SET\TrainingType::class, 5)->create([]);
-        $createdTrainings = factory(SET\Training::class, 25)->create([]);
+        $createdUsers = factory(User::class, 2)->create();
+        $createdTrainingTypes = factory(TrainingType::class, 5)->create([]);
+        $createdTrainings = factory(Training::class, 25)->create([]);
         $n = 0;
         // Create User Trainings (completed and incomplete) Trainings with types
         foreach ($createdUsers as $createdUser) {
@@ -579,28 +586,28 @@ class UserControllerTest extends TestCase
         $createdUserId = $createdUser->id;
 
         // Create trainingtype objects
-        $createdTrainingTypes = factory(SET\TrainingType::class, 2)->create();
+        $createdTrainingTypes = factory(TrainingType::class, 2)->create();
 
         // For each training type, create a training and add the created user to it.
         foreach ($createdTrainingTypes as $trainingType) {
-            $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $trainingType->id]);
+            $createdTraining = factory(Training::class)->create(['training_type_id' => $trainingType->id]);
 
             // Schedule created Training
-            $trainingUser = factory(SET\TrainingUser::class)->create(
+            $trainingUser = factory(TrainingUser::class)->create(
                     ['training_id'    => $createdTraining->id,
                      'user_id'        => $createdUserId,
                      'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
                      'author_id'      => $createdUserId,
                      'completed_date' => null, ]);
             // Created Training completed today
-            $trainingUser = factory(SET\TrainingUser::class)->create(
+            $trainingUser = factory(TrainingUser::class)->create(
                     ['training_id'    => $createdTraining->id,
                      'user_id'        => $createdUserId,
                      'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
                      'author_id'      => $createdUserId,
                      'completed_date' => Carbon::today()->format('Y-m-d'), ]);
             // Created Training completed a year ago
-            $trainingUser = factory(SET\TrainingUser::class)->create(
+            $trainingUser = factory(TrainingUser::class)->create(
                     ['training_id'    => $createdTraining->id,
                      'user_id'        => $createdUserId,
                      'due_date'       => Carbon::tomorrow()->format('Y-m-d'),
@@ -618,7 +625,6 @@ class UserControllerTest extends TestCase
         $trainings = $this->invokeMethod($userController, 'getUserTrainings', [$createdUser, $createdTrainingTypes->first()->name]);
         $this->assertNotNull($trainings);
         $this->assertCount(5, $trainings);
-        Log::Info($trainings);
 
         // GetUserTrainings when training type is an invalid value
         $userController = new UserController();

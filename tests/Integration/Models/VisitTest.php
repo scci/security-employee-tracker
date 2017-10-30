@@ -1,6 +1,11 @@
 <?php
 
+namespace Tests\Integration\Models;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use SET\Visit;
+use SET\User;
 
 class VisitTest extends TestCase
 {
@@ -11,20 +16,21 @@ class VisitTest extends TestCase
     {
         $visits = [];
         for ($i = 0; $i < 5; $i++) {
-            $visit = factory(SET\Visit::class)->create();
-            $user = factory(SET\User::class)->create();
+            $user = factory(User::class)->create();
+            $visit = factory(Visit::class)->create();
+            
             $visit->user_id = $user->id;
             $visit->save();
             $visits[] = $visit->id;
         }
         for ($i = 0; $i < 5; $i++) {
-            $visit = factory(SET\Visit::class)->create();
-            $user = factory(SET\User::class)->create(['status' => 'separated']);
+            $visit = factory(Visit::class)->create();
+            $user = factory(User::class)->create(['status' => 'separated']);
             $visit->user_id = $user->id;
             $visit->save();
             $visits[] = $visit->id;
         }
 
-        $this->assertEquals(5, SET\Visit::whereIn('id', $visits)->activeUsers()->get()->count());
+        $this->assertEquals(5, Visit::whereIn('id', $visits)->activeUsers()->get()->count());
     }
 }

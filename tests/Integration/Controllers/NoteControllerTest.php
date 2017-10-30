@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Note;
 use SET\User;
@@ -21,25 +24,27 @@ class NoteControllerTest extends TestCase
     {
         // Logged in as admin - Can access the note create page
         $userId = $this->user->id;
-        $this->call('GET', "/user/$userId/note/create");
-
-        $this->seePageIs("/user/$userId/note/create");
-
+        $response = $this->get("/user/$userId/note/create");
+        $response->assertStatus(200);
+        $response->assertSee('Add a Note');
+        $response->assertSee('Private');
+        $response->assertSee('File has PII/Encrypt File');
+        
         // Logged in as a regular user - Cannot access the note create page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('GET', "/user/$userId/note/create");
+        $response = $this->get("/user/$userId/note/create");
 
-        $this->seeStatusCode(403);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the note create page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('GET', "/user/$userId/note/create");
+        $response = $this->get("/user/$userId/note/create");
 
-        $this->seeStatusCode(403);
+        $response->assertStatus(403);
     }
 
     /**
@@ -54,22 +59,22 @@ class NoteControllerTest extends TestCase
                  'private'  => '1',
                  'alert'    => 0, ];
 
-        $this->call('POST', "/user/$userId/note/", $data);
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response = $this->post("/user/$userId/note/", $data);
+        $response->assertRedirect('user/'.$userId);
 
         // Logged in as a regular user - Does not store the note
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('POST', "/user/$userId/note/", $data);
-        $this->seeStatusCode(403);
+        $response = $this->post("/user/$userId/note/", $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Does not store the note
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('POST', "/user/$userId/note/", $data);
-        $this->seeStatusCode(403);
+        $response = $this->post("/user/$userId/note/", $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -81,17 +86,17 @@ class NoteControllerTest extends TestCase
         $userId = $this->user->id;
         $data = [];
 
-        $this->call('POST', "/user/$userId/note/", $data);
+        $response = $this->post("/user/$userId/note/", $data);
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['title']);
-        $this->assertSessionHasErrors('title', 'The title field is required.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['title']);
+        $response->assertSessionHasErrors('title', 'The title field is required.');
 
         // Logged in as admin - Only publish_date is entered.
         $data = ['comment' => 'A Note Description'];
-        $this->call('POST', "/user/$userId/note/", $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors('title', 'The title field is required.');
+        $response = $this->post("/user/$userId/note/", $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors('title', 'The title field is required.');
     }
 
     /**
@@ -105,17 +110,20 @@ class NoteControllerTest extends TestCase
         $createdNoteId = $noteToCreate->id;
 
         // Logged in as admin - Can edit the note
-        $this->call('GET', "/user/$userId/note/$createdNoteId/edit");
-        $this->seePageIs("/user/$userId/note/$createdNoteId/edit");
-        $this->assertViewHas('user');
-        $this->assertViewHas('note');
+        $response = $this->get("/user/$userId/note/$createdNoteId/edit");
+        $response->assertStatus(200);
+        $response->assertSee('Update a Note');
+        $response->assertSee('Private');
+        $response->assertSee('File has PII/Encrypt File');
+        $response->assertViewHas('user');
+        $response->assertViewHas('note');
 
         // Logged in as a regular user - Cannot edit the note
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('GET', "/user/$userId/note/$createdNoteId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("/user/$userId/note/$createdNoteId/edit");
+        $response->assertStatus(403);
     }
 
     /**
@@ -134,9 +142,9 @@ class NoteControllerTest extends TestCase
                  'private'  => '1', ]; //,
                  //'alert'   => 0, ];
 
-        $this->call('PATCH', "/user/$userId/note/$createdNoteId", $data);
+        $response = $this->patch("/user/$userId/note/$createdNoteId", $data);
 
-        $this->assertRedirectedToRoute('user.show', $userId);
+        $response->assertRedirect('user/'.$userId);
 
         $createdNote = Note::find($createdNoteId);
         $this->assertNotEquals($createdNote->title, $noteToCreate->title);
@@ -149,15 +157,15 @@ class NoteControllerTest extends TestCase
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('PATCH', "/user/$userId/note/$createdNoteId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("/user/$userId/note/$createdNoteId", $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot update the note
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
         $userId = $newuser->id;
-        $this->call('PATCH', "/user/$userId/note/$createdNoteId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("/user/$userId/note/$createdNoteId", $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -176,7 +184,7 @@ class NoteControllerTest extends TestCase
         $this->assertEquals($createdNote->id, $createdNoteId);
 
         // Delete the created note. Assert that a null object is returned.
-        $this->call('DELETE', "/user/$userId/note/$createdNoteId");
+        $response = $this->delete("/user/$userId/note/$createdNoteId");
         $deletedNote = Note::find($createdNoteId);
         $this->assertNull($deletedNote);
 
@@ -186,13 +194,13 @@ class NoteControllerTest extends TestCase
 
         // Cannot access the delete note page since the note with
         // the provided Id has already been deleted
-        $this->call('DELETE', "/user/$userId/note/$createdNoteId");
-        $this->seeStatusCode(404);
+        $response = $this->delete("/user/$userId/note/$createdNoteId");
+        $response->assertStatus(404);
 
         // Create a new note and try to delete. Get forbidden status code
         $noteToCreate = factory(Note::class)->create();
         $createdNoteId = $noteToCreate->id;
-        $this->call('DELETE', "/user/$userId/note/$createdNoteId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("/user/$userId/note/$createdNoteId");
+        $response->assertStatus(403);
     }
 }

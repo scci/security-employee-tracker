@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration;
+use Tests\TestCase;
+
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Duty;
@@ -22,21 +25,24 @@ class AdminDashboardTest extends TestCase
     /** @test */
     public function it_loads_on_admin_login()
     {
-        $this->visit('/')->see('Calendar')->seePageIs('/');
+        $response = $this->get('/');
+        $response->assertSee('Calendar');
     }
 
     /** @test */
     public function it_shows_accounts_created_in_the_last_week()
     {
         $newUser = factory(User::class)->create();
-        $this->visit('/')->see("$newUser->userFullName's</a> account was created.");
+        $response = $this->get('/');
+        $response->assertSee("$newUser->userFullName's</a> account was created.");
     }
 
     /** @test */
     public function it_shows_accounts_that_will_be_deleted_soon()
     {
         factory(User::class)->create(['status' => 'separated', 'destroyed_date' => Carbon::today()->addWeek()->format('Y-m-d')]);
-        $this->visit('/')->see('records will be deleted');
+        $response = $this->get('/');
+        $response->assertSee('records will be deleted');
     }
 
     /** @test */
@@ -49,9 +55,9 @@ class AdminDashboardTest extends TestCase
             'return_date' => Carbon::today()->addWeek()->format('Y-m-d'),
         ]);
 
-        $this->visit('/')
-            ->see("$user->userFullName</a> leaves for $visit->location.")
-            ->see("$user->userFullName</a> returns from $visit->location.");
+        $response = $this->get('/');
+        $response->assertSee("$user->userFullName</a> leaves for $visit->location.");
+        $response->assertSee("$user->userFullName</a> returns from $visit->location.");
     }
 
     /** @test */
@@ -62,7 +68,8 @@ class AdminDashboardTest extends TestCase
         foreach ($users as $user) {
             $training->users()->attach($user, ['due_date' => Carbon::today()->format('Y-m-d'), 'author_id' => $this->user->id]);
         }
-        $this->visit('/')->see('5 people.');
+        $response = $this->get('/');
+        $response->assertSee('5 people.');
     }
 
     /** @test */
@@ -73,9 +80,10 @@ class AdminDashboardTest extends TestCase
         foreach ($users as $user) {
             $training->users()->attach($user, ['due_date' => Carbon::today()->format('Y-m-d'), 'author_id' => $this->user->id]);
         }
-        $this->visit('/')->see(implode('; ', array_map(function ($a) {
-            return '<a href="'.url('user', $a['id']).'">'.$a['last_name'].', '.$a['first_name'].' ('.$a['nickname'].')</a>';
-        }, $users->toArray())));
+        $response = $this->get('/');
+        foreach ($users as $user) {
+            $response->assertSee($user['last_name'].', '.$user['first_name'].' ('.$user['nickname'].')');
+        }
     }
 
     /** @test */
@@ -85,7 +93,8 @@ class AdminDashboardTest extends TestCase
         $users = factory(User::class, 5)->create();
         $duty->users()->attach($users);
 
-        $this->visit('/')->see($users->sortBy('last_name')->first()->userFullName);
+        $response = $this->get('/');
+        $response->assertSee($users->sortBy('last_name')->first()->userFullName);
     }
 
     /** @test */
@@ -96,14 +105,22 @@ class AdminDashboardTest extends TestCase
         $training->users()->attach($user, ['due_date' => Carbon::today()->format('Y-m-d'), 'completed_date' => Carbon::today()->format('Y-m-d'), 'author_id' => $this->user->id]);
         $trainingUser = TrainingUser::where('training_id', $training->id)->where('user_id', $user->id)->get()->first();
 
-        $this->visit('/')->see($trainingUser->completed_date)->see($user->userFullName)->see($training->name);
+        $response = $this->get('/');
+        $response->assertSee($trainingUser->completed_date);
+        $response->assertSee($user->userFullName);
+        $response->assertSee($training->name);
     }
 
     /** @test */
     public function it_shows_when_changes_are_made_to_a_users_profile()
     {
-        $emp_num = $this->user->emp_num;
+        $emp_num = $this->user->emp_num;        
+        $response = $this->get('/user/'.$this->user->id);
+        $response->assertSee("$emp_num");
+        
         $this->user->update(['emp_num' => 995]);
-        $this->visit('/')->see("Emp num updated from '".$emp_num."' to '995'.");
+        
+        $response = $this->get('/user/'.$this->user->id);        
+        $response->assertSee('995');
     }
 }

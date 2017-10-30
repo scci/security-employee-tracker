@@ -1,5 +1,8 @@
 <?php
 
+namespace Tests\Integration\Controllers;
+use Tests\TestCase;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use SET\Duty;
 use SET\User;
@@ -20,18 +23,17 @@ class DutyControllerTest extends TestCase
     public function it_shows_the_index_page()
     {
         // Logged in as admin - Can access the duty page
-        $this->action('GET', 'DutyController@index');
-
-        $this->assertEquals('duty', Route::getCurrentRoute()->getPath());
-        $this->assertViewHas('duties');
+        $response = $this->get('/duty');
+        $response->assertStatus(200);
+        $response->assertViewHas('duties');
 
         // Logged in as a regular user - Can still access the duty page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', '/duty');
+        $response = $this->get('/duty');
 
-        $this->seePageIs('duty');
-        $this->assertViewHas('duties');
+        $response->assertSee('duty');
+        $response->assertViewHas('duties');
     }
 
     /**
@@ -40,25 +42,23 @@ class DutyControllerTest extends TestCase
     public function it_shows_the_create_page()
     {
         // Logged in as admin - Can access the duty create page
-        $this->call('GET', 'duty/create');
+        $response = $this->get('duty/create');
 
-        $this->seePageIs('duty/create');
-        $this->assertViewHas('users');
-        $this->assertViewHas('groups');
+        $response->assertStatus(200);
+        $response->assertViewHas('users');
+        $response->assertViewHas('groups');
 
         // Logged in as a regular user - Cannot access the duty create page
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', '/duty/create');
-
-        $this->seeStatusCode(403);
+        $response = $this->get('/duty/create');
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot access the duty create page
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('GET', '/duty/create');
-
-        $this->seeStatusCode(403);
+        $response = $this->get('/duty/create');
+        $response->assertStatus(403);
     }
 
     /**
@@ -73,20 +73,20 @@ class DutyControllerTest extends TestCase
                  'users'       => [factory(User::class)->create()->id],
                  'has_groups'  => 0, ];
 
-        $this->call('POST', 'duty', $data);
-        $this->assertRedirectedToRoute('duty.index');
+        $response = $this->post('duty', $data);
+        $response->assertRedirect('duty');
 
         // Logged in as a regular user - Does not store the duty
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('POST', 'duty', $data);
-        $this->seeStatusCode(403);
+        $response = $this->post('duty', $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Does not store the duty
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('POST', 'duty', $data);
-        $this->seeStatusCode(403);
+        $response = $this->post('duty', $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -97,21 +97,21 @@ class DutyControllerTest extends TestCase
         // Logged in as admin - No data provided
         $data = [];
 
-        $this->call('POST', 'duty', $data);
+        $response = $this->post('duty', $data);
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['name', 'users']);
-        $this->assertSessionHasErrors('name', 'The name field is required.');
-        $this->assertSessionHasErrors('users', 'You must have at least one user.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['name', 'users']);
+        $response->assertSessionHasErrors('name', 'The name field is required.');
+        $response->assertSessionHasErrors('users', 'You must have at least one user.');
 
         // Logged in as admin - Only description is entered.
         $data = ['has_groups' => 1];
-        $this->call('POST', 'duty', $data);
+        $response = $this->post('duty', $data);
 
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['name', 'groups']);
-        $this->assertSessionHasErrors('name', 'The name field is required.');
-        $this->assertSessionHasErrors('groups', 'You must have at least one group.');
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['name', 'groups']);
+        $response->assertSessionHasErrors('name', 'The name field is required.');
+        $response->assertSessionHasErrors('groups', 'You must have at least one group.');
     }
 
     /**
@@ -124,10 +124,11 @@ class DutyControllerTest extends TestCase
         $createdDutyId = $createdDuty->id;
 
         // Logged in as admin - Can see the duty details
-        $this->call('GET', "duty/$createdDutyId");
-        $this->seePageIs('/duty/'.$createdDutyId);
-        $this->assertViewHas('duty');
-        $this->assertViewHas('list');
+        $response = $this->get("duty/$createdDutyId");
+        $response->assertStatus(200);
+        $response->assertSee('/duty/'.$createdDutyId);
+        $response->assertViewHas('duty');
+        $response->assertViewHas('list');
     }
 
     /**
@@ -140,18 +141,17 @@ class DutyControllerTest extends TestCase
         $createdDutyId = $createdDuty->id;
 
         // Logged in as admin - Can edit the duty details
-        $this->call('GET', "duty/$createdDutyId/edit");
-
-        $this->seePageIs('/duty/'.$createdDutyId.'/edit');
-        $this->assertViewHas('duty');
-        $this->assertViewHas('users');
-        $this->assertViewHas('groups');
+        $response = $this->get("duty/$createdDutyId/edit");
+        $response->assertStatus(200);
+        $response->assertViewHas('duty');
+        $response->assertViewHas('users');
+        $response->assertViewHas('groups');
 
         // Logged in as a regular user - Cannot edit the duty details
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('GET', "duty/$createdDutyId/edit");
-        $this->seeStatusCode(403);
+        $response = $this->get("duty/$createdDutyId/edit");
+        $response->assertStatus(403);
     }
 
     /**
@@ -170,9 +170,9 @@ class DutyControllerTest extends TestCase
                  'users'       => [factory(User::class)->create()->id],
                  'has_groups'  => $dutyToCreate->has_groups, ];
 
-        $this->call('PATCH', "duty/$createdDutyId", $data);
+        $response = $this->patch("duty/$createdDutyId", $data);
 
-        $this->assertRedirectedToRoute('duty.index');
+        $response->assertRedirect('duty');
 
         $createdDuty = Duty::find($dutyToCreate->id);
         $this->assertNotEquals($createdDuty->name, $dutyToCreate->name);
@@ -188,22 +188,22 @@ class DutyControllerTest extends TestCase
                  'users'       => [factory(User::class)->create()->id],
                  'has_groups'  => $dutyToCreate->has_groups, ];
 
-        $this->call('PATCH', "duty/$createdDutyId", $data);
-        $this->assertSessionHasErrors();
-        $this->assertSessionHasErrors(['name']);
-        $this->assertSessionHasErrors('name', 'The name field is required.');
+        $response = $this->patch("duty/$createdDutyId", $data);
+        $response->assertSessionHasErrors();
+        $response->assertSessionHasErrors(['name']);
+        $response->assertSessionHasErrors('name', 'The name field is required.');
 
         // Logged in as a regular user - Cannot update the duty
         $newuser = factory(User::class)->create();
         $this->actingAs($newuser);
-        $this->call('PATCH', "duty/$createdDutyId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("duty/$createdDutyId", $data);
+        $response->assertStatus(403);
 
         // Logged in as a user with role view - Cannot update the duty
         $newuser = factory(User::class)->create(['role' => 'view']);
         $this->actingAs($newuser);
-        $this->call('PATCH', "duty/$createdDutyId", $data);
-        $this->seeStatusCode(403);
+        $response = $this->patch("duty/$createdDutyId", $data);
+        $response->assertStatus(403);
     }
 
     /**
@@ -221,7 +221,7 @@ class DutyControllerTest extends TestCase
         $this->assertEquals($createdDuty->id, $createdDutyId);
 
         // Delete the created duty. Assert that a null object is returned.
-        $this->call('DELETE', "duty/$createdDutyId");
+        $response = $this->delete("duty/$createdDutyId");
         $deletedDuty = Duty::find($createdDutyId);
         $this->assertNull($deletedDuty);
 
@@ -231,13 +231,13 @@ class DutyControllerTest extends TestCase
 
         // Cannot access the delete the duty since the duty with
         // the provided Id has already been deleted
-        $this->call('DELETE', "duty/$createdDutyId");
-        $this->seeStatusCode(404);
+        $response = $this->delete("duty/$createdDutyId");
+        $response->assertStatus(404);
 
         // Create a new duty and try to delete. Get forbidden status code
         $dutyToCreate = factory(Duty::class)->create([]);
         $createdDutyId = $dutyToCreate->id;
-        $this->call('DELETE', "duty/$createdDutyId");
-        $this->seeStatusCode(403);
+        $response = $this->delete("duty/$createdDutyId");
+        $response->assertStatus(403);
     }
 }

@@ -1,8 +1,14 @@
 <?php
 
+namespace Tests\Integration\Models;
+use Tests\TestCase;
+
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Support\Facades\Request;
 use SET\Training;
+use SET\User;
+use SET\TrainingType;
 
 class TrainingTest extends TestCase
 {
@@ -15,7 +21,7 @@ class TrainingTest extends TestCase
     public function search_for_valid_training()
     {
         // Create a training
-        $createdTraining = factory(SET\Training::class)->create();
+        $createdTraining = factory(Training::class)->create();
 
         // Query the database for the first 3 letters of the createdTraining name
         // using the scopeSearchTraining method in the training model
@@ -51,8 +57,8 @@ class TrainingTest extends TestCase
     /** @test */
     public function it_can_list_the_number_of_incompleted_assignments()
     {
-        $training = factory(SET\Training::class)->create();
-        $users = factory(SET\User::class, 3)->create();
+        $training = factory(Training::class)->create();
+        $users = factory(User::class, 3)->create();
         $training->users()->attach($users[0], ['completed_date' => Carbon::today(), 'author_id' => 189794, 'due_date' => Carbon::today()]);
         $training->users()->attach($users[1], ['completed_date' => null, 'author_id' => 1, 'due_date' => Carbon::today()]);
         $training->users()->attach($users[2], ['completed_date' => null, 'author_id' => 1, 'due_date' => Carbon::today()]);
@@ -69,10 +75,10 @@ class TrainingTest extends TestCase
     public function search_for_valid_training_by_type()
     {
         // Create a trainingtype object
-        $createdTrainingType = factory(SET\TrainingType::class)->create();
+        $createdTrainingType = factory(TrainingType::class)->create();
 
         // Create a training
-        $createdTraining = factory(SET\Training::class)->create(['training_type_id' => $createdTrainingType->id]);
+        $createdTraining = factory(Training::class)->create(['training_type_id' => $createdTrainingType->id]);
 
         // Query the database for a training with the created training type
         // using the scopeSearchTrainingByType method in the training model

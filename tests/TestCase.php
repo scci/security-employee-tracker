@@ -1,10 +1,12 @@
 <?php
 
-use Illuminate\Contracts\Console\Kernel;
+namespace Tests;
+
 use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\TestCase as BaseTestCase;
 use SET\User;
 
-class TestCase extends Illuminate\Foundation\Testing\TestCase
+class TestCase extends BaseTestCase
 {
     use DatabaseTransactions;
     /**
@@ -12,24 +14,18 @@ class TestCase extends Illuminate\Foundation\Testing\TestCase
      *
      * @var string
      */
-    protected $baseUrl = 'http://localhost';
+    protected $baseUrl = 'http://localhost/';
 
     protected $user;
-
-    /**
-     * Creates the application.
-     *
-     * @return \Illuminate\Foundation\Application
-     */
-    public function createApplication()
+    
+    use CreatesApplication; 
+    
+    protected function setUp()
     {
-        $app = require __DIR__.'/../bootstrap/app.php';
-
-        $app->make(Kernel::class)->bootstrap();
-
-        return $app;
+        parent::setUp();  
+        config(['app.url' => 'http://localhost/']);
     }
-
+    
     public function signIn($user = null)
     {
         if (!$user) {
