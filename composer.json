@@ -36,12 +36,12 @@
         "laravel/dusk": "^2.0"
     },
 	"extra": {
-		"laravel"; {
+		"laravel": {
 			"don't-discover": [
 				"laravel/dusk"
 			]
 		}
-	}
+	},
     "autoload": {
         "classmap": [
             "database"
