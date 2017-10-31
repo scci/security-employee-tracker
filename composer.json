@@ -59,6 +59,10 @@
         }
     },
     "scripts": {
+		"pre-install-cmd": [
+			"php -r \"unlink('bootstrap/cache/services.php');\"",
+			"php -r \"unlink('bootstrap/cache/config.php');\""
+		],
         "post-install-cmd": [
             "php artisan optimize"
         ],
