@@ -35,6 +35,13 @@
         "laracasts/generators": "dev-master",
         "laravel/dusk": "^2.0"
     },
+	"extra": {
+		"laravel"; {
+			"don't-discover": [
+				"laravel/dusk"
+			]
+		}
+	}
     "autoload": {
         "classmap": [
             "database"
