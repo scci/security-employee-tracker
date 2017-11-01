@@ -4,7 +4,6 @@ namespace SET\Providers;
 
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
-use Laravel\Dusk\DuskServiceProvider;
 use SET\Handlers\DBConfigs\DBConfigs;
 use SET\Setting;
 
@@ -46,7 +45,6 @@ class AppServiceProvider extends ServiceProvider
     {
         if ($this->app->environment('local', 'testing')) {
             $this->app->register('Laracasts\Generators\GeneratorsServiceProvider');
-            $this->app->register(DuskServiceProvider::class);
         }
     }
 

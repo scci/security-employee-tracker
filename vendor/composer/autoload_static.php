@@ -85,7 +85,6 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         array (
             'League\\Flysystem\\' => 17,
             'League\\CommonMark\\' => 18,
-            'Laravel\\Dusk\\' => 13,
             'Laracasts\\Generators\\' => 21,
         ),
         'I' => 
@@ -99,7 +98,6 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'F' => 
         array (
             'Faker\\' => 6,
-            'Facebook\\WebDriver\\' => 19,
         ),
         'E' => 
         array (
@@ -281,10 +279,6 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         array (
             0 => __DIR__ . '/..' . '/league/commonmark/src',
         ),
-        'Laravel\\Dusk\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/laravel/dusk/src',
-        ),
         'Laracasts\\Generators\\' => 
         array (
             0 => __DIR__ . '/..' . '/laracasts/generators/src',
@@ -300,10 +294,6 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'Faker\\' => 
         array (
             0 => __DIR__ . '/..' . '/fzaninotto/faker/src/Faker',
-        ),
-        'Facebook\\WebDriver\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/facebook/webdriver/lib',
         ),
         'Egulias\\EmailValidator\\' => 
         array (
