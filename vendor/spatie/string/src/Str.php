@@ -3,10 +3,10 @@
 namespace Spatie\String;
 
 use ArrayAccess;
-use Spatie\String\Exceptions\ErrorCreatingStringException;
-use Spatie\String\Exceptions\UnknownFunctionException;
-use Spatie\String\Exceptions\UnsetOffsetException;
 use Spatie\String\Integrations\Underscore;
+use Spatie\String\Exceptions\UnsetOffsetException;
+use Spatie\String\Exceptions\UnknownFunctionException;
+use Spatie\String\Exceptions\ErrorCreatingStringException;
 
 /**
  * Magic methods provided by underscore are documented here.
@@ -280,6 +280,12 @@ class Str implements ArrayAccess
     {
         if ($this->string == '') {
             return new static();
+        }
+
+        $noApostropheEdgeCases = ['it'];
+
+        if (in_array($this->string, $noApostropheEdgeCases)) {
+            return new static($this->string.'s');
         }
 
         return new static($this->string.'\''.($this->string[strlen($this->string) - 1] != 's' ? 's' : ''));

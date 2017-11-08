@@ -816,61 +816,6 @@
         ]
     },
     {
-        "name": "spatie/string",
-        "version": "2.2.1",
-        "version_normalized": "2.2.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/spatie/string.git",
-            "reference": "5435f8095a6c2f4ac67cbc9a1fbc116197863144"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/spatie/string/zipball/5435f8095a6c2f4ac67cbc9a1fbc116197863144",
-            "reference": "5435f8095a6c2f4ac67cbc9a1fbc116197863144",
-            "shasum": ""
-        },
-        "require": {
-            "anahkiasen/underscore-php": "^2.0",
-            "php": ">=5.6.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "5.*",
-            "scrutinizer/ocular": "~1.1"
-        },
-        "time": "2016-12-01T13:46:28+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "files": [
-                "src/string_functions.php"
-            ],
-            "psr-4": {
-                "Spatie\\String\\": "src"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Freek Van der Herten",
-                "email": "freek@spatie.be",
-                "homepage": "https://murze.be",
-                "role": "Developer"
-            }
-        ],
-        "description": "String handling evolved",
-        "homepage": "https://github.com/spatie/string",
-        "keywords": [
-            "handling",
-            "handy",
-            "spatie",
-            "string"
-        ]
-    },
-    {
         "name": "jeremeamia/SuperClosure",
         "version": "2.3.0",
         "version_normalized": "2.3.0.0",
@@ -986,52 +931,6 @@
         ]
     },
     {
-        "name": "mtdowling/cron-expression",
-        "version": "v1.2.0",
-        "version_normalized": "1.2.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/mtdowling/cron-expression.git",
-            "reference": "9504fa9ea681b586028adaaa0877db4aecf32bad"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/mtdowling/cron-expression/zipball/9504fa9ea681b586028adaaa0877db4aecf32bad",
-            "reference": "9504fa9ea681b586028adaaa0877db4aecf32bad",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.2"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "~4.0|~5.0"
-        },
-        "time": "2017-01-23T04:29:33+00:00",
-        "type": "library",
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Cron\\": "src/Cron/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Michael Dowling",
-                "email": "mtdowling@gmail.com",
-                "homepage": "https://github.com/mtdowling"
-            }
-        ],
-        "description": "CRON for PHP: Calculate the next or previous run date and determine if a CRON expression is due",
-        "keywords": [
-            "cron",
-            "schedule"
-        ]
-    },
-    {
         "name": "doctrine/collections",
         "version": "v1.4.0",
         "version_normalized": "1.4.0.0",
@@ -1098,59 +997,6 @@
             "array",
             "collections",
             "iterator"
-        ]
-    },
-    {
-        "name": "nikic/php-parser",
-        "version": "v3.1.1",
-        "version_normalized": "3.1.1.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/nikic/PHP-Parser.git",
-            "reference": "a1e8e1a30e1352f118feff1a8481066ddc2f234a"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/a1e8e1a30e1352f118feff1a8481066ddc2f234a",
-            "reference": "a1e8e1a30e1352f118feff1a8481066ddc2f234a",
-            "shasum": ""
-        },
-        "require": {
-            "ext-tokenizer": "*",
-            "php": ">=5.5"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "~4.0|~5.0"
-        },
-        "time": "2017-09-02T17:10:46+00:00",
-        "bin": [
-            "bin/php-parse"
-        ],
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "3.0-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "PhpParser\\": "lib/PhpParser"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Nikita Popov"
-            }
-        ],
-        "description": "A PHP parser written in PHP",
-        "keywords": [
-            "parser",
-            "php"
         ]
     },
     {
@@ -2096,77 +1942,6 @@
         ]
     },
     {
-        "name": "league/commonmark",
-        "version": "0.15.6",
-        "version_normalized": "0.15.6.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/thephpleague/commonmark.git",
-            "reference": "91742543c25fecedc84a4883d2919213e04a73b7"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/91742543c25fecedc84a4883d2919213e04a73b7",
-            "reference": "91742543c25fecedc84a4883d2919213e04a73b7",
-            "shasum": ""
-        },
-        "require": {
-            "ext-mbstring": "*",
-            "php": ">=5.4.8"
-        },
-        "replace": {
-            "colinodell/commonmark-php": "*"
-        },
-        "require-dev": {
-            "cebe/markdown": "~1.0",
-            "erusev/parsedown": "~1.0",
-            "jgm/commonmark": "0.28",
-            "michelf/php-markdown": "~1.4",
-            "mikehaertl/php-shellcommand": "~1.2.0",
-            "phpunit/phpunit": "~4.3|~5.0",
-            "scrutinizer/ocular": "~1.1",
-            "symfony/finder": "~2.3|~3.0"
-        },
-        "suggest": {
-            "league/commonmark-extras": "Library of useful extensions including smart punctuation"
-        },
-        "time": "2017-08-08T11:47:33+00:00",
-        "bin": [
-            "bin/commonmark"
-        ],
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "0.16-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "League\\CommonMark\\": "src/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Colin O'Dell",
-                "email": "colinodell@gmail.com",
-                "homepage": "https://www.colinodell.com",
-                "role": "Lead Developer"
-            }
-        ],
-        "description": "Markdown parser for PHP based on the CommonMark spec",
-        "homepage": "https://github.com/thephpleague/commonmark",
-        "keywords": [
-            "commonmark",
-            "markdown",
-            "parser"
-        ]
-    },
-    {
         "name": "rachidlaasri/laravel-installer",
         "version": "3.0",
         "version_normalized": "3.0.0.0",
@@ -2752,72 +2527,6 @@
         ]
     },
     {
-        "name": "sebastian/comparator",
-        "version": "2.0.2",
-        "version_normalized": "2.0.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/sebastianbergmann/comparator.git",
-            "reference": "ae068fede81d06e7bb9bb46a367210a3d3e1fe6a"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/ae068fede81d06e7bb9bb46a367210a3d3e1fe6a",
-            "reference": "ae068fede81d06e7bb9bb46a367210a3d3e1fe6a",
-            "shasum": ""
-        },
-        "require": {
-            "php": "^7.0",
-            "sebastian/diff": "^2.0",
-            "sebastian/exporter": "^3.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "^6.0"
-        },
-        "time": "2017-08-03T07:14:59+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "2.0.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "src/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Jeff Welch",
-                "email": "whatthejeff@gmail.com"
-            },
-            {
-                "name": "Volker Dusch",
-                "email": "github@wallbash.com"
-            },
-            {
-                "name": "Bernhard Schussek",
-                "email": "bschussek@2bepublished.at"
-            },
-            {
-                "name": "Sebastian Bergmann",
-                "email": "sebastian@phpunit.de"
-            }
-        ],
-        "description": "Provides the functionality to compare PHP values for equality",
-        "homepage": "http://www.github.com/sebastianbergmann/comparator",
-        "keywords": [
-            "comparator",
-            "compare",
-            "equality"
-        ]
-    },
-    {
         "name": "phpunit/phpunit-mock-objects",
         "version": "4.0.4",
         "version_normalized": "4.0.4.0",
@@ -2919,72 +2628,6 @@
             }
         ],
         "description": "A small library for converting tokenized PHP source code into XML and potentially other formats"
-    },
-    {
-        "name": "phpunit/php-code-coverage",
-        "version": "5.2.2",
-        "version_normalized": "5.2.2.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
-            "reference": "8ed1902a57849e117b5651fc1a5c48110946c06b"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/8ed1902a57849e117b5651fc1a5c48110946c06b",
-            "reference": "8ed1902a57849e117b5651fc1a5c48110946c06b",
-            "shasum": ""
-        },
-        "require": {
-            "ext-dom": "*",
-            "ext-xmlwriter": "*",
-            "php": "^7.0",
-            "phpunit/php-file-iterator": "^1.4.2",
-            "phpunit/php-text-template": "^1.2.1",
-            "phpunit/php-token-stream": "^1.4.11 || ^2.0",
-            "sebastian/code-unit-reverse-lookup": "^1.0.1",
-            "sebastian/environment": "^3.0",
-            "sebastian/version": "^2.0.1",
-            "theseer/tokenizer": "^1.1"
-        },
-        "require-dev": {
-            "ext-xdebug": "^2.5",
-            "phpunit/phpunit": "^6.0"
-        },
-        "suggest": {
-            "ext-xdebug": "^2.5.5"
-        },
-        "time": "2017-08-03T12:40:43+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "5.2.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "src/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Sebastian Bergmann",
-                "email": "sb@sebastian-bergmann.de",
-                "role": "lead"
-            }
-        ],
-        "description": "Library that provides collection, processing, and rendering functionality for PHP code coverage information.",
-        "homepage": "https://github.com/sebastianbergmann/php-code-coverage",
-        "keywords": [
-            "coverage",
-            "testing",
-            "xunit"
-        ]
     },
     {
         "name": "phar-io/version",
@@ -4584,165 +4227,6 @@
         ]
     },
     {
-        "name": "spatie/laravel-activitylog",
-        "version": "2.2.0",
-        "version_normalized": "2.2.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/spatie/laravel-activitylog.git",
-            "reference": "930707fbd2b13dbc8cda7c72e818d43378c11398"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/spatie/laravel-activitylog/zipball/930707fbd2b13dbc8cda7c72e818d43378c11398",
-            "reference": "930707fbd2b13dbc8cda7c72e818d43378c11398",
-            "shasum": ""
-        },
-        "require": {
-            "illuminate/config": "~5.5.0",
-            "illuminate/database": "~5.5.0",
-            "illuminate/support": "~5.5.0",
-            "php": "^7.0",
-            "spatie/string": "^2.1"
-        },
-        "require-dev": {
-            "orchestra/database": "~3.5.0",
-            "orchestra/testbench": "~3.5.0",
-            "phpunit/phpunit": "~6.2"
-        },
-        "time": "2017-10-16T19:55:43+00:00",
-        "type": "library",
-        "extra": {
-            "laravel": {
-                "providers": [
-                    "Spatie\\Activitylog\\ActivitylogServiceProvider"
-                ]
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "Spatie\\Activitylog\\": "src"
-            },
-            "files": [
-                "src/helpers.php"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Sebastian De Deyne",
-                "email": "sebastian@spatie.be",
-                "homepage": "https://spatie.be",
-                "role": "Developer"
-            },
-            {
-                "name": "Freek Van der Herten",
-                "email": "freek@spatie.be",
-                "homepage": "https://spatie.be",
-                "role": "Developer"
-            }
-        ],
-        "description": "A very simple activity logger to monitor the users of your website or application",
-        "homepage": "https://github.com/spatie/activitylog",
-        "keywords": [
-            "activity",
-            "laravel",
-            "log",
-            "spatie",
-            "user"
-        ]
-    },
-    {
-        "name": "phpunit/phpunit",
-        "version": "6.4.3",
-        "version_normalized": "6.4.3.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/sebastianbergmann/phpunit.git",
-            "reference": "06b28548fd2b4a20c3cd6e247dc86331a7d4db13"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/06b28548fd2b4a20c3cd6e247dc86331a7d4db13",
-            "reference": "06b28548fd2b4a20c3cd6e247dc86331a7d4db13",
-            "shasum": ""
-        },
-        "require": {
-            "ext-dom": "*",
-            "ext-json": "*",
-            "ext-libxml": "*",
-            "ext-mbstring": "*",
-            "ext-xml": "*",
-            "myclabs/deep-copy": "^1.6.1",
-            "phar-io/manifest": "^1.0.1",
-            "phar-io/version": "^1.0",
-            "php": "^7.0",
-            "phpspec/prophecy": "^1.7",
-            "phpunit/php-code-coverage": "^5.2.2",
-            "phpunit/php-file-iterator": "^1.4.2",
-            "phpunit/php-text-template": "^1.2.1",
-            "phpunit/php-timer": "^1.0.9",
-            "phpunit/phpunit-mock-objects": "^4.0.3",
-            "sebastian/comparator": "^2.0.2",
-            "sebastian/diff": "^2.0",
-            "sebastian/environment": "^3.1",
-            "sebastian/exporter": "^3.1",
-            "sebastian/global-state": "^2.0",
-            "sebastian/object-enumerator": "^3.0.3",
-            "sebastian/resource-operations": "^1.0",
-            "sebastian/version": "^2.0.1"
-        },
-        "conflict": {
-            "phpdocumentor/reflection-docblock": "3.0.2",
-            "phpunit/dbunit": "<3.0"
-        },
-        "require-dev": {
-            "ext-pdo": "*"
-        },
-        "suggest": {
-            "ext-xdebug": "*",
-            "phpunit/php-invoker": "^1.1"
-        },
-        "time": "2017-10-16T13:18:59+00:00",
-        "bin": [
-            "phpunit"
-        ],
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "6.4.x-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "classmap": [
-                "src/"
-            ]
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "BSD-3-Clause"
-        ],
-        "authors": [
-            {
-                "name": "Sebastian Bergmann",
-                "email": "sebastian@phpunit.de",
-                "role": "lead"
-            }
-        ],
-        "description": "The PHP Unit Testing framework.",
-        "homepage": "https://phpunit.de/",
-        "keywords": [
-            "phpunit",
-            "testing",
-            "xunit"
-        ]
-    },
-    {
         "name": "symfony/polyfill-util",
         "version": "v1.6.0",
         "version_normalized": "1.6.0.0",
@@ -4852,69 +4336,6 @@
             "polyfill",
             "portable",
             "shim"
-        ]
-    },
-    {
-        "name": "maximebf/debugbar",
-        "version": "v1.14.0",
-        "version_normalized": "1.14.0.0",
-        "source": {
-            "type": "git",
-            "url": "https://github.com/maximebf/php-debugbar.git",
-            "reference": "e23a98f2d65607d8aa6c7b409a513f8fdf4acdde"
-        },
-        "dist": {
-            "type": "zip",
-            "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/e23a98f2d65607d8aa6c7b409a513f8fdf4acdde",
-            "reference": "e23a98f2d65607d8aa6c7b409a513f8fdf4acdde",
-            "shasum": ""
-        },
-        "require": {
-            "php": ">=5.3.0",
-            "psr/log": "^1.0",
-            "symfony/var-dumper": "^2.6|^3.0"
-        },
-        "require-dev": {
-            "phpunit/phpunit": "^4.0|^5.0"
-        },
-        "suggest": {
-            "kriswallsmith/assetic": "The best way to manage assets",
-            "monolog/monolog": "Log using Monolog",
-            "predis/predis": "Redis storage"
-        },
-        "time": "2017-08-17T07:17:00+00:00",
-        "type": "library",
-        "extra": {
-            "branch-alias": {
-                "dev-master": "1.14-dev"
-            }
-        },
-        "installation-source": "dist",
-        "autoload": {
-            "psr-4": {
-                "DebugBar\\": "src/DebugBar/"
-            }
-        },
-        "notification-url": "https://packagist.org/downloads/",
-        "license": [
-            "MIT"
-        ],
-        "authors": [
-            {
-                "name": "Maxime Bouroumeau-Fuseau",
-                "email": "maxime.bouroumeau@gmail.com",
-                "homepage": "http://maximebf.com"
-            },
-            {
-                "name": "Barry vd. Heuvel",
-                "email": "barryvdh@gmail.com"
-            }
-        ],
-        "description": "Debug bar in the browser for php application",
-        "homepage": "https://github.com/maximebf/php-debugbar",
-        "keywords": [
-            "debug",
-            "debugbar"
         ]
     },
     {
@@ -5089,18 +4510,119 @@
         ]
     },
     {
-        "name": "laravel/framework",
-        "version": "v5.5.19",
-        "version_normalized": "5.5.19.0",
+        "name": "spatie/string",
+        "version": "2.2.2",
+        "version_normalized": "2.2.2.0",
         "source": {
             "type": "git",
-            "url": "https://github.com/laravel/framework.git",
-            "reference": "c678100e84934ec85c9f8bc26bd0a60222682719"
+            "url": "https://github.com/spatie/string.git",
+            "reference": "28607b9925b4f0499d48570553ca419c6298e26b"
         },
         "dist": {
             "type": "zip",
-            "url": "https://api.github.com/repos/laravel/framework/zipball/c678100e84934ec85c9f8bc26bd0a60222682719",
-            "reference": "c678100e84934ec85c9f8bc26bd0a60222682719",
+            "url": "https://api.github.com/repos/spatie/string/zipball/28607b9925b4f0499d48570553ca419c6298e26b",
+            "reference": "28607b9925b4f0499d48570553ca419c6298e26b",
+            "shasum": ""
+        },
+        "require": {
+            "anahkiasen/underscore-php": "^2.0",
+            "php": ">=5.6.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "5.*",
+            "scrutinizer/ocular": "~1.1"
+        },
+        "time": "2017-11-08T14:28:57+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "files": [
+                "src/string_functions.php"
+            ],
+            "psr-4": {
+                "Spatie\\String\\": "src"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Freek Van der Herten",
+                "email": "freek@spatie.be",
+                "homepage": "https://murze.be",
+                "role": "Developer"
+            }
+        ],
+        "description": "String handling evolved",
+        "homepage": "https://github.com/spatie/string",
+        "keywords": [
+            "handling",
+            "handy",
+            "spatie",
+            "string"
+        ]
+    },
+    {
+        "name": "mtdowling/cron-expression",
+        "version": "v1.2.1",
+        "version_normalized": "1.2.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/mtdowling/cron-expression.git",
+            "reference": "9504fa9ea681b586028adaaa0877db4aecf32bad"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/mtdowling/cron-expression/zipball/9504fa9ea681b586028adaaa0877db4aecf32bad",
+            "reference": "9504fa9ea681b586028adaaa0877db4aecf32bad",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.2"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "~4.0|~5.0"
+        },
+        "time": "2017-01-23T04:29:33+00:00",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Cron\\": "src/Cron/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Michael Dowling",
+                "email": "mtdowling@gmail.com",
+                "homepage": "https://github.com/mtdowling"
+            }
+        ],
+        "description": "CRON for PHP: Calculate the next or previous run date and determine if a CRON expression is due",
+        "keywords": [
+            "cron",
+            "schedule"
+        ]
+    },
+    {
+        "name": "laravel/framework",
+        "version": "v5.5.20",
+        "version_normalized": "5.5.20.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/laravel/framework.git",
+            "reference": "ce0019d22a83b1b240330ea4115ae27a4d75d79c"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/laravel/framework/zipball/ce0019d22a83b1b240330ea4115ae27a4d75d79c",
+            "reference": "ce0019d22a83b1b240330ea4115ae27a4d75d79c",
             "shasum": ""
         },
         "require": {
@@ -5182,12 +4704,12 @@
             "nexmo/client": "Required to use the Nexmo transport (~1.0).",
             "pda/pheanstalk": "Required to use the beanstalk queue driver (~3.0).",
             "predis/predis": "Required to use the redis cache and queue drivers (~1.0).",
-            "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~2.0).",
+            "pusher/pusher-php-server": "Required to use the Pusher broadcast driver (~3.0).",
             "symfony/css-selector": "Required to use some of the crawler integration testing tools (~3.3).",
             "symfony/dom-crawler": "Required to use most of the crawler integration testing tools (~3.3).",
             "symfony/psr-http-message-bridge": "Required to psr7 bridging features (~1.0)."
         },
-        "time": "2017-10-25T19:10:45+00:00",
+        "time": "2017-11-07T14:24:50+00:00",
         "type": "library",
         "extra": {
             "branch-alias": {
@@ -5219,6 +4741,484 @@
         "keywords": [
             "framework",
             "laravel"
+        ]
+    },
+    {
+        "name": "spatie/laravel-activitylog",
+        "version": "2.3.0",
+        "version_normalized": "2.3.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/spatie/laravel-activitylog.git",
+            "reference": "0bd2b36241febb8868aa5898b9a2c836e0b4e9b5"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/spatie/laravel-activitylog/zipball/0bd2b36241febb8868aa5898b9a2c836e0b4e9b5",
+            "reference": "0bd2b36241febb8868aa5898b9a2c836e0b4e9b5",
+            "shasum": ""
+        },
+        "require": {
+            "illuminate/config": "~5.5.0",
+            "illuminate/database": "~5.5.0",
+            "illuminate/support": "~5.5.0",
+            "php": "^7.0",
+            "spatie/string": "^2.1"
+        },
+        "require-dev": {
+            "orchestra/database": "~3.5.0",
+            "orchestra/testbench": "~3.5.0",
+            "phpunit/phpunit": "~6.2"
+        },
+        "time": "2017-11-07T14:03:51+00:00",
+        "type": "library",
+        "extra": {
+            "laravel": {
+                "providers": [
+                    "Spatie\\Activitylog\\ActivitylogServiceProvider"
+                ]
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Spatie\\Activitylog\\": "src"
+            },
+            "files": [
+                "src/helpers.php"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Sebastian De Deyne",
+                "email": "sebastian@spatie.be",
+                "homepage": "https://spatie.be",
+                "role": "Developer"
+            },
+            {
+                "name": "Freek Van der Herten",
+                "email": "freek@spatie.be",
+                "homepage": "https://spatie.be",
+                "role": "Developer"
+            }
+        ],
+        "description": "A very simple activity logger to monitor the users of your website or application",
+        "homepage": "https://github.com/spatie/activitylog",
+        "keywords": [
+            "activity",
+            "laravel",
+            "log",
+            "spatie",
+            "user"
+        ]
+    },
+    {
+        "name": "sebastian/comparator",
+        "version": "2.1.0",
+        "version_normalized": "2.1.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/sebastianbergmann/comparator.git",
+            "reference": "1174d9018191e93cb9d719edec01257fc05f8158"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/sebastianbergmann/comparator/zipball/1174d9018191e93cb9d719edec01257fc05f8158",
+            "reference": "1174d9018191e93cb9d719edec01257fc05f8158",
+            "shasum": ""
+        },
+        "require": {
+            "php": "^7.0",
+            "sebastian/diff": "^2.0",
+            "sebastian/exporter": "^3.1"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^6.4"
+        },
+        "time": "2017-11-03T07:16:52+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "2.1.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "src/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Jeff Welch",
+                "email": "whatthejeff@gmail.com"
+            },
+            {
+                "name": "Volker Dusch",
+                "email": "github@wallbash.com"
+            },
+            {
+                "name": "Bernhard Schussek",
+                "email": "bschussek@2bepublished.at"
+            },
+            {
+                "name": "Sebastian Bergmann",
+                "email": "sebastian@phpunit.de"
+            }
+        ],
+        "description": "Provides the functionality to compare PHP values for equality",
+        "homepage": "https://github.com/sebastianbergmann/comparator",
+        "keywords": [
+            "comparator",
+            "compare",
+            "equality"
+        ]
+    },
+    {
+        "name": "phpunit/php-code-coverage",
+        "version": "5.2.3",
+        "version_normalized": "5.2.3.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/sebastianbergmann/php-code-coverage.git",
+            "reference": "8e1d2397d8adf59a3f12b2878a3aaa66d1ab189d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/sebastianbergmann/php-code-coverage/zipball/8e1d2397d8adf59a3f12b2878a3aaa66d1ab189d",
+            "reference": "8e1d2397d8adf59a3f12b2878a3aaa66d1ab189d",
+            "shasum": ""
+        },
+        "require": {
+            "ext-dom": "*",
+            "ext-xmlwriter": "*",
+            "php": "^7.0",
+            "phpunit/php-file-iterator": "^1.4.2",
+            "phpunit/php-text-template": "^1.2.1",
+            "phpunit/php-token-stream": "^2.0",
+            "sebastian/code-unit-reverse-lookup": "^1.0.1",
+            "sebastian/environment": "^3.0",
+            "sebastian/version": "^2.0.1",
+            "theseer/tokenizer": "^1.1"
+        },
+        "require-dev": {
+            "ext-xdebug": "^2.5",
+            "phpunit/phpunit": "^6.0"
+        },
+        "suggest": {
+            "ext-xdebug": "^2.5.5"
+        },
+        "time": "2017-11-03T13:47:33+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "5.2.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "src/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Sebastian Bergmann",
+                "email": "sb@sebastian-bergmann.de",
+                "role": "lead"
+            }
+        ],
+        "description": "Library that provides collection, processing, and rendering functionality for PHP code coverage information.",
+        "homepage": "https://github.com/sebastianbergmann/php-code-coverage",
+        "keywords": [
+            "coverage",
+            "testing",
+            "xunit"
+        ]
+    },
+    {
+        "name": "phpunit/phpunit",
+        "version": "6.4.4",
+        "version_normalized": "6.4.4.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/sebastianbergmann/phpunit.git",
+            "reference": "562f7dc75d46510a4ed5d16189ae57fbe45a9932"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/sebastianbergmann/phpunit/zipball/562f7dc75d46510a4ed5d16189ae57fbe45a9932",
+            "reference": "562f7dc75d46510a4ed5d16189ae57fbe45a9932",
+            "shasum": ""
+        },
+        "require": {
+            "ext-dom": "*",
+            "ext-json": "*",
+            "ext-libxml": "*",
+            "ext-mbstring": "*",
+            "ext-xml": "*",
+            "myclabs/deep-copy": "^1.6.1",
+            "phar-io/manifest": "^1.0.1",
+            "phar-io/version": "^1.0",
+            "php": "^7.0",
+            "phpspec/prophecy": "^1.7",
+            "phpunit/php-code-coverage": "^5.2.2",
+            "phpunit/php-file-iterator": "^1.4.2",
+            "phpunit/php-text-template": "^1.2.1",
+            "phpunit/php-timer": "^1.0.9",
+            "phpunit/phpunit-mock-objects": "^4.0.3",
+            "sebastian/comparator": "^2.0.2",
+            "sebastian/diff": "^2.0",
+            "sebastian/environment": "^3.1",
+            "sebastian/exporter": "^3.1",
+            "sebastian/global-state": "^2.0",
+            "sebastian/object-enumerator": "^3.0.3",
+            "sebastian/resource-operations": "^1.0",
+            "sebastian/version": "^2.0.1"
+        },
+        "conflict": {
+            "phpdocumentor/reflection-docblock": "3.0.2",
+            "phpunit/dbunit": "<3.0"
+        },
+        "require-dev": {
+            "ext-pdo": "*"
+        },
+        "suggest": {
+            "ext-xdebug": "*",
+            "phpunit/php-invoker": "^1.1"
+        },
+        "time": "2017-11-08T11:26:09+00:00",
+        "bin": [
+            "phpunit"
+        ],
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "6.4.x-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "classmap": [
+                "src/"
+            ]
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Sebastian Bergmann",
+                "email": "sebastian@phpunit.de",
+                "role": "lead"
+            }
+        ],
+        "description": "The PHP Unit Testing framework.",
+        "homepage": "https://phpunit.de/",
+        "keywords": [
+            "phpunit",
+            "testing",
+            "xunit"
+        ]
+    },
+    {
+        "name": "league/commonmark",
+        "version": "0.15.7",
+        "version_normalized": "0.15.7.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/thephpleague/commonmark.git",
+            "reference": "36d82f166e441dfa28643f8d01dd8bdd3a579adf"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/thephpleague/commonmark/zipball/36d82f166e441dfa28643f8d01dd8bdd3a579adf",
+            "reference": "36d82f166e441dfa28643f8d01dd8bdd3a579adf",
+            "shasum": ""
+        },
+        "require": {
+            "ext-mbstring": "*",
+            "php": ">=5.4.8"
+        },
+        "replace": {
+            "colinodell/commonmark-php": "*"
+        },
+        "require-dev": {
+            "cebe/markdown": "~1.0",
+            "erusev/parsedown": "~1.0",
+            "jgm/commonmark": "0.28",
+            "michelf/php-markdown": "~1.4",
+            "mikehaertl/php-shellcommand": "~1.2.0",
+            "phpunit/phpunit": "~4.3|~5.0",
+            "scrutinizer/ocular": "~1.1",
+            "symfony/finder": "~2.3|~3.0"
+        },
+        "suggest": {
+            "league/commonmark-extras": "Library of useful extensions including smart punctuation"
+        },
+        "time": "2017-10-26T15:41:07+00:00",
+        "bin": [
+            "bin/commonmark"
+        ],
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "0.16-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "League\\CommonMark\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Colin O'Dell",
+                "email": "colinodell@gmail.com",
+                "homepage": "https://www.colinodell.com",
+                "role": "Lead Developer"
+            }
+        ],
+        "description": "Markdown parser for PHP based on the CommonMark spec",
+        "homepage": "https://github.com/thephpleague/commonmark",
+        "keywords": [
+            "commonmark",
+            "markdown",
+            "parser"
+        ]
+    },
+    {
+        "name": "maximebf/debugbar",
+        "version": "v1.14.1",
+        "version_normalized": "1.14.1.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/maximebf/php-debugbar.git",
+            "reference": "64251a392344e3d22f3d21c3b7c531ba96eb01d2"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/maximebf/php-debugbar/zipball/64251a392344e3d22f3d21c3b7c531ba96eb01d2",
+            "reference": "64251a392344e3d22f3d21c3b7c531ba96eb01d2",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.0",
+            "psr/log": "^1.0",
+            "symfony/var-dumper": "^2.6|^3.0"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "^4.0|^5.0"
+        },
+        "suggest": {
+            "kriswallsmith/assetic": "The best way to manage assets",
+            "monolog/monolog": "Log using Monolog",
+            "predis/predis": "Redis storage"
+        },
+        "time": "2017-09-13T12:19:36+00:00",
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "1.14-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "DebugBar\\": "src/DebugBar/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Maxime Bouroumeau-Fuseau",
+                "email": "maxime.bouroumeau@gmail.com",
+                "homepage": "http://maximebf.com"
+            },
+            {
+                "name": "Barry vd. Heuvel",
+                "email": "barryvdh@gmail.com"
+            }
+        ],
+        "description": "Debug bar in the browser for php application",
+        "homepage": "https://github.com/maximebf/php-debugbar",
+        "keywords": [
+            "debug",
+            "debugbar"
+        ]
+    },
+    {
+        "name": "nikic/php-parser",
+        "version": "v3.1.2",
+        "version_normalized": "3.1.2.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/nikic/PHP-Parser.git",
+            "reference": "08131e7ff29de6bb9f12275c7d35df71f25f4d89"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/08131e7ff29de6bb9f12275c7d35df71f25f4d89",
+            "reference": "08131e7ff29de6bb9f12275c7d35df71f25f4d89",
+            "shasum": ""
+        },
+        "require": {
+            "ext-tokenizer": "*",
+            "php": ">=5.5"
+        },
+        "require-dev": {
+            "phpunit/phpunit": "~4.0|~5.0"
+        },
+        "time": "2017-11-04T11:48:34+00:00",
+        "bin": [
+            "bin/php-parse"
+        ],
+        "type": "library",
+        "extra": {
+            "branch-alias": {
+                "dev-master": "3.0-dev"
+            }
+        },
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "PhpParser\\": "lib/PhpParser"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause"
+        ],
+        "authors": [
+            {
+                "name": "Nikita Popov"
+            }
+        ],
+        "description": "A PHP parser written in PHP",
+        "keywords": [
+            "parser",
+            "php"
         ]
     }
 ]
