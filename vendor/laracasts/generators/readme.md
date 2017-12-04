@@ -12,7 +12,21 @@ L5 includes a bunch of generators out of the box, so this package only needs to 
 
 *With one or two more to come.*
 
-## Usage
+
+## Usage on Laravel 5.5
+
+### Step 1: Install Through Composer
+
+```
+composer require laracasts/generators --dev
+```
+
+### Step 2: Run Artisan!
+
+You're all set. Run `php artisan` from the console, and you'll see the new commands in the `make:*` namespace section.
+
+
+## Usage on Laravel 5.4 and 5.3
 
 ### Step 1: Install Through Composer
 
@@ -171,7 +185,7 @@ This means, if you run, say:
 php artisan make:migration:schema create_dogs_table --schema="name:string"
 ```
 
-You'll get a migration, populated with the schema...but you'll also get an Eloquent model at `app/Dog.php`. Naturally, you can opt out of this by adding the `--model=false` flag/option.
+You'll get a migration, populated with the schema...but you'll also get an Eloquent model at `app/Dog.php`. Naturally, you can opt out of this by adding the `--model=0` flag/option.
 
 #### Foreign Constraints
 
@@ -181,7 +195,7 @@ There's also a secret bit of sugar for when you need to generate foreign constra
 php artisan make:migration:schema create_posts_table --schema="user_id:integer:foreign, title:string, body:text"
 ```
 
-Notice that "foreign" option (`user_id:integer:foreign`)? That's special. It signals that user_id` should receive a foreign constraint. Following conventions, this will give us:
+Notice that "foreign" option (`user_id:integer:foreign`)? That's special. It signals that `user_id` should receive a foreign constraint. Following conventions, this will give us:
 
 ```
 $table->integer('user_id');
