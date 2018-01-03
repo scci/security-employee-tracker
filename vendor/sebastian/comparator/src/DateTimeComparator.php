@@ -43,13 +43,23 @@ class DateTimeComparator extends ObjectComparator
      */
     public function assertEquals($expected, $actual, $delta = 0.0, $canonicalize = false, $ignoreCase = false, array &$processed = [])
     {
-        $delta = new \DateInterval(sprintf('PT%sS', abs($delta)));
+        /** @var \DateTimeInterface $expected */
+        /** @var \DateTimeInterface $actual */
+
+        $delta = new \DateInterval(sprintf('PT%dS', abs($delta)));
+
+        $actualClone = clone $actual;
+        $actualClone->setTimezone(new \DateTimeZone('UTC'));
 
         $expectedLower = clone $expected;
-        $expectedUpper = clone $expected;
+        $expectedLower->setTimezone(new \DateTimeZone('UTC'));
+        $expectedLower->sub($delta);
 
-        if ($actual < $expectedLower->sub($delta) ||
-            $actual > $expectedUpper->add($delta)) {
+        $expectedUpper = clone $expected;
+        $expectedUpper->setTimezone(new \DateTimeZone('UTC'));
+        $expectedUpper->add($delta);
+
+        if ($actual < $expectedLower || $actual > $expectedUpper) {
             throw new ComparisonFailure(
                 $expected,
                 $actual,

@@ -8,6 +8,7 @@
 [![Build Status](https://img.shields.io/travis/thephpleague/commonmark/master.svg?style=flat-square)](https://travis-ci.org/thephpleague/commonmark)
 [![Coverage Status](https://img.shields.io/scrutinizer/coverage/g/thephpleague/commonmark.svg?style=flat-square)](https://scrutinizer-ci.com/g/thephpleague/commonmark/code-structure)
 [![Quality Score](https://img.shields.io/scrutinizer/g/thephpleague/commonmark.svg?style=flat-square)](https://scrutinizer-ci.com/g/thephpleague/commonmark)
+[![SensioLabs Insight](https://img.shields.io/sensiolabs/i/9bf971c0-458f-4a19-9898-127728dbd65d.svg?style=flat-square)](https://insight.sensiolabs.com/projects/9bf971c0-458f-4a19-9898-127728dbd65d)
 [![CII Best Practices](https://bestpractices.coreinfrastructure.org/projects/126/badge)](https://bestpractices.coreinfrastructure.org/projects/126)
 
 **league/commonmark** is a PHP-based Markdown parser created by [Colin O'Dell][@colinodell] which supports the full [CommonMark] spec.  It is based on the [CommonMark JS reference implementation][commonmark.js] by [John MacFarlane] \([@jgm]\).
@@ -137,7 +138,7 @@ The following table shows which versions of league/commonmark are compatible wit
     </thead>
     <tbody>
         <tr>
-            <td><strong>0.15.6</strong><br>0.15.5</td>
+            <td><strong>0.16.0</strong><br>0.15.7<br>0.15.6<br>0.15.5</td>
             <td><strong><a href="http://spec.commonmark.org/0.28/">0.28</a></strong></td>
         </tr>
         <tr>
@@ -219,11 +220,11 @@ $ ./tests/benchmark/benchmark.php
 
 ## Versioning
 
-[SemVer](http://semver.org/) will be followed closely.  0.x.0 versions will introduce breaking changes to the codebase, so be careful which version constraints you use. **It's highly recommended that you use [Composer's caret operator](https://getcomposer.org/doc/articles/versions.md#caret) to ensure compatibility**; for example: `^0.15`.  This is equivalent to `>=0.15.0 <0.16.0`.
+[SemVer](http://semver.org/) will be followed closely.  0.x.0 versions will introduce breaking changes to the codebase, so be careful which version constraints you use. **It's highly recommended that you use [Composer's caret operator](https://getcomposer.org/doc/articles/versions.md#caret) to ensure compatibility**; for example: `^0.16`.  This is equivalent to `>=0.16.0 <0.17.0`.
 
 0.x.y releases should not introduce breaking changes to the codebase; however, they might change the resulting AST or HTML output of parsed Markdown (due to bug fixes, minor spec changes, etc.)  As a result, you might get slightly different HTML, but any custom code built onto this library will still function correctly.
 
-If you're only using the `CommonMarkConverter` class to convert Markdown (no other class references, custom parsers, etc.), then it should be safe to use a broader constraint like `~0.15`, `>0.15`, etc.  I personally promise to never break this specific class in any future 0.x release.
+If you're only using the `CommonMarkConverter` class to convert Markdown (no other class references, custom parsers, etc.), then it should be safe to use a broader constraint like `~0.16`, `>0.16`, etc.  I personally promise to never break this specific class in any future 0.x release.
 
 ## Stability
 
@@ -263,6 +264,10 @@ Also a huge thank you to [JetBrains](https://www.jetbrains.com/) for supporting 
 
 **league/commonmark** is licensed under the BSD-3 license.  See the `LICENSE` file for more details.
 
+## Governance
+
+This project is primarily maintained by [Colin O'Dell][@colinodell].  Members of the [PHP League][php-league] Leadership Team may occassionally assist with some of these duties.
+
 [CommonMark]: http://commonmark.org/
 [CommonMark spec]: http://spec.commonmark.org/
 [commonmark.js]: https://github.com/jgm/commonmark.js
@@ -276,3 +281,4 @@ Also a huge thank you to [JetBrains](https://www.jetbrains.com/) for supporting 
 [@jgm]: https://github.com/jgm
 [jgm/stmd]: https://github.com/jgm/stmd
 [Composer]: https://getcomposer.org/
+[PHP League]: https://thephpleague.com

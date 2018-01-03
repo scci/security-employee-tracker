@@ -14,14 +14,14 @@
         "illuminate/contracts": "5.1.*|5.2.*|5.3.*|5.4.*|5.5.*",
         "illuminate/support": "5.1.*|5.2.*|5.3.*|5.4.*|5.5.*",
         "illuminate/view": "5.1.*|5.2.*|5.3.*|5.4.*|5.5.*",
-        "league/commonmark": "^0.15"
+        "league/commonmark": "^0.17"
     },
     "require-dev": {
-        "graham-campbell/analyzer": "^1.1",
-        "graham-campbell/testbench": "^4.0",
-        "league/commonmark-extras": "^0.1.2",
-        "mockery/mockery": "dev-master#c90a17247147543081e4d00f46911e422b49e583",
-        "phpunit/phpunit": "^6.0"
+        "graham-campbell/analyzer": "^2.0",
+        "graham-campbell/testbench": "^4.0|^5.0",
+        "league/commonmark-extras": "^0.1.4",
+        "mockery/mockery": "^1.0",
+        "phpunit/phpunit": "^6.5"
     },
     "autoload": {
         "psr-4": {
@@ -38,7 +38,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "8.0-dev"
+            "dev-master": "9.0-dev"
         },
         "laravel": {
             "providers": [
