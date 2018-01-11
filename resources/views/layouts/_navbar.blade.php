@@ -16,7 +16,11 @@
             @if($logged_in_user->status == 'active')
                 <li><a href="{{url("news")}}">News</a></li>
                 @can('view')
-                    <li><a href="{{url("user")}}">Users</a></li>
+                    @if ($userStatus->count()>0)
+                        <li><a href="#!" class="dropdown-button" data-activates="user-status{{$i}}">Users<i class="material-icons custom right">arrow_drop_down</i></a></li>
+                    @else
+                        <li><a href="{{url("user")}}">Users</a></li>
+                    @endif                    
                     @if ($trainingTypes->count()>0)
                         <li><a href="#!" class="dropdown-button" data-activates="training-lists{{$i}}">Trainings<i class="material-icons custom right">arrow_drop_down</i></a></li>
                     @else
@@ -36,6 +40,12 @@
 
 <?php for($i = 1; $i <= 2; $i++) { ?>
 
+    <ul id="user-status{{$i}}" class="dropdown-content">
+        <li><a href="{{url("user")}}">All</a></li>
+        @foreach($userStatus as $status)
+            <li><a href="{{url('user/status',$status->status)}}">{{ $status->status }}</a></li>
+        @endforeach
+    </ul>
     <ul id="training-lists{{$i}}" class="dropdown-content">
         <li><a href="{{url("training")}}">All</a></li>
         @foreach($trainingTypes as $trainingType)

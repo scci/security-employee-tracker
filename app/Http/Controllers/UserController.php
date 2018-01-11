@@ -23,22 +23,36 @@ class UserController extends Controller
 {
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */
-    public function index()
+     */    
+    public function index($userStatus = null)
     {
         $this->authorize('view');
 
-        $users = User::with([
-            'assignedTrainings' => function ($q) {
-                $q->whereNull('completed_date')
-                    ->whereBetween('due_date', [Carbon::now()->subYear(), Carbon::now()->addWeeks(4)]);
-            },
-            'trainings',
-        ])
+        if ($userStatus)
+        {
+            $users = User::with([
+                'assignedTrainings' => function ($q) {
+                    $q->whereNull('completed_date')
+                        ->whereBetween('due_date', [Carbon::now()->subYear(), Carbon::now()->addWeeks(4)]);
+                },
+                'trainings',
+            ])
+                ->skipSystem()
+                ->where('status', $userStatus)
+                ->orderBy('last_name')->get();   
+        } else {
+            $users = User::with([
+                'assignedTrainings' => function ($q) {
+                    $q->whereNull('completed_date')
+                        ->whereBetween('due_date', [Carbon::now()->subYear(), Carbon::now()->addWeeks(4)]);
+                },
+                'trainings',
+            ])
             ->skipSystem()
             ->orderBy('last_name')->get();
+        }
 
-        return view('user.index', compact('users'));
+        return view('user.index', compact('users', 'userStatus'));
     }
 
     public function create()

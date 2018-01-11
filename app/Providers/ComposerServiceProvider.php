@@ -7,6 +7,7 @@ use Illuminate\Support\ServiceProvider;
 use SET\Duty;
 use SET\Setting;
 use SET\TrainingType;
+use SET\User;
 
 class ComposerServiceProvider extends ServiceProvider
 {
@@ -27,6 +28,7 @@ class ComposerServiceProvider extends ServiceProvider
             $view->with('duties', Duty::all());
             $view->with('trainingTypes', TrainingType::where('status', '1')
                     ->select('id', 'name')->orderBy('name')->get());
+            $view->with('userStatus', User::distinct()->orderBy('status')->get(['status']));
         });
 
         // Pass our action items if we have the sidebar.

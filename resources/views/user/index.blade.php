@@ -5,16 +5,43 @@
 @section('content')
 
     @can('edit')
-        <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
-            <a class="btn-floating btn-large red tooltipped modal-trigger" href="{{ url('/user/create') }}" data-position="left" data-tooltip="New User">
-                <i class="large material-icons">add</i>
-            </a>
-        </div>
+        @if($userStatus != 'separated')
+            <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
+                <a class="btn-floating btn-large red tooltipped modal-trigger" href="{{ url('/user/create') }}" data-position="left" data-tooltip="New User">
+                    <i class="large material-icons">add</i>
+                </a>
+            </div>
+        @endif
     @endcan
 
     <div class="card">
         <div class="card-content">
             <span class="card-title">Users</span>
+            @if($userStatus == 'separated')
+            <table class="row-border hover data-table">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th>Name</th>
+                        <th>Destroyed Date</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($users as $user)
+                        <tr class="user-{{$user->id}}">
+                            <td>@if(!$user->supervisor)
+                                    <span class="tooltipped" data-position="right" data-tooltip="Missing Supervisor">
+                                        <i class="material-icons orange-text">warning</i>
+                                    </span>
+                                @endif</td>
+                            <td><a href="{{ url('/user', $user->id) }}">{{ $user->userFullName }}</a></td>
+                            <td>{{ $user->destroyed_date }}</td>                            
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>            
+            @else
             <table class="row-border hover data-table">
                 <thead>
                     <tr>
@@ -62,6 +89,7 @@
                     @endforeach
                 </tbody>
             </table>
+            @endif
         </div>
     </div>
 
