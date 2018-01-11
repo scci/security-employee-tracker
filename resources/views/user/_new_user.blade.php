@@ -105,7 +105,7 @@
     @endif
     <div class="col s12 m6 l4">
         <div class="input-field" id="status_field">
-            {!! Form::select('status', ['active' => 'Active', 'separated' => 'Separated', 'destroyed' => 'Destroyed'], null, ['class' => 'validate']) !!}
+            {!! Form::select('status', ['active' => 'Active', 'separated' => 'Separated'], null, ['class' => 'validate']) !!}
             {!! Form::label('status', 'Status:') !!}
         </div>
     </div>
