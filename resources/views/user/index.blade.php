@@ -16,79 +16,70 @@
 
     <div class="card">
         <div class="card-content">
-            <span class="card-title">Users</span>
+            <span class="card-title">Users</span>            
             @if($userStatus == 'separated')
-            <table class="row-border hover data-table">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Name</th>
-                        <th>Destroyed Date</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($users as $user)
-                        <tr class="user-{{$user->id}}">
-                            <td>@if(!$user->supervisor)
-                                    <span class="tooltipped" data-position="right" data-tooltip="Missing Supervisor">
-                                        <i class="material-icons orange-text">warning</i>
-                                    </span>
-                                @endif</td>
-                            <td><a href="{{ url('/user', $user->id) }}">{{ $user->userFullName }}</a></td>
-                            <td>{{ $user->destroyed_date }}</td>                            
+                <table class="row-border hover data-table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th>Destroyed Date</th>                            
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>            
+                    </thead>
+                    <tbody>
+                        @foreach ($users as $user)
+                            <tr class="user-{{$user->id}}">                                
+                                <td><a href="{{ url('/user', $user->id) }}">{{ $user->userFullName }}</a></td>
+                                <td>{{ $user->destroyed_date }}</td>                            
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>            
             @else
-            <table class="row-border hover data-table">
-                <thead>
-                    <tr>
-                        <th></th>
-                        <th>Name</th>
-                        <th>Groups</th>
-                        <th>Status</th>
-                        <th>Incomplete</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach ($users as $user)
-                        <tr class="user-{{$user->id}}">
-
-
-                            <td>@if(!$user->supervisor)
-                                    <span class="tooltipped" data-position="right" data-tooltip="Missing Supervisor">
-                                        <i class="material-icons orange-text">warning</i>
-                                    </span>
-                                @endif</td>
-                            <td><a href="{{ url('/user', $user->id) }}">{{ $user->userFullName }}</a></td>
-                            <td>
-                                {{ $user->groups->implode('name', ', ') }}
-                            </td>
-                            <td>{{ $user->status }}</td>
-                            <td>
-                                @foreach($user->assignedTrainings as $assigned)
-                                        <a href={{ url('/training', $assigned->training_id) }}>{{ $assigned->training->name }}</a> <br />
-                                @endforeach
-                            </td>
-                            <td class="no-wrap">
-                                <div class="action-buttons">
-                                @can('edit')
-                                    <a href="{{ url("/user/$user->id/edit") }}" class="btn-flat btn-sm tooltipped" data-position="top" data-tooltip="Edit">
-                                        <i class="material-icons">mode_edit</i>
-                                    </a>
-                                    <button type="button" class="btn-flat btn-sm delete-user tooltipped" data-id="{{ $user->id }}" data-position="top" data-tooltip="Delete">
-                                        <i class="material-icons">delete</i>
-                                    </button>
-                                @endcan
-                                </div>
-                            </td>
+                <table class="row-border hover data-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th>Name</th>
+                            <th>Groups</th>
+                            <th>Status</th>
+                            <th>Incomplete</th>
+                            <th></th>
                         </tr>
-                    @endforeach
-                </tbody>
-            </table>
+                    </thead>
+                    <tbody>
+                        @foreach ($users as $user)
+                            <tr class="user-{{$user->id}}">
+                                <td>@if(!$user->supervisor && $user->status != 'separated')
+                                        <span class="tooltipped" data-position="right" data-tooltip="Missing Supervisor">
+                                            <i class="material-icons orange-text">warning</i>
+                                        </span>
+                                    @endif</td>
+                                <td><a href="{{ url('/user', $user->id) }}">{{ $user->userFullName }}</a></td>
+                                <td>
+                                    {{ $user->groups->implode('name', ', ') }}
+                                </td>
+                                <td>{{ $user->status }}</td>
+                                <td>
+                                    @foreach($user->assignedTrainings as $assigned)
+                                            <a href={{ url('/training', $assigned->training_id) }}>{{ $assigned->training->name }}</a> <br />
+                                    @endforeach
+                                </td>
+                                <td class="no-wrap">
+                                    <div class="action-buttons">
+                                    @can('edit')
+                                        <a href="{{ url("/user/$user->id/edit") }}" class="btn-flat btn-sm tooltipped" data-position="top" data-tooltip="Edit">
+                                            <i class="material-icons">mode_edit</i>
+                                        </a>
+                                        <button type="button" class="btn-flat btn-sm delete-user tooltipped" data-id="{{ $user->id }}" data-position="top" data-tooltip="Delete">
+                                            <i class="material-icons">delete</i>
+                                        </button>
+                                    @endcan
+                                    </div>
+                                </td>
+                            </tr>
+                        @endforeach
+                    </tbody>
+                </table>
             @endif
         </div>
     </div>
