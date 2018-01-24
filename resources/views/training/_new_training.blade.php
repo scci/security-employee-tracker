@@ -35,7 +35,7 @@
     <div class="col s12" id="file_upload">
         {!! Form::multipleFiles() !!}
         @if (isset($training))
-            Attachments:
+            Email Attachments:
             @foreach($training->attachments as $file)
                 <span class="chip">
                     <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>

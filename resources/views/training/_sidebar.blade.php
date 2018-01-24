@@ -25,7 +25,7 @@
 
 {{--Files--}}
         <ul class="collection with-header z-depth-1">
-            <li class="collection-header" style="font-size: 24px; font-weight: 300;">Attachments
+            <li class="collection-header" style="font-size: 24px; font-weight: 300;">Email Attachments
                 <a tabindex="0" role="button" data-trigger="focus" class="pull-right tooltipped"  data-position="top" data-tooltip="When the system sends out an email regarding this training (new assignment/reminder), these files/attachments will be included as well." aria-hidden="true">
                     <i class="material-icons">live_help</i>
                 </a>
