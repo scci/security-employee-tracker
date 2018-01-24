@@ -1,5 +1,11 @@
 <ul class="collapsible popout" data-collapsible="accordion">
-    <li><div class="collapsible-title">{{ucfirst($sectionId)}} Training</div></li>
+    <li>
+        @if(ucfirst($sectionId) == "Scheduled" || ucfirst($sectionId == ""))
+        <div class="collapsible-title"><h5>Training Due</h5></div>        
+        @else
+            <div class="collapsible-title">{{ucfirst($sectionId)}}</div>
+        @endif
+    </li>
     @foreach ($trainings as $trainingUser)
         @if (!$trainingUser->training->administrative
             && $training_user_types[$trainingUser->id] == $sectionId)

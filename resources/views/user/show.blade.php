@@ -21,8 +21,19 @@
 
         <h2 style="margin-left:1.5rem" class="hide-on-small-only">{{$user->userFullName}}</h2>
 
+        <?php 
+            $isScheduledTraining = in_array("Scheduled", $training_blocks);
+            $numTrainingBlocks = count($training_blocks);
+        ?>
+        @if($isScheduledTraining != 1 && $numTrainingBlocks > 0)
+            <h5 style="margin-left:2.0rem">Completed Trainings</h5>
+        @endif
+        
         @foreach ($training_blocks as $block_title)
             @include('user._show_training_blocks',['sectionId' => $block_title])
+            @if($block_title == 'Scheduled' && $numTrainingBlocks > 1)                 
+                <h5 style="margin-left:2.0rem">Completed Trainings</h5>
+            @endif
         @endforeach
         @unless($training_user_types)
             @include('user._show_training_blocks',['sectionId' =>''])
