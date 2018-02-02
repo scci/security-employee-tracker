@@ -59,7 +59,11 @@ class RenewTraining extends Command
     {
         $trainingUsers = TrainingUser::with('user', 'training')
             ->where('due_date', '<', Carbon::today())
-            ->RenewableTrainings()  // Training is renewed (positive renews_in)
+            ->where(function($query) {
+                $query->whereNull('stop_renewal')
+                      ->orWhere('stop_renewal', 0);
+            })
+            ->RenewableTrainings()  // Training is renewed (positive renews_in)            
             ->activeUsers()
             ->orderBy(DB::raw('CASE WHEN completed_date IS NULL THEN 0 ELSE 1 END'))
             ->orderBy('completed_date', 'desc')
@@ -67,7 +71,7 @@ class RenewTraining extends Command
             ->unique(function ($item) {
                 return $item['user_id'].'-'.$item['training_id'];
             });
-
+        
         foreach ($trainingUsers as $trainingUser) {
             if (!$this->renewedAlready($trainingUser) && $this->timeToRenew($trainingUser)) {
                 $this->processRenewal($trainingUser);
@@ -100,7 +104,7 @@ class RenewTraining extends Command
             ->where('user_id', $trainingUser->user_id)
             ->where('due_date', '>', Carbon::today())
             ->get();
-
+        
         return !($trainingRecord->isEmpty());
     }
 
