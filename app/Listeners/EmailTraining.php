@@ -27,7 +27,7 @@ class EmailTraining implements ShouldQueue
         $training = $trainingUser->training;
         $dueDate = $this->makeDueDatePretty($trainingUser->due_date);
 
-        if (is_null($trainingUser->completed_date)) {
+        if (is_null($trainingUser->completed_date) and $training->administrative == 0) {
             $this->sendEmail($user, $training, $dueDate, $trainingUser);
         }
     }
