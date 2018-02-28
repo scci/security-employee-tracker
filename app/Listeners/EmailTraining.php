@@ -66,8 +66,10 @@ class EmailTraining implements ShouldQueue
 
                 //ATTACH FILES
                 foreach ($training->attachments as $file) {
-                    $path = 'app/training_'.$file->imageable_id.'/'.$file->filename;
-                    $m->attach(storage_path($path), ['as' => $file->filename, 'mime' => $file->mime]);
+                    if(!$file->admin_only) {
+                        $path = 'app/training_'.$file->imageable_id.'/'.$file->filename;
+                        $m->attach(storage_path($path), ['as' => $file->filename, 'mime' => $file->mime]);
+                    }
                 }
             } // end $m function
         );

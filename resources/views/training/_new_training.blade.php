@@ -37,10 +37,12 @@
         @if (isset($training))
             Email Attachments:
             @foreach($training->attachments as $file)
-                <span class="chip">
-                    <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
-                    <i class="material-icons delete-attachment" data-id="{{$file->id}}">close</i>
-                </span> &nbsp;
+                @if(!$file->admin_only)
+                    <span class="chip">
+                        <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                        <i class="material-icons delete-attachment" data-id="{{$file->id}}">close</i>
+                    </span> &nbsp;
+                @endif
             @endforeach
         @endif
     </div>

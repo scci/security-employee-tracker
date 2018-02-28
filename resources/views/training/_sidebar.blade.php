@@ -31,17 +31,19 @@
                 </a>
             </li>
             @foreach($training->attachments as $file)
-                <li class="collection-item">
-                {!! Form::open(array('action' => ['AttachmentController@destroy', $file->id], 'method' => 'DELETE')) !!}
-                <div class="file">
-                    <button type="submit" class="btn-floating waves-effect secondary-content">
-                        <i class="material-icons">delete</i>
-                    </button>
-                    <a class="" style="display:inline-block; max-width:calc(100% - 40px); overflow: hidden; text-overflow: ellipsis" href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
-                    <br /><small>Uploaded: {{ $file->created_at->format('y-m-d') }}</small>
-                </div>
-                {!! Form::close() !!}
-                </li>
+                @if(!$file->admin_only)
+                    <li class="collection-item">
+                    {!! Form::open(array('action' => ['AttachmentController@destroy', $file->id], 'method' => 'DELETE')) !!}
+                    <div class="file">
+                        <button type="submit" class="btn-floating waves-effect secondary-content">
+                            <i class="material-icons">delete</i>
+                        </button>
+                        <a class="" style="display:inline-block; max-width:calc(100% - 40px); overflow: hidden; text-overflow: ellipsis" href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                        <br /><small>Uploaded: {{ $file->created_at->format('y-m-d') }}</small>
+                    </div>
+                    {!! Form::close() !!}
+                    </li>
+                @endif
             @endforeach
 
             <li class="collection-item">
@@ -51,6 +53,30 @@
                 {!! Form::multipleFiles('js-upload') !!}
             {!! Form::close() !!}
             </li>
+        </ul>
+
+{{--Administrative Files--}}
+        <ul class="collection with-header z-depth-1">
+            <li class="collection-header" style="font-size: 24px; font-weight: 300;">Administrative Files
+                <a tabindex="0" role="button" data-trigger="focus" class="pull-right tooltipped"  data-position="top" data-tooltip="This is used to store sign-in sheets of attendees for trainings administered by FSO." aria-hidden="true">
+                    <i class="material-icons">live_help</i>
+                </a>
+            </li>
+            @foreach($training->attachments as $file)
+                @if($file->admin_only)
+                    <li class="collection-item">
+                    {!! Form::open(array('action' => ['AttachmentController@destroy', $file->id], 'method' => 'DELETE')) !!}
+                    <div class="file">
+                        <button type="submit" class="btn-floating waves-effect secondary-content">
+                            <i class="material-icons">delete</i>
+                        </button>
+                        <a class="" style="display:inline-block; max-width:calc(100% - 40px); overflow: hidden; text-overflow: ellipsis" href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                        <br /><small>Uploaded: {{ $file->created_at->format('y-m-d') }}</small>
+                    </div>
+                    {!! Form::close() !!}
+                    </li>
+                @endif
+            @endforeach
         </ul>
 
 {{--Description--}}

@@ -10,14 +10,14 @@ class Attachment extends Model
 {
     protected $table = 'attachments';
     public $timestamps = true;
-    protected $fillable = ['filename', 'mime', 'imageable_type', 'imageable_id', 'encrypted'];
+    protected $fillable = ['filename', 'mime', 'imageable_type', 'imageable_id', 'encrypted', 'admin_only'];
 
     public function imageable()
     {
         return $this->morphTo();
     }
 
-    public static function upload($model, $files, $encrypted = false)
+    public static function upload($model, $files, $encrypted = false, $admin_only=false)
     {
         $modelName = strtolower(class_basename($model)).'_';
 
@@ -32,6 +32,7 @@ class Attachment extends Model
             $data['filename'] = $file->getClientOriginalName();
             $data['mime'] = $file->getClientMimeType();
             $data['encrypted'] = $encrypted;
+            $data['admin_only'] = $admin_only;
             $model->attachments()->create($data);
         }
     }

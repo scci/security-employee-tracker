@@ -30,6 +30,8 @@ Route::group(['middleware' => 'auth'], function () {
     Route::get('/search', 'HomeController@search');
     Route::get('training/{trainingID}/assign', ['as' => 'training.assignForm', 'uses' => 'TrainingController@assignForm']);
     Route::post('training/{trainingID}/assign', ['as' => 'training.assign', 'uses' => 'TrainingController@assign']);
+    Route::get('training/{trainingID}/bulkupdate', ['as' => 'training.updateForm', 'uses' => 'TrainingController@updateForm']);
+    Route::post('training/{trainingID}/bulkupdate', ['as' => 'training.bulkupdate', 'uses' => 'TrainingController@bulkupdate']);
     Route::get('user/{userID}/{sectionID}/show', ['uses' => 'UserController@show']);
     Route::get('/user/status/{userStatus}', ['uses' => 'UserController@index']);
     Route::get('/training/completed', ['uses' => 'TrainingController@showCompleted']);

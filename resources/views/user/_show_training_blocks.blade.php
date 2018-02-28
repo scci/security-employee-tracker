@@ -46,9 +46,11 @@
                         <div class="col m9 browser-default">
                             {!! Markdown::convertToHTML($trainingUser->training->description) !!} <br />
                             @foreach($trainingUser->training->attachments as $file)
-                                <div class="chip">
-                                    <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
-                                </div>
+                                @if(!$file->admin_only)
+                                    <div class="chip">
+                                        <a href="{{ url('/attachment', $file->id) }}" alt="{{ $file->filename }}">{{ $file->filename }}</a>
+                                    </div>
+                                @endif
                             @endforeach
                         </div>
                     </div>

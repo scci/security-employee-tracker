@@ -26,7 +26,7 @@ class UserControllerTest extends TestCase
         // Logged in as admin - Can access the user page
         $this->action('GET', 'UserController@index');
 
-        $this->assertEquals('user', Route::getCurrentRoute()->getPath());
+        $this->call('GET', 'user');
         $this->assertViewHas('users');
 
         // Logged in as a regular user - Cannot access the user page
@@ -232,7 +232,7 @@ class UserControllerTest extends TestCase
 
         // Verify page components (views\user\show.blade.php)
         $this->seePageIs('/user/'.$createdUserId)
-             ->see('Scheduled Training') // Block Title
+             ->see('Training Due') // Block Title
              ->see('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
              ->dontSee('ADD TRAINING') // button
              ->dontSee('SHOW ALL') // button
@@ -256,14 +256,14 @@ class UserControllerTest extends TestCase
         $this->seeStatusCode(200); // OK status code
 
         $this->seePageIs('/user/'.$createdUserId)
-             ->dontSee('Scheduled Training') // Block Title
+             ->dontSee('Training Due') // Block Title
              ->dontSee('ADD TRAINING') // button
              ->see('SHOW ALL') // Button
              ->see('Completed: '.Carbon::today()->format('Y-m-d')); // Field
 
         // Ensure the training type blocks are displayed since all trainings are marked completed
         foreach ($createdTrainingTypes as $createdTrainingType) {
-            $this->see($createdTrainingType->name.' Training');
+            $this->see($createdTrainingType->name);
         }
     }
 
@@ -294,7 +294,7 @@ class UserControllerTest extends TestCase
 
         // Verify page components (views\user\show.blade.php)
         $this->seePageIs('/user/'.$userId)
-             ->see('Scheduled Training') // Block Title
+             ->see('Training Due') // Block Title
              ->see('Due Date: '.Carbon::tomorrow()->format('Y-m-d')) // Field
              ->see('ADD TRAINING') // button
              ->dontSee('SHOW ALL') // button
@@ -324,14 +324,14 @@ class UserControllerTest extends TestCase
 
         // Verify page components (views\user\show.blade.php)
         $this->seePageIs('/user/'.$userId)
-             ->dontSee('Scheduled Training') // Block Title
+             ->dontSee('Training Due') // Block Title
              ->dontSee('ADD TRAINING') // button
              ->see('SHOW ALL') // Button
              ->see('Completed: '.Carbon::today()->format('Y-m-d')); // Field
 
         // Ensure the training type blocks are displayed since all trainings are marked completed
         foreach ($createdTrainingTypes as $createdTrainingType) {
-            $this->see($createdTrainingType->name.' Training');
+            $this->see($createdTrainingType->name);
         }
 
         // Add another set of trainings to the user with completed date set different past dates

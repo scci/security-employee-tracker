@@ -9,6 +9,11 @@
 @section('content')
 
     @can('edit')
+        <div class="fixed-action-btn" style="bottom: 45px; right: 100px;">
+            <a class="btn-floating btn-large green tooltipped modal-trigger" href="{{ url("training/$training->id/bulkupdate") }}" data-position="left" data-tooltip="Bulk Update Training">
+                <i class="large material-icons">update</i>
+            </a>
+        </div>
         <div class="fixed-action-btn" style="bottom: 45px; right: 24px;">
             <a class="btn-floating btn-large red tooltipped modal-trigger" href="{{ url("training/$training->id/assign") }}" data-position="left" data-tooltip="Assign training to users">
                 <i class="large material-icons">add</i>
