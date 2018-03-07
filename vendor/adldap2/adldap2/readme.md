@@ -2,37 +2,44 @@
 
 [![Build Status](https://img.shields.io/travis/Adldap2/Adldap2.svg?style=flat-square)](https://travis-ci.org/Adldap2/Adldap2)
 [![Scrutinizer Code Quality](https://img.shields.io/scrutinizer/g/adLDAP2/adLDAP2/master.svg?style=flat-square)](https://scrutinizer-ci.com/g/adLDAP2/adLDAP2/?branch=master)
-[![SensioLabsInsight](https://img.shields.io/sensiolabs/i/45a86fc2-b202-4f1b-9549-679900e5807c.svg?style=flat-square)](https://insight.sensiolabs.com/projects/45a86fc2-b202-4f1b-9549-679900e5807c)
 [![Total Downloads](https://img.shields.io/packagist/dt/adldap2/adldap2.svg?style=flat-square)](https://packagist.org/packages/adldap2/adldap2)
 [![Latest Stable Version](https://img.shields.io/packagist/v/adldap2/adldap2.svg?style=flat-square)](https://packagist.org/packages/adldap2/adldap2)
 [![License](https://img.shields.io/packagist/l/adldap2/adldap2.svg?style=flat-square)](https://packagist.org/packages/adldap2/adldap2)
 
+Working with LDAP doesn't need to be hard.
+
+Adldap2 is a tested PHP package that provides LDAP authentication and directory management tools using the Active Record pattern.
+
 ## Index
+
  - [Quick Start](docs/quick-start.md)
  - [Configuration](docs/configuration.md)
  - [Connecting](docs/connecting.md)
  - [Authenticating](docs/authenticating.md)
  - [Query Builder (Searching)](docs/query-builder.md)
- - [Models](docs/models.md)
- - [Working with DN's](docs/distinguished-names.md)
+ - [Models](docs/models/model.md)
+    - [Computer](docs/models/computer.md)
+    - [Contact](docs/models/contact.md)
+    - [Container](docs/models/container.md)
+    - [Entry](docs/models/entry.md)
+    - [Group](docs/models/group.md)
+    - [Organizational Unit](docs/models/ou.md)
+    - [Printer](docs/models/printer.md)
+    - [RootDse](docs/models/root-dse.md)
+    - [User](docs/models/user.md)
+ - [Working with Distinguished Names](docs/distinguished-names.md)
  - [Schema](docs/schema.md)
- - [Upgrading](docs/upgrading.md)
  - [Troubleshooting](docs/troubleshooting.md)
-
-## Description
-
-Working with Active Directory doesn't need to be hard. Adldap2 is a tested PHP package that provides LDAP
-authentication and Active Directory management tools using the Active Record pattern.
 
 ## Installation
 
 ### Requirements
 
-To use Adldap2, your sever must support:
+To use Adldap2, your server must support:
 
 - PHP 5.5.9 or greater
 - PHP LDAP Extension
-- An Active Directory Server
+- An LDAP Server
 
 > **Note**: OpenLDAP support is experimental, success may vary.
 
@@ -47,15 +54,16 @@ If your AD server requires SSL, your server must support the following libraries
 
 ### Installing
 
-Adldap2 utilizes composer for installation. Insert `"adldap2/adldap2": "6.1.*"` in your `composer.json` file:
+Adldap2 utilizes composer for installation.
 
-```json
-"require": {
-    "adldap2/adldap2": "6.1.*"
-},
+Run the following command in the root directory of your project:
+
+```
+composer require adldap2/adldap2
 ```
 
-Then run the `composer update` command in the root of your project.
+> **Note**: If you're upgrading from an earlier release, please take a look
+> at the [release notes](https://github.com/Adldap2/Adldap2/releases).
 
 ## Implementations
 

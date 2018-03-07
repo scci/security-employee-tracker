@@ -3,233 +3,140 @@
 namespace Adldap\Laravel\Commands;
 
 use Adldap\Models\User;
-use Adldap\Laravel\Traits\ImportsUsers;
-use Illuminate\Console\Command;
+use Adldap\AdldapException;
+use Adldap\Laravel\Events\Importing;
+use Adldap\Laravel\Events\Synchronized;
+use Adldap\Laravel\Events\Synchronizing;
+use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Model;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 
-class Import extends Command
+class Import
 {
-    use ImportsUsers;
-
     /**
-     * The name of the console command.
+     * The LDAP user that is being imported.
      *
-     * @var string
+     * @var User
      */
-    protected $name = 'adldap:import';
+    protected $user;
 
     /**
-     * The description of the console command.
+     * The LDAP users database model.
      *
-     * @var string
+     * @var Model
      */
-    protected $description = 'Imports LDAP users into the local database with a random 16 character hashed password.';
+    protected $model;
 
     /**
-     * Execute the console command.
+     * The LDAP users credentials.
      *
-     * @return mixed
+     * @var array
+     */
+    protected $credentials;
+
+    /**
+     * Constructor.
+     *
+     * @param User  $user
+     * @param Model $model
+     * @param array $credentials
+     */
+    public function __construct(User $user, Model $model, array $credentials = [])
+    {
+        $this->user = $user;
+        $this->model = $model;
+        $this->credentials = $credentials;
+    }
+
+    /**
+     * Imports the current LDAP user.
+     *
+     * @return Model
+     *
+     * @throws AdldapException
      */
     public function handle()
     {
-        // Retrieve the Adldap instance.
-        $adldap = $this->getAdldap($this->option('connection'));
+        // Here we'll try to locate our local user model from
+        // the LDAP users model. If one isn't located,
+        // we'll create a new one for them.
+        $model = $this->findByCredentials() ?: $this->model->newInstance();
 
-        if (!$adldap->getConnection()->isBound()) {
-            // If the connection isn't bound yet, we'll connect to the server manually.
-            $adldap->connect();
+        if (! $model->exists) {
+            Event::fire(new Importing($this->user, $model));
         }
 
-        // Generate a new user search.
-        $search = $adldap->search()->users();
+        Event::fire(new Synchronizing($this->user, $model));
 
-        if ($filter = $this->getFilter()) {
-            // If the filter option was given, we'll
-            // insert it into our search query.
-            $search->rawFilter($filter);
+        $this->sync($model);
+
+        Event::fire(new Synchronized($this->user, $model));
+
+        return $model;
+    }
+
+    /**
+     * Retrieves an eloquent user by their credentials.
+     *
+     * @return Model|null
+     */
+    protected function findByCredentials()
+    {
+        if (empty($this->credentials)) {
+            return;
         }
 
-        if ($user = $this->argument('user')) {
-            $users = [$search->findOrFail($user)];
+        $query = $this->model->newQuery();
 
-            $this->info("Found user '{$users[0]->getCommonName()}'. Importing...");
-        } else {
-            // Retrieve all users. We'll paginate our search in case we hit
-            // the 1000 record hard limit of active directory.
-            $users = $search->paginate()->getResults();
-
-            $count = count($users);
-
-            $this->info("Found {$count} user(s). Importing...");
+        if ($query->getMacro('withTrashed')) {
+            // If the withTrashed macro exists on our User model, then we must be
+            // using soft deletes. We need to make sure we include these
+            // results so we don't create duplicate user records.
+            $query->withTrashed();
         }
 
-        $this->info("\nSuccessfully imported / synchronized {$this->import($users)} user(s).");
-    }
-
-    /**
-     * Imports the specified users and returns the total
-     * number of users successfully imported.
-     *
-     * @param array $users
-     *
-     * @return int
-     */
-    public function import(array $users = [])
-    {
-        $imported = 0;
-
-        // We need to filter our results to make sure they are
-        // only users. In some cases, Contact models may be
-        // returned due the possibility of the
-        // existing in the same scope.
-        $users = collect($users)->filter(function($user) {
-            return $user instanceof User;
-        });
-
-        $bar = $this->output->createProgressBar(count($users));
-
-        foreach ($users as $user) {
-            try {
-                // Import the user and retrieve it's model.
-                $model = $this->getModelFromAdldap($user);
-
-                // Save the returned model.
-                $this->save($user, $model);
-
-                if ($this->isDeleting()) {
-                    $this->delete($user, $model);
-                }
-
-                $imported++;
-            } catch (\Exception $e) {
-                // Log the unsuccessful import.
-                if ($this->isLogging()) {
-                    logger()->error("Unable to import user {$user->getCommonName()}. {$e->getMessage()}");
-                }
-            }
-
-            $bar->advance();
-        }
-
-        return $imported;
-    }
-
-    /**
-     * Returns true / false if the current import is being logged.
-     *
-     * @return bool
-     */
-    public function isLogging()
-    {
-        return $this->option('log') == 'true';
-    }
-
-    /**
-     * Returns true / false if users are being deleted if they are disabled in AD.
-     *
-     * @return bool
-     */
-    public function isDeleting()
-    {
-        return $this->option('delete') == 'true';
-    }
-
-    /**
-     * Returns the limitation filter for the user query.
-     *
-     * @return string
-     */
-    public function getFilter()
-    {
-        return $this->getLimitationFilter() ?: $this->option('filter');
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    public function getArguments()
-    {
-        return [
-            ['user', InputArgument::OPTIONAL, 'The specific user to import using ANR.'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    public function getOptions()
-    {
-        return [
-            ['filter', '-f', InputOption::VALUE_OPTIONAL, 'The raw filter for limiting users imported.'],
-
-            ['log', '-l', InputOption::VALUE_OPTIONAL, 'Log successful and unsuccessful imported users.', 'true'],
-
-            ['connection', '-c', InputOption::VALUE_OPTIONAL, 'The LDAP connection to use to import users.'],
-
-            ['delete', '-d', InputOption::VALUE_OPTIONAL, 'Soft-delete the users model if the AD user is disabled.', 'false'],
-        ];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createModel()
-    {
-        $model = auth()->getProvider()->getModel();
-
-        return new $model();
-    }
-
-    /**
-     * Saves the specified user with its model.
-     *
-     * @param User  $user
-     * @param Model $model
-     *
-     * @return bool
-     */
-    protected function save(User $user, Model $model)
-    {
-        $imported = false;
-
-        if ($this->saveModel($model) && $model->wasRecentlyCreated) {
-            $imported = true;
-
-            // Log the successful import.
-            if ($this->isLogging()) {
-                logger()->info("Imported user {$user->getCommonName()}");
+        foreach ($this->credentials as $key => $value) {
+            if (! Str::contains($key, 'password')) {
+                $query->where($key, $value);
             }
         }
 
-        return $imported;
+        return $query->first();
     }
 
     /**
-     * Soft deletes the specified model if the specified AD account is disabled.
+     * Fills a models attributes by the specified Users attributes.
      *
-     * @param User  $user
      * @param Model $model
+     *
+     * @throws AdldapException
+     *
+     * @return void
      */
-    protected function delete(User $user, Model $model)
+    protected function sync(Model $model)
     {
-        if (
-            method_exists($model, 'trashed') &&
-            ! $model->trashed() &&
-            $user->isDisabled()
-        ) {
-            // If deleting is enabled, the model supports soft deletes, the model
-            // isn't already deleted, and the AD user is disabled, we'll
-            // go ahead and delete the users model.
-            $model->delete();
+        $toSync = Config::get('adldap_auth.sync_attributes', [
+            'email' => 'userprincipalname',
+            'name' => 'cn',
+        ]);
 
-            if ($this->isLogging()) {
-                logger()->info("Soft-deleted user {$user->getCommonName()}. Their AD user account is disabled.");
+        foreach ($toSync as $modelField => $ldapField) {
+            // If the field is a loaded class, we can
+            // assume it's an attribute handler.
+            if (class_exists($ldapField)) {
+                // We will construct the attribute handler using Laravel's
+                // IoC to allow developers to utilize application
+                // dependencies in the constructor.
+                $handler = app($ldapField);
+
+                if (! method_exists($handler, 'handle')) {
+                    throw new AdldapException("A public 'handle()' method must be defined when using an attribute handler.");
+                }
+
+                $handler->handle($this->user, $model);
+            } else {
+                $model->{$modelField} = $this->user->getFirstAttribute($ldapField);
             }
         }
     }

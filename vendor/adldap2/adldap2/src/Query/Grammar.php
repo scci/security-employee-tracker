@@ -2,8 +2,6 @@
 
 namespace Adldap\Query;
 
-use Adldap\Query\Bindings\Where;
-
 class Grammar
 {
     /**
@@ -25,42 +23,54 @@ class Grammar
     /**
      * Compiles the Builder instance into an LDAP query string.
      *
-     * @param \Adldap\Query\Builder $builder
+     * @param Builder $builder
      *
      * @return string
      */
-    public function compileQuery(Builder $builder)
+    public function compile(Builder $builder)
     {
-        // Retrieve the query 'where' bindings.
-        $wheres = $builder->getWheres();
+        $ands = $builder->filters['and'];
+        $ors = $builder->filters['or'];
+        $raws = $builder->filters['raw'];
 
-        // Retrieve the query 'orWhere' bindings.
-        $orWheres = $builder->getOrWheres();
+        $query = $this->concatenate($raws);
 
-        // Retrieve the query filter bindings.
-        $filters = $builder->getFilters();
+        $query = $this->compileWheres($ands, $query);
 
-        // We'll combine all raw filters together first.
-        $query = implode(null, $filters);
+        $query = $this->compileOrWheres($ors, $query);
 
-        // Compile wheres.
-        $query = $this->compileWheres($wheres, $query);
+        // We need to check if the query is already nested, otherwise
+        // we'll nest it here and return the result.
+        if (!$builder->isNested()) {
+            $total = count($ands) + count($raws);
 
-        // Compile or wheres.
-        $query = $this->compileOrWheres($orWheres, $query);
-
-        // Count the total amount of filters.
-        $total = count($wheres) + count($filters);
-
-        // Make sure we wrap the query in an 'and' if using
-        // multiple filters. We also need to check if only
-        // one where is used with multiple orWheres, that
-        // we wrap it in an `and` query.
-        if ($total > 1 || (count($wheres) === 1 && count($orWheres) > 0)) {
-            $query = $this->compileAnd($query);
+            // Make sure we wrap the query in an 'and' if using
+            // multiple filters. We also need to check if only
+            // one where is used with multiple orWheres, that
+            // we wrap it in an `and` query.
+            if ($total > 1 || (count($ands) === 1 && count($ors) > 0)) {
+                $query = $this->compileAnd($query);
+            }
         }
 
         return $query;
+    }
+
+    /**
+     * Concatenates filters into a single string.
+     *
+     * @param array $bindings
+     *
+     * @return string
+     */
+    public function concatenate(array $bindings = [])
+    {
+        // Filter out empty query segments.
+        $bindings = array_filter($bindings, function ($value) {
+            return (string) $value !== '';
+        });
+
+        return implode('', $bindings);
     }
 
     /**
@@ -90,7 +100,22 @@ class Grammar
      */
     public function compileDoesNotEqual($field, $value)
     {
-        return $this->wrap(Operator::$doesNotEqual.$this->compileEquals($field, $value));
+        return $this->compileNot($this->compileEquals($field, $value));
+    }
+
+    /**
+     * Alias for does not equal operator (!=) operator.
+     *
+     * Produces: (!(field=value))
+     *
+     * @param string $field
+     * @param string $value
+     *
+     * @return string
+     */
+    public function compileDoesNotEqualAlias($field, $value)
+    {
+        return $this->compileDoesNotEqual($field, $value);
     }
 
     /**
@@ -165,7 +190,7 @@ class Grammar
      */
     public function compileNotStartsWith($field, $value)
     {
-        return $this->wrap(Operator::$doesNotEqual.$this->compileStartsWith($field, $value));
+        return $this->compileNot($this->compileStartsWith($field, $value));
     }
 
     /**
@@ -195,7 +220,7 @@ class Grammar
      */
     public function compileNotEndsWith($field, $value)
     {
-        return $this->wrap(Operator::$doesNotEqual.$this->compileEndsWith($field, $value));
+        return $this->compileNot($this->compileEndsWith($field, $value));
     }
 
     /**
@@ -225,7 +250,7 @@ class Grammar
      */
     public function compileNotContains($field, $value)
     {
-        return $this->wrap(Operator::$doesNotEqual.$this->compileContains($field, $value));
+        return $this->compileNot($this->compileContains($field, $value));
     }
 
     /**
@@ -253,7 +278,7 @@ class Grammar
      */
     public function compileNotHas($field)
     {
-        return $this->wrap(Operator::$doesNotEqual.$this->compileHas($field));
+        return $this->compileNot($this->compileHas($field));
     }
 
     /**
@@ -267,7 +292,7 @@ class Grammar
      */
     public function compileAnd($query)
     {
-        return $this->wrap($query, '(&');
+        return $query ? $this->wrap($query, '(&') : '';
     }
 
     /**
@@ -281,7 +306,19 @@ class Grammar
      */
     public function compileOr($query)
     {
-        return $this->wrap($query, '(|');
+        return $query ? $this->wrap($query, '(|') : '';
+    }
+
+    /**
+     * Wraps the inserted query inside an NOT operator.
+     *
+     * @param string $query
+     *
+     * @return string
+     */
+    public function compileNot($query)
+    {
+        return $query ? $this->wrap($query, '(!') : '';
     }
 
     /**
@@ -292,7 +329,7 @@ class Grammar
      *
      * @return string
      */
-    protected function compileWheres(array $wheres, $query = '')
+    protected function compileWheres(array $wheres = [], $query = '')
     {
         foreach ($wheres as $where) {
             $query .= $this->compileWhere($where);
@@ -309,20 +346,20 @@ class Grammar
      *
      * @return string
      */
-    protected function compileOrWheres(array $orWheres, $query = '')
+    protected function compileOrWheres(array $orWheres = [], $query = '')
     {
-        $ors = '';
+        $or = '';
 
         foreach ($orWheres as $where) {
-            $ors .= $this->compileWhere($where);
+            $or .= $this->compileWhere($where);
         }
 
         // Make sure we wrap the query in an 'or' if using multiple
         // orWheres. For example (|(QUERY)(ORWHEREQUERY)).
         if (($query && count($orWheres) > 0) || count($orWheres) > 1) {
-            $query .= $this->compileOr($ors);
+            $query .= $this->compileOr($or);
         } else {
-            $query .= $ors;
+            $query .= $or;
         }
 
         return $query;
@@ -332,29 +369,21 @@ class Grammar
      * Assembles a single where query based
      * on its operator and returns it.
      *
-     * @param Where $where
+     * @param array $where
      *
      * @return string|null
      */
-    protected function compileWhere(Where $where)
+    protected function compileWhere(array $where)
     {
-        // The compile function prefix.
-        $prefix = 'compile';
-
-        // Get the operator from the where.
-        $operator = $where->getOperator();
-
         // Get the name of the operator.
-        $name = array_search($operator, Operator::all());
-
-        if ($name !== false) {
+        if ($name = array_search($where['operator'], Operator::all())) {
             // If the name was found we'll camel case it
             // to run it through the compile method.
-            $method = $prefix.ucfirst($name);
+            $method = 'compile'.ucfirst($name);
 
             // Make sure the compile method exists for the operator.
             if (method_exists($this, $method)) {
-                return $this->{$method}($where->getField(), $where->getValue());
+                return $this->{$method}($where['field'], $where['value']);
             }
         }
     }

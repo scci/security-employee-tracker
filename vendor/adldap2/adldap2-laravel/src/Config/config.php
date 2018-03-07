@@ -24,24 +24,28 @@ return [
             | Auto Connect
             |--------------------------------------------------------------------------
             |
-            | If auto connect is true, anytime Adldap is instantiated it will automatically
-            | connect to your AD server. If this is set to false, you must connect manually
-            | using: Adldap::connect().
+            | If auto connect is true, Adldap will try to automatically connect to
+            | your LDAP server in your configuration. This allows you to assume
+            | connectivity rather than having to connect manually
+            | in your application.
+            |
+            | If this is set to false, you **must** connect manually before running
+            | LDAP operations.
             |
             */
 
-            'auto_connect' => true,
+            'auto_connect' => env('ADLDAP_AUTO_CONNECT', true),
 
             /*
             |--------------------------------------------------------------------------
             | Connection
             |--------------------------------------------------------------------------
             |
-            | The connection class to use to run operations on.
+            | The connection class to use to run raw LDAP operations on.
             |
-            | You can also set this option to `null` to use the default connection class.
+            | Custom connection classes must implement:
             |
-            | Custom connection classes must implement \Adldap\Contracts\Connections\ConnectionInterface
+            |  Adldap\Connections\ConnectionInterface
             |
             */
 
@@ -56,7 +60,15 @@ return [
             |
             | You can also set this option to `null` to use the default schema class.
             |
-            | Custom schema classes must implement \Adldap\Contracts\Schemas\SchemaInterface
+            | For OpenLDAP, you must use the schema:
+            |
+            |   Adldap\Schemas\OpenLDAP::class
+            |
+            | For FreeIPA, you must use the schema:
+            |
+            |   Adldap\Schemas\FreeIPA::class
+            |
+            | Custom schema classes must implement Adldap\Schemas\SchemaInterface
             |
             */
 
@@ -80,29 +92,26 @@ return [
                 | Account Prefix
                 |--------------------------------------------------------------------------
                 |
-                | The account prefix option is the prefix of your user accounts in AD.
+                | The account prefix option is the prefix of your user accounts in LDAP directory.
                 |
-                | For example, if you'd prefer your users to use only their username instead
-                | of specifying a domain ('ACME\jdoe'), enter your domain name.
+                | This string is prepended to authenticating users usernames.
                 |
                 */
 
-                'account_prefix' => '',
+                'account_prefix' => env('ADLDAP_ACCOUNT_PREFIX', ''),
 
                 /*
                 |--------------------------------------------------------------------------
                 | Account Suffix
                 |--------------------------------------------------------------------------
                 |
-                | The account suffix option is the suffix of your user accounts in AD.
+                | The account suffix option is the suffix of your user accounts in your LDAP directory.
                 |
-                | For example, if your domain DN is DC=corp,DC=acme,DC=org, then your
-                | account suffix would be @corp.acme.org. This is then appended to
-                | then end of your user accounts on authentication.
+                | This string is appended to authenticating users usernames.
                 |
                 */
 
-                'account_suffix' => '@acme.org',
+                'account_suffix' => env('ADLDAP_ACCOUNT_SUFFIX', ''),
 
                 /*
                 |--------------------------------------------------------------------------
@@ -118,18 +127,18 @@ return [
                 |
                 */
 
-                'domain_controllers' => ['corp-dc1.corp.acme.org', 'corp-dc2.corp.acme.org'],
+                'domain_controllers' => explode(' ', env('ADLDAP_CONTROLLERS', 'corp-dc1.corp.acme.org corp-dc2.corp.acme.org')),
 
                 /*
                 |--------------------------------------------------------------------------
                 | Port
                 |--------------------------------------------------------------------------
                 |
-                | The port option is used for authenticating and binding to your AD server.
+                | The port option is used for authenticating and binding to your LDAP server.
                 |
                 */
 
-                'port' => 389,
+                'port' => env('ADLDAP_PORT', 389),
 
                 /*
                 |--------------------------------------------------------------------------
@@ -142,44 +151,46 @@ return [
                 |
                 */
 
-                'timeout' => 5,
+                'timeout' => env('ADLDAP_TIMEOUT', 5),
 
                 /*
                 |--------------------------------------------------------------------------
                 | Base Distinguished Name
                 |--------------------------------------------------------------------------
                 |
-                | The base distinguished name is the base distinguished name you'd like
-                | to perform operations on. An example base DN would be DC=corp,DC=acme,DC=org.
+                | The base distinguished name is the base distinguished name you'd
+                | like to perform query operations on. An example base DN would be:
                 |
-                | If one is not defined, then Adldap will try to find it automatically
-                | by querying your server. It's recommended to include it to
-                | limit queries executed per request.
+                |        dc=corp,dc=acme,dc=org
+                |
+                | A correct base DN is required for any query results to be returned.
                 |
                 */
 
-                'base_dn' => 'dc=corp,dc=acme,dc=org',
+                'base_dn' => env('ADLDAP_BASEDN', 'dc=corp,dc=acme,dc=org'),
 
                 /*
                 |--------------------------------------------------------------------------
-                | Administrator Account Suffix
+                | Administrator Account Suffix / Prefix
                 |--------------------------------------------------------------------------
                 |
-                | This option allows you to set a different account suffix for your
-                | configured administrator account upon binding.
+                | This option allows you to set a different account prefix and suffix
+                | for your configured administrator account upon binding.
                 |
-                | If left empty, your `account_suffix` option will be used.
+                | If left empty or set to `null`, your `account_prefix` and
+                | `account_suffix` options above will be used.
                 |
                 */
 
-                'admin_account_suffix' => '@acme.org',
+                'admin_account_prefix' => env('ADLDAP_ADMIN_ACCOUNT_PREFIX', ''),
+                'admin_account_suffix' => env('ADLDAP_ADMIN_ACCOUNT_SUFFIX', ''),
 
                 /*
                 |--------------------------------------------------------------------------
                 | Administrator Username & Password
                 |--------------------------------------------------------------------------
                 |
-                | When connecting to your AD server, a username and password is required
+                | When connecting to your LDAP server, a username and password is required
                 | to be able to query and run operations on your server(s). You can
                 | use any user account that has these permissions. This account
                 | does not need to be a domain administrator unless you
@@ -213,13 +224,15 @@ return [
                 |
                 | If you need to be able to change user passwords on your server, then an
                 | SSL or TLS connection is required. All other operations are allowed
-                | on unsecured protocols. One of these options are definitely recommended
-                | if you have the ability to connect to your server securely.
+                | on unsecured protocols.
+                | 
+                | One of these options are definitely recommended if you 
+                | have the ability to connect to your server securely.
                 |
                 */
 
-                'use_ssl' => false,
-                'use_tls' => false,
+                'use_ssl' => env('ADLDAP_USE_SSL', false),
+                'use_tls' => env('ADLDAP_USE_TLS', false),
 
             ],
 

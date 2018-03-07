@@ -438,7 +438,7 @@ class LaravelDebugbar extends DebugBar
 
         if ($this->shouldCollect('auth', false)) {
             try {
-                $guards = array_keys($this->app['config']->get('auth.guards'));
+                $guards = array_keys($this->app['config']->get('auth.guards', []));
                 $authCollector = new MultiAuthCollector($app['auth'], $guards);
 
                 $authCollector->setShowName(
@@ -1012,7 +1012,7 @@ class LaravelDebugbar extends DebugBar
                 case 'redis':
                     $connection = $config->get('debugbar.storage.connection');
                     $client = $this->app['redis']->connection($connection);
-                    if (is_a($client, 'Illuminate\Redis\Connections\PredisConnection', false)) {
+                    if (is_a($client, 'Illuminate\Redis\Connections\Connection', false)) {
                         $client = $client->client();
                     }
                     $storage = new RedisStorage($client);

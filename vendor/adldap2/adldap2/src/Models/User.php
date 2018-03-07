@@ -4,69 +4,93 @@ namespace Adldap\Models;
 
 use DateTime;
 use Adldap\Utilities;
-use Adldap\Objects\AccountControl;
-use Adldap\Objects\BatchModification;
-use Adldap\Exceptions\AdldapException;
-use Adldap\Exceptions\WrongPasswordException;
-use Adldap\Exceptions\PasswordPolicyException;
-use Adldap\Models\Traits\HasDescriptionTrait;
-use Adldap\Models\Traits\HasMemberOfTrait;
-use Adldap\Models\Traits\HasLastLogonAndLogOffTrait;
+use Adldap\AdldapException;
+use Adldap\Models\Concerns\HasMemberOf;
+use Adldap\Models\Concerns\HasDescription;
+use Adldap\Models\Concerns\HasUserAccountControl;
+use Adldap\Models\Concerns\HasLastLogonAndLogOff;
+use Illuminate\Contracts\Auth\Authenticatable;
 
-class User extends Entry
+/**
+ * Class User
+ *
+ * Represents an LDAP user.
+ *
+ * @package Adldap\Models
+ */
+class User extends Entry implements Authenticatable
 {
-    use HasDescriptionTrait, HasMemberOfTrait, HasLastLogonAndLogOffTrait;
+    use HasDescription,
+        HasMemberOf,
+        HasLastLogonAndLogOff,
+        HasUserAccountControl;
 
     /**
-     * Returns the users display name.
+     * Get the name of the unique identifier for the user.
      *
      * @return string
      */
-    public function getDisplayName()
+    public function getAuthIdentifierName()
     {
-        return $this->getFirstAttribute($this->schema->displayName());
+        return $this->schema->objectGuid();
     }
 
     /**
-     * Sets the users display name.
+     * Get the unique identifier for the user.
      *
-     * @param string $displayName
-     *
-     * @return User
+     * @return mixed
      */
-    public function setDisplayName($displayName)
+    public function getAuthIdentifier()
     {
-        return $this->setFirstAttribute($this->schema->displayName(), $displayName);
+        return $this->getConvertedGuid();
     }
 
     /**
-     * Returns the users title.
-     *
-     * https://msdn.microsoft.com/en-us/library/ms680037(v=vs.85).aspx
+     * Get the password for the user.
      *
      * @return string
      */
-    public function getTitle()
+    public function getAuthPassword()
     {
-        return $this->getFirstAttribute($this->schema->title());
+        return;
     }
 
     /**
-     * Sets the users title.
+     * Get the token value for the "remember me" session.
      *
-     * @param string $title
-     *
-     * @return User
+     * @return string
      */
-    public function setTitle($title)
+    public function getRememberToken()
     {
-        return $this->setFirstAttribute($this->schema->title(), $title);
+        return;
+    }
+
+    /**
+     * Set the token value for the "remember me" session.
+     *
+     * @param string $value
+     *
+     * @return void
+     */
+    public function setRememberToken($value)
+    {
+        return;
+    }
+
+    /**
+     * Get the column name for the "remember me" token.
+     *
+     * @return string
+     */
+    public function getRememberTokenName()
+    {
+        return;
     }
 
     /**
      * Returns the users department.
      *
-     * https://msdn.microsoft.com/en-us/library/ms675490(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms675490(v=vs.85).aspx
      *
      * @return string
      */
@@ -80,7 +104,7 @@ class User extends Entry
      *
      * @param string $department
      *
-     * @return User
+     * @return $this
      */
     public function setDepartment($department)
     {
@@ -88,9 +112,55 @@ class User extends Entry
     }
 
     /**
+     * Returns the department number.
+     *
+     * @return string
+     */
+    public function getDepartmentNumber()
+    {
+        return $this->getFirstAttribute($this->schema->departmentNumber());
+    }
+
+    /**
+     * Sets the department number.
+     *
+     * @param string $number
+     *
+     * @return $this
+     */
+    public function setDepartmentNumber($number)
+    {
+        return $this->setFirstAttribute($this->schema->departmentNumber(), $number);
+    }
+
+    /**
+     * Returns the users title.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms680037(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getTitle()
+    {
+        return $this->getFirstAttribute($this->schema->title());
+    }
+
+    /**
+     * Sets the users title.
+     *
+     * @param string $title
+     *
+     * @return $this
+     */
+    public function setTitle($title)
+    {
+        return $this->setFirstAttribute($this->schema->title(), $title);
+    }
+
+    /**
      * Returns the users first name.
      *
-     * https://msdn.microsoft.com/en-us/library/ms675719(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms675719(v=vs.85).aspx
      *
      * @return mixed
      */
@@ -104,7 +174,7 @@ class User extends Entry
      *
      * @param string $firstName
      *
-     * @return User
+     * @return $this
      */
     public function setFirstName($firstName)
     {
@@ -114,7 +184,7 @@ class User extends Entry
     /**
      * Returns the users last name.
      *
-     * https://msdn.microsoft.com/en-us/library/ms679872(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms679872(v=vs.85).aspx
      *
      * @return mixed
      */
@@ -128,7 +198,7 @@ class User extends Entry
      *
      * @param string $lastName
      *
-     * @return User
+     * @return $this
      */
     public function setLastName($lastName)
     {
@@ -150,7 +220,7 @@ class User extends Entry
      *
      * @param string $info
      *
-     * @return User
+     * @return $this
      */
     public function setInfo($info)
     {
@@ -172,7 +242,7 @@ class User extends Entry
      *
      * @param string $initials
      *
-     * @return User
+     * @return $this
      */
     public function setInitials($initials)
     {
@@ -194,7 +264,7 @@ class User extends Entry
      *
      * @param string $country
      *
-     * @return User
+     * @return $this
      */
     public function setCountry($country)
     {
@@ -204,7 +274,7 @@ class User extends Entry
     /**
      * Returns the users street address.
      *
-     * @return User
+     * @return $this
      */
     public function getStreetAddress()
     {
@@ -216,7 +286,7 @@ class User extends Entry
      *
      * @param string $address
      *
-     * @return User
+     * @return $this
      */
     public function setStreetAddress($address)
     {
@@ -238,11 +308,33 @@ class User extends Entry
      *
      * @param string $postalCode
      *
-     * @return User
+     * @return $this
      */
     public function setPostalCode($postalCode)
     {
         return $this->setFirstAttribute($this->schema->postalCode(), $postalCode);
+    }
+
+    /**
+     * Get the users post office box.
+     *
+     * @return mixed
+     */
+    public function getPostOfficeBox()
+    {
+        return $this->getFirstAttribute($this->schema->postOfficeBox());
+    }
+
+    /**
+     * Sets the users post office box.
+     *
+     * @param string|int $box
+     *
+     * @return $this
+     */
+    public function setPostOfficeBox($box)
+    {
+        return $this->setFirstAttribute($this->schema->postOfficeBox(), $box);
     }
 
     /**
@@ -260,7 +352,7 @@ class User extends Entry
      *
      * @param string $deliveryOffice
      *
-     * @return User
+     * @return $this
      */
     public function setPhysicalDeliveryOfficeName($deliveryOffice)
     {
@@ -270,7 +362,7 @@ class User extends Entry
     /**
      * Returns the users telephone number.
      *
-     * https://msdn.microsoft.com/en-us/library/ms680027(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms680027(v=vs.85).aspx
      *
      * @return string
      */
@@ -284,11 +376,35 @@ class User extends Entry
      *
      * @param string $number
      *
-     * @return User
+     * @return $this
      */
     public function setTelephoneNumber($number)
     {
         return $this->setFirstAttribute($this->schema->telephone(), $number);
+    }
+
+    /**
+     * Returns the users facsimile number.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms675675(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getFacsimileNumber()
+    {
+        return $this->getFirstAttribute($this->schema->facsimile());
+    }
+
+    /**
+     * Sets the users facsimile number.
+     *
+     * @param string $number
+     *
+     * @return $this
+     */
+    public function setFacsimileNumber($number)
+    {
+        return $this->setFirstAttribute($this->schema->facsimile(), $number);
     }
 
     /**
@@ -306,7 +422,7 @@ class User extends Entry
      *
      * @param string $locale
      *
-     * @return User
+     * @return $this
      */
     public function setLocale($locale)
     {
@@ -316,7 +432,7 @@ class User extends Entry
     /**
      * Returns the users company.
      *
-     * https://msdn.microsoft.com/en-us/library/ms675457(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms675457(v=vs.85).aspx
      *
      * @return string
      */
@@ -330,7 +446,7 @@ class User extends Entry
      *
      * @param string $company
      *
-     * @return User
+     * @return $this
      */
     public function setCompany($company)
     {
@@ -340,7 +456,7 @@ class User extends Entry
     /**
      * Returns the users primary email address.
      *
-     * https://msdn.microsoft.com/en-us/library/ms676855(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms676855(v=vs.85).aspx
      *
      * @return string
      */
@@ -357,7 +473,7 @@ class User extends Entry
      *
      * @param string $email
      *
-     * @return User
+     * @return $this
      */
     public function setEmail($email)
     {
@@ -367,7 +483,7 @@ class User extends Entry
     /**
      * Returns the users email addresses.
      *
-     * https://msdn.microsoft.com/en-us/library/ms676855(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms676855(v=vs.85).aspx
      *
      * @return array
      */
@@ -381,7 +497,7 @@ class User extends Entry
      *
      * @param array $emails
      *
-     * @return User
+     * @return $this
      */
     public function setEmails(array $emails = [])
     {
@@ -391,7 +507,7 @@ class User extends Entry
     /**
      * Returns the users other mailbox attribute.
      *
-     * https://msdn.microsoft.com/en-us/library/ms679091(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms679091(v=vs.85).aspx
      *
      * @return array
      */
@@ -405,7 +521,7 @@ class User extends Entry
      *
      * @param array $otherMailbox
      *
-     * @return User
+     * @return $this
      */
     public function setOtherMailbox($otherMailbox = [])
     {
@@ -415,13 +531,61 @@ class User extends Entry
     /**
      * Returns the users mailbox store DN.
      *
-     * https://msdn.microsoft.com/en-us/library/aa487565(v=exchg.65).aspx
+     * @link https://msdn.microsoft.com/en-us/library/aa487565(v=exchg.65).aspx
      *
      * @return string
      */
     public function getHomeMdb()
     {
         return $this->getFirstAttribute($this->schema->homeMdb());
+    }
+
+    /**
+     * Sets the users home drive.
+     * 
+     * @link https://msdn.microsoft.com/en-us/library/ms676191(v=vs.85).aspx
+     * 
+     * @return $this
+     */
+    public function setHomeDrive($drive)
+    {
+        return $this->setAttribute($this->schema->homeDrive(), $drive);
+    }
+
+    /**
+     * Specifies the drive letter to which to map the UNC path specified by homeDirectory.
+     * 
+     * @link https://msdn.microsoft.com/en-us/library/ms676191(v=vs.85).aspx
+     *
+     * @return string|null
+     */
+    public function getHomeDrive()
+    {
+        return $this->getFirstAttribute($this->schema->homeDrive());
+    }
+
+    /**
+     * Sets the users home directory.
+     * 
+     * @link https://msdn.microsoft.com/en-us/library/ms676190(v=vs.85).aspx
+     * 
+     * @return $this
+     */
+    public function setHomeDirectory($directory)
+    {
+        return $this->setAttribute($this->schema->homeDirectory(), $directory);
+    }
+
+    /**
+     * The home directory for the account.
+     * 
+     * @link https://msdn.microsoft.com/en-us/library/ms676190(v=vs.85).aspx
+     *
+     * @return string|null
+     */
+    public function getHomeDirectory()
+    {
+        return $this->getFirstAttribute($this->schema->homeDirectory());
     }
 
     /**
@@ -439,7 +603,7 @@ class User extends Entry
      *
      * This is usually their email address.
      *
-     * https://msdn.microsoft.com/en-us/library/ms680857(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms680857(v=vs.85).aspx
      *
      * @return string
      */
@@ -453,7 +617,7 @@ class User extends Entry
      *
      * @param string $userPrincipalName
      *
-     * @return User
+     * @return $this
      */
     public function setUserPrincipalName($userPrincipalName)
     {
@@ -461,9 +625,39 @@ class User extends Entry
     }
 
     /**
+     * Returns an array of workstations the user is assigned to.
+     *
+     * @return array
+     */
+    public function getUserWorkstations()
+    {
+        $workstations = $this->getFirstAttribute($this->schema->userWorkstations());
+
+        return array_filter(explode(',', $workstations));
+    }
+
+    /**
+     * Sets the workstations the user can login to.
+     *
+     * @param string|array $workstations The names of the workstations the user can login to.
+     *                                   Must be an array of names, or a comma separated
+     *                                   list of names.
+     *
+     * @return $this
+     */
+    public function setUserWorkstations($workstations = [])
+    {
+        if (is_array($workstations)) {
+            $workstations = implode(',', $workstations);
+        }
+
+        return $this->setFirstAttribute($this->schema->userWorkstations(), $workstations);
+    }
+
+    /**
      * Returns the users proxy addresses.
      *
-     * https://msdn.microsoft.com/en-us/library/ms679424(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms679424(v=vs.85).aspx
      *
      * @return array
      */
@@ -477,11 +671,11 @@ class User extends Entry
      *
      * This will remove all proxy addresses on the user and insert the specified addresses.
      *
-     * https://msdn.microsoft.com/en-us/library/ms679424(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms679424(v=vs.85).aspx
      *
      * @param array $addresses
      *
-     * @return User
+     * @return $this
      */
     public function setProxyAddresses(array $addresses = [])
     {
@@ -493,7 +687,7 @@ class User extends Entry
      *
      * @param string $address
      *
-     * @return User
+     * @return $this
      */
     public function addProxyAddress($address)
     {
@@ -507,7 +701,7 @@ class User extends Entry
     /**
      * Returns the users script path if the user has one.
      *
-     * https://msdn.microsoft.com/en-us/library/ms679656(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms679656(v=vs.85).aspx
      *
      * @return string
      */
@@ -521,7 +715,7 @@ class User extends Entry
      *
      * @param string $path
      *
-     * @return User
+     * @return $this
      */
     public function setScriptPath($path)
     {
@@ -559,6 +753,30 @@ class User extends Entry
     }
 
     /**
+     * Returns the password last set unix timestamp.
+     *
+     * @return float|null
+     */
+    public function getPasswordLastSetTimestamp()
+    {
+        if ($time = $this->getPasswordLastSet()) {
+            return Utilities::convertWindowsTimeToUnixTime($time);
+        }
+    }
+
+    /**
+     * Returns the formatted timestamp of the password last set date.
+     *
+     * @return string|null
+     */
+    public function getPasswordLastSetDate()
+    {
+        if ($timestamp = $this->getPasswordLastSetTimestamp()) {
+            return (new DateTime())->setTimestamp($timestamp)->format($this->dateFormat);
+        }
+    }
+
+    /**
      * Returns the users lockout time.
      *
      * @return string
@@ -566,28 +784,6 @@ class User extends Entry
     public function getLockoutTime()
     {
         return $this->getFirstAttribute($this->schema->lockoutTime());
-    }
-
-    /**
-     * Returns the users user account control integer.
-     *
-     * @return string
-     */
-    public function getUserAccountControl()
-    {
-        return $this->getFirstAttribute($this->schema->userAccountControl());
-    }
-
-    /**
-     * Sets the users account control property.
-     *
-     * @param int|string|AccountControl $accountControl
-     *
-     * @return User
-     */
-    public function setUserAccountControl($accountControl)
-    {
-        return $this->setAttribute($this->schema->userAccountControl(), (string) $accountControl);
     }
 
     /**
@@ -605,7 +801,7 @@ class User extends Entry
      *
      * @param string $path
      *
-     * @return User
+     * @return $this
      */
     public function setProfilePath($path)
     {
@@ -635,11 +831,11 @@ class User extends Entry
     /**
      * Sets the users account expiry date.
      *
-     * https://msdn.microsoft.com/en-us/library/ms675098(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms675098(v=vs.85).aspx
      *
      * @param float $expiryTime
      *
-     * @return User
+     * @return $this
      */
     public function setAccountExpiry($expiryTime)
     {
@@ -672,13 +868,88 @@ class User extends Entry
     /**
      * Returns the users thumbnail photo base 64 encoded.
      *
-     * @return string|null
+     * Suitable for inserting into an HTML image element.
+     *
+     * @return null|string
      */
     public function getThumbnailEncoded()
     {
-        $thumb = $this->getThumbnail();
+        $data = base64_decode($this->getThumbnail());
 
-        return is_null($thumb) ? $thumb : 'data:image/jpeg;base64,'.base64_encode($thumb);
+        if ($data) {
+            // In case we don't have the file info extension enabled,
+            // we'll set the jpeg mime type as default.
+            $mime = 'image/jpeg';
+
+            $image = base64_encode($data);
+
+            if (function_exists('finfo_open')) {
+                $finfo = finfo_open();
+
+                $mime = finfo_buffer($finfo, $data, FILEINFO_MIME_TYPE);
+
+                return "data:$mime;base64,$image";
+            }
+
+            return "data:$mime;base64,$image";
+        }
+    }
+
+    /**
+     * Sets the users thumbnail photo.
+     *
+     * @param string $data
+     * @param bool   $encode
+     *
+     * @return $this
+     */
+    public function setThumbnail($data, $encode = true)
+    {
+        if ($encode && !base64_decode($data, $strict = true)) {
+            // If the string we're given is not base 64 encoded, then
+            // we will encode it before setting it on the user.
+            $data = base64_encode($data);
+        }
+
+        return $this->setAttribute($this->schema->thumbnail(), $data);
+    }
+
+    /**
+     * Returns the users JPEG photo.
+     *
+     * @return mixed
+     */
+    public function getJpegPhoto()
+    {
+        return $this->getFirstAttribute($this->schema->jpegPhoto());
+    }
+
+    /**
+     * Returns the users JPEG photo.
+     *
+     * @return null|string
+     */
+    public function getJpegPhotoEncoded()
+    {
+        $jpeg = $this->getJpegPhoto();
+
+        return is_null($jpeg) ? $jpeg : 'data:image/jpeg;base64,'.base64_encode($jpeg);
+    }
+
+    /**
+     * Sets the users JPEG photo.
+     *
+     * @param string $string
+     *
+     * @return $this
+     */
+    public function setJpegPhoto($string)
+    {
+        if (!base64_decode($string, $strict = true)) {
+            $string = base64_encode($string);
+        }
+
+        return $this->setAttribute($this->schema->jpegPhoto(), $string);
     }
 
     /**
@@ -696,7 +967,7 @@ class User extends Entry
      *
      * @param string $managerDn
      *
-     * @return User
+     * @return $this
      */
     public function setManager($managerDn)
     {
@@ -706,7 +977,7 @@ class User extends Entry
     /**
      * Return the employee ID.
      *
-     * @return User
+     * @return string
      */
     public function getEmployeeId()
     {
@@ -718,7 +989,7 @@ class User extends Entry
      *
      * @param string $employeeId
      *
-     * @return User
+     * @return $this
      */
     public function setEmployeeId($employeeId)
     {
@@ -726,9 +997,53 @@ class User extends Entry
     }
 
     /**
+     * Returns the employee number.
+     *
+     * @return string
+     */
+    public function getEmployeeNumber()
+    {
+        return $this->getFirstAttribute($this->schema->employeeNumber());
+    }
+
+    /**
+     * Sets the employee number.
+     *
+     * @param string $number
+     *
+     * @return $this
+     */
+    public function setEmployeeNumber($number)
+    {
+        return $this->setFirstAttribute($this->schema->employeeNumber(), $number);
+    }
+
+    /**
+     * Returns the room number.
+     *
+     * @return string
+     */
+    public function getRoomNumber()
+    {
+        return $this->getFirstAttribute($this->schema->roomNumber());
+    }
+
+    /**
+     * Sets the room number.
+     *
+     * @param string $number
+     *
+     * @return $this
+     */
+    public function setRoomNumber($number)
+    {
+        return $this->setFirstAttribute($this->schema->roomNumber(), $number);
+    }
+
+    /**
      * Return the personal title.
      *
-     * @return User
+     * @return $this
      */
     public function getPersonalTitle()
     {
@@ -740,7 +1055,7 @@ class User extends Entry
      *
      * @param string $personalTitle
      *
-     * @return User
+     * @return $this
      */
     public function setPersonalTitle($personalTitle)
     {
@@ -754,7 +1069,7 @@ class User extends Entry
      */
     public function getPrimaryGroup()
     {
-        $groupSid = preg_replace('/\d+$/', $this->getPrimaryGroupId(), $this->getSid());
+        $groupSid = preg_replace('/\d+$/', $this->getPrimaryGroupId(), $this->getConvertedSid());
 
         return $this->query->newInstance()->findBySid($groupSid);
     }
@@ -764,132 +1079,119 @@ class User extends Entry
      *
      * @param string $password
      *
-     * @throws AdldapException
+     * @throws AdldapException When no SSL or TLS secured connection is present.
      *
-     * @return bool
+     * @return $this
      */
     public function setPassword($password)
     {
-        $connection = $this->query->getConnection();
+        $this->validateSecureConnection();
 
-        if (!$connection->isUsingSSL() && !$connection->isUsingTLS()) {
-            $message = 'SSL or TLS must be configured on your web server and enabled to set passwords.';
-
-            throw new AdldapException($message);
-        }
-
-        $modification = new BatchModification(
+        $mod = $this->newBatchModification(
             $this->schema->unicodePassword(),
             LDAP_MODIFY_BATCH_REPLACE,
             [Utilities::encodePassword($password)]
         );
 
-        return $this->addModification($modification);
+        return $this->addModification($mod);
     }
 
     /**
-     * Change the password of the current user. This must be performed over SSL.
+     * Sets the option to force the password change at the next logon.
+     *
+     * Does not work if the "Password never expires" option is enabled.
+     *
+     * @return $this
+     */
+    public function setEnableForcePasswordChange()
+    {
+        return $this->setFirstAttribute($this->schema->passwordLastSet(), 0);
+    }
+
+    /**
+     * Sets the option to disable forcing a password change at the next logon.
+     *
+     * @return $this
+     */
+    public function setDisableForcePasswordChange()
+    {
+        return $this->setFirstAttribute($this->schema->passwordLastSet(), -1);
+    }
+
+    /**
+     * Change the password of the current user. This must be performed over SSL / TLS.
+     *
+     * Throws an exception on failure.
      *
      * @param string $oldPassword      The new password
      * @param string $newPassword      The old password
      * @param bool   $replaceNotRemove Alternative password change method. Set to true if you're receiving 'CONSTRAINT'
      *                                 errors.
      *
-     * @throws AdldapException
-     * @throws PasswordPolicyException
-     * @throws WrongPasswordException
+     * @throws UserPasswordPolicyException When the new password does not match your password policy.
+     * @throws UserPasswordIncorrectException When the old password is incorrect.
+     * @throws AdldapException When an unknown cause of failure occurs.
      *
-     * @return bool
+     * @return true
      */
     public function changePassword($oldPassword, $newPassword, $replaceNotRemove = false)
     {
-        $connection = $this->query->getConnection();
-
-        if (!$connection->isUsingSSL() && !$connection->isUsingTLS()) {
-            $message = 'SSL or TLS must be configured on your web server and enabled to change passwords.';
-
-            throw new AdldapException($message);
-        }
+        $this->validateSecureConnection();
 
         $attribute = $this->schema->unicodePassword();
 
         $modifications = [];
 
-        if ($replaceNotRemove === true) {
-            $modifications[] = new BatchModification(
+        if ($replaceNotRemove) {
+            $modifications[] = $this->newBatchModification(
                 $attribute,
                 LDAP_MODIFY_BATCH_REPLACE,
                 [Utilities::encodePassword($newPassword)]
             );
         } else {
             // Create batch modification for removing the old password.
-            $modifications[] = new BatchModification(
+            $modifications[] = $this->newBatchModification(
                 $attribute,
                 LDAP_MODIFY_BATCH_REMOVE,
                 [Utilities::encodePassword($oldPassword)]
             );
 
             // Create batch modification for adding the new password.
-            $modifications[] = new BatchModification(
+            $modifications[] = $this->newBatchModification(
                 $attribute,
                 LDAP_MODIFY_BATCH_ADD,
                 [Utilities::encodePassword($newPassword)]
             );
         }
 
-        // Add the modifications
+        // Add the modifications.
         foreach ($modifications as $modification) {
             $this->addModification($modification);
         }
 
-        // Update the user.
-        $result = $this->update();
+        $result = @$this->update();
 
-        if ($result === false) {
+        if (!$result) {
             // If the user failed to update, we'll see if we can
             // figure out why by retrieving the extended error.
-            $error = $connection->getExtendedError();
+            $error = $this->query->getConnection()->getExtendedError();
+            $code = $this->query->getConnection()->getExtendedErrorCode();
 
-            if ($error) {
-                $errorCode = $connection->getExtendedErrorCode();
-
-                $message = "Error: $error";
-
-                if ($errorCode == '0000052D') {
-                    $message = "Error: $errorCode. Your new password might not match the password policy.";
-
-                    throw new PasswordPolicyException($message);
-                } elseif ($errorCode == '00000056') {
-                    $message = "Error: $errorCode. Your old password might be wrong.";
-
-                    throw new WrongPasswordException($message);
-                }
-
-                throw new AdldapException($message);
+            switch ($code) {
+                case '0000052D':
+                    throw new UserPasswordPolicyException(
+                        "Error: $code. Your new password does not match the password policy."
+                    );
+                case '00000056':
+                    throw new UserPasswordIncorrectException(
+                        "Error: $code. Your old password is incorrect."
+                    );
+                default:
+                    throw new AdldapException($error);
             }
         }
 
         return $result;
-    }
-
-    /**
-     * Returns if the user is disabled.
-     *
-     * @return bool
-     */
-    public function isDisabled()
-    {
-        return ($this->getUserAccountControl() & AccountControl::ACCOUNTDISABLE) === AccountControl::ACCOUNTDISABLE;
-    }
-
-    /**
-     * Returns if the user is enabled.
-     *
-     * @return bool
-     */
-    public function isEnabled()
-    {
-        return $this->getUserAccountControl() === null ? false : !$this->isDisabled();
     }
 
     /**
@@ -907,7 +1209,9 @@ class User extends Entry
 
         $unixTime = Utilities::convertWindowsTimeToUnixTime($accountExpiry);
 
-        return new \DateTime(date($this->dateFormat, $unixTime));
+        $date = date($this->dateFormat, $unixTime);
+
+        return new DateTime($date);
     }
 
     /**
@@ -919,7 +1223,7 @@ class User extends Entry
      */
     public function isExpired(DateTime $date = null)
     {
-        $date = ($date ?: new DateTime());
+        $date = $date ?: new DateTime();
 
         $expirationDate = $this->expirationDate();
 

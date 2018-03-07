@@ -4,24 +4,29 @@ namespace Adldap\Laravel\Middleware;
 
 use Closure;
 use Adldap\Models\User;
-use Adldap\Laravel\Traits\ImportsUsers;
+use Adldap\Laravel\Facades\Resolver;
+use Adldap\Laravel\Commands\Import;
+use Adldap\Laravel\Commands\SyncPassword;
+use Adldap\Laravel\Auth\DatabaseUserProvider;
+use Adldap\Laravel\Auth\NoDatabaseUserProvider;
+use Adldap\Laravel\Events\AuthenticatedWithWindows;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
-use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Config;
 
 class WindowsAuthenticate
 {
-    use ImportsUsers;
-
     /**
      * The authenticator implementation.
      *
-     * @var \Illuminate\Contracts\Auth\Guard
+     * @var Guard
      */
     protected $auth;
 
     /**
-     * Create a new filter instance.
+     * Constructor.
      *
      * @param Guard $auth
      */
@@ -41,99 +46,167 @@ class WindowsAuthenticate
     public function handle(Request $request, Closure $next)
     {
         if (!$this->auth->check()) {
-            // Retrieve the SSO login attribute.
-            $auth = $this->getWindowsAuthAttribute();
+            // Retrieve the users account name from the request.
+            if ($account = $this->account($request)) {
+                // Retrieve the users username from their account name.
+                $username = $this->username($account);
 
-            // Retrieve the SSO input key.
-            $key = key($auth);
-
-            // Handle Windows Authentication.
-            if ($account = $request->server($auth[$key])) {
-                // Username's may be prefixed with their domain,
-                // we just need their account name.
-                $username = explode('\\', $account);
-
-                if (count($username) === 2) {
-                    list($domain, $username) = $username;
-                } else {
-                    $username = $username[key($username)];
-                }
-
-                // Find the user in AD.
-                $user = $this->newAdldapUserQuery()
-                    ->whereEquals($key, $username)
-                    ->first();
-
-                // Double check that we have the correct AD user instance.
-                if ($user instanceof User) {
-                    // Retrieve the Eloquent user model from our AD user instance.
-                    // We'll assign the user a random password since we don't
-                    // have access to it through SSO auth.
-                    $model = $this->getModelFromAdldap($user, str_random());
-
-                    // Save model in case of changes.
-                    $this->saveModel($model);
-
-                    // Manually log the user in.
-                    $this->auth->login($model);
-
-                    // Perform any further operations on the authenticated user model.
-                    $this->handleAuthenticatedUser($model);
+                // Finally, retrieve the users authenticatable model and log them in.
+                if ($user = $this->retrieveAuthenticatedUser($username)) {
+                    $this->auth->login($user, $remember = true);
                 }
             }
         }
 
-        return $this->returnNextRequest($request, $next);
-    }
-
-    /**
-     * Returns the next request.
-     *
-     * This method exists to be overridden.
-     *
-     * @param Request $request
-     * @param Closure $next
-     *
-     * @return mixed
-     */
-    public function returnNextRequest(Request $request, Closure $next)
-    {
         return $next($request);
     }
 
     /**
-     * Returns a new auth model instance.
+     * Returns the authenticatable user instance if found.
+     *
+     * @param string $username
+     *
+     * @return \Illuminate\Contracts\Auth\Authenticatable|null
+     */
+    protected function retrieveAuthenticatedUser($username)
+    {
+        // Find the user in LDAP.
+        if ($user = $this->resolveUserByUsername($username)) {
+            $provider = $this->auth->getProvider();
+
+            if ($provider instanceof NoDatabaseUserProvider) {
+                $this->fireAuthenticatedEvent($user);
+
+                return $user;
+            } elseif ($provider instanceof DatabaseUserProvider) {
+                $credentials = $this->makeCredentials($user);
+
+                // Here we'll import the LDAP user. If the user already exists in
+                // our local database, it will be returned from the importer.
+                $model = Bus::dispatch(
+                    new Import($user, $this->model(), $credentials)
+                );
+
+                // We'll sync / set the users password after
+                // our model has been synchronized.
+                Bus::dispatch(new SyncPassword($model));
+
+                // We also want to save the returned model in case it doesn't
+                // exist yet, or there are changes to be synced.
+                $model->save();
+
+                $this->fireAuthenticatedEvent($user, $model);
+
+                return $model;
+            }
+        }
+    }
+
+    /**
+     * Fires the windows authentication event.
+     *
+     * @param User       $user
+     * @param mixed|null $model
+     * 
+     * @return void
+     */
+    protected function fireAuthenticatedEvent(User $user, $model = null)
+    {
+        Event::fire(new AuthenticatedWithWindows($user, $model));
+    }
+
+    /**
+     * Retrieves an LDAP user by their username.
+     *
+     * @param string $username
+     *
+     * @return mixed
+     */
+    protected function resolveUserByUsername($username)
+    {
+        return Resolver::query()
+            ->where([$this->discover() => $username])
+            ->first();
+    }
+
+    /**
+     * Returns a credentials array to be used in the import command.
+     *
+     * @param User $user
+     *
+     * @return array
+     */
+    protected function makeCredentials(User $user)
+    {
+        $field = Resolver::getEloquentUsernameAttribute();
+
+        $username = $user->getFirstAttribute(Resolver::getLdapDiscoveryAttribute());
+
+        return [$field => $username];
+    }
+
+    /**
+     * Returns the configured authentication model.
      *
      * @return \Illuminate\Database\Eloquent\Model
      */
-    public function createModel()
+    protected function model()
     {
-        $model = $this->auth->getProvider()->getModel();
-
-        return new $model();
+        return $this->auth->getProvider()->createModel();
     }
 
     /**
-     * Handle the authenticated user model.
+     * Retrieves the users SSO account name from our server.
      *
-     * This method exists to be overridden.
-     *
-     * @param Model $user
-     *
-     * @return void
-     */
-    protected function handleAuthenticatedUser(Model $user)
-    {
-        //
-    }
-
-    /**
-     * Returns the windows authentication attribute.
+     * @param Request $request
      *
      * @return string
      */
-    protected function getWindowsAuthAttribute()
+    protected function account(Request $request)
     {
-        return config('adldap_auth.windows_auth_attribute', [$this->getSchema()->accountName() => 'AUTH_USER']);
+        return utf8_encode($request->server($this->key()));
+    }
+
+    /**
+     * Retrieves the users username from their full account name.
+     *
+     * @param string $account
+     *
+     * @return string
+     */
+    protected function username($account)
+    {
+        // Username's may be prefixed with their domain,
+        // we just need their account name.
+        $username = explode('\\', $account);
+
+        if (count($username) === 2) {
+            list($domain, $username) = $username;
+        } else {
+            $username = $username[key($username)];
+        }
+
+        return $username;
+    }
+
+    /**
+     * Returns the configured key to use for retrieving
+     * the username from the server global variable.
+     *
+     * @return string
+     */
+    protected function key()
+    {
+        return Config::get('adldap_auth.usernames.windows.key', 'AUTH_USER');
+    }
+
+    /**
+     * Returns the attribute to discover users by.
+     *
+     * @return string
+     */
+    protected function discover()
+    {
+        return Config::get('adldap_auth.usernames.windows.discover', 'samaccountname');
     }
 }

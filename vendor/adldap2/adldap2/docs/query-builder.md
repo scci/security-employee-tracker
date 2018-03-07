@@ -3,20 +3,31 @@
 ## Index
 
 - [Selects](#selects)
+- [Limit](#limit)
 - [Wheres](#wheres)
 - [Or Wheres](#or-wheres)
 - [Dynamic Wheres](#dynamic-wheres)
+- [Nested Filters](#nested-filters)
 - [Raw Filters](#raw-filters)
 - [Sorting](#sorting)
 - [Pagination](#paginating)
 - [Scopes](#scopes)
+- [Base DN](#base-dn)
 - [Search Options](#search-options)
 
-The Adldap2 query builder makes building LDAP queries feel effortless. Let's get started.
+## Introduction
 
-## Opening a Query
+The Adldap2 query builder makes building LDAP queries feel effortless.
 
-To open a search query, call the `search()` method on your provider instance:
+It allows you to generate queries using a fluent and convenient interface.
+
+> **Note:** The Adldap2 query builder escapes all fields & values
+> given to its `where()` methods. There is no need to clean or
+> escape strings before passing them into the query builder.
+
+## Creating a new Query
+
+To create a new search query, call the `search()` method on your provider instance:
 
 ```php
 $search = $provider->search();
@@ -29,6 +40,9 @@ $results = $provider->search()->where('cn', '=', 'John Doe')->get();
 ```
 
 ## Selects
+
+> **Note:** Fields are case in-sensitive. For example, you can
+> insert `CN`, `cn` or `cN`, they will return the same result.
 
 #### Selecting attributes
 
@@ -49,11 +63,9 @@ If you're trying to find a single record, but not sure what the record might be,
 ```php
 $record = $search->find('John Doe');
 
-if($record)
-{
+if ($record) {
     // Record was found!    
-} else
-{
+} else {
     // Hmm, looks like we couldn't find anything...
 }
 ```
@@ -68,8 +80,10 @@ found, use the `findOrFail()` method:
 
 ```php
 try {
+
     $record = $search->findOrFail('John Doe');
-} catch (Adldap\Exceptions\ModelNotFoundException $e) {
+    
+} catch (\Adldap\Models\ModelNotFoundException $e) {
     // Record wasn't found!
 }
 ```
@@ -90,8 +104,10 @@ an exception when it hasn't been found, use the `findByOrFail()` method:
 
 ```php
 try {
+
     $record = $search->findByOrFail('samaccountname', 'jdoe');
-} catch (Adldap\Exceptions\ModelNotFoundException $e) {
+    
+} catch (\Adldap\Models\ModelNotFoundException $e) {
     // Record wasn't found!
 }
 ```
@@ -111,8 +127,10 @@ an exception when it hasn't been found, use the `findByDnOrFail()` method:
 
 ```php
 try {
+
     $record = $search->findByDnOrFail('cn=John Doe,dc=corp,dc=org');
-} catch (Adldap\Exceptions\ModelNotFoundException $e) {
+    
+} catch (\Adldap\Models\ModelNotFoundException $e) {
     // Record wasn't found!
 }
 ```
@@ -147,10 +165,22 @@ To retrieve the first record of a search or throw an exception when one isn't fo
 
 ```php
 try {
+
     $record = $search->firstOrFail();
-} catch (Adldap\Exceptions\ModelNotFoundException $e) {
+    
+} catch (\Adldap\Models\ModelNotFoundException $e) {
     // Record wasn't found!
 }
+```
+
+## Limit
+
+To limit the results records returned from your LDAP server and increase the
+speed of your queries, you can use the `limit()` method:
+
+```php
+// This will only return 5 records that contain the name of 'John'.
+$records = $search->where('cn', 'contains', 'John')->limit(5)->get();
 ```
 
 ## Wheres
@@ -169,7 +199,7 @@ We can also perform a 'where equals' without including the operator:
 $search->whereEquals('cn', 'John Doe');
 ```
 
-Or we can supply an array of key - value pairs to quickly add multiple wheres:
+We can also supply an array of key - value pairs to quickly add multiple wheres:
 
 ```php
 $wheres = [
@@ -180,16 +210,25 @@ $wheres = [
 $search->where($wheres);
 ```
 
+Or, if you require conditionals, you can quickly add multiple wheres with nested arrays:
+
+```php
+$search->where([
+   ['cn', '=', 'John Doe'],
+   ['manager', '!', 'Suzy Doe'],
+]);
+```
+
 #### Where Starts With
 
 We could also perform a search for all objects beginning with the common name of 'John' using the `starts_with` operator:
 
 ```php
-$results = $ad->search()->where('cn', 'starts_with', 'John')->get();
+$results = $provider->search()->where('cn', 'starts_with', 'John')->get();
 
 // Or use the method whereStartsWith($attribute, $value)
 
-$results = $ad->search()->whereStartsWith('cn', 'John')->get();
+$results = $provider->search()->whereStartsWith('cn', 'John')->get();
 ```
 
 #### Where Ends With
@@ -197,11 +236,27 @@ $results = $ad->search()->whereStartsWith('cn', 'John')->get();
 We can also search for all objects that end with the common name of `Doe` using the `ends_with` operator:
 
 ```php
-$results = $ad->search()->where('cn', 'ends_with', 'Doe')->get();
+$results = $provider->search()->where('cn', 'ends_with', 'Doe')->get();
 
 // Or use the method whereEndsWith($attribute, $value)
 
-$results = $ad->search()->whereEndsWith('cn', 'Doe')->get();
+$results = $provider->search()->whereEndsWith('cn', 'Doe')->get();
+```
+
+#### Where Between
+
+To search for records between two values, use the `whereBetween` method.
+
+For the example below, we'll retrieve all users who were created between two dates:
+
+```php
+$from = (new DateTime('October 1st 2016'))->format('YmdHis.0\Z');
+$to = (new DateTime('January 1st 2017'))->format('YmdHis.0\Z');
+
+$users = $provider->search()
+    ->users()
+    ->whereBetween('whencreated', [$from, $to])
+    ->get();
 ```
 
 #### Where Contains
@@ -209,11 +264,11 @@ $results = $ad->search()->whereEndsWith('cn', 'Doe')->get();
 We can also search for all objects with a common name that contains `John Doe` using the `contains` operator:
 
 ```php
-$results = $ad->search()->where('cn', 'contains', 'John Doe')->get();
+$results = $provider->search()->where('cn', 'contains', 'John Doe')->get();
 
 // Or use the method whereContains($attribute, $value)
 
-$results = $ad->search()->whereContains('cn', 'John Doe')->get();
+$results = $provider->search()->whereContains('cn', 'John Doe')->get();
 ```
 
 ##### Where Not Contains
@@ -221,11 +276,11 @@ $results = $ad->search()->whereContains('cn', 'John Doe')->get();
 You can use a 'where not contains' to perform the inverse of a 'where contains':
 
 ```php
-$results = $ad->search()->where('cn', 'not_contains', 'John Doe')->get();
+$results = $provider->search()->where('cn', 'not_contains', 'John Doe')->get();
 
 // Or use the method whereNotContains($attribute, $value)
 
-$results = $ad->search()->whereNotContains('cn', 'John Doe');
+$results = $provider->search()->whereNotContains('cn', 'John Doe');
 ```
 
 #### Where Has
@@ -233,34 +288,25 @@ $results = $ad->search()->whereNotContains('cn', 'John Doe');
 Or we can retrieve all objects that have a common name attribute using the wildcard operator (`*`):
 
 ```php
-$results = $ad->search()->where('cn', '*')->get();
+$results = $provider->search()->where('cn', '*')->get();
 
 // Or use the method whereHas($field)
-$results = $ad->search()->whereHas('cn')->get();
+
+$results = $provider->search()->whereHas('cn')->get();
 ```
 
 This type of filter syntax allows you to clearly see what your searching for.
-
-Remember, fields are case insensitive, so it doesn't matter if you use `->where('CN', '*')` or `->where('cn', '*')`,
-they would return the same result.
-   
-It's also good to know that all values inserted into a where, or an orWhere method,
-<b>are escaped</b> by default into a hex string, so you don't need to worry about escaping them. For example:
-
-```php
-// Returns '(cn=\74\65\73\74\2f\2f\75\6e\2d\65\73\63\61\70\69\6e\67\2f\2f)'
-$query = $ad->search()->where('cn', '=', 'test//un-escaping//')->getQuery();
-```
 
 ##### Where Not Has
 
 You can use a 'where not has' to perform the inverse of a 'where has':
 
 ```php
-$results = $ad->search->where('cn', '!*')->get();
+$results = $provider->search->where('cn', '!*')->get();
 
 // Or use the method whereNotHas($field)
-$results = $ad->search()->whereNotHas($field)->get();
+
+$results = $provider->search()->whereNotHas($field)->get();
 ```
 
 ## Or Wheres
@@ -271,7 +317,7 @@ function performs differently than it would on a database. For example:
 ```php
 $results = $search
             ->where('cn', '=', 'John Doe')
-            ->orWhere('cn' '=', 'Suzy Doe')
+            ->orWhere('cn', '=', 'Suzy Doe')
             ->get();
 ```
     
@@ -284,7 +330,7 @@ To solve the above problem, we would use `orWhere()` for both fields. For exampl
 ```php
 $results = $search
         ->orWhere('cn', '=', 'John Doe')
-        ->orWhere('cn' '=', 'Suzy Doe')
+        ->orWhere('cn', '=', 'Suzy Doe')
         ->get();
 ```
 
@@ -327,7 +373,7 @@ $result = $search
     ->first();
 ```
 
-You can even perform multiple wheres by separating your fields by an `And`:
+You can even perform multiple dynamic wheres by separating your fields by an `And`:
 
 ```php
 // This would perform a search for a user with the
@@ -335,9 +381,89 @@ You can even perform multiple wheres by separating your fields by an `And`:
 $result = $search->whereGivennameAndSn('John', 'Doe')->first();
 ```
 
+## Nested Filters
+
+By default, the Adldap2 query builder automatically wraps your queries in `and` / `or` filters for you.
+However, if any further complexity is required, nested filters allow you
+to construct any query fluently and easily.
+
+#### andFilter
+
+The `andFilter` method accepts a closure which allows you to construct a query inside of an `and` LDAP filter:
+
+```php
+$query = $provider->search()->newQuery();
+
+// Creates the filter: (&(givenname=John)(sn=Doe))
+$results = $query->andFilter(function (\Adldap\Query\Builder $q) {
+
+    $q->where('givenname', '=', 'John')
+      ->where('sn', '=', 'Doe');
+      
+})->get();
+```
+
+The above query would return records that contain the first name `John` **and** the last name `Doe`.
+
+#### orFilter
+
+The `orFilter` method accepts a closure which allows you to construct a query inside of an `or` LDAP filter:
+
+```php
+$query = $provider->search()->newQuery();
+
+
+// Creates the filter: (|(givenname=John)(sn=Doe))
+$results = $query->orFilter(function (\Adldap\Query\Builder $q) {
+
+    $q->where('givenname', '=', 'John')
+      ->where('sn', '=', 'Doe');
+      
+})->get();
+```
+
+The above query would return records that contain the first name `John` **or** the last name `Doe`.
+
+#### notFilter
+
+The `notFilter` method accepts a closure which allows you to construct a query inside a `not` LDAP filter:
+
+```php
+$query = $provider->search()->newQuery();
+
+// Creates the filter: (!(givenname=John)(sn=Doe))
+$results = $query->notFilter(function (\Adldap\Query\Builder $q) {
+
+    $q->where('givenname', '=', 'John')
+      ->where('sn', '=', 'Doe');
+      
+})->get();
+```
+
+The above query would return records that **do not** contain the first name `John` **or** the last name `Doe`.
+
+#### Complex Nesting
+
+The above methods `andFilter` / `orFilter` can be chained together and nested
+as many times as you'd like for larger complex queries:
+
+```php
+$query = $provider->search()->newQuery();
+
+$query = $query->orFilter(function (\Adldap\Query\Builder $q) {
+    $q->where('givenname', '=', 'John')
+        ->where('sn', '=', 'Doe');
+})->andFilter(function (\Adldap\Query\Builder $q) {
+    $q->where('department', '=', 'Accounting')
+        ->where('title', '=', 'Manager');
+})->getUnescapedQuery();
+
+echo $query; // Returns '(&(|(givenname=John)(sn=Doe))(&(department=Accounting)(title=Manager)))'
+```
+
 ## Raw Filters
 
-> **Note**: Raw filters are not escaped. Do not accept user input into the raw filter method.
+> **Note**: Raw filters are not escaped. **Do not** accept user input into the raw filter method.
 
 Sometimes you might just want to add a raw filter without using the query builder.
 You can do so by using the `rawFilter()` method:
@@ -357,6 +483,11 @@ $results = $search->rawFilter($filters)->get();
 
 // Or use multiple arguments
 $results = $search->rawFilter($filters[0], $filters[1])->get();
+
+// Multiple raw filters will be automatically wrapped into an `and` filter:
+$query = $search->getUnescapedQuery();
+
+echo $query; // Returns (&(samaccountname=jdoe)(surname=Doe))
 ```
 
 ## Sorting
@@ -376,8 +507,12 @@ $results = $search->whereHas('cn')->sortBy('cn', 'asc')->paginate(25);
 
 ## Paginating
 
-Paginating your search results will allow you to return more results than your AD cap
+Paginating your search results will allow you to return more results than your LDAP cap
 (usually 1000) and display your results in pages.
+
+> **Note**: Pagination will retrieve **all** records from your LDAP server.
+> The pagination object is simply a collection that allows you to
+> iterate through the resulting records easily and intuitively.
 
 To perform this, call the `paginate()` method instead of the `get()` method:
 
@@ -412,7 +547,7 @@ foreach($paginator as $result)
 
 ## Scopes
 
-Search scopes allow you to easily retrieve common models of a particular 'group'. Here is how you utilize them:
+Search scopes allow you to easily retrieve common models of a particular 'scope'. Here is how you utilize them:
 
 ```php
 // Retrieve all users.
@@ -427,9 +562,6 @@ $results = $search->ous()->get();
 // Retrieve all groups.
 $results = $search->groups()->get();
 
-// Retrieve all exchange servers.
-$results = $search->exchangeServers()->get();
-
 // Retrieve all containers.
 $results = $search->containers()->get();
 
@@ -440,6 +572,24 @@ $results = $search->contacts()->get();
 $results = $search->computers()->get();
 ```
 
+## Base DN
+
+To set the base DN of your search you can use one of two methods:
+
+```php
+// Using the `in()` method:
+$results = $provider->search()
+    ->in('ou=Accounting,dc=acme,dc=org')
+    ->get();
+    
+// Using the `setDn()` method:
+$results = $provider->search()
+    ->setDn('ou=Accounting,dc=acme,dc=org')
+    ->get();
+```
+
+Either option will return the same results. Use which ever method you prefer to be more readable.
+
 ## Search Options
 
 #### Recursive
@@ -447,7 +597,7 @@ $results = $search->computers()->get();
 By default, all searches performed are recursive. If you'd like to disable recursive search, use the `recursive()` method:
 
 ```php
-$result = $ad->search()->recursive(false)->all();
+$result = $provider->search()->recursive(false)->all();
 ```
     
 This would perform an `ldap_listing()` instead of an `ldap_search()`.
@@ -457,7 +607,7 @@ This would perform an `ldap_listing()` instead of an `ldap_search()`.
 If you'd like to perform a read instead of a listing or a recursive search, use the `read()` method:
 
 ```php
-$result = $ad->search()->read(true)->where('objectClass', '*')->get();
+$result = $provider->search()->read(true)->where('objectClass', '*')->get();
 ```
 
 This would perform an `ldap_read()` instead of an `ldap_listing()` or an `ldap_search()`.
@@ -467,7 +617,7 @@ This would perform an `ldap_read()` instead of an `ldap_listing()` or an `ldap_s
 If you'd like to retrieve the raw LDAP results, use the `raw()` method:
 
 ```php
-$rawResults = $ad->search()->raw()->where('cn', '=', 'John Doe')->get();
+$rawResults = $provider->search()->raw()->where('cn', '=', 'John Doe')->get();
 
 var_dump($rawResults); // Returns an array
 ```
@@ -475,13 +625,18 @@ var_dump($rawResults); // Returns an array
 ## Retrieving the ran query
 
 If you'd like to retrieve the current query to save or run it at another time, use the `getQuery()` method
-on the search instance, then on the query builder itself:
+on the query builder. This will return the escaped filter.
 
 ```php
-$query = $ad->search()->where('cn', '=', 'John Doe')->getQuery();
+$query = $provider->search()->where('cn', '=', 'John Doe')->getQuery();
 
-$filter = $query->getQuery();
-
-echo $filter; // Returns '(cn=\4a\6f\68\6e\20\44\6f\65)'
+echo $query; // Returns '(cn=\4a\6f\68\6e\20\44\6f\65)'
 ```
 
+You can also utilize the `getUnescapedQuery()` method for retrieving the unescaped filter:
+
+```php
+$query = $provider->search()->where('cn', '=', 'John Doe')->getUnescapedQuery();
+
+echo $query; // Returns '(cn=John Doe)'
+```

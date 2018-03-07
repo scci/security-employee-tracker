@@ -2,10 +2,18 @@
 
 namespace Adldap\Laravel;
 
-use Adldap\Laravel\Commands\Import;
+use Adldap\AdldapInterface;
+use InvalidArgumentException;
+use Adldap\Laravel\Resolvers\UserResolver;
+use Adldap\Laravel\Resolvers\ResolverInterface;
+use Adldap\Laravel\Commands\Console\Import;
+use Adldap\Laravel\Auth\DatabaseUserProvider;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Contracts\Hashing\Hasher;
+use Illuminate\Auth\Events\Authenticated;
 
 class AdldapAuthServiceProvider extends ServiceProvider
 {
@@ -18,30 +26,25 @@ class AdldapAuthServiceProvider extends ServiceProvider
     {
         $config = __DIR__.'/Config/auth.php';
 
-        // Add publishable configuration.
         $this->publishes([
             $config => config_path('adldap_auth.php'),
         ], 'adldap');
 
         $this->mergeConfigFrom($config, 'adldap_auth');
 
-        $auth = $this->getAuth();
+        $auth = Auth::getFacadeRoot();
 
         if (method_exists($auth, 'provider')) {
-            // If the provider method exists, we're running Laravel 5.2.
-            // Register the adldap auth user provider.
             $auth->provider('adldap', function ($app, array $config) {
-                return $this->newAdldapAuthUserProvider($app['hash'], $config['model']);
+                return $this->makeUserProvider($app['hash'], $config);
             });
         } else {
-            // Otherwise we're using 5.0 || 5.1
-            // Extend Laravel authentication with Adldap driver.
             $auth->extend('adldap', function ($app) {
-                return $this->newAdldapAuthUserProvider($app['hash'], $app['config']['auth.model']);
+                return $this->makeUserProvider($app['hash'], $app['config']['auth']);
             });
         }
 
-        $this->commands([Import::class]);
+        $this->commands(Import::class);
     }
 
     /**
@@ -51,7 +54,9 @@ class AdldapAuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->registerBindings();
+
+        $this->registerListeners();
     }
 
     /**
@@ -65,25 +70,90 @@ class AdldapAuthServiceProvider extends ServiceProvider
     }
 
     /**
-     * Returns a new instance of the AdldapAuthUserProvider.
+     * Registers the application bindings.
      *
-     * @param Hasher $hasher
-     * @param string $model
-     *
-     * @return AdldapAuthUserProvider
+     * @return void
      */
-    protected function newAdldapAuthUserProvider(Hasher $hasher, $model)
+    protected function registerBindings()
     {
-        return new AdldapAuthUserProvider($hasher, $model);
+        $this->app->bind(ResolverInterface::class, function () {
+            $ad = $this->app->make(AdldapInterface::class);
+
+            return new UserResolver($ad);
+        });
     }
 
     /**
-     * Returns the root Auth instance.
+     * Registers the event listeners.
      *
-     * @return mixed
+     * @return void
      */
-    protected function getAuth()
+    protected function registerListeners()
     {
-        return Auth::getFacadeRoot();
+        // Here we will register the event listener that will bind the users LDAP
+        // model to their Eloquent model upon authentication (if configured).
+        // This allows us to utilize their LDAP model right
+        // after authentication has passed.
+        Event::listen(Authenticated::class, Listeners\BindsLdapUserModel::class);
+
+        if ($this->isLogging()) {
+            // If logging is enabled, we will set up our event listeners that
+            // log each event fired throughout the authentication process.
+            foreach ($this->getLoggingEvents() as $event => $listener) {
+                Event::listen($event, $listener);
+            }
+        }
+    }
+
+    /**
+     * Returns a new Adldap user provider.
+     *
+     * @param Hasher $hasher
+     * @param array  $config
+     *
+     * @throws InvalidArgumentException
+     * 
+     * @return \Illuminate\Contracts\Auth\UserProvider
+     */
+    protected function makeUserProvider(Hasher $hasher, array $config)
+    {
+        $provider = Config::get('adldap_auth.provider', DatabaseUserProvider::class);
+
+        // The DatabaseUserProvider has some extra dependencies needed,
+        // so we will validate that we have them before
+        // constructing a new instance.
+        if ($provider == DatabaseUserProvider::class) {
+            $model = array_get($config, 'model');
+
+            if (!$model) {
+                throw new InvalidArgumentException(
+                    "No model is configured. You must configure a model to use with the {$provider}."
+                );
+            }
+
+            return new $provider($hasher, $model);
+        }
+        
+        return new $provider;
+    }
+
+    /**
+     * Determines if authentication requests are logged.
+     *
+     * @return bool
+     */
+    protected function isLogging()
+    {
+        return Config::get('adldap_auth.logging.enabled', false);
+    }
+
+    /**
+     * Returns the configured authentication events to log.
+     *
+     * @return array
+     */
+    protected function getLoggingEvents()
+    {
+        return Config::get('adldap_auth.logging.events', []);
     }
 }

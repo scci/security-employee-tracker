@@ -2,38 +2,36 @@
 
 namespace Barryvdh\Debugbar\DataCollector;
 
+use Barryvdh\Debugbar\DataFormatter\SimpleFormatter;
 use DebugBar\DataCollector\MessagesCollector;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Symfony\Component\HttpKernel\DataCollector\Util\ValueExporter;
+use Illuminate\Contracts\Auth\Access\Authorizable;
+use Symfony\Component\VarDumper\Cloner\VarCloner;
 
 /**
  * Collector for Laravel's Auth provider
  */
 class GateCollector extends MessagesCollector
 {
-    /** @var ValueExporter */
-    protected $exporter;
     /**
      * @param Gate $gate
      */
     public function __construct(Gate $gate)
     {
         parent::__construct('gate');
-        $this->exporter = new ValueExporter();
-
+        $this->setDataFormatter(new SimpleFormatter());
         $gate->after([$this, 'addCheck']);
     }
 
-    public function addCheck(Authenticatable $user, $ability, $result, $arguments = [])
+    public function addCheck(Authorizable $user = null, $ability, $result, $arguments = [])
     {
         $label = $result ? 'success' : 'error';
 
         $this->addMessage([
             'ability' => $ability,
             'result' => $result,
-            'user' => $user->getAuthIdentifier(),
-            'arguments' => $this->exporter->exportValue($arguments),
+            ($user ? snake_case(class_basename($user)) : 'user') => ($user ? $user->id : null),
+            'arguments' => $this->getDataFormatter()->formatVar($arguments),
         ], $label, false);
     }
 }

@@ -2,42 +2,39 @@
 
 namespace Adldap\Models;
 
+use DateTime;
 use ArrayAccess;
 use JsonSerializable;
+use InvalidArgumentException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Adldap\Utilities;
 use Adldap\Query\Builder;
-use Adldap\Objects\BatchModification;
-use Adldap\Objects\DistinguishedName;
-use Adldap\Exceptions\AdldapException;
-use Adldap\Exceptions\ModelNotFoundException;
-use Adldap\Exceptions\ModelDoesNotExistException;
-use Adldap\Contracts\Schemas\SchemaInterface;
+use Adldap\Models\Attributes\Sid;
+use Adldap\Models\Attributes\Guid;
+use Adldap\Models\Attributes\DistinguishedName;
+use Adldap\Schemas\SchemaInterface;
+use Adldap\Models\Concerns\HasAttributes;
+use Adldap\Connections\ConnectionException;
 
+/**
+ * Class Model
+ *
+ * Represents an LDAP record and provides the ability to
+ * modify / retrieve data from the record.
+ *
+ * @package Adldap\Models
+ */
 abstract class Model implements ArrayAccess, JsonSerializable
 {
+    use HasAttributes;
+
     /**
      * Indicates if the model exists.
      *
      * @var bool
      */
     public $exists = false;
-
-    /**
-     * The default output date format for all time related methods.
-     *
-     * Default format is suited for MySQL timestamps.
-     *
-     * @var string
-     */
-    public $dateFormat = 'Y-m-d H:i:s';
-
-    /**
-     * The models distinguished name.
-     *
-     * @var string
-     */
-    protected $dn;
 
     /**
      * The current query builder instance.
@@ -54,20 +51,6 @@ abstract class Model implements ArrayAccess, JsonSerializable
     protected $schema;
 
     /**
-     * Contains the models attributes.
-     *
-     * @var array
-     */
-    protected $attributes = [];
-
-    /**
-     * Contains the models original attributes.
-     *
-     * @var array
-     */
-    protected $original = [];
-
-    /**
      * Contains the models modifications.
      *
      * @var array
@@ -75,48 +58,16 @@ abstract class Model implements ArrayAccess, JsonSerializable
     protected $modifications = [];
 
     /**
-     * The format that is used to convert AD timestamps to unix timestamps.
-     *
-     * @var string
-     */
-    protected $timestampFormat = 'YmdHis.0Z';
-
-    /**
      * Constructor.
      *
      * @param array   $attributes
      * @param Builder $builder
      */
-    public function __construct(array $attributes, Builder $builder)
+    public function __construct(array $attributes = [], Builder $builder)
     {
         $this->setQuery($builder)
             ->setSchema($builder->getSchema())
             ->fill($attributes);
-    }
-
-    /**
-     * Dynamically retrieve attributes on the object.
-     *
-     * @param mixed $key
-     *
-     * @return bool
-     */
-    public function __get($key)
-    {
-        return $this->getAttribute($key);
-    }
-
-    /**
-     * Dynamically set attributes on the object.
-     *
-     * @param mixed $key
-     * @param mixed $value
-     *
-     * @return $this
-     */
-    public function __set($key, $value)
-    {
-        return $this->setAttribute($key, $value);
     }
 
     /**
@@ -154,13 +105,27 @@ abstract class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Returns a new batch modification.
+     *
+     * @param string|null     $attribute
+     * @param string|int|null $type
+     * @param array           $values
+     *
+     * @return BatchModification
+     */
+    public function newBatchModification($attribute = null, $type = null, $values = [])
+    {
+        return new BatchModification($attribute, $type, $values);
+    }
+
+    /**
      * Returns a new collection with the specified items.
      *
      * @param mixed $items
      *
      * @return \Illuminate\Support\Collection
      */
-    public function newCollection($items)
+    public function newCollection($items = [])
     {
         return new Collection($items);
     }
@@ -245,38 +210,40 @@ abstract class Model implements ArrayAccess, JsonSerializable
      */
     public function jsonSerialize()
     {
-        // We need to remove the object SID and GUID from
-        // being serialized as these attributes contain
-        // characters that cannot be serialized.
-        return Arr::except($this->getAttributes(), [
-            $this->schema->objectSid(),
-            $this->schema->objectGuid(),
+        $attributes = $this->getAttributes();
+
+        array_walk_recursive($attributes, function(&$val){
+            $val = utf8_encode($val);
+        });
+
+        // We'll replace the binary GUID and SID with
+        // their string equivalents for convenience.
+        return array_replace($attributes, [
+            $this->schema->objectGuid() => $this->getConvertedGuid(),
+            $this->schema->objectSid() => $this->getConvertedSid(),
         ]);
     }
 
     /**
-     * Synchronizes the models original attributes
-     * with the model's current attributes.
+     * Reload a fresh model instance from the directory.
      *
-     * @return $this
+     * @return static|null
      */
-    public function syncOriginal()
+    public function fresh()
     {
-        $this->original = $this->attributes;
+        $model = $this->query->newInstance()->findByDn($this->getDn());
 
-        return $this;
+        return $model instanceof Model ? $model : null;
     }
 
     /**
-     * Synchronizes the models attributes with the server values.
+     * Synchronizes the current models attributes with the directory values.
      *
      * @return bool
      */
     public function syncRaw()
     {
-        $model = $this->query->newInstance()->findByDn($this->getDn());
-
-        if ($model instanceof self) {
+        if ($model = $this->fresh()) {
             $this->setRawAttributes($model->getAttributes());
 
             return true;
@@ -286,233 +253,13 @@ abstract class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * Returns the models attribute with the specified key.
-     *
-     * If a sub-key is specified, it will try and
-     * retrieve it from the parent keys array.
-     *
-     * @param int|string $key
-     * @param int|string $subKey
-     *
-     * @return mixed
-     */
-    public function getAttribute($key, $subKey = null)
-    {
-        if (is_null($subKey) && $this->hasAttribute($key)) {
-            return $this->attributes[$key];
-        } elseif ($this->hasAttribute($key, $subKey)) {
-            return $this->attributes[$key][$subKey];
-        }
-    }
-
-    /**
-     * Returns the first attribute by the specified key.
-     *
-     * @param string $key
-     *
-     * @return mixed
-     */
-    public function getFirstAttribute($key)
-    {
-        return $this->getAttribute($key, 0);
-    }
-
-    /**
-     * Returns all of the models attributes.
-     *
-     * @return array
-     */
-    public function getAttributes()
-    {
-        return $this->attributes;
-    }
-
-    /**
-     * Fills the entry with the supplied attributes.
-     *
-     * @param array $attributes
-     *
-     * @return $this
-     */
-    public function fill(array $attributes = [])
-    {
-        foreach ($attributes as $key => $value) {
-            $this->setAttribute($key, $value);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sets an attributes value by the specified key and sub-key.
-     *
-     * @param int|string $key
-     * @param mixed      $value
-     * @param int|string $subKey
-     *
-     * @return $this
-     */
-    public function setAttribute($key, $value, $subKey = null)
-    {
-        // Normalize key.
-        $key = $this->normalizeAttributeKey($key);
-
-        // If the key is equal to 'dn', we'll automatically
-        // change it to the full attribute name.
-        $key = ($key == 'dn' ? $this->schema->distinguishedName() : $key);
-
-        if (is_null($subKey)) {
-            $this->attributes[$key] = (is_array($value) ? $value : [$value]);
-        } else {
-            $this->attributes[$key][$subKey] = $value;
-        }
-
-        return $this;
-    }
-
-    /**
-     * Sets the first attributes value by the specified key.
-     *
-     * @param int|string $key
-     * @param mixed      $value
-     *
-     * @return $this
-     */
-    public function setFirstAttribute($key, $value)
-    {
-        return $this->setAttribute($key, $value, 0);
-    }
-
-    /**
-     * Sets the attributes property.
-     *
-     * @param array $attributes
-     *
-     * @return $this
-     */
-    public function setRawAttributes(array $attributes = [])
-    {
-        $this->attributes = $this->filterRawAttributes($attributes);
-
-        if (Arr::has($attributes, 'dn')) {
-            $this->setDn($attributes['dn']);
-        }
-
-        $this->syncOriginal();
-
-        // Set exists to true since raw attributes are only
-        // set in the case of attributes being loaded by
-        // query results.
-        $this->exists = true;
-
-        return $this;
-    }
-
-    /**
-     * Filters the count key recursively from raw LDAP attributes.
-     *
-     * @param array        $attributes
-     * @param array|string $keys
-     *
-     * @return array
-     */
-    public function filterRawAttributes(array $attributes = [], $keys = ['count'])
-    {
-        $attributes = Arr::except($attributes, $keys);
-
-        array_walk($attributes, function (&$value) use ($keys) {
-            $value = is_array($value) ?
-                $this->filterRawAttributes($value, $keys) :
-                $value;
-        });
-
-        return $attributes;
-    }
-
-    /**
-     * Returns true / false if the specified attribute
-     * exists in the attributes array.
-     *
-     * @param int|string $key
-     * @param int|string $subKey
-     *
-     * @return bool
-     */
-    public function hasAttribute($key, $subKey = null)
-    {
-        if (is_null($subKey)) {
-            return Arr::has($this->attributes, $key);
-        }
-
-        return Arr::has($this->attributes, "$key.$subKey");
-    }
-
-    /**
-     * Returns the number of attributes inside
-     * the attributes property.
-     *
-     * @return int
-     */
-    public function countAttributes()
-    {
-        return count($this->getAttributes());
-    }
-
-    /**
-     * Returns the models original attributes.
-     *
-     * @return array
-     */
-    public function getOriginal()
-    {
-        return $this->original;
-    }
-
-    /**
-     * Get the attributes that have been changed since last sync.
-     *
-     * @return array
-     */
-    public function getDirty()
-    {
-        $dirty = [];
-
-        foreach ($this->attributes as $key => $value) {
-            if (!array_key_exists($key, $this->original)) {
-                $dirty[$key] = $value;
-            } elseif ($value !== $this->original[$key] &&
-                !$this->originalIsNumericallyEquivalent($key)) {
-                $dirty[$key] = $value;
-            }
-        }
-
-        return $dirty;
-    }
-
-    /**
-     * Sets and returns the models modifications.
+     * Returns the models batch modifications to be processed.
      *
      * @return array
      */
     public function getModifications()
     {
-        foreach ($this->getDirty() as $attribute => $values) {
-            // Make sure values is always an array.
-            $values = (is_array($values) ? $values : [$values]);
-
-            // Create a new modification.
-            $modification = new BatchModification($attribute, null, $values);
-
-            if (array_key_exists($attribute, $this->original)) {
-                // If the attribute we're modifying has an original value, we'll give the
-                // BatchModification object its values to automatically determine
-                // which type of LDAP operation we need to perform.
-                $modification->setOriginal($this->original[$attribute]);
-            }
-
-            // Finally, we'll add the modification to the model.
-            $this->addModification($modification->build());
-        }
+        $this->buildModificationsFromDirty();
 
         return $this->modifications;
     }
@@ -532,33 +279,41 @@ abstract class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * Adds a modification to the models modifications array.
+     * Adds a batch modification to the models modifications array.
      *
-     * @param BatchModification $modification
+     * @param array|BatchModification $mod
+     *
+     * @throws InvalidArgumentException
      *
      * @return $this
      */
-    public function addModification(BatchModification $modification)
+    public function addModification($mod = [])
     {
-        $batch = $modification->get();
-
-        if (is_array($batch)) {
-            $this->modifications[] = $batch;
+        if ($mod instanceof BatchModification) {
+            $mod = $mod->get();
         }
 
-        return $this;
+        if ($this->isValidModification($mod)) {
+            $this->modifications[] = $mod;
+
+            return $this;
+        }
+
+        throw new InvalidArgumentException(
+            "The batch modification array does not include the mandatory 'attrib' or 'modtype' keys."
+        );
     }
 
     /**
      * Returns the model's distinguished name string.
      *
-     * https://msdn.microsoft.com/en-us/library/aa366101(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/aa366101(v=vs.85).aspx
      *
      * @return string|null
      */
     public function getDistinguishedName()
     {
-        return $this->dn;
+        return $this->getFirstAttribute($this->schema->distinguishedName());
     }
 
     /**
@@ -570,7 +325,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      */
     public function setDistinguishedName($dn)
     {
-        $this->dn = (string) $dn;
+        $this->setFirstAttribute($this->schema->distinguishedName(), (string) $dn);
 
         return $this;
     }
@@ -580,7 +335,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
      *
      * (Alias for getDistinguishedName())
      *
-     * https://msdn.microsoft.com/en-us/library/aa366101(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/aa366101(v=vs.85).aspx
      *
      * @return string|null
      */
@@ -596,7 +351,11 @@ abstract class Model implements ArrayAccess, JsonSerializable
      */
     public function getDnBuilder()
     {
-        return $this->getNewDnBuilder($this->getDistinguishedName());
+        // If we currently don't have a distinguished name, we'll set
+        // it to our base, otherwise we'll use our query's base DN.
+        $dn = $this->getDistinguishedName() ?: $this->query->getDn();
+
+        return $this->getNewDnBuilder($dn);
     }
 
     /**
@@ -626,9 +385,61 @@ abstract class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Returns the model's hex object SID.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms679024(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getObjectSid()
+    {
+        return $this->getFirstAttribute($this->schema->objectSid());
+    }
+
+    /**
+     * Returns the model's binary object GUID.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms679021(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getObjectGuid()
+    {
+        return $this->getFirstAttribute($this->schema->objectGuid());
+    }
+
+    /**
+     * Returns the model's GUID.
+     *
+     * @return string|null
+     */
+    public function getConvertedGuid()
+    {
+        try {
+            return (string) new Guid($this->getObjectGuid());
+        } catch (InvalidArgumentException $e) {
+            return;
+        }
+    }
+
+    /**
+     * Returns the model's SID.
+     *
+     * @return string|null
+     */
+    public function getConvertedSid()
+    {
+        try {
+            return (string) new Sid($this->getObjectSid());
+        } catch (InvalidArgumentException $e) {
+            return;
+        }
+    }
+
+    /**
      * Returns the model's common name.
      *
-     * https://msdn.microsoft.com/en-us/library/ms675449(v=vs.85).aspx
+     * @link https://msdn.microsoft.com/en-us/library/ms675449(v=vs.85).aspx
      *
      * @return string
      */
@@ -650,22 +461,301 @@ abstract class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * Saves the changes to LDAP and returns the results.
+     * Returns the model's name. An AD alias for the CN attribute.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms675449(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->getFirstAttribute($this->schema->name());
+    }
+
+    /**
+     * Sets the model's name.
+     *
+     * @param string $name
+     *
+     * @return Model
+     */
+    public function setName($name)
+    {
+        return $this->setFirstAttribute($this->schema->name(), $name);
+    }
+
+    /**
+     * Returns the model's display name.
+     *
+     * @return string
+     */
+    public function getDisplayName()
+    {
+        return $this->getFirstAttribute($this->schema->displayName());
+    }
+
+    /**
+     * Sets the model's display name.
+     *
+     * @param string $displayName
+     *
+     * @return $this
+     */
+    public function setDisplayName($displayName)
+    {
+        return $this->setFirstAttribute($this->schema->displayName(), $displayName);
+    }
+
+    /**
+     * Returns the model's samaccountname.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms679635(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getAccountName()
+    {
+        return $this->getFirstAttribute($this->schema->accountName());
+    }
+
+    /**
+     * Sets the model's samaccountname.
+     *
+     * @param string $accountName
+     *
+     * @return Model
+     */
+    public function setAccountName($accountName)
+    {
+        return $this->setFirstAttribute($this->schema->accountName(), $accountName);
+    }
+
+    /**
+     * Returns the model's samaccounttype.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms679637(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getAccountType()
+    {
+        return $this->getFirstAttribute($this->schema->accountType());
+    }
+
+    /**
+     * Returns the model's `whenCreated` time.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms680924(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getCreatedAt()
+    {
+        return $this->getFirstAttribute($this->schema->createdAt());
+    }
+
+    /**
+     * Returns the created at time in a mysql formatted date.
+     *
+     * @return string
+     */
+    public function getCreatedAtDate()
+    {
+        return (new DateTime())->setTimestamp($this->getCreatedAtTimestamp())->format($this->dateFormat);
+    }
+
+    /**
+     * Returns the created at time in a unix timestamp format.
+     *
+     * @return float
+     */
+    public function getCreatedAtTimestamp()
+    {
+        return DateTime::createFromFormat('YmdHis.0Z', $this->getCreatedAt())->getTimestamp();
+    }
+
+    /**
+     * Returns the model's `whenChanged` time.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms680921(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getUpdatedAt()
+    {
+        return $this->getFirstAttribute($this->schema->updatedAt());
+    }
+
+    /**
+     * Returns the updated at time in a mysql formatted date.
+     *
+     * @return string
+     */
+    public function getUpdatedAtDate()
+    {
+        return (new DateTime())->setTimestamp($this->getUpdatedAtTimestamp())->format($this->dateFormat);
+    }
+
+    /**
+     * Returns the updated at time in a unix timestamp format.
+     *
+     * @return float
+     */
+    public function getUpdatedAtTimestamp()
+    {
+        return DateTime::createFromFormat($this->timestampFormat, $this->getUpdatedAt())->getTimestamp();
+    }
+
+    /**
+     * Returns the Container of the current Model.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms679012(v=vs.85).aspx
+     *
+     * @return Container|Entry|bool
+     */
+    public function getObjectClass()
+    {
+        return $this->query->findByDn($this->getObjectCategoryDn());
+    }
+
+    /**
+     * Returns the CN of the model's object category.
+     *
+     * @return null|string
+     */
+    public function getObjectCategory()
+    {
+        $category = $this->getObjectCategoryArray();
+
+        if (is_array($category) && array_key_exists(0, $category)) {
+            return $category[0];
+        }
+    }
+
+    /**
+     * Returns the model's object category DN in an exploded array.
+     *
+     * @return array|false
+     */
+    public function getObjectCategoryArray()
+    {
+        return Utilities::explodeDn($this->getObjectCategoryDn());
+    }
+
+    /**
+     * Returns the model's object category DN string.
+     *
+     * @return null|string
+     */
+    public function getObjectCategoryDn()
+    {
+        return $this->getFirstAttribute($this->schema->objectCategory());
+    }
+
+    /**
+     * Returns the model's primary group ID.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms679375(v=vs.85).aspx
+     *
+     * @return string
+     */
+    public function getPrimaryGroupId()
+    {
+        return $this->getFirstAttribute($this->schema->primaryGroupId());
+    }
+
+    /**
+     * Returns the model's instance type.
+     *
+     * @link https://msdn.microsoft.com/en-us/library/ms676204(v=vs.85).aspx
+     *
+     * @return int
+     */
+    public function getInstanceType()
+    {
+        return $this->getFirstAttribute($this->schema->instanceType());
+    }
+
+    /**
+     * Returns the model's max password age.
+     *
+     * @return string
+     */
+    public function getMaxPasswordAge()
+    {
+        return $this->getFirstAttribute($this->schema->maxPasswordAge());
+    }
+
+    /**
+     * Returns the model's max password age in days.
+     *
+     * @return int
+     */
+    public function getMaxPasswordAgeDays()
+    {
+        $age = $this->getMaxPasswordAge();
+
+        return (int) (abs($age) / 10000000 / 60 / 60 / 24);
+    }
+
+    /**
+     * Determine if the current model is located inside the given OU.
+     *
+     * If a model instance is given, the strict parameter is ignored.
+     *
+     * @param Model|string $ou     The organizational unit to check.
+     * @param bool         $strict Whether the check is case-sensitive.
      *
      * @return bool
      */
-    public function save()
+    public function inOu($ou, $strict = false)
     {
-        return $this->exists ? $this->update() : $this->create();
+        if ($ou instanceof Model) {
+            // If we've been given an OU model, we can
+            // just check if the OU's DN is inside
+            // the current models DN.
+            return (bool) strpos($this->getDn(), $ou->getDn());
+        }
+
+        $suffix = $strict ? '' : 'i';
+
+        return (bool) preg_grep("/{$ou}/{$suffix}", $this->getDnBuilder()->organizationUnits);
+    }
+
+    /**
+     * Returns true / false if the current model is writable
+     * by checking its instance type integer.
+     *
+     * @return bool
+     */
+    public function isWritable()
+    {
+        return (int) $this->getInstanceType() === 4;
+    }
+
+    /**
+     * Saves the changes to LDAP and returns the results.
+     *
+     * @param array $attributes
+     *
+     * @return bool
+     */
+    public function save(array $attributes = [])
+    {
+        return $this->exists ? $this->update($attributes) : $this->create($attributes);
     }
 
     /**
      * Updates the model.
      *
+     * @param array $attributes
+     *
      * @return bool
      */
-    public function update()
+    public function update(array $attributes = [])
     {
+        $this->fill($attributes);
+
         $modifications = $this->getModifications();
 
         if (count($modifications) > 0) {
@@ -673,6 +763,9 @@ abstract class Model implements ArrayAccess, JsonSerializable
             if ($this->query->getConnection()->modifyBatch($this->getDn(), $modifications)) {
                 // Re-sync attributes.
                 $this->syncRaw();
+
+                // Re-set the models modifications.
+                $this->modifications = [];
 
                 return true;
             }
@@ -690,17 +783,18 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Creates the entry in LDAP.
      *
+     * @param array $attributes
+     *
      * @return bool
      */
-    public function create()
+    public function create(array $attributes = [])
     {
+        $this->fill($attributes);
+
         if (empty($this->getDn())) {
             // If the model doesn't currently have a DN,
             // we'll create a new one automatically.
             $dn = $this->getDnBuilder();
-
-            // We'll set the base of the DN to the query's base DN.
-            $dn->setBase($this->query->getDn());
 
             // Then we'll add the entry's common name attribute.
             $dn->addCn($this->getCommonName());
@@ -710,7 +804,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
         }
 
         // Create the entry.
-        $created = $this->query->getConnection()->add($this->getDn(), $this->getAttributes());
+        $created = $this->query->getConnection()->add($this->getDn(), $this->getCreatableAttributes());
 
         if ($created) {
             // If the entry was created we'll re-sync
@@ -726,15 +820,23 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Creates an attribute on the current model.
      *
-     * @param string $attribute
-     * @param mixed  $value
+     * @param string $attribute The attribute to create
+     * @param mixed  $value     The value of the new attribute
+     * @param bool   $sync      Whether to re-sync all attributes
      *
      * @return bool
      */
-    public function createAttribute($attribute, $value)
+    public function createAttribute($attribute, $value, $sync = true)
     {
-        if ($this->exists) {
-            return $this->query->getConnection()->modAdd($this->getDn(), [$attribute => $value]);
+        if (
+            $this->exists &&
+            $this->query->getConnection()->modAdd($this->getDn(), [$attribute => $value])
+        ) {
+            if ($sync) {
+                $this->syncRaw();
+            }
+
+            return true;
         }
 
         return false;
@@ -743,20 +845,21 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Updates the specified attribute with the specified value.
      *
-     * @param string $attribute
-     * @param mixed  $value
+     * @param string $attribute The attribute to modify
+     * @param mixed  $value     The new value for the attribute
+     * @param bool   $sync      Whether to re-sync all attributes
      *
      * @return bool
      */
-    public function updateAttribute($attribute, $value)
+    public function updateAttribute($attribute, $value, $sync = true)
     {
         if (
             $this->exists &&
             $this->query->getConnection()->modReplace($this->getDn(), [$attribute => $value])
         ) {
-            // If the models attribute was successfully updated,
-            // we'll re-sync the models attributes.
-            $this->syncRaw();
+            if ($sync) {
+                $this->syncRaw();
+            }
 
             return true;
         }
@@ -767,21 +870,33 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Deletes an attribute on the current entry.
      *
-     * @param string $attribute
+     * @param string|array $attributes The attribute(s) to delete
+     * @param bool         $sync       Whether to re-sync all attributes
+     *
+     * Delete specific values in attributes:
+     *
+     *     ["memberuid" => "username"]
+     * 
+     * Delete an entire attribute:
+     *
+     *     ["memberuid" => []]
      *
      * @return bool
      */
-    public function deleteAttribute($attribute)
+    public function deleteAttribute($attributes, $sync = true)
     {
-        // We need to pass in an empty array as the value
-        // for the attribute so AD knows to remove it.
+        // If we've been given a string, we'll assume we're removing a
+        // single attribute. Otherwise, we'll assume it's
+        // an array of attributes to remove.
+        $attributes = is_string($attributes) ? [$attributes => []] : $attributes;
+
         if (
             $this->exists &&
-            $this->query->getConnection()->modDelete($this->getDn(), [$attribute => []])
+            $this->query->getConnection()->modDelete($this->getDn(), $attributes)
         ) {
-            // If the models attribute was successfully deleted, we'll
-            // resynchronize the models raw attributes.
-            $this->syncRaw();
+            if ($sync) {
+                $this->syncRaw();
+            }
 
             return true;
         }
@@ -792,8 +907,10 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Deletes the current entry.
      *
-     * @throws ModelNotFoundException
-     * @throws AdldapException
+     * Throws a ModelNotFoundException if the current model does
+     * not exist or does not contain a distinguished name.
+     *
+     * @throws ModelDoesNotExistException
      *
      * @return bool
      */
@@ -801,16 +918,10 @@ abstract class Model implements ArrayAccess, JsonSerializable
     {
         $dn = $this->getDn();
 
-        if ($this->exists === false) {
+        if ($this->exists === false || empty($dn)) {
             // Make sure the record exists before we can delete it.
             // Otherwise, we'll throw an exception.
             throw (new ModelDoesNotExistException())->setModel(get_class($this));
-        }
-
-        if (empty($dn)) {
-            // If the record exists but the DN attribute does
-            // not exist, we can't process a delete.
-            throw new AdldapException('Unable to delete. The current model does not have a distinguished name.');
         }
 
         if ($this->query->getConnection()->delete($dn)) {
@@ -863,36 +974,81 @@ abstract class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
-     * Returns a normalized attribute key.
+     * Returns the models creatable attributes.
      *
-     * @param string $key
-     *
-     * @return string
+     * @return mixed
      */
-    protected function normalizeAttributeKey($key)
+    protected function getCreatableAttributes()
     {
-        return strtolower($key);
+        return Arr::except($this->getAttributes(), [$this->schema->distinguishedName()]);
     }
-    
+
     /**
-     * Determine if the new and old values for a given key are numerically equivalent.
+     * Determines if the given modification is valid.
      *
-     * @param string $key
+     * @param mixed $mod
      *
      * @return bool
      */
-    protected function originalIsNumericallyEquivalent($key)
+    protected function isValidModification($mod)
     {
-        $current = $this->attributes[$key];
-
-        $original = $this->original[$key];
-
-        return  is_numeric($current) &&
-                is_numeric($original) &&
-                strcmp((string) $current, (string) $original) === 0 ||
-            count(array_diff($current, $original)) === 0;
+        return is_array($mod) &&
+            array_key_exists(BatchModification::KEY_MODTYPE, $mod) &&
+            array_key_exists(BatchModification::KEY_ATTRIB, $mod);
     }
 
+    /**
+     * Builds the models modifications from its dirty attributes.
+     *
+     * @return array
+     */
+    protected function buildModificationsFromDirty()
+    {
+        foreach ($this->getDirty() as $attribute => $values) {
+            // Make sure values is always an array.
+            $values = (is_array($values) ? $values : [$values]);
+
+            // Create a new modification.
+            $modification = $this->newBatchModification($attribute, null, $values);
+
+            if (array_key_exists($attribute, $this->original)) {
+                // If the attribute we're modifying has an original value, we'll give the
+                // BatchModification object its values to automatically determine
+                // which type of LDAP operation we need to perform.
+                $modification->setOriginal($this->original[$attribute]);
+            }
+
+            // Build the modification from its
+            // possible original values.
+            $modification->build();
+
+            if ($modification->isValid()) {
+                // Finally, we'll add the modification to the model.
+                $this->addModification($modification);
+            }
+        }
+
+        return $this->modifications;
+    }
+
+    /**
+     * Validates that the current LDAP connection is secure.
+     *
+     * @throws ConnectionException
+     *
+     * @return void
+     */
+    protected function validateSecureConnection()
+    {
+        $connection = $this->query->getConnection();
+
+        if (!$connection->isUsingSSL() && !$connection->isUsingTLS()) {
+            throw new ConnectionException(
+                "You must be connected to your LDAP server with TLS or SSL to perform this operation."
+            );
+        }
+    }
+    
     /**
      * Converts the inserted string boolean to a PHP boolean.
      *

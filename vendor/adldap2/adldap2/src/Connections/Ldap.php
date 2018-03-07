@@ -2,9 +2,15 @@
 
 namespace Adldap\Connections;
 
-use Adldap\Exceptions\AdldapException;
-use Adldap\Contracts\Connections\ConnectionInterface;
+use Adldap\AdldapException;
 
+/**
+ * Class Ldap
+ *
+ * A class that abstracts PHP's LDAP functions and stores the bound connection.
+ *
+ * @package Adldap\Connections
+ */
 class Ldap implements ConnectionInterface
 {
     use LdapFunctionSupportTrait;
@@ -80,9 +86,9 @@ class Ldap implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function useSSL()
+    public function ssl($enabled = true)
     {
-        $this->useSSL = true;
+        $this->useSSL = $enabled;
 
         return $this;
     }
@@ -90,9 +96,9 @@ class Ldap implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function useTLS()
+    public function tls($enabled = true)
     {
-        $this->useTLS = true;
+        $this->useTLS = $enabled;
 
         return $this;
     }
@@ -180,6 +186,16 @@ class Ldap implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
+    public function setOptions(array $options = [])
+    {
+        foreach ($options as $option => $value) {
+            $this->setOption($option, $value);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setRebindCallback(callable $callback)
     {
         return ldap_set_rebind_proc($this->getConnection(), $callback);
@@ -196,11 +212,11 @@ class Ldap implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function connect($hostname = [], $port = '389')
+    public function connect($hosts = [], $port = '389')
     {
-        $host = $this->getHostname($hostname, $this->getProtocol());
+        $connections = $this->getConnectionString($hosts, $this->getProtocol(), $port);
 
-        return $this->connection = ldap_connect("{$host}:{$port}");
+        return $this->connection = ldap_connect($connections);
     }
 
     /**
@@ -216,25 +232,25 @@ class Ldap implements ConnectionInterface
     /**
      * {@inheritdoc}
      */
-    public function search($dn, $filter, array $fields)
+    public function search($dn, $filter, array $fields, $onlyAttributes = false, $size = 0, $time = 0)
     {
-        return ldap_search($this->getConnection(), $dn, $filter, $fields);
+        return ldap_search($this->getConnection(), $dn, $filter, $fields, $onlyAttributes, $size, $time);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function listing($dn, $filter, array $attributes)
+    public function listing($dn, $filter, array $fields, $onlyAttributes = false, $size = 0, $time = 0)
     {
-        return ldap_list($this->getConnection(), $dn, $filter, $attributes);
+        return ldap_list($this->getConnection(), $dn, $filter, $fields, $onlyAttributes, $size, $time);
     }
 
     /**
      * {@inheritdoc}
      */
-    public function read($dn, $filter, array $fields)
+    public function read($dn, $filter, array $fields, $onlyAttributes = false, $size = 0, $time = 0)
     {
-        return ldap_read($this->getConnection(), $dn, $filter, $fields);
+        return ldap_read($this->getConnection(), $dn, $filter, $fields, $onlyAttributes, $size, $time);
     }
 
     /**
@@ -326,9 +342,9 @@ class Ldap implements ConnectionInterface
             return ldap_control_paged_result($this->getConnection(), $pageSize, $isCritical, $cookie);
         }
 
-        $message = 'LDAP Pagination is not supported on your current PHP installation.';
-
-        throw new AdldapException($message);
+        throw new AdldapException(
+            'LDAP Pagination is not supported on your current PHP installation.'
+        );
     }
 
     /**
@@ -340,9 +356,9 @@ class Ldap implements ConnectionInterface
             return ldap_control_paged_result_response($this->getConnection(), $result, $cookie);
         }
 
-        $message = 'LDAP Pagination is not supported on your current PHP installation.';
-
-        throw new AdldapException($message);
+        throw new AdldapException(
+            'LDAP Pagination is not supported on your current PHP installation.'
+        );
     }
 
     /**
@@ -412,21 +428,29 @@ class Ldap implements ConnectionInterface
      *
      * @return string
      */
-    protected function getProtocol()
+    public function getProtocol()
     {
         return $this->isUsingSSL() ? $this::PROTOCOL_SSL : $this::PROTOCOL;
     }
 
     /**
-     * Returns a compiled hostname compatible with ldap_connect().
+     * Generates an LDAP connection string for each host given.
      *
-     * @param array  $hostname
-     * @param string $protocol
+     * @param string|array  $hosts
+     * @param string        $protocol
+     * @param string        $port
      *
      * @return string
      */
-    protected function getHostname($hostname = [], $protocol = '')
+    protected function getConnectionString($hosts = [], $protocol, $port)
     {
-        return is_array($hostname) ? $protocol.implode(' '.$protocol, $hostname) : $hostname;
+        // Normalize hosts into an array.
+        $hosts = is_array($hosts) ? $hosts : [$hosts];
+
+        $hosts = array_map(function ($host) use ($protocol, $port) {
+            return "{$protocol}{$host}:{$port}";
+        }, $hosts);
+
+        return implode(' ', $hosts);
     }
 }

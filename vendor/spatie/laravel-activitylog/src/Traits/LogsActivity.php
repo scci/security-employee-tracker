@@ -66,6 +66,10 @@ trait LogsActivity
 
     public function getLogNameToUse(string $eventName = ''): string
     {
+        if (isset(static::$logName)) {
+            return static::$logName;
+        }
+
         return config('activitylog.default_log_name');
     }
 
@@ -84,7 +88,7 @@ trait LogsActivity
             'deleted',
         ]);
 
-        if (collect(class_uses_recursive(__CLASS__))->contains(SoftDeletes::class)) {
+        if (collect(class_uses_recursive(static::class))->contains(SoftDeletes::class)) {
             $events->push('restored');
         }
 

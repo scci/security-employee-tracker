@@ -43,3 +43,37 @@ $filter = '(memberof:1.2.840.113556.1.4.1941:=CN=MyGroup,DC=example,DC=com)';
 
 $users = $provider->search()->rawFilter($filter)->get();
 ```
+
+#### I'm connected but not getting any search results!
+
+The first thing you need to ensure is your `base_dn` in your configuration.
+
+Your `base_dn` needs to identical to the base DN on your domain. Even one mistyped character will result in no search results.
+
+If you also include an `ou` in your base DN (ex. `ou=Accounting,dc=corp,dc=acme,dc=org`), you will only receive results inside the `Accounting` OU.
+
+Once you're connected to your LDAP server, retrieve the Root DSE record.
+
+Here's a full example:
+
+```php
+$providers = [
+    'default' => [
+        'base_dn' => '',
+        '...',
+    ]
+];
+
+$ad = new \Adldap\Adldap($providers);
+
+try {
+    $provider = $ad->connect();
+    
+    $root = $provider->search()->getRootDse();
+    
+    // ex. Returns 'dc=corp,dc=acme,dc=org'
+    die($root->getRootDomainNamingContext());
+
+} catch (\Adldap\Auth\BindException $e) {
+}
+```
