@@ -158,6 +158,7 @@ return [
         SET\Providers\RouteServiceProvider::class,
         SET\Providers\AuthServiceProvider::class,
 
+        Adldap\Laravel\AdldapAuthServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Krucas\Notification\NotificationServiceProvider::class,
