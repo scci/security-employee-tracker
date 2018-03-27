@@ -7,7 +7,7 @@
         </div>
         <div class="row">
         {!! Form::open(array('action' => 'UserController@import', 'method' => 'POST', 'files' => true, 'class' => 'form-horizontal jpas-form')) !!}
-            {!! Form::hidden('resolveImport', 0) !!}
+            <input type="hidden" name="resolveImport" value="0"/>
             <div class="col s12 m7">
                 <div class="file-field input-field">
                     <div class="btn">

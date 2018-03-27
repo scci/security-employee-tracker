@@ -7,7 +7,7 @@
     {!! Form::open(array('action' => 'UserController@resolveImport', 'method' => 'POST', 'files' => true, 'class' => 'form-inline note-form')) !!}
 
     {!! Form::hidden('uploadedFile', $uploadedFile ) !!}
-    {!! Form::hidden('resolveImport', 1) !!}
+    <input type="hidden" name="resolveImport" value="1"/>
 
     <div class="row">
         <div class="col m4">
