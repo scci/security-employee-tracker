@@ -2,10 +2,23 @@
 
 namespace Pusher;
 
-class Pusher
+use Psr\Log\LoggerAwareInterface;
+use Psr\Log\LoggerAwareTrait;
+use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+
+class Pusher implements LoggerAwareInterface
 {
+    use LoggerAwareTrait;
+
+    /**
+     * @var string Version
+     */
     public static $VERSION = '3.0.0';
 
+    /**
+     * @var array Settings
+     */
     private $settings = array(
         'scheme'       => 'http',
         'port'         => 80,
@@ -13,13 +26,14 @@ class Pusher
         'debug'        => false,
         'curl_options' => array(),
     );
-    private $logger = null;
+
+    /**
+     * @var null|resource
+     */
     private $ch = null; // Curl handler
 
     /**
-     * PHP5 Constructor.
-     *
-     * Initializes a new Pusher instance with key, secret , app ID and channel.
+     * Initializes a new Pusher instance with key, secret, app ID and channel.
      * You can optionally turn on debugging for all requests by setting debug to true.
      *
      * @param string $auth_key
@@ -39,6 +53,8 @@ class Pusher
      * @param string $host     [optional] - deprecated
      * @param int    $port     [optional] - deprecated
      * @param int    $timeout  [optional] - deprecated
+     *
+     * @throws PusherException Throws exception if any required dependencies are missing
      */
     public function __construct($auth_key, $secret, $app_id, $options = array(), $host = null, $port = null, $timeout = null)
     {
@@ -62,8 +78,10 @@ class Pusher
 
             $this->settings['host'] = $host;
 
-            $this->log('INFO: Legacy $host parameter provided: '.
-                $this->settings['scheme'].' host: '.$this->settings['host']);
+            $this->log('Legacy $host parameter provided: {scheme} host: {host}', array(
+                'scheme' => $this->settings['scheme'],
+                'host'   => $this->settings['host'],
+            ));
         }
 
         if (!is_null($port)) {
@@ -141,6 +159,10 @@ class Pusher
     /**
      * Set a logger to be informed of internal log messages.
      *
+     * @deprecated Use the PSR-3 compliant Pusher::setLogger() instead. This method will be removed in the next breaking release.
+     *
+     * @param object $logger A object with a public function log($message) method
+     *
      * @return void
      */
     public function set_logger($logger)
@@ -151,21 +173,39 @@ class Pusher
     /**
      * Log a string.
      *
-     * @param string $msg The message to log
+     * @param string           $msg     The message to log
+     * @param array|\Exception $context [optional] Any extraneous information that does not fit well in a string.
+     * @param string           $level   [optional] Importance of log message, highly recommended to use Psr\Log\LogLevel::{level}
      *
      * @return void
      */
-    private function log($msg)
+    private function log($msg, array $context = array(), $level = LogLevel::INFO)
     {
-        if (is_null($this->logger) === false) {
-            $this->logger->log('Pusher: '.$msg);
+        if (is_null($this->logger)) {
+            return;
         }
+
+        if ($this->logger instanceof LoggerInterface) {
+            $this->logger->log($level, $msg, $context);
+
+            return;
+        }
+
+        // Support old style logger (deprecated)
+        $msg = sprintf('Pusher: %s: %s', strtoupper($level), $msg);
+        $replacement = array();
+
+        foreach ($context as $k => $v) {
+            $replacement['{'.$k.'}'] = $v;
+        }
+
+        $this->logger->log(strtr($msg, $replacement));
     }
 
     /**
      * Check if the current PHP setup is sufficient to run this class.
      *
-     * @throws PusherException if any required dependencies are missing
+     * @throws PusherException If any required dependencies are missing
      *
      * @return void
      */
@@ -189,7 +229,7 @@ class Pusher
      *
      * @param string[] $channels An array of channel names to validate
      *
-     * @throws PusherException if $channels is too big or any channel is invalid
+     * @throws PusherException If $channels is too big or any channel is invalid
      *
      * @return void
      */
@@ -207,9 +247,9 @@ class Pusher
     /**
      * Ensure a channel name is valid based on our spec.
      *
-     * @param $channel The channel name to validate
+     * @param string $channel The channel name to validate
      *
-     * @throws PusherException if $channel is invalid
+     * @throws PusherException If $channel is invalid
      *
      * @return void
      */
@@ -225,7 +265,7 @@ class Pusher
      *
      * @param string $socket_id The socket ID to validate
      *
-     * @throws PusherException if $socket_id is invalid
+     * @throws PusherException If $socket_id is invalid
      */
     private function validate_socket_id($socket_id)
     {
@@ -236,6 +276,15 @@ class Pusher
 
     /**
      * Utility function used to create the curl object with common settings.
+     *
+     * @param string            $domain
+     * @param string            $s_url
+     * @param string [optional] $request_method
+     * @param array [optional]  $query_params
+     *
+     * @throws PusherException Throws exception if curl wasn't initialized correctly
+     *
+     * @return resource
      */
     private function create_curl($domain, $s_url, $request_method = 'GET', $query_params = array())
     {
@@ -250,10 +299,10 @@ class Pusher
 
         $full_url = $domain.$s_url.'?'.$signed_query;
 
-        $this->log('INFO: create_curl( '.$full_url.' )');
+        $this->log('create_curl( {full_url} )', array('full_url' => $full_url));
 
         // Create or reuse existing curl handle
-        if (null === $this->ch) {
+        if (!is_resource($this->ch)) {
             $this->ch = curl_init();
         }
 
@@ -295,6 +344,10 @@ class Pusher
 
     /**
      * Utility function to execute curl and create capture response information.
+     *
+     * @param $ch resource
+     *
+     * @return array
      */
     private function exec_curl($ch)
     {
@@ -304,10 +357,10 @@ class Pusher
         $response['status'] = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 
         if ($response['body'] === false || $response['status'] < 200 || 400 <= $response['status']) {
-            $this->log('ERROR: exec_curl error: '.curl_error($ch));
+            $this->log('exec_curl error: {error}', array('error' => curl_error($ch)), LogLevel::ERROR);
         }
 
-        $this->log('INFO: exec_curl response: '.print_r($response, true));
+        $this->log('exec_curl response: {response}', array('response' => print_r($response, true)));
 
         return $response;
     }
@@ -339,7 +392,7 @@ class Pusher
      * @param string $auth_secret
      * @param string $request_method
      * @param string $request_path
-     * @param array  $query_params
+     * @param array  $query_params   [optional]
      * @param string $auth_version   [optional]
      * @param string $auth_timestamp [optional]
      *
@@ -373,9 +426,9 @@ class Pusher
      * a glue, a separator between pairs and the array
      * to implode.
      *
-     * @param string $glue      The glue between key and value
-     * @param string $separator Separator between pairs
-     * @param array  $array     The array to implode
+     * @param string       $glue      The glue between key and value
+     * @param string       $separator Separator between pairs
+     * @param array|string $array     The array to implode
      *
      * @return string The imploded array
      */
@@ -384,6 +437,7 @@ class Pusher
         if (!is_array($array)) {
             return $array;
         }
+
         $string = array();
         foreach ($array as $key => $val) {
             if (is_array($val)) {
@@ -406,6 +460,8 @@ class Pusher
      * @param bool         $debug           [optional]
      * @param bool         $already_encoded [optional]
      *
+     * @throws PusherException Throws exception if $channels is an array of size 101 or above or $socket_id is invalid
+     *
      * @return bool|array
      */
     public function trigger($channels, $event, $data, $socket_id = null, $debug = false, $already_encoded = false)
@@ -425,7 +481,9 @@ class Pusher
 
         // json_encode might return false on failure
         if (!$data_encoded) {
-            $this->Log('ERROR: Failed to perform json_encode on the the provided data: '.print_r($data, true));
+            $this->log('Failed to perform json_encode on the the provided data: {error}', array(
+                'error' => print_r($data, true),
+            ), LogLevel::ERROR);
         }
 
         $post_params = array();
@@ -443,7 +501,7 @@ class Pusher
 
         $ch = $this->create_curl($this->ddn_domain(), $s_url, 'POST', $query_params);
 
-        $this->log('INFO: trigger POST: '.$post_value);
+        $this->log('trigger POST: {post_value}', compact('post_value'));
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_value);
 
@@ -451,21 +509,25 @@ class Pusher
 
         if ($response['status'] === 200 && $debug === false) {
             return true;
-        } elseif ($debug === true || $this->settings['debug'] === true) {
-            return $response;
-        } else {
-            return false;
         }
+
+        if ($debug === true || $this->settings['debug'] === true) {
+            return $response;
+        }
+
+        return false;
     }
 
     /**
      * Trigger multiple events at the same time.
      *
-     * @param array $batch           An array of events to send
+     * @param array $batch           [optional] An array of events to send
      * @param bool  $debug           [optional]
      * @param bool  $already_encoded [optional]
      *
-     * @return bool|string
+     * @throws PusherException Throws exception if curl wasn't initialized correctly
+     *
+     * @return array|bool|string
      */
     public function triggerBatch($batch = array(), $debug = false, $already_encoded = false)
     {
@@ -490,7 +552,7 @@ class Pusher
 
         $ch = $this->create_curl($this->ddn_domain(), $s_url, 'POST', $query_params);
 
-        $this->log('INFO: trigger POST: '.$post_value);
+        $this->log('trigger POST: {post_value}', compact('post_value'));
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_value);
 
@@ -498,20 +560,24 @@ class Pusher
 
         if ($response['status'] === 200 && $debug === false) {
             return true;
-        } elseif ($debug === true || $this->settings['debug'] === true) {
-            return $response;
-        } else {
-            return false;
         }
+
+        if ($debug === true || $this->settings['debug'] === true) {
+            return $response;
+        }
+
+        return false;
     }
 
     /**
-     *	Fetch channel information for a specific channel.
+     * Fetch channel information for a specific channel.
      *
      * @param string $channel The name of the channel
      * @param array  $params  Additional parameters for the query e.g. $params = array( 'info' => 'connection_count' )
      *
-     *	@return object
+     * @throws PusherException If $channel is invalid or if curl wasn't initialized correctly
+     *
+     * @return bool|object
      */
     public function get_channel_info($channel, $params = array())
     {
@@ -520,12 +586,10 @@ class Pusher
         $response = $this->get('/channels/'.$channel, $params);
 
         if ($response['status'] === 200) {
-            $response = json_decode($response['body']);
-        } else {
-            $response = false;
+            return json_decode($response['body']);
         }
 
-        return $response;
+        return false;
     }
 
     /**
@@ -533,7 +597,9 @@ class Pusher
      *
      * @param array $params Additional parameters for the query e.g. $params = array( 'info' => 'connection_count' )
      *
-     * @return array
+     * @throws PusherException Throws exception if curl wasn't initialized correctly
+     *
+     * @return array|bool
      */
     public function get_channels($params = array())
     {
@@ -542,21 +608,23 @@ class Pusher
         if ($response['status'] === 200) {
             $response = json_decode($response['body']);
             $response->channels = get_object_vars($response->channels);
-        } else {
-            $response = false;
+
+            return $response;
         }
 
-        return $response;
+        return false;
     }
 
     /**
      * GET arbitrary REST API resource using a synchronous http client.
      * All request signing is handled automatically.
      *
-     * @param string path Path excluding /apps/APP_ID
-     * @param params array API params (see http://pusher.com/docs/rest_api)
+     * @param string $path   Path excluding /apps/APP_ID
+     * @param array  $params API params (see http://pusher.com/docs/rest_api)
      *
-     * @return See Pusher API docs
+     * @throws PusherException Throws exception if curl wasn't initialized correctly
+     *
+     * @return array|bool See Pusher API docs
      */
     public function get($path, $params = array())
     {
@@ -568,20 +636,23 @@ class Pusher
 
         if ($response['status'] === 200) {
             $response['result'] = json_decode($response['body'], true);
-        } else {
-            $response = false;
+
+            return $response;
         }
 
-        return $response;
+        return false;
     }
 
     /**
      * Creates a socket signature.
      *
+     * @param string $channel
      * @param string $socket_id
      * @param string $custom_data
      *
-     * @return string
+     * @throws PusherException Throws exception if $channel is invalid or above or $socket_id is invalid
+     *
+     * @return string Json encoded authentication string.
      */
     public function socket_auth($channel, $socket_id, $custom_data = null)
     {
@@ -606,9 +677,12 @@ class Pusher
     /**
      * Creates a presence signature (an extension of socket signing).
      *
+     * @param string $channel
      * @param string $socket_id
      * @param string $user_id
      * @param mixed  $user_info
+     *
+     * @throws PusherException Throws exception if $channel is invalid or above or $socket_id is invalid
      *
      * @return string
      */
@@ -626,19 +700,19 @@ class Pusher
      * Send a native notification via the Push Notifications Api.
      *
      * @param array $interests
-     * @param array $payload
+     * @param array $data
      * @param bool  $debug
      *
-     * @throws PusherException if validation fails.
+     * @throws PusherException If validation fails
      *
-     * @return bool|string
+     * @return array|bool|string
      */
     public function notify($interests, $data = array(), $debug = false)
     {
         $query_params = array();
 
         if (is_string($interests)) {
-            $this->log('INFO: ->notify received string interests "'.$interests.'". Converting to array.');
+            $this->log('->notify received string interests "{interests}" Converting to array.', compact('interests'));
             $interests = array($interests);
         }
 
@@ -655,7 +729,7 @@ class Pusher
         $notification_path = '/server_api/v1'.$this->settings['base_path'].'/notifications';
         $ch = $this->create_curl($this->notification_domain(), $notification_path, 'POST', $query_params);
 
-        $this->log('INFO: trigger POST (Native notifications): '.$post_value);
+        $this->log('trigger POST (Native notifications): {post_value}', compact('post_value'));
 
         curl_setopt($ch, CURLOPT_POSTFIELDS, $post_value);
 
@@ -663,10 +737,12 @@ class Pusher
 
         if ($response['status'] === 202 && $debug === false) {
             return true;
-        } elseif ($debug === true || $this->settings['debug'] === true) {
-            return $response;
-        } else {
-            return false;
         }
+
+        if ($debug === true || $this->settings['debug'] === true) {
+            return $response;
+        }
+
+        return false;
     }
 }

@@ -83,6 +83,7 @@ return [
         // Only allows users with a user principal name to authenticate.
         // Remove this if you're using OpenLDAP.
         Adldap\Laravel\Scopes\UpnScope::class,
+        SET\Scopes\GroupScope::class,
 
         // Only allows users with a uid to authenticate.
         // Uncomment if you're using OpenLDAP.
@@ -122,7 +123,7 @@ return [
 
             'discover' => 'samaccountname',
 
-            'authenticate' => 'distinguishedname',
+            'authenticate' => 'samaccountname',
 
         ],
 
@@ -257,9 +258,9 @@ return [
 
     'sync_attributes' => [
 
-        /*'email' => 'userprincipalname',
+        'username' => 'samaccountname',
 
-        'name' => 'cn',*/
+        //'name' => 'cn',
         'first_name' => 'givenname',
         'last_name'  => 'sn',
         'email'      => 'mail',

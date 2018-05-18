@@ -15,12 +15,12 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         'bd9634f2d41831496de0d3dfe4c94881' => __DIR__ . '/..' . '/symfony/polyfill-php56/bootstrap.php',
         'e91d0dc994644828154ae2387ede1ca8' => __DIR__ . '/..' . '/spatie/string/src/string_functions.php',
+        '72b1e3f4a2af9b30b3f137b3ec2057fc' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/helpers.php',
+        '4a1f389d6ce373bda9e57857d3b61c84' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/helpers.php',
         'f0906e6318348a765ffb6eb24e0d0938' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Foundation/helpers.php',
         '58571171fd5812e6e447dce228f52f4d' => __DIR__ . '/..' . '/laravel/framework/src/Illuminate/Support/helpers.php',
         'f18cc91337d49233e5754e93f3ed9ec3' => __DIR__ . '/..' . '/laravelcollective/html/src/helpers.php',
         'd7354eb4c8441fbf08eec280b61c7c73' => __DIR__ . '/..' . '/rachidlaasri/laravel-installer/src/Helpers/functions.php',
-        '4a1f389d6ce373bda9e57857d3b61c84' => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src/helpers.php',
-        '72b1e3f4a2af9b30b3f137b3ec2057fc' => __DIR__ . '/..' . '/spatie/laravel-activitylog/src/helpers.php',
     );
 
     public static $prefixLengthsPsr4 = array (
@@ -120,7 +120,6 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         array (
             'Cron\\' => 5,
             'Collective\\Html\\' => 16,
-            'Carbon\\' => 7,
         ),
         'B' => 
         array (
@@ -345,10 +344,6 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         array (
             0 => __DIR__ . '/..' . '/laravelcollective/html/src',
         ),
-        'Carbon\\' => 
-        array (
-            0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
-        ),
         'Barryvdh\\Debugbar\\' => 
         array (
             0 => __DIR__ . '/..' . '/barryvdh/laravel-debugbar/src',
@@ -361,6 +356,10 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         array (
             0 => __DIR__ . '/..' . '/adldap2/adldap2/src',
         ),
+    );
+
+    public static $fallbackDirsPsr4 = array (
+        0 => __DIR__ . '/..' . '/nesbot/carbon/src',
     );
 
     public static $prefixesPsr0 = array (
@@ -1096,6 +1095,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         return \Closure::bind(function () use ($loader) {
             $loader->prefixLengthsPsr4 = ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25::$prefixLengthsPsr4;
             $loader->prefixDirsPsr4 = ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25::$prefixDirsPsr4;
+            $loader->fallbackDirsPsr4 = ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25::$fallbackDirsPsr4;
             $loader->prefixesPsr0 = ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25::$prefixesPsr0;
             $loader->classMap = ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25::$classMap;
 

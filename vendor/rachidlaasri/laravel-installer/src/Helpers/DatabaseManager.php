@@ -37,7 +37,7 @@ class DatabaseManager
             Artisan::call('migrate', ["--force"=> true], $outputLog);
         }
         catch(Exception $e){
-            return $this->response($e->getMessage(), $outputLog);
+            return $this->response($e->getMessage(), 'error', $outputLog);
         }
 
         return $this->seed($outputLog);
@@ -52,10 +52,10 @@ class DatabaseManager
     private function seed($outputLog)
     {
         try{
-            Artisan::call('db:seed', [], $outputLog);
+            Artisan::call('db:seed', ['--force' => true], $outputLog);
         }
         catch(Exception $e){
-            return $this->response($e->getMessage(), $outputLog);
+            return $this->response($e->getMessage(), 'error', $outputLog);
         }
 
         return $this->response(trans('installer_messages.final.finished'), 'success', $outputLog);
@@ -69,7 +69,7 @@ class DatabaseManager
      * @param collection $outputLog
      * @return array
      */
-    private function response($message, $outputLog, $status = 'danger')
+    private function response($message, $status = 'danger', $outputLog)
     {
         return [
             'status' => $status,

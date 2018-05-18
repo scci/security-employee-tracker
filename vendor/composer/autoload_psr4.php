@@ -58,8 +58,8 @@ return array(
     'DebugBar\\' => array($vendorDir . '/maximebf/debugbar/src/DebugBar'),
     'Cron\\' => array($vendorDir . '/mtdowling/cron-expression/src/Cron'),
     'Collective\\Html\\' => array($vendorDir . '/laravelcollective/html/src'),
-    'Carbon\\' => array($vendorDir . '/nesbot/carbon/src/Carbon'),
     'Barryvdh\\Debugbar\\' => array($vendorDir . '/barryvdh/laravel-debugbar/src'),
     'Adldap\\Laravel\\' => array($vendorDir . '/adldap2/adldap2-laravel/src'),
     'Adldap\\' => array($vendorDir . '/adldap2/adldap2/src'),
+    '' => array($vendorDir . '/nesbot/carbon/src'),
 );

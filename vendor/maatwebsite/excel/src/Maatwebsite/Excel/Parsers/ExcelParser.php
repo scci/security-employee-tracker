@@ -95,7 +95,7 @@ class ExcelParser {
         $this->reader = $reader;
         $this->excel = $reader->excel;
 
-        $this->defaultStartRow = $this->currentRow = $reader->getHeaderRow();
+        $this->defaultStartRow = $this->currentRow = config('excel.import.startRow', 1);
 
         // Reset
         $this->reset();
@@ -237,10 +237,6 @@ class ExcelParser {
 
             case 'hashed':
                 return $this->getHashedIndex($value);
-                break;
-
-            case 'hashed_with_lower':
-                return $this->getHashedIndex(strtolower(trim($value)));
                 break;
 
             case 'trans':

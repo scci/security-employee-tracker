@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Routing\Redirector;
 use RachidLaasri\LaravelInstaller\Helpers\EnvironmentManager;
+use RachidLaasri\LaravelInstaller\Events\EnvironmentSaved;
 use Validator;
 use Illuminate\Validation\Rule;
 
@@ -69,6 +70,8 @@ class EnvironmentController extends Controller
     {
         $message = $this->EnvironmentManager->saveFileClassic($input);
 
+        event(new EnvironmentSaved($input));
+
         return $redirect->route('LaravelInstaller::environmentClassic')
                         ->with(['message' => $message]);
     }
@@ -95,6 +98,8 @@ class EnvironmentController extends Controller
         }
 
         $results = $this->EnvironmentManager->saveFileWizard($request);
+
+        event(new EnvironmentSaved($request));
 
         return $redirect->route('LaravelInstaller::database')
                         ->with(['results' => $results]);

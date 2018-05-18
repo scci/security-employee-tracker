@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
 use SET\Handlers\DateFormat;
 use SET\Mail\SendNewsEmail;
+use Illuminate\Support\Facades\Log;
 
 class News extends Model
 {
@@ -71,9 +72,7 @@ class News extends Model
      */
     public function emailNews()
     {
-        $publishDate = Carbon::createFromFormat('Y-m-d', $this->publish_date);
-
-        if ($this->send_email && $publishDate->eq(Carbon::now())) {
+        if ($this->send_email && ($this->publish_date == Carbon::now()->toDateString())) {
             $users = User::skipSystem()->active()->get();
             Mail::bcc($users)->send(new SendNewsEmail($this));
         }
