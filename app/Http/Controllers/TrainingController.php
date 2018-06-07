@@ -13,6 +13,7 @@ use SET\Events\TrainingAssigned;
 use SET\Group;
 use SET\Handlers\Excel\CompletedTrainingExport;
 use SET\Http\Requests\AssignTrainingRequest;
+use SET\Http\Requests\BulkUpdateTrainingRequest;
 use SET\Http\Requests\StoreTrainingRequest;
 use SET\Training;
 use SET\TrainingType;
@@ -205,12 +206,12 @@ class TrainingController extends Controller
      * Bulk update a training. Useful when FSO provides a training and needs to update
      * the training for all assigned users with the same completed date and attach the sign-in sheet.
      *
-     * @param AssignTrainingRequest $request
-     * @param int                   $trainingID
+     * @param BulkUpdateTrainingRequest $request
+     * @param int                       $trainingID
      *
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function bulkupdate(Request $request, $trainingID)
+    public function bulkupdate(BulkUpdateTrainingRequest $request, $trainingID)
     {
         $this->authorize('edit');
         
