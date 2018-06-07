@@ -1,7 +1,8 @@
 <?php
 
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use SET\Http\Controllers\TrainingController;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Storage;
 use SET\Training;
 use SET\TrainingType;
 use SET\TrainingUser;
@@ -26,7 +27,8 @@ class TrainingControllerTest extends TestCase
         // Logged in as admin - Can access the training page
         $this->action('GET', 'TrainingController@index');
 
-        $this->assertEquals('training', Route::getCurrentRoute()->getPath());
+        $this->call('GET', 'training');
+        $this->seeStatusCode(200); 
 
         // Logged in as a regular user - Cannot access the training page
         $newuser = factory(User::class)->create();
@@ -217,14 +219,18 @@ class TrainingControllerTest extends TestCase
         $this->seePageIs('/training/'.$createdTrainingId);
         $this->assertViewHas('notes');
         $this->assertViewHas('training');
-        $this->assertViewHas('showAll');
+        $this->assertViewHas('showAll');        
 
         //  Verify page components
         $this->see('Auto Renew'); // Block title
         $this->see('Attachments'); // Block title
         $this->see('Description'); // Block title
+        $this->see('Administrative Files'); // Block title
+        $this->see('Assign training to users');
+        $this->see('Bulk Update Training');
         // When there are no training types (views\layouts\_new_training.blade.php)
         $this->dontSee('Training Type'); // Block title
+
 
         // MIMIC call when there are training types
         // Create trainingtype object
@@ -241,6 +247,8 @@ class TrainingControllerTest extends TestCase
         $this->seeStatusCode(200); // OK status code
         // Verify page components - When there are no training types (views\layouts\_new_training.blade.php)
         $this->see('Training Type'); // Block title
+        $this->see('Assign training to users');
+        $this->see('Bulk Update Training');
     }
 
     /**
@@ -377,9 +385,9 @@ class TrainingControllerTest extends TestCase
         $training = factory(Training::class)->create();
         $createdTrainingId = $training->id;
 
-        $this->action('GET', 'TrainingController@assignForm', $createdTrainingId);
-
-        $this->assertEquals('training/{trainingID}/assign', Route::getCurrentRoute()->getPath());
+        $this->call('GET', "training/$createdTrainingId/assign");
+        $this->seeStatusCode(200); // OK status code
+        $this->seePageIs("training/$createdTrainingId/assign");
         $this->assertViewHas('training');
         $this->assertViewHas('users');
         $this->assertViewHas('groups');
@@ -437,12 +445,100 @@ class TrainingControllerTest extends TestCase
     /**
      * @test
      */
+    public function it_bulk_updates_a_training()
+    {
+        $training = factory(Training::class)->create();
+        $createdTrainingId = $training->id;
+        
+        // Create multiple training users for the same training with completed_date null.
+        $trainingUsers = factory(TrainingUser::class, 5)->create(
+                            ['training_id'    => $createdTrainingId,
+                             'completed_date' => null]);
+        
+        Storage::fake('local');
+        $data = ['users' => 
+                    array (
+                      0 => $trainingUsers[0]->user_id,
+                      1 => $trainingUsers[2]->user_id,
+                      2 => $trainingUsers[3]->user_id,
+                    ),
+                 'training_id'      => $createdTrainingId,
+                 'completed_date'   => '2016-12-29',
+                 'comment'          => 'Completed training offered by company',
+                 'encrypt'          => '1',
+                 'admin_only'       => '1',
+                 'files'            => 
+                    array (
+                      0 => UploadedFile::fake()->create('document.pdf', 26112),
+                    ),
+                ];
+        $this->call('POST', "/training/$createdTrainingId/bulkupdate/", $data);       
+        $this->seeStatusCode(302); // Redirection status code
+        $this->assertRedirectedTo("/training/$createdTrainingId");
+        
+        // Tried to test notification message. But none of the following worked.
+        //It may be easier to test notifications if we moved to using 
+        //https://laravel.com/docs/5.6/notifications instead of Krucas\Notification\Facades\Notification
+        /*$this->see("Training was updated for the users.");
+        $notifications= \Krucas\Notification\Facades\Notification::container()->all();
+        $notifications = \Krucas\Notification\Facades\Notification($this->getSessionStore(), 'notifications');
+        $notifications= \Krucas\Notification\Facades\Notification::container()->get('success')->first();
+        Log::Info($notifications);*/
+        
+        // Retrieve the training user just updated             
+        $updatedTrainingUser = SET\TrainingUser::where('training_id', $createdTrainingId)->get();
+        $this->assertEquals($updatedTrainingUser[0]->completed_date, $data['completed_date']);
+        $this->assertEquals($updatedTrainingUser[0]->comment, $data['comment']);
+        
+        $this->assertEquals($updatedTrainingUser[2]->completed_date, $data['completed_date']);
+        $this->assertEquals($updatedTrainingUser[2]->comment, $data['comment']);
+        
+        $this->assertEquals($updatedTrainingUser[3]->completed_date, $data['completed_date']);
+        $this->assertEquals($updatedTrainingUser[3]->comment, $data['comment']);
+        
+        $this->assertEquals($updatedTrainingUser[1]->completed_date, null);
+        $this->assertEquals($updatedTrainingUser[4]->completed_date, null);
+        $this->assertNotEquals($updatedTrainingUser[1]->completed_date, $data['completed_date']);
+        $this->assertNotEquals($updatedTrainingUser[1]->comment, $data['comment']);
+        $this->assertNotEquals($updatedTrainingUser[4]->completed_date, $data['completed_date']);
+        $this->assertNotEquals($updatedTrainingUser[4]->comment, $data['comment']);
+        
+        // Retrieve the uploaded file for the created training             
+        // Assert the file was stored...
+        $fileURL = Storage::url('local');
+        $this->assertEquals($fileURL."/".$data['files'][0]->name, "/storage/local/document.pdf");        
+    }
+    
+    /**
+     * @test
+     */
+    public function it_does_not_bulk_update_if_no_users_or_completed_date()
+    {
+        $training = factory(Training::class)->create();
+        $createdTrainingId = $training->id;
+        
+        // Error when no users are specified
+        $data1 = ['training_id'     => $createdTrainingId,                 
+                 'comment'          => 'Completed training offered by company',                 
+                ];
+        
+        $this->call('POST', "/training/$createdTrainingId/bulkupdate/", $data1);
+        $this->assertSessionHasErrors('users', 'The users field is required');
+        $this->assertSessionHasErrors('completed_date', 'The completed_date field is required');
+    }
+    
+    /**
+     * @test
+     */
     public function it_sends_reminders()
     {
         $trainingUser = factory(TrainingUser::class)->create();
         $trainingUserId = $trainingUser->id;
 
-        $this->action('GET', 'TrainingController@sendReminder', $trainingUserId);
-        $this->expectsEvents(SET\Events\TrainingAssigned::class);
+        $response = $this->call('GET', "training/reminder/$trainingUserId");
+        $this->expectsEvents(SET\Events\TrainingAssigned::class);        
+        $this->assertFalse($response->isOk()); // Just check that you don't get a 200 OK response.
+        $this->seeStatusCode(302); // Redirection status code
+        $this->assertRedirectedTo('/'); // Only check that you're redirecting to a specific URI
     }
 }
