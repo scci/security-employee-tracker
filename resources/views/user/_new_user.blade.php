@@ -109,7 +109,10 @@
             {!! Form::label('status', 'Status:') !!}
         </div>
     </div>
-</div>
+    <div class="col s12 m6 l4" id="separated_field">
+        {!! Form::label('separated_date', 'Separated Date:') !!}
+        {!! Form::date('separated_date', null, ['class' => 'datepicker']) !!}
+    </div>
 <div class="row">
     <div class="col s12 right-align">
         {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}

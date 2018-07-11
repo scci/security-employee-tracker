@@ -29,7 +29,6 @@ class ProcessMonday extends Command
         'notes'     => SendReminders::class,
         'visits'    => ExpiringVisits::class,
         'records'   => RenewTraining::class,
-        'destroyed' => DeleteUsers::class,
     ];
 
     /**

@@ -21,15 +21,15 @@
                 <table class="row-border hover data-table">
                     <thead>
                         <tr>
-                            <th>Name</th>
-                            <th>Destroyed Date</th>                            
+                            <th>Name</th>                      
+                            <th>Separated Date</th>                            
                         </tr>
                     </thead>
                     <tbody>
                         @foreach ($users as $user)
                             <tr class="user-{{$user->id}}">                                
                                 <td><a href="{{ url('/user', $user->id) }}">{{ $user->userFullName }}</a></td>
-                                <td>{{ $user->destroyed_date }}</td>                            
+                                <td>{{ $user->separated_date }}</td>                            
                             </tr>
                         @endforeach
                     </tbody>
@@ -101,6 +101,17 @@
     <strong>Creating a User</strong>
     <p>You may create a new user record using the <code>Add User</code> button on the bottom right of the page.</p>
 
+    <strong>Edit/Update a User</strong>
+    <p>You may edit/update a  user record using the <code>Edit</code> button towards the right of the user row. <br>
+       Note: You may edit a separated user by clicking on the name of the user.
+    </p>
+    
+    <strong>Deleting a User</strong>
+    <p>You may delete a  user record using the <code>Delete</code> button towards the right of the user row.<br>
+       Note: Once deleted a user record will be deleted from the database. This may have adverse effect if the user was an admin or trainings were assigned to the user. <br>
+             Only delete users created accidentally and who have not been assigned trainings or groups or user roles.     
+    </p>
+    
     <strong>Users</strong>
     <p>LDAP users will automatically be pulled in, even if you manually delete them. As such, it is better to filter the users out via the config file.</p>
 @stop

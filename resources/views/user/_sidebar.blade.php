@@ -39,11 +39,11 @@
             </div>
         @endif
 
-        @if($user->status != 'active' and $user->destroyed_date)
-            <div class="divider"></div>
-            <div>
-                <strong>Destroy Date:</strong>
-                {{ $user->destroyed_date->format('Y-m-d') }}
+        @if($user->status != 'active' and $user->separated_date)
+        <div class="divider"></div>
+        <div>
+                <strong>Separated Date:</strong>
+                {{ $user->separated_date }}
             </div>
         @endif
 

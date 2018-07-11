@@ -15,6 +15,7 @@ use SET\Handlers\Excel\JpasImport;
 use SET\Http\Requests\StoreUserRequest;
 use SET\Training;
 use SET\User;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class UserController.
@@ -143,8 +144,8 @@ class UserController extends Controller
         $this->authorize('edit');
 
         $data = Input::all();
-
-        $data['destroyed_date'] = $user->getDestroyDate($data['status']);
+        
+        //$data['destroyed_date'] = $user->getDestroyDate($data['status']);
 
         $user->update($data);
 
@@ -192,9 +193,12 @@ class UserController extends Controller
     {
         // Get the scheduled trainings and the completed trainings separately, so it will be easier to get either
         // the full list of completed trainings or the most recently completed training for each training type.
-        $scheduledTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
+        // Fetch scheduled trainings only if the user is active.
+        if ($user->status == 'active') {
+            $scheduledTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
                                 ->whereNull('completed_date');
-                
+        }
+        
         // Now fetch the recently completed training records for the specified  user
         $recentCompletedTrainings = DB::table('training_user as t1')
                                     ->where('id', function($query) use ($user) {
@@ -202,6 +206,7 @@ class UserController extends Controller
                                               ->selectRaw('t2.id')
                                               ->where('t2.user_id', '=', $user->id)
                                               ->whereRaw('t1.training_id = t2.training_id')
+                                              ->whereNotNull('completed_date')
                                               ->orderBy('completed_date', 'DESC')->limit(1);
                                     });
 
@@ -211,12 +216,25 @@ class UserController extends Controller
             $selectedTraining = Training::trainingByType($sectionId)->get()->pluck('id')->toArray();
 
             $completedTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
-                                    ->whereIn('training_id', $selectedTraining);
+                                    ->whereIn('training_id', $selectedTraining)->whereNotNull('completed_date');
 
-            $trainings = $scheduledTrainings->union($completedTrainings)->union($recentCompletedTrainings)
+            if (isset($scheduledTrainings)) {
+                $trainings = $scheduledTrainings->union($completedTrainings)->union($recentCompletedTrainings)
                                         ->orderBy('completed_date', 'DESC')->get();
+            } else {
+                $trainings = $completedTrainings->union($recentCompletedTrainings)
+                                ->orderBy('completed_date', 'DESC')->get();
+            }
         } else {
-            $trainings = $scheduledTrainings->union($recentCompletedTrainings)->orderBy('completed_date', 'DESC')->get();
+            if (isset($scheduledTrainings)) {
+                $trainings = $scheduledTrainings->union($recentCompletedTrainings)
+                                ->orderBy('completed_date', 'DESC')->get();
+            } else {
+                $rcTrainingIds = $recentCompletedTrainings->get()->pluck('training_id')->toArray();
+                $trainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
+                                    ->whereIn('training_id', $rcTrainingIds)
+                                    ->orderBy('completed_date', 'DESC')->get();
+            }
         }
 
         return $trainings;

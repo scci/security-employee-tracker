@@ -11,10 +11,6 @@
     </div>
 
     <div class="col s12 m8">
-        @if($user->status != 'active')
-          @include('user._show_destoryed_date_block')
-        @endif
-
         <ul class="collapsible popout" data-collapsible="accordion">
             @include('user._show_notes_blocks', ['alert' => true])
         </ul>
@@ -96,11 +92,10 @@
     Note: Training attachments cannot be deleted from this page. @can('edit') To delete a training attachment, go to that trainin's page. Removing a training attachment removes it for all suers.@endcan</p>
 
     <strong>Active, separated and destroyed statuses</strong>
-    <p>Each user may have one of 3 statuses:
+    <p>Each user may have one of 2 statuses:
     <ul>
         <li>Active (green): Account is currently active and the user will be listed in various select boxes in the application.</li>
-        <li>Separated (yellow): Account has been deactivated. Person is no longer employed. Will be deleted from the system in 2 years.</li>
-        <li>Destroyed (gray): Account has been flagged for deletion next week.</li>
+        <li>Separated (yellow): Account has been deactivated. Person is no longer employed. </li>
     </ul>
     </p>
 @stop

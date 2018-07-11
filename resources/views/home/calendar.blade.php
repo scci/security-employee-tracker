@@ -10,12 +10,7 @@
                     {{ Carbon\Carbon::createFromFormat('Y-m-d', $cal['date'])->format('j') }}
                 </div>
             </div>
-            <div class="events">
-                @if(count($cal['separated']) > 0)
-                    <div class="entry">
-                        The following records will be deleted: {!! implode("; ", array_map(function($a) {return "<a href='". url('user', $a['id']) . "'>". $a['last_name'] . ", ". $a['first_name'] ."</a>";}, $cal['separated'])) !!}
-                    </div>
-                @endif
+            <div class="events">                
                 @foreach($cal['travel'] as $travelCalendar)
                     @if($travelCalendar->leave_date == $cal['date'])
                         <div class="entry"> <a href="{{ url('user', $travelCalendar->user_id) }}">{{ $travelCalendar->user->userFullName }}</a> leaves for {{ $travelCalendar->location }}.</div>

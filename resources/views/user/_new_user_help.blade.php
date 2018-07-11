@@ -16,12 +16,11 @@
 <strong>Closed Areas</strong>
 <p>If a Group is flagged to have a closed area and is selected/deselected, then the corresponding closed area fields will display/hide.</p>
 
-<strong>Status and deleting users</strong>
+<strong>Status</strong>
 <p>
-    When changing the status to something other than active, a destroyed date is set for the user. When the destroyed date is reached, the system will delete the user from the database.
+    When changing the status to something other than active, a user may be marked as separated and a separated date set for that user.
     <ul class="browser-default">
-        <li>Separated - Delete in 2 years.</li>
-        <li>Destroyed - Delete at the start of next week.</li>
+        <li>Separated - Mark user as separated in the database. The user record will continue to exist in the database and will show up in the separated list of users.</li>
     </ul>
     Note: If a user is destroyed, but still in LDAP, they will be re-created with no records on the next login.
 </p>

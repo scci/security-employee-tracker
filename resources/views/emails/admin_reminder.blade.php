@@ -61,17 +61,6 @@
 </table>
 @endif
 
-@if($destroyed->count())
-    <h2>Users Destroyed</h2>
-    <p>The following users have been deleted from the system:</p>
-    <ul>
-        @foreach($destroyed as $user)
-            <li>{{ $user->userFullName }}</li>
-        @endforeach
-    </ul>
-    Note: If these users still exist within LDAP, they will be recreated on the next user login to SET.
-@endif
-
 @if($dutyLists->count())
 <h2>Security Checks for this week</h2>
 

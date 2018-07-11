@@ -29,7 +29,7 @@ class EmailAdminSummary extends Mailable implements ShouldQueue
         $this->notes = $array['notes'];
         $this->visits = $array['visits'];
         $this->records = $array['records'];
-        $this->destroyed = $array['destroyed'];
+        //$this->destroyed = $array['destroyed'];
         $this->dutyLists = $array['dutyLists'];
         $this->monday = Carbon::now()->startOfWeek();
     }
