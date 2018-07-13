@@ -8,6 +8,7 @@ use SET\Duty;
 use SET\Handlers\Duty\DutyList;
 use SET\Mail\EmailAdminSummary;
 use SET\Setting;
+use SET\User;
 
 class ProcessMonday extends Command
 {
@@ -53,8 +54,9 @@ class ProcessMonday extends Command
     private function sendReporterEmail($array)
     {
         $reportAddress = Setting::get('summary_recipient', null);
+        $recipientEmails = User::whereIn('id', $reportAddress)->get()->pluck('email');
         if ($reportAddress !== null) {
-            Mail::to($reportAddress)->send(new EmailAdminSummary($array));
+            Mail::to($recipientEmails)->send(new EmailAdminSummary($array));
         }
     }
 

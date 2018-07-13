@@ -22,7 +22,9 @@ class SettingController extends Controller
         $ldapControllers = $settings['adldap.connections.default.connection_settings.domain_controllers'] ?? config('adldap.connections.default.connection_settings.domain_controllers');
         $settings['ldap_controller1'] = $ldapControllers[0];
         $settings['ldap_controller2'] = $ldapControllers[1];
-
+        //$settings['summary_recipient'] = explode(',', $settings['summary_recipient']);
+        $settings['summary_recipient'] = User::whereIn('id', $settings['summary_recipient'])->get()->pluck('id');
+        
         $users = User::skipSystem()->active()->get()->sortBy('UserFullName');
         $userList = $users->pluck('UserFullName', 'id');
         $admins = $users->where('role', 'edit')->pluck('id')->all();
