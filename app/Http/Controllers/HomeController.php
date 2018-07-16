@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Request;
 use SET\Duty;
+use Illuminate\Database\Eloquent\Collection;
+use SET\Handlers\Duty\DutyUsers;
+use SET\Handlers\Duty\DutyGroups;
 use SET\Handlers\Calendar\Calendar;
 use SET\Training;
 use SET\TrainingUser;
@@ -37,13 +40,7 @@ class HomeController extends Controller
 
         $calendar = (new Calendar())->getCalendar();
 
-        $duties = Duty::with([
-            'users' => function ($query) {
-                $query->orderBy('duty_user.last_worked', 'desc');
-            },
-            'groups' => function ($query) {
-                $query->orderBy('duty_group.last_worked', 'desc');
-            }, ])->get();
+        $duties = $this->getDuties();
 
         return view('home.index', compact('trainingUser', 'activityLog', 'calendar', 'duties'));
     }
@@ -75,5 +72,36 @@ class HomeController extends Controller
                 'training' => $dbTraining,
             ],
         ]);
+    }
+    
+    private function getDuties()
+    {
+        $newCollection = new Collection();
+        $allDuties = Duty::all();
+        
+        foreach ($allDuties as $duty) {
+           if ($duty->has_groups) {
+               $userList = (new DutyGroups($duty))->queryList()->list->first();
+               $groupUsers = $this->getHtmlUserOutput($userList);
+               $newCollection->push([
+                    'duty'  => $duty->name,
+                    'user'=> implode('; ', $groupUsers)                    
+               ]);
+           } else {
+                $user = (new DutyUsers($duty))->getList()[0]['user'];
+                $newCollection->push([
+                    'duty'  => $duty->name,
+                    'user'  => "<a href='".url('user', $user->id)."'>".$user->userFullName.'</a>'   
+                ]);                
+           }           
+        }
+        return $newCollection;
+    }
+    
+    private function getHtmlUserOutput($userList) {
+        foreach ($userList->users as $user) {
+            $groupUsers[] = "<a href='".url('user', $user->id)."'>".$user->userFullName.'</a>';                   
+        }
+        return $groupUsers;
     }
 }
