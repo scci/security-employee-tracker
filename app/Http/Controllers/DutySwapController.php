@@ -2,12 +2,12 @@
 
 namespace SET\Http\Controllers;
 
-use Illuminate\Http\Request;
+use SET\Http\Requests\DutySwapRequest;
 use SET\Handlers\Duty\DutyList;
 
 class DutySwapController extends Controller
 {
-    public function store(Request $request)
+    public function store(DutySwapRequest $request)
     {
         $this->authorize('edit');
 
