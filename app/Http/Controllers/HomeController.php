@@ -41,7 +41,7 @@ class HomeController extends Controller
         $calendar = (new Calendar())->getCalendar();
 
         $duties = $this->getDuties();
-
+        
         return view('home.index', compact('trainingUser', 'activityLog', 'calendar', 'duties'));
     }
 
@@ -79,9 +79,9 @@ class HomeController extends Controller
         $newCollection = new Collection();
         $allDuties = Duty::all();
         
-        foreach ($allDuties as $duty) {
+        foreach ($allDuties as $duty) {           
            if ($duty->has_groups) {
-               $userList = (new DutyGroups($duty))->queryList()->list->first();
+               $userList = (new DutyGroups($duty))->getLastWorked()->list[0]['group'];
                $groupUsers = $this->getHtmlUserOutput($userList);
                $newCollection->push([
                     'duty'  => $duty->name,
@@ -99,7 +99,7 @@ class HomeController extends Controller
     }
     
     private function getHtmlUserOutput($userList) {
-        foreach ($userList->users as $user) {
+        foreach ($userList as $user) {
             $groupUsers[] = "<a href='".url('user', $user->id)."'>".$user->userFullName.'</a>';                   
         }
         return $groupUsers;
