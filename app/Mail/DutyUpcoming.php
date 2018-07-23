@@ -63,6 +63,7 @@ class DutyUpcoming extends Mailable implements ShouldQueue
         $date = Carbon::createFromFormat('Y-m-d', $this->date);
 
         $reportAddress = Setting::get('summary_recipient', null);
+        $recipientEmails = User::whereIn('id', $reportAddress)->get()->pluck('email');
 
         $rrule = '';
         if ($this->duty->cycle == 'weekly') {
@@ -79,7 +80,7 @@ class DutyUpcoming extends Mailable implements ShouldQueue
         $dtend = gmdate('Ymd\THis\Z', $meetingstamp + $meetingDuration);
         $todaystamp = gmdate('Ymd\THis\Z');
         $title = "You have $this->duty->name security check";
-        $organizer = 'MAILTO:'.$reportAddress;
+        $organizer = 'MAILTO:'.$recipientEmails;
 
         // ICS
         $mail = [];
