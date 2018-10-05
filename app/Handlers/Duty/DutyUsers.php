@@ -100,7 +100,7 @@ class DutyUsers extends DutyHelper
      */
     public function queryList()
     {
-        $this->list = $this->duty->users()->active()->orderBy('last_name')->get();
+        $this->list = $this->duty->users()->active()->orderBy('last_name')->orderBy('duty_user.last_worked', 'DESC')->get();
 
         return $this;
     }
@@ -117,6 +117,7 @@ class DutyUsers extends DutyHelper
         
         $count = $this->list->count();
         $dateCounter = 0;
+	
         for ($i = 0; $i < $count; $i++) {
             // Does list[i] already have date assigned? Is yes, skip assignment
             if (!empty($this->list[$i]['date'])) {
@@ -139,7 +140,7 @@ class DutyUsers extends DutyHelper
     {
         $dutySwaps = DutySwap::where('duty_id', $this->duty->id)
             ->where('imageable_type', 'SET\User')
-            ->where('date', '>=', Carbon::now()->subMonth())  //Omit really old records.
+            ->where('date', '>=', Carbon::now()->subDays(6)) //Omit really old records.
             ->orderBy('date', 'ASC')
             ->get();
 

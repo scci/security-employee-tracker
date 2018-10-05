@@ -113,7 +113,7 @@ class DutyGroups extends DutyHelper
     {
         $dutySwaps = DutySwap::where('duty_id', $this->duty->id)
             ->where('imageable_type', 'SET\Group')
-            ->where('date', '>=', Carbon::now()->subMonth()) //Omit really old records.
+            ->where('date', '>=', Carbon::now()->subDays(6)) //Omit really old records.
             ->orderBy('date', 'ASC')
             ->get();
         
