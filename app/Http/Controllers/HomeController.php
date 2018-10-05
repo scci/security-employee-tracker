@@ -81,14 +81,14 @@ class HomeController extends Controller
         
         foreach ($allDuties as $duty) {           
            if ($duty->has_groups) {
-               $userList = (new DutyGroups($duty))->getLastWorked()->list[0]['group'];
+               $userList = (new DutyGroups($duty))->getList()->first()['group'];
                $groupUsers = $this->getHtmlUserOutput($userList);
                $newCollection->push([
                     'duty'  => $duty->name,
                     'user'=> implode('; ', $groupUsers)                    
                ]);
            } else {
-                $user = (new DutyUsers($duty))->getList()[0]['user'];
+                $user = (new DutyUsers($duty))->getList()->first()['user'];
                 $newCollection->push([
                     'duty'  => $duty->name,
                     'user'  => "<a href='".url('user', $user->id)."'>".$user->userFullName.'</a>'   

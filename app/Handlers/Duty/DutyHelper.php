@@ -11,6 +11,7 @@ use SET\Duty;
 class DutyHelper
 {
     public $list;
+    public $swapDates;
     public $lastWorkedUser = null;
     public $duty;
 
@@ -24,9 +25,9 @@ class DutyHelper
     {
         $this->queryList()
             ->getLastWorked()
-            ->sortList()
-            ->combineListWithDates()
-            ->insertFromDutySwap();
+            ->sortList()            
+            ->insertFromDutySwap()
+            ->combineListWithDates();
     }
 
     public function iterateList()
@@ -47,7 +48,7 @@ class DutyHelper
                 $this->list->push($this->list->shift());
             }
         }
-
+        
         return $this;
     }
 

@@ -37,7 +37,7 @@ class DutyUsers extends DutyHelper
                 'date' => $entry['date'],
             ]);
         }
-
+        
         return $newCollection;
     }
 
@@ -105,28 +105,33 @@ class DutyUsers extends DutyHelper
         return $this;
     }
 
-    /**
+     /**
      * Take our list of users and merge them with dates so that each user is assigned a duty date.
      *
      * @return DutyUsers
      */
     public function combineListWithDates()
     {
-        $dates = (new DutyDates($this->duty))->getDates();
+        $dates = (new DutyDates($this->duty))->getDates();        
+        $newDatesList = array_values(array_diff($dates, $this->swapDates->toArray())); 
+        
         $count = $this->list->count();
-        $newList = new Collection();
-
+        $dateCounter = 0;
         for ($i = 0; $i < $count; $i++) {
-            $newList->push([
-                'date' => $dates[$i],
-                'user' => $this->list[$i],
-            ]);
-        }
-        $this->list = $newList;
-
+            // Does list[i] already have date assigned? Is yes, skip assignment
+            if (!empty($this->list[$i]['date'])) {
+                continue;
+            } else {
+                $this->list[$i] = [
+                    'date' => $newDatesList[$dateCounter++],
+                    'user' => $this->list[$i]['user']
+                ];             
+            }
+        }        
+        $this->list = $this->list->sortBy('date');
         return $this;
     }
-
+    
     /**
      * Query a list of users who we swapped around and insert them into our current duty list of users.
      */
@@ -138,17 +143,35 @@ class DutyUsers extends DutyHelper
             ->orderBy('date', 'ASC')
             ->get();
 
+        $this->convertListToCollection();
+           
+        $this->swapDates = new Collection();
         foreach ($dutySwaps as $swap) {
-            foreach ($this->list as $key => $entry) {
-                if ($swap->date == $entry['date']) {
-                    $this->list[$key] = [
-                        'user' => $swap->imageable()->first(),
-                        'date' => $entry['date'],
-                    ];
-                }
+            $key = key($this->list->pluck('user')->where('id', $swap->imageable_id)->toArray());
+            if (! is_null($key)) {
+                $this->swapDates->push($swap->date);
+                $this->list[$key] = [
+                        'date' => $swap->date,
+                        'user' => $swap->imageable()->first(),                        
+                ];
             }
         }
-
         return $this;
+    }
+    
+    /**
+     * Convert the list of users into a collection of date and users
+     */
+    private function convertListToCollection()
+    {
+        $count = $this->list->count();
+        $newList = new Collection();
+        for ($i = 0; $i < $count; $i++) {
+            $newList->push([
+                'date' => '',
+                'user' => $this->list[$i],
+            ]);
+        }
+        $this->list = $newList;
     }
 }

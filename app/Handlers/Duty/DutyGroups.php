@@ -44,6 +44,16 @@ class DutyGroups extends DutyHelper
         return $collection;
     }
 
+    /**
+     * Get function for the list. List is stored on the helper class.
+     *
+     * @return Collection
+     */
+    public function getList()
+    {
+        return $this->list;
+    }
+    
     public function recordNextEntry()
     {
         if ($this->list->count() < 2) {
@@ -68,25 +78,37 @@ class DutyGroups extends DutyHelper
         return $this;
     }
 
+    /**
+     * Take our list of groups and merge them with dates so that each group is assigned a duty date.
+     *
+     * @return DutyGroups
+     */
     public function combineListWithDates()
     {
         $dates = (new DutyDates($this->duty))->getDates();
-        $newList = new Collection();
+        $newDatesList = array_values(array_diff($dates, $this->swapDates->toArray())); 
         $count = $this->list->count();
+        $dateCounter = 0;
 
         for ($i = 0; $i < $count; $i++) {
-            $newList->push([
-                'date'  => $dates[$i],
-                'group' => $this->list[$i]->users()->active()->get(),
-                'id'    => $this->list[$i]->id,
-            ]);
-        }
-
-        $this->list = $newList;
-
+            // Does list[i] already have date assigned? Is yes, skip assignment
+            if (!empty($this->list[$i]['date'])) {
+                continue;
+            } else {
+                $this->list[$i] = [                    
+                    'group' => $this->list[$i]['group'],
+                    'id'    => $this->list[$i]['id'],
+                    'date'  => $newDatesList[$dateCounter++],
+                ];
+            }
+        }                
+        $this->list = $this->list->sortBy('date');
         return $this;
     }
 
+    /**
+     * Query a list of groups who we swapped around and insert them into our current duty list of groups.
+     */
     public function insertFromDutySwap()
     {
         $dutySwaps = DutySwap::where('duty_id', $this->duty->id)
@@ -94,18 +116,39 @@ class DutyGroups extends DutyHelper
             ->where('date', '>=', Carbon::now()->subMonth()) //Omit really old records.
             ->orderBy('date', 'ASC')
             ->get();
-
+        
+        $this->convertListToCollection();
+        $this->swapDates = new Collection();
+        
         foreach ($dutySwaps as $swap) {
-            foreach ($this->list as $key => $entry) {
-                if ($swap->date == $entry['date']) {
-                    $this->list[$key] = [
-                        'group' => $swap->imageable()->first()->users()->active()->get(),
-                        'id'    => $swap->imageable()->first()->id,
-                        'date'  => $entry['date'],
-                    ];
-                }
+            $key = key($this->list->where('id', $swap->imageable_id)->toArray());            
+            if (! is_null($key)) {
+                $this->swapDates->push($swap->date);
+                $this->list[$key] = [
+                    'group' => $swap->imageable()->first()->users()->active()->get(),
+                    'id'    => $swap->imageable()->first()->id,
+                    'date'  => $swap->date,
+                ];
             }
         }
+        return $this;
+    }
+    
+    /**
+     * Convert the list of groups into a collection of group users, group id and date
+     */
+    private function convertListToCollection()
+    {
+        $count = $this->list->count();
+        $newList = new Collection();
+        for ($i = 0; $i < $count; $i++) {
+            $newList->push([
+                'group' => $this->list[$i]->users()->active()->get(),
+                'id'    => $this->list[$i]->id,           
+                'date' => '',
+            ]);
+        }
+        $this->list = $newList;
     }
 
     /**

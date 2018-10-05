@@ -29,7 +29,7 @@ class GroupController extends Controller
 
         $groups = Group::with([
             'users' => function ($q) {
-                $q->orderBy('last_name');
+                $q->active()->orderBy('last_name');
             },
             'trainings',
         ])->get()->sortBy('name');

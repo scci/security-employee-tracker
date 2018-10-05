@@ -24,7 +24,7 @@ class DutyDates
         $array = [];
         $storeDate = $date = $this->getStartDate($this->duty->cycle);
 
-        $count = $this->duty->has_groups ? $this->duty->groups()->get()->count() : $this->duty->users()->get()->count();
+        $count = $this->duty->has_groups ? $this->duty->groups()->get()->count() : $this->duty->users()->active()->get()->count();
 
         for ($i = 0; $i < $count; $i++) {
             $array[$i] = $storeDate->format('Y-m-d');
