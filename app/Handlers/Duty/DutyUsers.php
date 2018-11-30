@@ -94,13 +94,13 @@ class DutyUsers extends DutyHelper
     }
 
     /**
-     * Get a list of all users for a specific duty sorted by the user's last name.
+     * Get a list of all users for a specific duty sorted by the user's last_worked date.
      *
      * @return DutyUsers
      */
     public function queryList()
     {
-        $this->list = $this->duty->users()->active()->orderBy('last_name')->orderBy('duty_user.last_worked', 'DESC')->get();
+        $this->list = $this->duty->users()->active()->orderBy('duty_user.last_worked', 'ASC')->get();
 
         return $this;
     }
@@ -128,7 +128,7 @@ class DutyUsers extends DutyHelper
                     'user' => $this->list[$i]['user']
                 ];             
             }
-        }        
+        }
         $this->list = $this->list->sortBy('date');
         return $this;
     }
