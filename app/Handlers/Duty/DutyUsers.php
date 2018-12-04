@@ -5,6 +5,7 @@ namespace SET\Handlers\Duty;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
 use SET\Duty;
 use SET\DutySwap;
 
@@ -89,7 +90,39 @@ class DutyUsers extends DutyHelper
     public function getLastWorked()
     {
         $this->lastWorkedUser = $this->duty->users()->orderBy('duty_user.last_worked', 'DESC')->orderBy('last_name')->first();
+        
+        return $this;
+    }
 
+    /*
+     * Add new duty user/group to the bottom of the duty list by
+     * setting the last_worked field to the oldest date
+     */
+    public function setLastWorkedDate()
+    {
+        // Get the new duty_user just added
+        $newDutyUserID = $this->duty->users()->whereNull('duty_user.last_worked')->orderBy('last_name', 'DESC')->pluck('id');
+
+        // Add the new users to the bottom of the duty list by assiging their last_worked dates
+        // to the most recent weeks. This means that the last_worked dates for the other users
+        // will need to move further down(depending on number of users added). Do not change the
+        // last_worked date for the user for the current week.
+        if($newDutyUserID->isNotEmpty())
+        {
+            $newDutyUsersCount = $newDutyUserID->count();
+
+            DB::table('duty_user')
+                ->whereNotIn('user_id', [$this->lastWorkedUser->id, $newDutyUserID])
+                ->update(['last_worked' => DB::raw('DATE_SUB(last_worked, INTERVAL ' . $newDutyUsersCount.' WEEK)')]);
+
+            $lastWorkedDate = new Carbon($this->lastWorkedUser->pivot->last_worked);
+
+            // Assign last_worked dates to the new users instead of null
+            foreach($newDutyUserID as $newUserID)
+            {
+                $this->duty->users()->updateExistingPivot($newUserID, ['last_worked' => $lastWorkedDate->subDays($newDutyUsersCount--)]);
+            }
+        }
         return $this;
     }
 
@@ -101,7 +134,7 @@ class DutyUsers extends DutyHelper
     public function queryList()
     {
         $this->list = $this->duty->users()->active()->orderBy('duty_user.last_worked', 'ASC')->get();
-
+        
         return $this;
     }
 

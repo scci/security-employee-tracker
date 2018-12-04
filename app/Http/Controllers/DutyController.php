@@ -68,6 +68,7 @@ class DutyController extends Controller
             ? $duty->groups()->sync($data['groups'])
             : $duty->users()->sync($data['users']);
 
+        (new DutyList($duty))->setLastWorkedDate();
         return redirect()->action('DutyController@index');
     }
 

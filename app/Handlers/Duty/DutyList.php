@@ -37,6 +37,11 @@ class DutyList
         return $userGroup->emailOutput();
     }
 
+    public function setLastWorkedDate()
+    {
+        return $this->processedList()->setLastWorkedDate();
+    }
+
     /**
      * @param array  $dateArray
      * @param array  $IDArray
