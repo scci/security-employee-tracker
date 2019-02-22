@@ -5,7 +5,6 @@ namespace Barryvdh\Debugbar\DataCollector;
 use Barryvdh\Debugbar\DataFormatter\SimpleFormatter;
 use DebugBar\DataCollector\MessagesCollector;
 use Illuminate\Contracts\Auth\Access\Gate;
-use Illuminate\Contracts\Auth\Access\Authorizable;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Symfony\Component\VarDumper\Cloner\VarCloner;
 
@@ -21,10 +20,12 @@ class GateCollector extends MessagesCollector
     {
         parent::__construct('gate');
         $this->setDataFormatter(new SimpleFormatter());
-        $gate->after([$this, 'addCheck']);
+        $gate->after(function ($user = null, $ability, $result, $arguments = []) {
+            $this->addCheck($user, $ability, $result, $arguments);
+        });
     }
 
-    public function addCheck(Authorizable $user = null, $ability, $result, $arguments = [])
+    public function addCheck($user = null, $ability, $result, $arguments = [])
     {
         $userKey = 'user';
         $userId = null;

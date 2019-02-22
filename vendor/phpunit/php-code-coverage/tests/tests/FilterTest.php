@@ -11,6 +11,7 @@
 namespace SebastianBergmann\CodeCoverage;
 
 use PHPUnit\Framework\TestCase;
+use SebastianBergmann\FileIterator\Facade as FileIteratorFacade;
 
 class FilterTest extends TestCase
 {
@@ -51,6 +52,7 @@ class FilterTest extends TestCase
             TEST_FILES_PATH . 'CoverageTwoDefaultClassAnnotations.php',
             TEST_FILES_PATH . 'CoveredClass.php',
             TEST_FILES_PATH . 'CoveredFunction.php',
+            TEST_FILES_PATH . 'Crash.php',
             TEST_FILES_PATH . 'NamespaceCoverageClassExtendedTest.php',
             TEST_FILES_PATH . 'NamespaceCoverageClassTest.php',
             TEST_FILES_PATH . 'NamespaceCoverageCoversClassPublicTest.php',
@@ -120,7 +122,7 @@ class FilterTest extends TestCase
      */
     public function testAddingFilesToTheWhitelistWorks()
     {
-        $facade = new \File_Iterator_Facade;
+        $facade = new FileIteratorFacade;
 
         $files = $facade->getFilesAsArray(
             TEST_FILES_PATH,

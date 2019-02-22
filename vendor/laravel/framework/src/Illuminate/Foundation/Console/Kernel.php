@@ -6,6 +6,7 @@ use Closure;
 use Exception;
 use Throwable;
 use ReflectionClass;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use Illuminate\Console\Command;
 use Symfony\Component\Finder\Finder;
@@ -97,7 +98,7 @@ class Kernel implements KernelContract
      */
     protected function defineConsoleSchedule()
     {
-        $this->app->singleton(Schedule::class, function ($app) {
+        $this->app->singleton(Schedule::class, function () {
             return new Schedule;
         });
 
@@ -195,7 +196,7 @@ class Kernel implements KernelContract
      */
     protected function load($paths)
     {
-        $paths = array_unique(is_array($paths) ? $paths : (array) $paths);
+        $paths = array_unique(Arr::wrap($paths));
 
         $paths = array_filter($paths, function ($path) {
             return is_dir($path);
@@ -353,7 +354,7 @@ class Kernel implements KernelContract
     }
 
     /**
-     * Report the exception to the exception handler.
+     * Render the given exception.
      *
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @param  \Exception  $e

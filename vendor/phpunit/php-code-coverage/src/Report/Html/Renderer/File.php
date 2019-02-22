@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace SebastianBergmann\CodeCoverage\Report\Html;
 
 use SebastianBergmann\CodeCoverage\Node\File as FileNode;
@@ -16,49 +15,24 @@ use SebastianBergmann\CodeCoverage\Util;
 /**
  * Renders a file node.
  */
-class File extends Renderer
+final class File extends Renderer
 {
     /**
      * @var int
      */
-    private $htmlspecialcharsFlags;
+    private $htmlSpecialCharsFlags = \ENT_COMPAT | \ENT_HTML401 | \ENT_SUBSTITUTE;
 
     /**
-     * Constructor.
-     *
-     * @param string $templatePath
-     * @param string $generator
-     * @param string $date
-     * @param int    $lowUpperBound
-     * @param int    $highLowerBound
+     * @throws \RuntimeException
      */
-    public function __construct($templatePath, $generator, $date, $lowUpperBound, $highLowerBound)
-    {
-        parent::__construct(
-            $templatePath,
-            $generator,
-            $date,
-            $lowUpperBound,
-            $highLowerBound
-        );
-
-        $this->htmlspecialcharsFlags = ENT_COMPAT;
-
-        $this->htmlspecialcharsFlags = $this->htmlspecialcharsFlags | ENT_HTML401 | ENT_SUBSTITUTE;
-    }
-
-    /**
-     * @param FileNode $node
-     * @param string   $file
-     */
-    public function render(FileNode $node, $file)
+    public function render(FileNode $node, string $file): void
     {
         $template = new \Text_Template($this->templatePath . 'file.html', '{{', '}}');
 
         $template->setVar(
             [
                 'items' => $this->renderItems($node),
-                'lines' => $this->renderSource($node)
+                'lines' => $this->renderSource($node),
             ]
         );
 
@@ -67,12 +41,7 @@ class File extends Renderer
         $template->renderTo($file);
     }
 
-    /**
-     * @param FileNode $node
-     *
-     * @return string
-     */
-    protected function renderItems(FileNode $node)
+    protected function renderItems(FileNode $node): string
     {
         $template = new \Text_Template($this->templatePath . 'file_item.html', '{{', '}}');
 
@@ -98,7 +67,7 @@ class File extends Renderer
                 'testedMethodsPercentAsString' => $node->getTestedFunctionsAndMethodsPercent(),
                 'testedClassesPercent'         => $node->getTestedClassesAndTraitsPercent(false),
                 'testedClassesPercentAsString' => $node->getTestedClassesAndTraitsPercent(),
-                'crap'                         => '<abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr>'
+                'crap'                         => '<abbr title="Change Risk Anti-Patterns (CRAP) Index">CRAP</abbr>',
             ]
         );
 
@@ -122,14 +91,7 @@ class File extends Renderer
         return $items;
     }
 
-    /**
-     * @param array          $items
-     * @param \Text_Template $template
-     * @param \Text_Template $methodItemTemplate
-     *
-     * @return string
-     */
-    protected function renderTraitOrClassItems(array $items, \Text_Template $template, \Text_Template $methodItemTemplate)
+    protected function renderTraitOrClassItems(array $items, \Text_Template $template, \Text_Template $methodItemTemplate): string
     {
         $buffer = '';
 
@@ -168,7 +130,7 @@ class File extends Renderer
             $buffer .= $this->renderItemTemplate(
                 $template,
                 [
-                    'name'                         => $name,
+                    'name'                         => $this->abbreviateClassName($name),
                     'numClasses'                   => $numClasses,
                     'numTestedClasses'             => $numTestedClasses,
                     'numMethods'                   => $numMethods,
@@ -183,8 +145,7 @@ class File extends Renderer
                     'numExecutableLines'           => $item['executableLines'],
                     'testedMethodsPercent'         => Util::percent(
                         $numTestedMethods,
-                        $numMethods,
-                        false
+                        $numMethods
                     ),
                     'testedMethodsPercentAsString' => Util::percent(
                         $numTestedMethods,
@@ -193,15 +154,14 @@ class File extends Renderer
                     ),
                     'testedClassesPercent'         => Util::percent(
                         $numTestedMethods == $numMethods ? 1 : 0,
-                        1,
-                        false
+                        1
                     ),
                     'testedClassesPercentAsString' => Util::percent(
                         $numTestedMethods == $numMethods ? 1 : 0,
                         1,
                         true
                     ),
-                    'crap'                         => $item['crap']
+                    'crap'                         => $item['crap'],
                 ]
             );
 
@@ -217,13 +177,7 @@ class File extends Renderer
         return $buffer;
     }
 
-    /**
-     * @param array          $functions
-     * @param \Text_Template $template
-     *
-     * @return string
-     */
-    protected function renderFunctionItems(array $functions, \Text_Template $template)
+    protected function renderFunctionItems(array $functions, \Text_Template $template): string
     {
         if (empty($functions)) {
             return '';
@@ -241,12 +195,7 @@ class File extends Renderer
         return $buffer;
     }
 
-    /**
-     * @param \Text_Template $template
-     *
-     * @return string
-     */
-    protected function renderFunctionOrMethodItem(\Text_Template $template, array $item, $indent = '')
+    protected function renderFunctionOrMethodItem(\Text_Template $template, array $item, string $indent = ''): string
     {
         $numMethods       = 0;
         $numTestedMethods = 0;
@@ -266,15 +215,14 @@ class File extends Renderer
                     '%s<a href="#%d"><abbr title="%s">%s</abbr></a>',
                     $indent,
                     $item['startLine'],
-                    \htmlspecialchars($item['signature']),
-                    isset($item['functionName']) ? $item['functionName'] : $item['methodName']
+                    \htmlspecialchars($item['signature'], $this->htmlSpecialCharsFlags),
+                    $item['functionName'] ?? $item['methodName']
                 ),
                 'numMethods'                   => $numMethods,
                 'numTestedMethods'             => $numTestedMethods,
                 'linesExecutedPercent'         => Util::percent(
                     $item['executedLines'],
-                    $item['executableLines'],
-                    false
+                    $item['executableLines']
                 ),
                 'linesExecutedPercentAsString' => Util::percent(
                     $item['executedLines'],
@@ -285,25 +233,19 @@ class File extends Renderer
                 'numExecutableLines'           => $item['executableLines'],
                 'testedMethodsPercent'         => Util::percent(
                     $numTestedMethods,
-                    1,
-                    false
+                    1
                 ),
                 'testedMethodsPercentAsString' => Util::percent(
                     $numTestedMethods,
                     1,
                     true
                 ),
-                'crap'                         => $item['crap']
+                'crap'                         => $item['crap'],
             ]
         );
     }
 
-    /**
-     * @param FileNode $node
-     *
-     * @return string
-     */
-    protected function renderSource(FileNode $node)
+    protected function renderSource(FileNode $node): string
     {
         $coverageData = $node->getCoverageData();
         $testData     = $node->getTestData();
@@ -384,7 +326,7 @@ class File extends Renderer
                         $popoverContent .= \sprintf(
                             '<li%s>%s</li>',
                             $testCSS,
-                            \htmlspecialchars($test)
+                            \htmlspecialchars($test, $this->htmlSpecialCharsFlags)
                         );
                     }
 
@@ -393,14 +335,14 @@ class File extends Renderer
                 }
             }
 
+            $popover = '';
+
             if (!empty($popoverTitle)) {
                 $popover = \sprintf(
                     ' data-title="%s" data-content="%s" data-placement="bottom" data-html="true"',
                     $popoverTitle,
-                    \htmlspecialchars($popoverContent)
+                    \htmlspecialchars($popoverContent, $this->htmlSpecialCharsFlags)
                 );
-            } else {
-                $popover = '';
             }
 
             $lines .= \sprintf(
@@ -421,10 +363,8 @@ class File extends Renderer
 
     /**
      * @param string $file
-     *
-     * @return array
      */
-    protected function loadFile($file)
+    protected function loadFile($file): array
     {
         $buffer              = \file_get_contents($file);
         $tokens              = \token_get_all($buffer);
@@ -440,26 +380,26 @@ class File extends Renderer
                 if ($token === '"' && $tokens[$j - 1] !== '\\') {
                     $result[$i] .= \sprintf(
                         '<span class="string">%s</span>',
-                        \htmlspecialchars($token)
+                        \htmlspecialchars($token, $this->htmlSpecialCharsFlags)
                     );
 
                     $stringFlag = !$stringFlag;
                 } else {
                     $result[$i] .= \sprintf(
                         '<span class="keyword">%s</span>',
-                        \htmlspecialchars($token)
+                        \htmlspecialchars($token, $this->htmlSpecialCharsFlags)
                     );
                 }
 
                 continue;
             }
 
-            list($token, $value) = $token;
+            [$token, $value] = $token;
 
             $value = \str_replace(
                 ["\t", ' '],
                 ['&nbsp;&nbsp;&nbsp;&nbsp;', '&nbsp;'],
-                \htmlspecialchars($value, $this->htmlspecialcharsFlags)
+                \htmlspecialchars($value, $this->htmlSpecialCharsFlags)
             );
 
             if ($value === "\n") {
@@ -475,73 +415,73 @@ class File extends Renderer
                             $colour = 'string';
                         } else {
                             switch ($token) {
-                                case T_INLINE_HTML:
+                                case \T_INLINE_HTML:
                                     $colour = 'html';
 
                                     break;
 
-                                case T_COMMENT:
-                                case T_DOC_COMMENT:
+                                case \T_COMMENT:
+                                case \T_DOC_COMMENT:
                                     $colour = 'comment';
 
                                     break;
 
-                                case T_ABSTRACT:
-                                case T_ARRAY:
-                                case T_AS:
-                                case T_BREAK:
-                                case T_CALLABLE:
-                                case T_CASE:
-                                case T_CATCH:
-                                case T_CLASS:
-                                case T_CLONE:
-                                case T_CONTINUE:
-                                case T_DEFAULT:
-                                case T_ECHO:
-                                case T_ELSE:
-                                case T_ELSEIF:
-                                case T_EMPTY:
-                                case T_ENDDECLARE:
-                                case T_ENDFOR:
-                                case T_ENDFOREACH:
-                                case T_ENDIF:
-                                case T_ENDSWITCH:
-                                case T_ENDWHILE:
-                                case T_EXIT:
-                                case T_EXTENDS:
-                                case T_FINAL:
-                                case T_FINALLY:
-                                case T_FOREACH:
-                                case T_FUNCTION:
-                                case T_GLOBAL:
-                                case T_IF:
-                                case T_IMPLEMENTS:
-                                case T_INCLUDE:
-                                case T_INCLUDE_ONCE:
-                                case T_INSTANCEOF:
-                                case T_INSTEADOF:
-                                case T_INTERFACE:
-                                case T_ISSET:
-                                case T_LOGICAL_AND:
-                                case T_LOGICAL_OR:
-                                case T_LOGICAL_XOR:
-                                case T_NAMESPACE:
-                                case T_NEW:
-                                case T_PRIVATE:
-                                case T_PROTECTED:
-                                case T_PUBLIC:
-                                case T_REQUIRE:
-                                case T_REQUIRE_ONCE:
-                                case T_RETURN:
-                                case T_STATIC:
-                                case T_THROW:
-                                case T_TRAIT:
-                                case T_TRY:
-                                case T_UNSET:
-                                case T_USE:
-                                case T_VAR:
-                                case T_WHILE:
-                                case T_YIELD:
+                                case \T_ABSTRACT:
+                                case \T_ARRAY:
+                                case \T_AS:
+                                case \T_BREAK:
+                                case \T_CALLABLE:
+                                case \T_CASE:
+                                case \T_CATCH:
+                                case \T_CLASS:
+                                case \T_CLONE:
+                                case \T_CONTINUE:
+                                case \T_DEFAULT:
+                                case \T_ECHO:
+                                case \T_ELSE:
+                                case \T_ELSEIF:
+                                case \T_EMPTY:
+                                case \T_ENDDECLARE:
+                                case \T_ENDFOR:
+                                case \T_ENDFOREACH:
+                                case \T_ENDIF:
+                                case \T_ENDSWITCH:
+                                case \T_ENDWHILE:
+                                case \T_EXIT:
+                                case \T_EXTENDS:
+                                case \T_FINAL:
+                                case \T_FINALLY:
+                                case \T_FOREACH:
+                                case \T_FUNCTION:
+                                case \T_GLOBAL:
+                                case \T_IF:
+                                case \T_IMPLEMENTS:
+                                case \T_INCLUDE:
+                                case \T_INCLUDE_ONCE:
+                                case \T_INSTANCEOF:
+                                case \T_INSTEADOF:
+                                case \T_INTERFACE:
+                                case \T_ISSET:
+                                case \T_LOGICAL_AND:
+                                case \T_LOGICAL_OR:
+                                case \T_LOGICAL_XOR:
+                                case \T_NAMESPACE:
+                                case \T_NEW:
+                                case \T_PRIVATE:
+                                case \T_PROTECTED:
+                                case \T_PUBLIC:
+                                case \T_REQUIRE:
+                                case \T_REQUIRE_ONCE:
+                                case \T_RETURN:
+                                case \T_STATIC:
+                                case \T_THROW:
+                                case \T_TRAIT:
+                                case \T_TRY:
+                                case \T_UNSET:
+                                case \T_USE:
+                                case \T_VAR:
+                                case \T_WHILE:
+                                case \T_YIELD:
                                     $colour = 'keyword';
 
                                     break;
@@ -570,5 +510,20 @@ class File extends Renderer
         }
 
         return $result;
+    }
+
+    private function abbreviateClassName(string $className): string
+    {
+        $tmp = \explode('\\', $className);
+
+        if (\count($tmp) > 1) {
+            $className = \sprintf(
+                '<abbr title="%s">%s</abbr>',
+                $className,
+                \array_pop($tmp)
+            );
+        }
+
+        return $className;
     }
 }

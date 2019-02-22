@@ -7,19 +7,18 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace SebastianBergmann\CodeCoverage;
 
-class InvalidArgumentException extends \InvalidArgumentException implements Exception
+final class InvalidArgumentException extends \InvalidArgumentException implements Exception
 {
     /**
-     * @param int    $argument
-     * @param string $type
-     * @param mixed  $value
+     * @param int        $argument
+     * @param string     $type
+     * @param null|mixed $value
      *
      * @return InvalidArgumentException
      */
-    public static function create($argument, $type, $value = null)
+    public static function create($argument, $type, $value = null): self
     {
         $stack = \debug_backtrace(0);
 

@@ -123,6 +123,30 @@ class Filesystem
     }
 
     /**
+     * Write the contents of a file, replacing it atomically if it already exists.
+     *
+     * @param  string  $path
+     * @param  string  $content
+     * @return void
+     */
+    public function replace($path, $content)
+    {
+        // If the path already exists and is a symlink, get the real path...
+        clearstatcache(true, $path);
+
+        $path = realpath($path) ?: $path;
+
+        $tempPath = tempnam(dirname($path), basename($path));
+
+        // Fix permissions of tempPath because `tempnam()` creates it with permissions set to 0600...
+        chmod($tempPath, 0777 - umask());
+
+        file_put_contents($tempPath, $content);
+
+        rename($tempPath, $path);
+    }
+
+    /**
      * Prepend to a file.
      *
      * @param  string  $path
@@ -387,7 +411,7 @@ class Filesystem
     public function files($directory, $hidden = false)
     {
         return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0),
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->depth(0)->sortByName(),
             false
         );
     }
@@ -402,7 +426,7 @@ class Filesystem
     public function allFiles($directory, $hidden = false)
     {
         return iterator_to_array(
-            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory),
+            Finder::create()->files()->ignoreDotFiles(! $hidden)->in($directory)->sortByName(),
             false
         );
     }
@@ -417,7 +441,7 @@ class Filesystem
     {
         $directories = [];
 
-        foreach (Finder::create()->in($directory)->directories()->depth(0) as $dir) {
+        foreach (Finder::create()->in($directory)->directories()->depth(0)->sortByName() as $dir) {
             $directories[] = $dir->getPathname();
         }
 
@@ -452,10 +476,8 @@ class Filesystem
      */
     public function moveDirectory($from, $to, $overwrite = false)
     {
-        if ($overwrite && $this->isDirectory($to)) {
-            if (! $this->deleteDirectory($to)) {
-                return false;
-            }
+        if ($overwrite && $this->isDirectory($to) && ! $this->deleteDirectory($to)) {
+            return false;
         }
 
         return @rename($from, $to) === true;
@@ -551,6 +573,27 @@ class Filesystem
         }
 
         return true;
+    }
+
+    /**
+     * Remove all of the directories within a given directory.
+     *
+     * @param  string  $directory
+     * @return bool
+     */
+    public function deleteDirectories($directory)
+    {
+        $allDirectories = $this->directories($directory);
+
+        if (! empty($allDirectories)) {
+            foreach ($allDirectories as $directoryName) {
+                $this->deleteDirectory($directoryName);
+            }
+
+            return true;
+        }
+
+        return false;
     }
 
     /**

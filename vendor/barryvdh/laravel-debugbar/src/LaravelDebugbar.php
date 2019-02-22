@@ -319,6 +319,9 @@ class LaravelDebugbar extends DebugBar
             try {
                 $db->listen(
                     function ($query, $bindings = null, $time = null, $connectionName = null) use ($db, $queryCollector) {
+                        if (!$this->shouldCollect('db', true)) {
+                            return; // Issue 776 : We've turned off collecting after the listener was attached
+                        }
                         // Laravel 5.2 changed the way some core events worked. We must account for
                         // the first argument being an "event object", where arguments are passed
                         // via object properties, instead of individual arguments.
@@ -666,7 +669,7 @@ class LaravelDebugbar extends DebugBar
 
         if ($this->shouldCollect('symfony_request', true) && !$this->hasCollector('request')) {
             try {
-                $this->addCollector(new RequestCollector($request, $response, $sessionManager));
+                $this->addCollector(new RequestCollector($request, $response, $sessionManager, $this->getCurrentRequestId()));
             } catch (\Exception $e) {
                 $this->addThrowable(
                     new Exception(

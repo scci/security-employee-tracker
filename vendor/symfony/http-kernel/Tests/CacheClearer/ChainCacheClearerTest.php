@@ -20,7 +20,7 @@ class ChainCacheClearerTest extends TestCase
 
     public static function setUpBeforeClass()
     {
-        self::$cacheDir = tempnam(sys_get_temp_dir(), 'sf2_cache_clearer_dir');
+        self::$cacheDir = tempnam(sys_get_temp_dir(), 'sf_cache_clearer_dir');
     }
 
     public static function tearDownAfterClass()
@@ -35,22 +35,7 @@ class ChainCacheClearerTest extends TestCase
             ->expects($this->once())
             ->method('clear');
 
-        $chainClearer = new ChainCacheClearer(array($clearer));
-        $chainClearer->clear(self::$cacheDir);
-    }
-
-    /**
-     * @group legacy
-     */
-    public function testInjectClearerUsingAdd()
-    {
-        $clearer = $this->getMockClearer();
-        $clearer
-            ->expects($this->once())
-            ->method('clear');
-
-        $chainClearer = new ChainCacheClearer();
-        $chainClearer->add($clearer);
+        $chainClearer = new ChainCacheClearer([$clearer]);
         $chainClearer->clear(self::$cacheDir);
     }
 

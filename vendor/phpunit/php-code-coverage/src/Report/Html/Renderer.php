@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace SebastianBergmann\CodeCoverage\Report\Html;
 
 use SebastianBergmann\CodeCoverage\Node\AbstractNode;
@@ -51,16 +50,7 @@ abstract class Renderer
      */
     protected $version;
 
-    /**
-     * Constructor.
-     *
-     * @param string $templatePath
-     * @param string $generator
-     * @param string $date
-     * @param int    $lowUpperBound
-     * @param int    $highLowerBound
-     */
-    public function __construct($templatePath, $generator, $date, $lowUpperBound, $highLowerBound)
+    public function __construct(string $templatePath, string $generator, string $date, int $lowUpperBound, int $highLowerBound)
     {
         $this->templatePath   = $templatePath;
         $this->generator      = $generator;
@@ -70,13 +60,7 @@ abstract class Renderer
         $this->version        = Version::id();
     }
 
-    /**
-     * @param \Text_Template $template
-     * @param array          $data
-     *
-     * @return string
-     */
-    protected function renderItemTemplate(\Text_Template $template, array $data)
+    protected function renderItemTemplate(\Text_Template $template, array $data): string
     {
         $numSeparator  = '&nbsp;/&nbsp;';
 
@@ -130,8 +114,8 @@ abstract class Renderer
 
         $template->setVar(
             [
-                'icon'                   => isset($data['icon']) ? $data['icon'] : '',
-                'crap'                   => isset($data['crap']) ? $data['crap'] : '',
+                'icon'                   => $data['icon'] ?? '',
+                'crap'                   => $data['crap'] ?? '',
                 'name'                   => $data['name'],
                 'lines_bar'              => $linesBar,
                 'lines_executed_percent' => $data['linesExecutedPercentAsString'],
@@ -142,20 +126,16 @@ abstract class Renderer
                 'methods_level'          => $methodsLevel,
                 'methods_number'         => $methodsNumber,
                 'classes_bar'            => $classesBar,
-                'classes_tested_percent' => isset($data['testedClassesPercentAsString']) ? $data['testedClassesPercentAsString'] : '',
+                'classes_tested_percent' => $data['testedClassesPercentAsString'] ?? '',
                 'classes_level'          => $classesLevel,
-                'classes_number'         => $classesNumber
+                'classes_number'         => $classesNumber,
             ]
         );
 
         return $template->render();
     }
 
-    /**
-     * @param \Text_Template $template
-     * @param AbstractNode   $node
-     */
-    protected function setCommonTemplateVariables(\Text_Template $template, AbstractNode $node)
+    protected function setCommonTemplateVariables(\Text_Template $template, AbstractNode $node): void
     {
         $template->setVar(
             [
@@ -168,12 +148,12 @@ abstract class Renderer
                 'runtime'          => $this->getRuntimeString(),
                 'generator'        => $this->generator,
                 'low_upper_bound'  => $this->lowUpperBound,
-                'high_lower_bound' => $this->highLowerBound
+                'high_lower_bound' => $this->highLowerBound,
             ]
         );
     }
 
-    protected function getBreadcrumbs(AbstractNode $node)
+    protected function getBreadcrumbs(AbstractNode $node): string
     {
         $breadcrumbs = '';
         $path        = $node->getPathAsArray();
@@ -202,35 +182,35 @@ abstract class Renderer
         return $breadcrumbs;
     }
 
-    protected function getActiveBreadcrumb(AbstractNode $node)
+    protected function getActiveBreadcrumb(AbstractNode $node): string
     {
         $buffer = \sprintf(
-            '        <li class="active">%s</li>' . "\n",
+            '         <li class="breadcrumb-item active">%s</li>' . "\n",
             $node->getName()
         );
 
         if ($node instanceof DirectoryNode) {
-            $buffer .= '        <li>(<a href="dashboard.html">Dashboard</a>)</li>' . "\n";
+            $buffer .= '         <li class="breadcrumb-item">(<a href="dashboard.html">Dashboard</a>)</li>' . "\n";
         }
 
         return $buffer;
     }
 
-    protected function getInactiveBreadcrumb(AbstractNode $node, $pathToRoot)
+    protected function getInactiveBreadcrumb(AbstractNode $node, string $pathToRoot): string
     {
         return \sprintf(
-            '        <li><a href="%sindex.html">%s</a></li>' . "\n",
+            '         <li class="breadcrumb-item"><a href="%sindex.html">%s</a></li>' . "\n",
             $pathToRoot,
             $node->getName()
         );
     }
 
-    protected function getPathToRoot(AbstractNode $node)
+    protected function getPathToRoot(AbstractNode $node): string
     {
         $id    = $node->getId();
         $depth = \substr_count($id, '/');
 
-        if ($id != 'index' &&
+        if ($id !== 'index' &&
             $node instanceof DirectoryNode) {
             $depth++;
         }
@@ -238,7 +218,7 @@ abstract class Renderer
         return \str_repeat('../', $depth);
     }
 
-    protected function getCoverageBar($percent)
+    protected function getCoverageBar(float $percent): string
     {
         $level = $this->getColorLevel($percent);
 
@@ -253,27 +233,21 @@ abstract class Renderer
         return $template->render();
     }
 
-    /**
-     * @param int $percent
-     *
-     * @return string
-     */
-    protected function getColorLevel($percent)
+    protected function getColorLevel(float $percent): string
     {
         if ($percent <= $this->lowUpperBound) {
             return 'danger';
-        } elseif ($percent > $this->lowUpperBound &&
+        }
+
+        if ($percent > $this->lowUpperBound &&
             $percent < $this->highLowerBound) {
             return 'warning';
-        } else {
-            return 'success';
         }
+
+        return 'success';
     }
 
-    /**
-     * @return string
-     */
-    private function getRuntimeString()
+    private function getRuntimeString(): string
     {
         $runtime = new Runtime;
 

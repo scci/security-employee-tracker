@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace SebastianBergmann\CodeCoverage\Node;
 
 use SebastianBergmann\CodeCoverage\Util;
@@ -42,15 +41,9 @@ abstract class AbstractNode implements \Countable
      */
     private $id;
 
-    /**
-     * Constructor.
-     *
-     * @param string       $name
-     * @param AbstractNode $parent
-     */
-    public function __construct($name, self $parent = null)
+    public function __construct(string $name, self $parent = null)
     {
-        if (\substr($name, -1) == '/') {
+        if (\substr($name, -1) == \DIRECTORY_SEPARATOR) {
             $name = \substr($name, 0, -1);
         }
 
@@ -58,18 +51,12 @@ abstract class AbstractNode implements \Countable
         $this->parent = $parent;
     }
 
-    /**
-     * @return string
-     */
-    public function getName()
+    public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @return string
-     */
-    public function getId()
+    public function getId(): string
     {
         if ($this->id === null) {
             $parent = $this->getParent();
@@ -79,7 +66,7 @@ abstract class AbstractNode implements \Countable
             } else {
                 $parentId = $parent->getId();
 
-                if ($parentId == 'index') {
+                if ($parentId === 'index') {
                     $this->id = \str_replace(':', '_', $this->name);
                 } else {
                     $this->id = $parentId . '/' . $this->name;
@@ -90,26 +77,20 @@ abstract class AbstractNode implements \Countable
         return $this->id;
     }
 
-    /**
-     * @return string
-     */
-    public function getPath()
+    public function getPath(): string
     {
         if ($this->path === null) {
             if ($this->parent === null || $this->parent->getPath() === null || $this->parent->getPath() === false) {
                 $this->path = $this->name;
             } else {
-                $this->path = $this->parent->getPath() . '/' . $this->name;
+                $this->path = $this->parent->getPath() . \DIRECTORY_SEPARATOR . $this->name;
             }
         }
 
         return $this->path;
     }
 
-    /**
-     * @return array
-     */
-    public function getPathAsArray()
+    public function getPathAsArray(): array
     {
         if ($this->pathArray === null) {
             if ($this->parent === null) {
@@ -124,10 +105,7 @@ abstract class AbstractNode implements \Countable
         return $this->pathArray;
     }
 
-    /**
-     * @return AbstractNode
-     */
-    public function getParent()
+    public function getParent(): ?self
     {
         return $this->parent;
     }
@@ -135,11 +113,9 @@ abstract class AbstractNode implements \Countable
     /**
      * Returns the percentage of classes that has been tested.
      *
-     * @param bool $asString
-     *
-     * @return int
+     * @return int|string
      */
-    public function getTestedClassesPercent($asString = true)
+    public function getTestedClassesPercent(bool $asString = true)
     {
         return Util::percent(
             $this->getNumTestedClasses(),
@@ -151,11 +127,9 @@ abstract class AbstractNode implements \Countable
     /**
      * Returns the percentage of traits that has been tested.
      *
-     * @param bool $asString
-     *
-     * @return int
+     * @return int|string
      */
-    public function getTestedTraitsPercent($asString = true)
+    public function getTestedTraitsPercent(bool $asString = true)
     {
         return Util::percent(
             $this->getNumTestedTraits(),
@@ -167,11 +141,9 @@ abstract class AbstractNode implements \Countable
     /**
      * Returns the percentage of classes and traits that has been tested.
      *
-     * @param bool $asString
-     *
-     * @return int
+     * @return int|string
      */
-    public function getTestedClassesAndTraitsPercent($asString = true)
+    public function getTestedClassesAndTraitsPercent(bool $asString = true)
     {
         return Util::percent(
             $this->getNumTestedClassesAndTraits(),
@@ -183,11 +155,9 @@ abstract class AbstractNode implements \Countable
     /**
      * Returns the percentage of functions that has been tested.
      *
-     * @param bool $asString
-     *
-     * @return int
+     * @return int|string
      */
-    public function getTestedFunctionsPercent($asString = true)
+    public function getTestedFunctionsPercent(bool $asString = true)
     {
         return Util::percent(
             $this->getNumTestedFunctions(),
@@ -199,11 +169,9 @@ abstract class AbstractNode implements \Countable
     /**
      * Returns the percentage of methods that has been tested.
      *
-     * @param bool $asString
-     *
-     * @return int
+     * @return int|string
      */
-    public function getTestedMethodsPercent($asString = true)
+    public function getTestedMethodsPercent(bool $asString = true)
     {
         return Util::percent(
             $this->getNumTestedMethods(),
@@ -215,11 +183,9 @@ abstract class AbstractNode implements \Countable
     /**
      * Returns the percentage of functions and methods that has been tested.
      *
-     * @param bool $asString
-     *
-     * @return int
+     * @return int|string
      */
-    public function getTestedFunctionsAndMethodsPercent($asString = true)
+    public function getTestedFunctionsAndMethodsPercent(bool $asString = true)
     {
         return Util::percent(
             $this->getNumTestedFunctionsAndMethods(),
@@ -231,11 +197,9 @@ abstract class AbstractNode implements \Countable
     /**
      * Returns the percentage of executed lines.
      *
-     * @param bool $asString
-     *
-     * @return int
+     * @return int|string
      */
-    public function getLineExecutedPercent($asString = true)
+    public function getLineExecutedPercent(bool $asString = true)
     {
         return Util::percent(
             $this->getNumExecutedLines(),
@@ -246,159 +210,119 @@ abstract class AbstractNode implements \Countable
 
     /**
      * Returns the number of classes and traits.
-     *
-     * @return int
      */
-    public function getNumClassesAndTraits()
+    public function getNumClassesAndTraits(): int
     {
         return $this->getNumClasses() + $this->getNumTraits();
     }
 
     /**
      * Returns the number of tested classes and traits.
-     *
-     * @return int
      */
-    public function getNumTestedClassesAndTraits()
+    public function getNumTestedClassesAndTraits(): int
     {
         return $this->getNumTestedClasses() + $this->getNumTestedTraits();
     }
 
     /**
      * Returns the classes and traits of this node.
-     *
-     * @return array
      */
-    public function getClassesAndTraits()
+    public function getClassesAndTraits(): array
     {
         return \array_merge($this->getClasses(), $this->getTraits());
     }
 
     /**
      * Returns the number of functions and methods.
-     *
-     * @return int
      */
-    public function getNumFunctionsAndMethods()
+    public function getNumFunctionsAndMethods(): int
     {
         return $this->getNumFunctions() + $this->getNumMethods();
     }
 
     /**
      * Returns the number of tested functions and methods.
-     *
-     * @return int
      */
-    public function getNumTestedFunctionsAndMethods()
+    public function getNumTestedFunctionsAndMethods(): int
     {
         return $this->getNumTestedFunctions() + $this->getNumTestedMethods();
     }
 
     /**
      * Returns the functions and methods of this node.
-     *
-     * @return array
      */
-    public function getFunctionsAndMethods()
+    public function getFunctionsAndMethods(): array
     {
         return \array_merge($this->getFunctions(), $this->getMethods());
     }
 
     /**
      * Returns the classes of this node.
-     *
-     * @return array
      */
-    abstract public function getClasses();
+    abstract public function getClasses(): array;
 
     /**
      * Returns the traits of this node.
-     *
-     * @return array
      */
-    abstract public function getTraits();
+    abstract public function getTraits(): array;
 
     /**
      * Returns the functions of this node.
-     *
-     * @return array
      */
-    abstract public function getFunctions();
+    abstract public function getFunctions(): array;
 
     /**
      * Returns the LOC/CLOC/NCLOC of this node.
-     *
-     * @return array
      */
-    abstract public function getLinesOfCode();
+    abstract public function getLinesOfCode(): array;
 
     /**
      * Returns the number of executable lines.
-     *
-     * @return int
      */
-    abstract public function getNumExecutableLines();
+    abstract public function getNumExecutableLines(): int;
 
     /**
      * Returns the number of executed lines.
-     *
-     * @return int
      */
-    abstract public function getNumExecutedLines();
+    abstract public function getNumExecutedLines(): int;
 
     /**
      * Returns the number of classes.
-     *
-     * @return int
      */
-    abstract public function getNumClasses();
+    abstract public function getNumClasses(): int;
 
     /**
      * Returns the number of tested classes.
-     *
-     * @return int
      */
-    abstract public function getNumTestedClasses();
+    abstract public function getNumTestedClasses(): int;
 
     /**
      * Returns the number of traits.
-     *
-     * @return int
      */
-    abstract public function getNumTraits();
+    abstract public function getNumTraits(): int;
 
     /**
      * Returns the number of tested traits.
-     *
-     * @return int
      */
-    abstract public function getNumTestedTraits();
+    abstract public function getNumTestedTraits(): int;
 
     /**
      * Returns the number of methods.
-     *
-     * @return int
      */
-    abstract public function getNumMethods();
+    abstract public function getNumMethods(): int;
 
     /**
      * Returns the number of tested methods.
-     *
-     * @return int
      */
-    abstract public function getNumTestedMethods();
+    abstract public function getNumTestedMethods(): int;
 
     /**
      * Returns the number of functions.
-     *
-     * @return int
      */
-    abstract public function getNumFunctions();
+    abstract public function getNumFunctions(): int;
 
     /**
      * Returns the number of tested functions.
-     *
-     * @return int
      */
-    abstract public function getNumTestedFunctions();
+    abstract public function getNumTestedFunctions(): int;
 }

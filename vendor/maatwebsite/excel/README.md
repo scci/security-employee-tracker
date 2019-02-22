@@ -1,100 +1,224 @@
-## Laravel Excel v2.1.* for Laravel 5
 
-Looking for Laravel Excel for Laravel 4? Visit the [`1.3` branch](https://github.com/Maatwebsite/Laravel-Excel/tree/1.3)
 
-[<img src="http://www.maatwebsite.nl/img/excel_banner.jpg"/>](http://www.maatwebsite.nl/laravel-excel/docs)
-[<img src="https://cloud.githubusercontent.com/assets/7728097/6332170/1b495af2-bb84-11e4-9a93-34a9abc01840.jpg"/>](http://www.maatwebsite.nl/vacature-php-programmeur-maastricht)
+<p align="center">
+  <a href="https://laravel-excel.maatwebsite.nl">
+    <img alt="Laravel Excel" src="https://user-images.githubusercontent.com/7728097/43685313-ff1e2110-98b0-11e8-8b50-900a2b262f0f.png" />
+  </a>
+</p>
 
-Laravel Excel brings the power of PHPOffice's PHPExcel to Laravel 5 with a touch of the Laravel Magic. It includes features like: importing Excel and CSV to collections, exporting models, array's and views to Excel, importing batches of files and importing a file by a config file.
+<h1 align="center">
+  Laravel Excel 3.1
+</h1>
 
-- Import into Laravel **Collections**
-- Export **Blade views** to Excel and CSV with optional CSS styling
-- **Batch** imports
-- A lot of optional **config settings**
-- Easy **cell caching**
-- Chunked and queued importer
-- ExcelFile method injections
-- Editing existing Excel files
-- **Advanced import** by config files
-- and many more...
+<p align="center">
+  
+  <a href="https://medium.com/maatwebsite/celebrating-5-years-of-laravel-excel-d0416eebca20">
+  <img alt="Laravel Excel - 10 Million Downloads" src="https://user-images.githubusercontent.com/7728097/52121137-db33f300-261e-11e9-98b4-18fa4d572b2e.jpg" />
+  </a>
+  </p>
+  
+<h3 align="center">
+  🎉 Celebrating 10 Million Downloads. Read more on <a href="https://medium.com/maatwebsite/celebrating-5-years-of-laravel-excel-d0416eebca20">our blog!</a> about 5 years of Laravel!
+</h3>
 
----
+<p></p>
 
-```php
-Excel::create('Laravel Excel', function($excel) {
 
-    $excel->sheet('Excel sheet', function($sheet) {
+<h3 align="center">
+  :muscle: :fire: :rocket:
+</h3>
 
-        $sheet->setOrientation('landscape');
+<p align="center">
+  <strong>Supercharged Excel exports and imports</strong><br>
+  A simple, but elegant wrapper around <a href="https://phpspreadsheet.readthedocs.io/">PhpSpreadsheet</a> with the goal of simplifying
+exports and imports. 
+</p>
 
-    });
+<p align="center">
+  <a href="https://travis-ci.org/Maatwebsite/Laravel-Excel">
+    <img src="https://travis-ci.org/Maatwebsite/Laravel-Excel.svg?branch=3.1" alt="Build Status">
+  </a> 
+  
+  <a href="https://styleci.io/repos/14259390">
+    <img src="https://styleci.io/repos/14259390/shield?branch=3.1" alt="StyleCI">
+  </a> 
+  
+   <a href="https://packagist.org/packages/maatwebsite/excel">
+      <img src="https://poser.pugx.org/maatwebsite/excel/v/stable.png" alt="Latest Stable Version">
+  </a> 
+  
+  <a href="https://packagist.org/packages/maatwebsite/excel">
+      <img src="https://poser.pugx.org/maatwebsite/excel/downloads.png" alt="Total Downloads">
+  </a> 
+  
+  <a href="https://packagist.org/packages/maatwebsite/excel">
+    <img src="https://poser.pugx.org/maatwebsite/excel/license.png" alt="License">
+  </a>
+</p>
 
-})->export('xls');
+<h4 align="center">
+  <a href="https://laravel-excel.maatwebsite.nl/3.1/exports/">Quickstart</a>
+  <span> · </span>
+  <a href="https://laravel-excel.maatwebsite.nl/3.1/getting-started/">Documentation</a>
+  <span> · </span>
+  <a href="https://github.com/Maatwebsite/Laravel-Nova-Excel">Nova</a>
+  <span> · </span>
+  <a href="https://medium.com/maatwebsite/laravel-excel/home">Blog</a>
+  <span> · </span>
+  <a href="https://laravel-excel.maatwebsite.nl/3.1/getting-started/contributing.html">Contributing</a>
+  <span> · </span>
+  <a href="https://laravel-excel.maatwebsite.nl/3.1/getting-started/support.html">Support</a>
+</h4>
+
+- **Easily export collections to Excel.** Supercharge your Laravel collections and export them directly to an Excel or CSV document. Exporting has never been so easy.
+
+- **Supercharged exports.** Export queries with automatic chunking for better performance. You provide us the query, we handle the performance. Exporting even larger datasets? No worries, Laravel Excel has your back. You can queue your exports so all of this happens in the background.
+
+- **Supercharged imports.** Import workbooks and worksheets to Eloquent models with chunk reading and batch inserts! Have large files? You can queue every chunk of a file! Your entire import will happen in the background.
+
+- **Export Blade views.** Want to have a custom layout in your spreadsheet? Use a HTML table in a Blade view and export that to Excel.
+
+## :rocket: 5 minutes quick start for exports
+
+:bulb: Require this package in the `composer.json` of your Laravel project. This will download the package and PhpSpreadsheet.
+
+```
+composer require maatwebsite/excel
 ```
 
----
+:muscle: Create an export class in `App/Exports`
 
-[![Build Status](https://travis-ci.org/Maatwebsite/Laravel-Excel.svg?branch=master)](https://travis-ci.org/Maatwebsite/Laravel-Excel)
-[![Latest Stable Version](https://poser.pugx.org/maatwebsite/excel/v/stable.png)](https://packagist.org/packages/maatwebsite/excel) [![Total Downloads](https://poser.pugx.org/maatwebsite/excel/downloads.png)](https://packagist.org/packages/maatwebsite/excel)  [![License](https://poser.pugx.org/maatwebsite/excel/license.png)](https://packagist.org/packages/maatwebsite/excel)
-[![Monthly Downloads](https://poser.pugx.org/maatwebsite/excel/d/monthly.png)](https://packagist.org/packages/maatwebsite/excel)
-[![Daily Downloads](https://poser.pugx.org/maatwebsite/excel/d/daily.png)](https://packagist.org/packages/maatwebsite/excel)
-
-[![Help the project](http://www.pledgie.com/campaigns/30385.png?skin_name=chrome)](http://pledgie.com/campaigns/30385)
-
-# Installation
-
-Require this package in your `composer.json` and update composer. This will download the package and PHPExcel of PHPOffice.
-
-```php
-"maatwebsite/excel": "~2.1.0"
+```
+php artisan make:export UsersExport --model=User
 ```
 
-After updating composer, add the ServiceProvider to the providers array in `config/app.php`
+This should have created:
 
 ```php
-Maatwebsite\Excel\ExcelServiceProvider::class,
+<?php
+
+namespace App\Exports;
+
+use App\User;
+use Maatwebsite\Excel\Concerns\FromCollection;
+
+class UsersExport implements FromCollection
+{
+    public function collection()
+    {
+        return User::all();
+    }
+}
 ```
 
-You can use the facade for shorter code. Add this to your aliases:
+:fire: In your controller you can call this export now:
 
 ```php
-'Excel' => Maatwebsite\Excel\Facades\Excel::class,
+
+use App\Exports\UsersExport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\Controller;
+
+class UsersController extends Controller 
+{
+    public function export() 
+    {
+        return Excel::download(new UsersExport, 'users.xlsx');
+    }
+}
 ```
 
-The class is bound to the ioC as `excel`
+:page_facing_up: Find your `users.xlsx` in your downloads folder!
+
+More installation instructions can be found at: [https://laravel-excel.maatwebsite.nl/3.1/getting-started/installation.html](https://laravel-excel.maatwebsite.nl/3.1/getting-started/installation.html)
+
+## :rocket: 5 minutes quick start for imports
+
+:muscle: Create an import class in `App\Imports`
+
+You may do this by using the `make:import` command.
+
+```
+php artisan make:import UsersImport --model=User
+```
+
+If you prefer to create the import manually, you can create the following in `App\Imports`:
 
 ```php
-$excel = App::make('excel');
+<?php
+
+namespace App\Imports;
+
+use App\User;
+use Illuminate\Support\Facades\Hash;
+use Maatwebsite\Excel\Concerns\ToModel;
+
+class UsersImport implements ToModel
+{
+    /**
+     * @param array $row
+     *
+     * @return User|null
+     */
+    public function model(array $row)
+    {
+        return new User([
+           'name'     => $row[0],
+           'email'    => $row[1], 
+           'password' => Hash::make($row[2]),
+        ]);
+    }
+}
 ```
 
-To publish the config settings in Laravel 5 use:
+:fire: In your controller you can call this import now:
 
 ```php
-php artisan vendor:publish --provider="Maatwebsite\Excel\ExcelServiceProvider"
+
+use App\Imports\UsersImport;
+use Maatwebsite\Excel\Facades\Excel;
+use App\Http\Controllers\Controller;
+
+class UsersController extends Controller 
+{
+    public function import() 
+    {
+        Excel::import(new UsersImport, 'users.xlsx');
+        
+        return redirect('/')->with('success', 'All good!');
+    }
+}
 ```
 
-This will add an `excel.php` config file to your config folder.
+:page_facing_up: Find the imported users in your database!
 
-# Documentation
+## 🎓 Learning Laravel Excel
 
-The complete documentation can be found at: [http://www.maatwebsite.nl/laravel-excel/docs](http://www.maatwebsite.nl/laravel-excel/docs)
+You can find the full documentation of Laravel Excel [on the website](https://laravel-excel.maatwebsite.nl/).
 
-# Support
+We welcome suggestions for improving our docs. The documentation repository can be found at [https://github.com/Maatwebsite/laravel-excel-docs](https://github.com/Maatwebsite/laravel-excel-docs).
 
-Support only through Github. Please don't mail us about issues, make a Github issue instead.
+Read some articles and tutorials can be found on our blog: https://laravel-excel.maatwebsite.nl/blog/
 
-# Contributing
+## :wrench: Supported Versions
 
-**ALL** bug fixes should be made to appropriate branch (e.g. `2.0` for 2.0.* bug fixes). Bug fixes should never be sent to the `master` branch.
+Versions will be supported for a limited amount of time.
 
-More about contributing can be found at: [http://www.maatwebsite.nl/laravel-excel/docs/getting-started#contributing](http://www.maatwebsite.nl/laravel-excel/docs/getting-started#contributing)
+| Version | Laravel Version | Php Version | Support |
+|---- |----|----|----|
+| 2.1 | <=5.6 | <=7.0 | Unsupported since 15-5-2018 |
+| 3.0 | ^5.5 |  ^7.0 | Unsupported since 31-12-2018 |
+| 3.1 | ^5.5 |  ^7.0 | New features |
 
-# License
+## :mailbox_with_mail: License & Postcardware
 
-This package is licensed under LGPL. You are free to use it in personal and commercial projects. The code can be forked and modified, but the original copyright author should always be included!
+Our software is open source and licensed under the MIT license.
 
-# FAQ
+If you use the software in your production environment we would appreciate to receive a postcard of your hometown. Please send it to:
 
-1) Chunk importer only imports the first row
+**Maatwebsite**  
+Florijnruwe 111-2  
+6218 CA Maastricht  
+The Netherlands  
 
-Check that auto_detect_line_endings in your php.ini is set to true.
+More about the license can be found at: [https://laravel-excel.maatwebsite.nl/3.1/getting-started/license.html](https://laravel-excel.maatwebsite.nl/3.1/getting-started/license.html)

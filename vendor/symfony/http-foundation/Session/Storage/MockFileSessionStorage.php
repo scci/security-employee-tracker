@@ -31,7 +31,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
      * @param string      $name     Session name
      * @param MetadataBag $metaBag  MetadataBag instance
      */
-    public function __construct($savePath = null, $name = 'MOCKSESSID', MetadataBag $metaBag = null)
+    public function __construct(string $savePath = null, string $name = 'MOCKSESSID', MetadataBag $metaBag = null)
     {
         if (null === $savePath) {
             $savePath = sys_get_temp_dir();
@@ -98,7 +98,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
                 unset($data[$key]);
             }
         }
-        if (array($key = $this->metadataBag->getStorageKey()) === array_keys($data)) {
+        if ([$key = $this->metadataBag->getStorageKey()] === array_keys($data)) {
             unset($data[$key]);
         }
 
@@ -145,7 +145,7 @@ class MockFileSessionStorage extends MockArraySessionStorage
     private function read()
     {
         $filePath = $this->getFilePath();
-        $this->data = is_readable($filePath) && is_file($filePath) ? unserialize(file_get_contents($filePath)) : array();
+        $this->data = is_readable($filePath) && is_file($filePath) ? unserialize(file_get_contents($filePath)) : [];
 
         $this->loadSession();
     }

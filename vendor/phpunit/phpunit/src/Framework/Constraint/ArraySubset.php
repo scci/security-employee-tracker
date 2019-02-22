@@ -17,24 +17,22 @@ use SebastianBergmann\Comparator\ComparisonFailure;
  *
  * Uses array_replace_recursive() to check if a key value subset is part of the
  * subject array.
+ *
+ * @deprecated https://github.com/sebastianbergmann/phpunit/issues/3494
  */
 class ArraySubset extends Constraint
 {
     /**
-     * @var array|\Traversable
+     * @var iterable
      */
-    protected $subset;
+    private $subset;
 
     /**
      * @var bool
      */
-    protected $strict;
+    private $strict;
 
-    /**
-     * @param array|\Traversable $subset
-     * @param bool               $strict Check for object identity
-     */
-    public function __construct($subset, $strict = false)
+    public function __construct(iterable $subset, bool $strict = false)
     {
         parent::__construct();
 
@@ -52,13 +50,12 @@ class ArraySubset extends Constraint
      * a boolean value instead: true in case of success, false in case of a
      * failure.
      *
-     * @param mixed  $other        Value or object to evaluate.
+     * @param mixed  $other        value or object to evaluate
      * @param string $description  Additional information about the test
      * @param bool   $returnResult Whether to return a result or throw an exception
      *
-     * @return mixed
-     *
      * @throws ExpectationFailedException
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
     public function evaluate($other, $description = '', $returnResult = false)
     {
@@ -83,8 +80,8 @@ class ArraySubset extends Constraint
             $f = new ComparisonFailure(
                 $patched,
                 $other,
-                \print_r($patched, true),
-                \print_r($other, true)
+                \var_export($patched, true),
+                \var_export($other, true)
             );
 
             $this->fail($other, $description, $f);
@@ -94,9 +91,9 @@ class ArraySubset extends Constraint
     /**
      * Returns a string representation of the constraint.
      *
-     * @return string
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    public function toString()
+    public function toString(): string
     {
         return 'has the subset ' . $this->exporter->export($this->subset);
     }
@@ -107,21 +104,16 @@ class ArraySubset extends Constraint
      * The beginning of failure messages is "Failed asserting that" in most
      * cases. This method should return the second part of that sentence.
      *
-     * @param mixed $other Evaluated value or object.
+     * @param mixed $other evaluated value or object
      *
-     * @return string
+     * @throws \SebastianBergmann\RecursionContext\InvalidArgumentException
      */
-    protected function failureDescription($other)
+    protected function failureDescription($other): string
     {
         return 'an array ' . $this->toString();
     }
 
-    /**
-     * @param array|\Traversable $other
-     *
-     * @return array
-     */
-    private function toArray($other)
+    private function toArray(iterable $other): array
     {
         if (\is_array($other)) {
             return $other;

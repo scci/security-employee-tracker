@@ -52,7 +52,7 @@ class CrawlerTest extends TestCase
         $crawler->add($this->createNodeList());
         $this->assertEquals('foo', $crawler->filterXPath('//div')->attr('class'), '->add() adds nodes from a \DOMNodeList');
 
-        $list = array();
+        $list = [];
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
@@ -269,7 +269,7 @@ EOF
 
     public function testAddNodes()
     {
-        $list = array();
+        $list = [];
         foreach ($this->createNodeList() as $node) {
             $list[] = $node;
         }
@@ -314,7 +314,7 @@ EOF
             return $i.'-'.$node->text();
         });
 
-        $this->assertEquals(array('0-One', '1-Two', '2-Three'), $data, '->each() executes an anonymous function on each node of the list');
+        $this->assertEquals(['0-One', '1-Two', '2-Three'], $data, '->each() executes an anonymous function on each node of the list');
     }
 
     public function testIteration()
@@ -411,11 +411,11 @@ EOF
     {
         $crawler = $this->createTestCrawler()->filterXPath('//ul[1]/li');
 
-        $this->assertEquals(array('One', 'Two', 'Three'), $crawler->extract('_text'), '->extract() returns an array of extracted data from the node list');
-        $this->assertEquals(array(array('One', 'first'), array('Two', ''), array('Three', '')), $crawler->extract(array('_text', 'class')), '->extract() returns an array of extracted data from the node list');
-        $this->assertEquals(array(array(), array(), array()), $crawler->extract(array()), '->extract() returns empty arrays if the attribute list is empty');
+        $this->assertEquals(['One', 'Two', 'Three'], $crawler->extract('_text'), '->extract() returns an array of extracted data from the node list');
+        $this->assertEquals([['One', 'first'], ['Two', ''], ['Three', '']], $crawler->extract(['_text', 'class']), '->extract() returns an array of extracted data from the node list');
+        $this->assertEquals([[], [], []], $crawler->extract([]), '->extract() returns empty arrays if the attribute list is empty');
 
-        $this->assertEquals(array(), $this->createTestCrawler()->filterXPath('//ol')->extract('_text'), '->extract() returns an empty array if the node list is empty');
+        $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->extract('_text'), '->extract() returns an empty array if the node list is empty');
     }
 
     public function testFilterXpathComplexQueries()
@@ -849,7 +849,7 @@ HTML;
         $links = $crawler->links();
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Link', $links[0], '->links() returns an array of Link instances');
 
-        $this->assertEquals(array(), $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
+        $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
     }
 
     public function testImages()
@@ -861,7 +861,7 @@ HTML;
         $images = $crawler->images();
         $this->assertInstanceOf('Symfony\\Component\\DomCrawler\\Image', $images[0], '->images() returns an array of Image instances');
 
-        $this->assertEquals(array(), $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
+        $this->assertEquals([], $this->createTestCrawler()->filterXPath('//ol')->links(), '->links() returns an empty array if the node selection is empty');
     }
 
     public function testForm()
@@ -874,9 +874,9 @@ HTML;
 
         $this->assertEquals($crawler->form()->getFormNode()->getAttribute('id'), $crawler2->form()->getFormNode()->getAttribute('id'), '->form() works on elements with form attribute');
 
-        $this->assertEquals(array('FooName' => 'FooBar', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form(array('FooName' => 'FooBar'))->getValues(), '->form() takes an array of values to submit as its first argument');
-        $this->assertEquals(array('FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler->form()->getValues(), '->getValues() returns correct form values');
-        $this->assertEquals(array('FooBarName' => 'FooBarValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'), $crawler2->form()->getValues(), '->getValues() returns correct form values');
+        $this->assertEquals(['FooName' => 'FooBar', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'], $crawler->form(['FooName' => 'FooBar'])->getValues(), '->form() takes an array of values to submit as its first argument');
+        $this->assertEquals(['FooName' => 'FooValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'], $crawler->form()->getValues(), '->getValues() returns correct form values');
+        $this->assertEquals(['FooBarName' => 'FooBarValue', 'TextName' => 'TextValue', 'FooTextName' => 'FooTextValue'], $crawler2->form()->getValues(), '->getValues() returns correct form values');
 
         try {
             $this->createTestCrawler()->filterXPath('//ol')->form();
@@ -1004,6 +1004,37 @@ HTML;
         }
     }
 
+    public function testFilteredChildren()
+    {
+        $html = <<<'HTML'
+<!DOCTYPE html>
+<html lang="en">
+<body>
+    <div id="foo">
+        <div class="lorem">
+            <p class="lorem"></p>
+        </div>
+        <div class="lorem">
+            <span class="lorem"></span>
+        </div>
+        <span class="ipsum"></span>
+    </div>
+</body>
+</html>
+HTML;
+
+        $crawler = new Crawler($html);
+        $foo = $crawler->filter('#foo');
+
+        $this->assertEquals(3, $foo->children()->count());
+        $this->assertEquals(2, $foo->children('.lorem')->count());
+        $this->assertEquals(2, $foo->children('div')->count());
+        $this->assertEquals(2, $foo->children('div.lorem')->count());
+        $this->assertEquals(1, $foo->children('span')->count());
+        $this->assertEquals(1, $foo->children('span.ipsum')->count());
+        $this->assertEquals(1, $foo->children('.ipsum')->count());
+    }
+
     public function testParents()
     {
         $crawler = $this->createTestCrawler()->filterXPath('//li[1]');
@@ -1027,7 +1058,7 @@ HTML;
     /**
      * @dataProvider getBaseTagData
      */
-    public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = null)
+    public function testBaseTag($baseValue, $linkValue, $expectedUri, $currentUri = null, $description = '')
     {
         $crawler = new Crawler('<html><base href="'.$baseValue.'"><a href="'.$linkValue.'"></a></html>', $currentUri);
         $this->assertEquals($expectedUri, $crawler->filterXPath('//a')->link()->getUri(), $description);
@@ -1035,13 +1066,13 @@ HTML;
 
     public function getBaseTagData()
     {
-        return array(
-            array('http://base.com', 'link', 'http://base.com/link'),
-            array('//base.com', 'link', 'https://base.com/link', 'https://domain.com', '<base> tag can use a schema-less URL'),
-            array('path/', 'link', 'https://domain.com/path/link', 'https://domain.com', '<base> tag can set a path'),
-            array('http://base.com', '#', 'http://base.com#', 'http://domain.com/path/link', '<base> tag does work with links to an anchor'),
-            array('http://base.com', '', 'http://base.com', 'http://domain.com/path/link', '<base> tag does work with empty links'),
-        );
+        return [
+            ['http://base.com', 'link', 'http://base.com/link'],
+            ['//base.com', 'link', 'https://base.com/link', 'https://domain.com', '<base> tag can use a schema-less URL'],
+            ['path/', 'link', 'https://domain.com/path/link', 'https://domain.com', '<base> tag can set a path'],
+            ['http://base.com', '#', 'http://base.com#', 'http://domain.com/path/link', '<base> tag does work with links to an anchor'],
+            ['http://base.com', '', 'http://base.com', 'http://domain.com/path/link', '<base> tag does work with empty links'],
+        ];
     }
 
     /**
@@ -1055,14 +1086,14 @@ HTML;
 
     public function getBaseTagWithFormData()
     {
-        return array(
-            array('https://base.com/', 'link/', 'https://base.com/link/', 'https://base.com/link/', '<base> tag does work with a path and relative form action'),
-            array('/basepath', '/registration', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and form action'),
-            array('/basepath', '', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and empty form action'),
-            array('http://base.com/', '/registration', 'http://base.com/registration', 'http://domain.com/registration', '<base> tag does work with a URL and form action'),
-            array('http://base.com', '', 'http://domain.com/path/form', 'http://domain.com/path/form', '<base> tag does work with a URL and an empty form action'),
-            array('http://base.com/path', '/registration', 'http://base.com/registration', 'http://domain.com/path/form', '<base> tag does work with a URL and form action'),
-        );
+        return [
+            ['https://base.com/', 'link/', 'https://base.com/link/', 'https://base.com/link/', '<base> tag does work with a path and relative form action'],
+            ['/basepath', '/registration', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and form action'],
+            ['/basepath', '', 'http://domain.com/registration', 'http://domain.com/registration', '<base> tag does work with a path and empty form action'],
+            ['http://base.com/', '/registration', 'http://base.com/registration', 'http://domain.com/registration', '<base> tag does work with a URL and form action'],
+            ['http://base.com', '', 'http://domain.com/path/form', 'http://domain.com/path/form', '<base> tag does work with a URL and an empty form action'],
+            ['http://base.com/path', '/registration', 'http://base.com/registration', 'http://domain.com/path/form', '<base> tag does work with a URL and form action'],
+        ];
     }
 
     public function testCountOfNestedElements()
@@ -1078,7 +1109,7 @@ HTML;
 
         $result = $crawler->filterXPath('//form/input')->evaluate('substring-before(@name, "Name")');
 
-        $this->assertSame(array('Text', 'Foo', 'Bar'), $result);
+        $this->assertSame(['Text', 'Foo', 'Bar'], $result);
     }
 
     public function testEvaluateReturnsTypedResultOfNamespacedXPathExpressionOnADocumentSubset()
@@ -1087,7 +1118,7 @@ HTML;
 
         $result = $crawler->filterXPath('//yt:accessControl/@action')->evaluate('string(.)');
 
-        $this->assertSame(array('comment', 'videoRespond'), $result);
+        $this->assertSame(['comment', 'videoRespond'], $result);
     }
 
     public function testEvaluateReturnsTypedResultOfNamespacedXPathExpression()
@@ -1097,7 +1128,7 @@ HTML;
 
         $result = $crawler->evaluate('string(//youtube:accessControl/@action)');
 
-        $this->assertSame(array('comment'), $result);
+        $this->assertSame(['comment'], $result);
     }
 
     public function testEvaluateReturnsACrawlerIfXPathExpressionEvaluatesToANode()
@@ -1115,6 +1146,62 @@ HTML;
     public function testEvaluateThrowsAnExceptionIfDocumentIsEmpty()
     {
         (new Crawler())->evaluate('//form/input[1]');
+    }
+
+    /**
+     * @group legacy
+     * @expectedDeprecation The "Symfony\Component\DomCrawler\Crawler::children()" method will have a new "string $selector = null" argument in version 5.0, not defining it is deprecated since Symfony 4.2.
+     */
+    public function testInheritedClassCallChildrenWithoutArgument()
+    {
+        $dom = new \DOMDocument();
+        $dom->loadHTML('
+            <html>
+                <body>
+                    <a href="foo">Foo</a>
+                    <a href="/foo">   Fabien\'s Foo   </a>
+                    <a href="/foo">Fabien"s Foo</a>
+                    <a href="/foo">\' Fabien"s Foo</a>
+
+                    <a href="/bar"><img alt="Bar"/></a>
+                    <a href="/bar"><img alt="   Fabien\'s Bar   "/></a>
+                    <a href="/bar"><img alt="Fabien&quot;s Bar"/></a>
+                    <a href="/bar"><img alt="\' Fabien&quot;s Bar"/></a>
+
+                    <a href="?get=param">GetLink</a>
+
+                    <a href="/example">Klausi|Claudiu</a>
+
+                    <form action="foo" id="FooFormId">
+                        <input type="text" value="TextValue" name="TextName" />
+                        <input type="submit" value="FooValue" name="FooName" id="FooId" />
+                        <input type="button" value="BarValue" name="BarName" id="BarId" />
+                        <button value="ButtonValue" name="ButtonName" id="ButtonId" />
+                    </form>
+
+                    <input type="submit" value="FooBarValue" name="FooBarName" form="FooFormId" />
+                    <input type="text" value="FooTextValue" name="FooTextName" form="FooFormId" />
+
+                    <ul class="first">
+                        <li class="first">One</li>
+                        <li>Two</li>
+                        <li>Three</li>
+                    </ul>
+                    <ul>
+                        <li>One Bis</li>
+                        <li>Two Bis</li>
+                        <li>Three Bis</li>
+                    </ul>
+                    <div id="parent">
+                        <div id="child"></div>
+                        <div id="child2" xmlns:foo="http://example.com"></div>
+                    </div>
+                    <div id="sibling"><img /></div>
+                </body>
+            </html>
+        ');
+        $crawlerChild = new ClassThatInheritCrawler($dom);
+        $crawlerChild->children();
     }
 
     public function createTestCrawler($uri = null)
@@ -1201,5 +1288,13 @@ HTML;
         $domxpath = new \DOMXPath($dom);
 
         return $domxpath->query('//div');
+    }
+}
+
+class ClassThatInheritCrawler extends Crawler
+{
+    public function children()
+    {
+        parent::children();
     }
 }

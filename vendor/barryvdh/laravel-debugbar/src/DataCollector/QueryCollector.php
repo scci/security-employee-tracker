@@ -70,9 +70,10 @@ class QueryCollector extends PDOCollector
     public function setExplainSource($enabled, $types)
     {
         $this->explainQuery = $enabled;
-        if($types){
-            $this->explainTypes = $types;
-        }
+        // workaround ['SELECT'] only. https://github.com/barryvdh/laravel-debugbar/issues/888
+//        if($types){
+//            $this->explainTypes = $types;
+//        }
     }
 
     /**
@@ -94,7 +95,7 @@ class QueryCollector extends PDOCollector
         $bindings = $connection->prepareBindings($bindings);
 
         // Run EXPLAIN on this query (if needed)
-        if ($this->explainQuery && preg_match('/^('.implode($this->explainTypes).') /i', $query)) {
+        if ($this->explainQuery && preg_match('/^\s*('.implode('|', $this->explainTypes).') /i', $query)) {
             $statement = $pdo->prepare('EXPLAIN ' . $query);
             $statement->execute($bindings);
             $explainResults = $statement->fetchAll(\PDO::FETCH_CLASS);
@@ -109,7 +110,13 @@ class QueryCollector extends PDOCollector
                 $regex = is_numeric($key)
                     ? "/\?(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/"
                     : "/:{$key}(?=(?:[^'\\\']*'[^'\\\']*')*[^'\\\']*$)/";
-                $query = preg_replace($regex, $pdo->quote($binding), $query, 1);
+
+                // Mimic bindValue and only quote non-integer and non-float data types
+                if (!is_int($binding) && !is_float($binding)) {
+                    $binding = $pdo->quote($binding);
+                }
+
+                $query = preg_replace($regex, $binding, $query, 1);
             }
         }
 
@@ -218,16 +225,9 @@ class QueryCollector extends PDOCollector
             return $frame;
         }
 
-        if (isset($trace['class']) && isset($trace['file']) && strpos(
-                $trace['file'],
-                DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'laravel' . DIRECTORY_SEPARATOR . 'framework/src/Illuminate/Database'
-            ) === false && strpos(
-               $trace['file'],
-               DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'laravel' . DIRECTORY_SEPARATOR . 'framework/src/Illuminate/Events'
-           ) === false && strpos(
-                $trace['file'],
-                DIRECTORY_SEPARATOR . 'vendor' . DIRECTORY_SEPARATOR . 'barryvdh' . DIRECTORY_SEPARATOR . 'laravel-debugbar'
-            ) === false
+        if (isset($trace['class']) &&
+            isset($trace['file']) &&
+            !$this->fileIsInExcludedPath($trace['file'])
         ) {
             $file = $trace['file'];
 
@@ -260,6 +260,31 @@ class QueryCollector extends PDOCollector
             return $frame;
         }
 
+
+        return false;
+    }
+
+    /**
+     * Check if the given file is to be excluded from analysis
+     *
+     * @param string $file
+     * @return bool
+     */
+    protected function fileIsInExcludedPath($file)
+    {
+        $excludedPaths = [
+            '/vendor/laravel/framework/src/Illuminate/Database',
+            '/vendor/laravel/framework/src/Illuminate/Events',
+            '/vendor/barryvdh/laravel-debugbar',
+        ];
+
+        $normalizedPath = str_replace('\\', '/', $file);
+
+        foreach ($excludedPaths as $excludedPath) {
+            if (strpos($normalizedPath, $excludedPath) !== false) {
+                return true;
+            }
+        }
 
         return false;
     }

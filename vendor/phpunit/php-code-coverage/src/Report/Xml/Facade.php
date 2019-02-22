@@ -7,7 +7,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 namespace SebastianBergmann\CodeCoverage\Report\Xml;
 
 use SebastianBergmann\CodeCoverage\CodeCoverage;
@@ -18,7 +17,7 @@ use SebastianBergmann\CodeCoverage\RuntimeException;
 use SebastianBergmann\CodeCoverage\Version;
 use SebastianBergmann\Environment\Runtime;
 
-class Facade
+final class Facade
 {
     /**
      * @var string
@@ -35,24 +34,18 @@ class Facade
      */
     private $phpUnitVersion;
 
-    /**
-     * @param string $version
-     */
-    public function __construct($version)
+    public function __construct(string $version)
     {
         $this->phpUnitVersion = $version;
     }
 
     /**
-     * @param CodeCoverage $coverage
-     * @param string       $target
-     *
      * @throws RuntimeException
      */
-    public function process(CodeCoverage $coverage, $target)
+    public function process(CodeCoverage $coverage, string $target): void
     {
-        if (\substr($target, -1, 1) != DIRECTORY_SEPARATOR) {
-            $target .= DIRECTORY_SEPARATOR;
+        if (\substr($target, -1, 1) !== \DIRECTORY_SEPARATOR) {
+            $target .= \DIRECTORY_SEPARATOR;
         }
 
         $this->target = $target;
@@ -71,7 +64,7 @@ class Facade
         $this->saveDocument($this->project->asDom(), 'index');
     }
 
-    private function setBuildInformation()
+    private function setBuildInformation(): void
     {
         $buildNode = $this->project->getBuildInformation();
         $buildNode->setRuntimeInformation(new Runtime());
@@ -80,9 +73,9 @@ class Facade
     }
 
     /**
-     * @param string $directory
+     * @throws RuntimeException
      */
-    protected function initTargetDirectory($directory)
+    private function initTargetDirectory(string $directory): void
     {
         if (\file_exists($directory)) {
             if (!\is_dir($directory)) {
@@ -96,33 +89,38 @@ class Facade
                     "'$directory' exists but is not writable."
                 );
             }
-        } elseif (!@\mkdir($directory, 0777, true)) {
+        } elseif (!$this->createDirectory($directory)) {
             throw new RuntimeException(
                 "'$directory' could not be created."
             );
         }
     }
 
-    private function processDirectory(DirectoryNode $directory, Node $context)
+    private function processDirectory(DirectoryNode $directory, Node $context): void
     {
-        $dirname = $directory->getName();
-        if ($this->project->getProjectSourceDirectory() === $dirname) {
-            $dirname = '/';
-        }
-        $dirObject = $context->addDirectory($dirname);
+        $directoryName = $directory->getName();
 
-        $this->setTotals($directory, $dirObject->getTotals());
+        if ($this->project->getProjectSourceDirectory() === $directoryName) {
+            $directoryName = '/';
+        }
+
+        $directoryObject = $context->addDirectory($directoryName);
+
+        $this->setTotals($directory, $directoryObject->getTotals());
 
         foreach ($directory->getDirectories() as $node) {
-            $this->processDirectory($node, $dirObject);
+            $this->processDirectory($node, $directoryObject);
         }
 
         foreach ($directory->getFiles() as $node) {
-            $this->processFile($node, $dirObject);
+            $this->processFile($node, $directoryObject);
         }
     }
 
-    private function processFile(FileNode $file, Directory $context)
+    /**
+     * @throws RuntimeException
+     */
+    private function processFile(FileNode $file, Directory $context): void
     {
         $fileObject = $context->addFile(
             $file->getName(),
@@ -135,6 +133,7 @@ class Facade
             $file->getPath(),
             \strlen($this->project->getProjectSourceDirectory())
         );
+
         $fileReport = new Report($path);
 
         $this->setTotals($file, $fileReport->getTotals());
@@ -168,7 +167,7 @@ class Facade
         $this->saveDocument($fileReport->asDom(), $file->getId());
     }
 
-    private function processUnit($unit, Report $report)
+    private function processUnit(array $unit, Report $report): void
     {
         if (isset($unit['className'])) {
             $unitObject = $report->getClassObject($unit['className']);
@@ -206,7 +205,7 @@ class Facade
         }
     }
 
-    private function processFunction($function, Report $report)
+    private function processFunction(array $function, Report $report): void
     {
         $functionObject = $report->getFunctionObject($function['functionName']);
 
@@ -216,12 +215,12 @@ class Facade
         $functionObject->setTotals($function['executableLines'], $function['executedLines'], $function['coverage']);
     }
 
-    private function processTests(array $tests)
+    private function processTests(array $tests): void
     {
         $testsObject = $this->project->getTests();
 
         foreach ($tests as $test => $result) {
-            if ($test == 'UNCOVERED_FILES_FROM_WHITELIST') {
+            if ($test === 'UNCOVERED_FILES_FROM_WHITELIST') {
                 continue;
             }
 
@@ -229,7 +228,7 @@ class Facade
         }
     }
 
-    private function setTotals(AbstractNode $node, Totals $totals)
+    private function setTotals(AbstractNode $node, Totals $totals): void
     {
         $loc = $node->getLinesOfCode();
 
@@ -262,15 +261,15 @@ class Facade
         );
     }
 
-    /**
-     * @return string
-     */
-    protected function getTargetDirectory()
+    private function getTargetDirectory(): string
     {
         return $this->target;
     }
 
-    protected function saveDocument(\DOMDocument $document, $name)
+    /**
+     * @throws RuntimeException
+     */
+    private function saveDocument(\DOMDocument $document, string $name): void
     {
         $filename = \sprintf('%s/%s.xml', $this->getTargetDirectory(), $name);
 
@@ -279,5 +278,10 @@ class Facade
         $this->initTargetDirectory(\dirname($filename));
 
         $document->save($filename);
+    }
+
+    private function createDirectory(string $directory): bool
+    {
+        return !(!\is_dir($directory) && !@\mkdir($directory, 0777, true) && !\is_dir($directory));
     }
 }
