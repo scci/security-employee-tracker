@@ -11,7 +11,8 @@ use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
 use SET\Events\TrainingAssigned;
 use SET\Group;
-use SET\Handlers\Excel\CompletedTrainingExport;
+use SET\Handlers\Excel\CompletedTrainingExportHandler;
+use Maatwebsite\Excel\Facades\Excel;
 use SET\Http\Requests\AssignTrainingRequest;
 use SET\Http\Requests\StoreTrainingRequest;
 use SET\Training;
@@ -193,11 +194,10 @@ class TrainingController extends Controller
      *
      * @return mixed
      */
-    public function showCompleted(CompletedTrainingExport $export)
+    public function showCompleted()
     {
         $this->authorize('view');
-
-        return $export->handleExport();
+        return Excel::download(new CompletedTrainingExportHandler, 'CompletedTraining.xlsx');
     }
 
     /**

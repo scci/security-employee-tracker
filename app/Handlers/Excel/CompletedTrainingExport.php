@@ -2,9 +2,9 @@
 
 namespace SET\Handlers\Excel;
 
-use Maatwebsite\Excel\Files\NewExcelFile;
+use Maatwebsite\Excel\Excel;
 
-class CompletedTrainingExport extends NewExcelFile
+class CompletedTrainingExport extends Excel
 {
     public function getFilename()
     {

@@ -9,9 +9,11 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
 use Krucas\Notification\Facades\Notification;
+use Maatwebsite\Excel\Facades\Excel;
 use SET\Duty;
 use SET\Group;
 use SET\Handlers\Excel\JpasImport;
+use SET\Handlers\Excel\JpasImportHandler;
 use SET\Http\Requests\StoreUserRequest;
 use SET\Training;
 use SET\User;
@@ -246,8 +248,10 @@ class UserController extends Controller
      */
     public function import(JpasImport $import)
     {
-        $results = $import->handleImport();
         $uploadedFile = $import->getFile('file');
+        $importHandler = new JpasImportHandler();
+        $importData = Excel::toCollection($importHandler, $uploadedFile);
+        $results = $importHandler->collection($importData[0]);
 
         $changes = $results['changes'];
         $unique = $results['unique'];
@@ -264,11 +268,14 @@ class UserController extends Controller
      */
     public function resolveImport(JpasImport $import)
     {
-        $import->handleImport();
+        $uploadedFile = $import->getFile('file');
+        $importHandler = new JpasImportHandler();
+        $importData = Excel::toCollection($importHandler, $uploadedFile);
+        $importHandler->collection($importData[0]);
 
         Notification::container()->success('Import Complete');
 
-        File::delete($import->getFile('file'));
+        File::delete($uploadedFile);
 
         return redirect()->action('HomeController@index');
     }

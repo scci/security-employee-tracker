@@ -4,7 +4,8 @@ namespace SET\Handlers\Excel;
 
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Input;
-use Maatwebsite\Excel\Files\ImportHandler;
+use Maatwebsite\Excel\Concerns\ToCollection;
+use Maatwebsite\Excel\Concerns\WithHeadingRow;
 use SET\Handlers\DateFormat;
 use SET\User;
 
@@ -13,7 +14,7 @@ use SET\User;
  *
  * Going to handle importing our JPAS excel file.
  */
-class JpasImportHandler implements ImportHandler
+class JpasImportHandler implements ToCollection, WithHeadingRow
 {
     use DateFormat;
 
@@ -37,9 +38,8 @@ class JpasImportHandler implements ImportHandler
      *
      * @return array
      */
-    public function handle($import)
+    public function collection(Collection $excel)
     {
-        $excel = $import->get();
         $data = Input::all();
 
         //We always pass a token and the file. If there is anything more, then we are resolving.
@@ -63,9 +63,12 @@ class JpasImportHandler implements ImportHandler
     private function initialImport($excel)
     {
         foreach ($excel as $row) {
-            $row->name = preg_replace('/(,\s|\s)/', '_', $row->name);
-            if (!is_null($row->name) && $row->name != '') { //we get a bunch of null records that we can ignore.
-                $user = User::where('jpas_name', $row->name)->first(); //see if the record maps to a user
+            $row['eligibility_date'] = $this->transformDateVal($row['eligibility_date']);
+            $row['prev_inves'] = $this->transformDateVal($row['prev_inves']);
+
+            $row['name'] = preg_replace('/(,\s|\s)/', '_', $row['name']);
+            if (!is_null($row['name']) && $row['name'] != '') { //we get a bunch of null records that we can ignore.
+                    $user = User::where('jpas_name',  $row['name'])->first(); //see if the record maps to a user
                 if (is_null($user)) {
                     $this->unique->push($row); //if no results, we need to have the admin map this record to a user.
                 } else {
@@ -138,11 +141,11 @@ class JpasImportHandler implements ImportHandler
      */
     private function mapJpasToUser($user, $data)
     {
-        $user->jpas_name = $data->name;
-        $user->clearance = $data->eligibility;
-        $user->elig_date = $this->dateFormat($data->eligibility_date);
-        $user->inv = $data->inves;
-        $user->inv_close = $this->dateFormat($data->prev_inves);
+        $user->jpas_name = $data['name'];
+        $user->clearance = $data['eligibility'];
+        $user->elig_date = $this->dateFormat($data['eligibility_date']);
+        $user->inv = $data['inves'];
+        $user->inv_close = $this->dateFormat($data['prev_inves']);
 
         return $user;
     }
@@ -158,8 +161,10 @@ class JpasImportHandler implements ImportHandler
     {
         $user = User::find($userGroup);
         foreach ($excel as $row) {
-            $row->name = preg_replace('/(,\s|\s)/', '_', $row->name);
-            if ($row->name == $jpasName) {
+            $row['eligibility_date'] = $this->transformDateVal($row['eligibility_date']);
+            $row['prev_inves'] = $this->transformDateVal($row['prev_inves']);
+            $row['name']  = preg_replace('/(,\s|\s)/', '_', $row['name']);
+            if ($row['name']  == $jpasName) {
                 $this->updateAndLogUser($this->mapJpasToUser($user, $row));
             }
         }
@@ -178,6 +183,19 @@ class JpasImportHandler implements ImportHandler
                 }
             }
             $this->updateAndLogUser($user);
+        }
+    }
+
+    /**
+     * Transform excel date values into a datetime string.
+     *
+     */
+    public function transformDateVal($value, $format = 'Y-m-d H:i:s')
+    {
+        try {
+            return \Carbon\Carbon::instance(\PhpOffice\PhpSpreadsheet\Shared\Date::excelToDateTimeObject($value));
+        } catch (\ErrorException $e) {
+            return \Carbon\Carbon::createFromFormat($format, $value);
         }
     }
 }

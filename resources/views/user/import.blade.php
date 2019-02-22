@@ -17,8 +17,8 @@
                     @foreach($unique as $excelUser)
                         <div class="row">
                             <div class="input-field">
-                            {!! Form::select($excelUser->name, array(null=>'Ignore this record.') + $userList, null) !!}
-                            {!! Form::label($excelUser->name, $excelUser->name ) !!}
+                            {!! Form::select($excelUser['name'], array(null=>'Ignore this record.') + $userList, null) !!}
+                            {!! Form::label($excelUser['name'], $excelUser['name'] ) !!}
                             </div>
                         </div>
                     @endforeach

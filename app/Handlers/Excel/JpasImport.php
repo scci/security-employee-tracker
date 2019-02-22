@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
 use Maatwebsite\Excel\Files\ExcelFile;
 
-class JpasImport extends ExcelFile
+class JpasImport
 {
     public function getFile()
     {
@@ -20,9 +20,7 @@ class JpasImport extends ExcelFile
         $fileName = $file->getClientOriginalName();
         Storage::disk('local')->put($fileName, File::get($file));
 
-        $storagePath = Storage::disk('local')->getDriver()->getAdapter()->getPathPrefix();
-
-        return $storagePath.$fileName;
+        return $fileName;
     }
 
     public function getFilters()
