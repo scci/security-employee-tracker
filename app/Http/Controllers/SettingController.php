@@ -23,6 +23,14 @@ class SettingController extends Controller
         $settings['ldap_controller1'] = $ldapControllers[0];
         $settings['ldap_controller2'] = $ldapControllers[1];
 
+        // Ensure that summary_recipient element exists in the array
+        if (array_key_exists('summary_recipient', $settings)) {
+            //$settings['summary_recipient'] = explode(',', $settings['summary_recipient']);
+            $settings['summary_recipient'] = User::whereIn('id', $settings['summary_recipient'])->pluck('id')->all();
+        } else {
+            $settings['summary_recipient'] = "";
+        }
+
         $users = User::skipSystem()->active()->get()->sortBy('UserFullName');
         $userList = $users->pluck('UserFullName', 'id');
         $admins = $users->where('role', 'edit')->pluck('id')->all();

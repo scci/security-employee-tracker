@@ -15,9 +15,9 @@
     </div>
 </div>
 <div class="row">
-    <div class="col s12 m6 l4 input-field">
+    <div class="col s12 m6">        
         {!! Form::label('summary_recipient', 'Summary Email Recipient:') !!}
-        {!! Form::text('summary_recipient', $settings['summary_recipient'] ?? null, ['placeholder' => 'fso@yourcompany.com']) !!}
+        {!! Form::select('summary_recipient[]', $userList, $settings['summary_recipient'] ,['multiple']) !!}
     </div>
 </div>
 <div class="row">
