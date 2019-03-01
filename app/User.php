@@ -191,7 +191,7 @@ class User extends Authenticatable
         $ignoreList = ['password', 'last_logon', 'remember_token', 'ip'];
         $record = $logs = []; // define arrays
 
-        foreach (($user) ? $user->activity : Activity::all() as $entry) {
+        foreach (($user) ? $user->activities : Activity::all() as $entry) {
             $record['updated_at'] = $entry->updated_at;
             $record['user_fullname'] = $entry->properties['attributes']['last_name']
                 .', '.$entry->properties['attributes']['first_name'];
