@@ -41,7 +41,7 @@ abstract class DuskTestCase extends BaseTestCase
         $options = (new ChromeOptions())->addArguments([
             '--disable-gpu',
             '--headless',
-            '--no-sandbox'
+            '--no-sandbox',
         ]);
 
         return RemoteWebDriver::create(

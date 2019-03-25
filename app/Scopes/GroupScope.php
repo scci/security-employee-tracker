@@ -2,8 +2,8 @@
 
 namespace SET\Scopes;
 
-use Adldap\Query\Builder;
 use Adldap\Laravel\Scopes\ScopeInterface;
+use Adldap\Query\Builder;
 
 class GroupScope implements ScopeInterface
 {
@@ -22,9 +22,9 @@ class GroupScope implements ScopeInterface
         $limitationFilter = config('app.limitation_filter');
 
         if ($limitationFilter != '') {
-                $query->in($ldapGroup)->whereDivision($limitationFilter);
+            $query->in($ldapGroup)->whereDivision($limitationFilter);
         } else {
-                $query->in($ldapGroup);
+            $query->in($ldapGroup);
         }
     }
 }

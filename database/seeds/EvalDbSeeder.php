@@ -46,8 +46,8 @@ class EvalDbSeeder extends Seeder
           'destroyed_date'                          => Carbon\Carbon::tomorrow()->addDays(rand(0, 4)),
           'created_at'                              => Carbon\Carbon::today()->addWeeks(-9), ]); // Regular destroyed users
         factory(SET\User::class, 3)->create(['role' => '', 'status' => 'separated',
-          'destroyed_date'                        => Carbon\Carbon::today()->addMonths(rand(3, 9)),
-          'created_at'                            => Carbon\Carbon::today()->addWeeks(-9), ]); // Regular separated users
+          'destroyed_date'                          => Carbon\Carbon::today()->addMonths(rand(3, 9)),
+          'created_at'                              => Carbon\Carbon::today()->addWeeks(-9), ]); // Regular separated users
         DB::table('activity_log')->truncate();
 
         $createdUsers = SET\User::all();

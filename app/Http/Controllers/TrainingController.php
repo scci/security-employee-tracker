@@ -7,11 +7,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Input;
+use Maatwebsite\Excel\Facades\Excel;
 use SET\Attachment;
 use SET\Events\TrainingAssigned;
 use SET\Group;
 use SET\Handlers\Excel\CompletedTrainingExportHandler;
-use Maatwebsite\Excel\Facades\Excel;
 use SET\Http\Requests\AssignTrainingRequest;
 use SET\Http\Requests\StoreTrainingRequest;
 use SET\Training;
@@ -190,7 +190,8 @@ class TrainingController extends Controller
     public function showCompleted()
     {
         $this->authorize('view');
-        return Excel::download(new CompletedTrainingExportHandler, 'CompletedTraining.xlsx');
+
+        return Excel::download(new CompletedTrainingExportHandler(), 'CompletedTraining.xlsx');
     }
 
     /**
