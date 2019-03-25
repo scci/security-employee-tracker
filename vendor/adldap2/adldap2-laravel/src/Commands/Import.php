@@ -7,7 +7,6 @@ use Adldap\Laravel\Events\Importing;
 use Adldap\Laravel\Events\Synchronized;
 use Adldap\Laravel\Events\Synchronizing;
 use Illuminate\Support\Str;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Model;
 
@@ -43,7 +42,7 @@ class Import
      */
     public function __construct(User $user, Model $model, array $credentials = [])
     {
-        $this->user = $user;
+        $this->user = $this->transformUsername($user);
         $this->model = $model;
         $this->credentials = $credentials;
     }
@@ -61,14 +60,14 @@ class Import
         $model = $this->findByCredentials() ?: $this->model->newInstance();
 
         if (! $model->exists) {
-            Event::fire(new Importing($this->user, $model));
+            event(new Importing($this->user, $model));
         }
 
-        Event::fire(new Synchronizing($this->user, $model));
+        event(new Synchronizing($this->user, $model));
 
         $this->sync($model);
 
-        Event::fire(new Synchronized($this->user, $model));
+        event(new Synchronized($this->user, $model));
 
         return $model;
     }
@@ -95,7 +94,9 @@ class Import
 
         foreach ($this->credentials as $key => $value) {
             if (! Str::contains($key, 'password')) {
-                $query->where($key, $value);
+                // We need to lowercase all values so we locate the
+                // proper model. This avoids case sensitivity.
+                $query->where($key, strtolower($value));
             }
         }
 
@@ -111,15 +112,10 @@ class Import
      */
     protected function sync(Model $model)
     {
-        $toSync = Config::get('adldap_auth.sync_attributes', [
-            'email' => 'userprincipalname',
-            'name' => 'cn',
-        ]);
-
-        foreach ($toSync as $modelField => $ldapField) {
+        foreach ($this->getLdapSyncAttributes() as $modelField => $ldapField) {
             // If the field is a loaded class and contains a `handle()` method,
             // we need to construct the attribute handler.
-            if (class_exists($ldapField) && method_exists($ldapField, 'handle')) {
+            if ($this->isHandler($ldapField)) {
                 // We will construct the attribute handler using Laravel's
                 // IoC to allow developers to utilize application
                 // dependencies in the constructor.
@@ -128,8 +124,64 @@ class Import
 
                 $handler->handle($this->user, $model);
             } else {
-                $model->{$modelField} = $this->user->getFirstAttribute($ldapField);
+                // We'll try to retrieve the value from the LDAP model. If the LDAP field is a string,
+                // we'll assume the developer wants the attribute, or a null value. Otherwise,
+                // the raw value of the LDAP field will be used.
+                $model->{$modelField} = is_string($ldapField) ? $this->user->getFirstAttribute($ldapField) : $ldapField;
             }
         }
+    }
+
+    /**
+     * Transforms the username of the given user to avoid case sensitivity issues.
+     *
+     * We want to transform the username on the user model so it persists through attribute handlers.
+     *
+     * @param User $user
+     *
+     * @return User
+     */
+    protected function transformUsername(User $user)
+    {
+        $attribute = $this->getLdapDiscoveryUsername();
+
+        $user->setFirstAttribute($attribute, strtolower($user->getFirstAttribute($attribute)));
+
+        return $user;
+    }
+
+    /**
+     * Determines if the given handler value is a class that contains the 'handle' method.
+     *
+     * @param mixed $handler
+     *
+     * @return bool
+     */
+    protected function isHandler($handler)
+    {
+        return is_string($handler) && class_exists($handler) && method_exists($handler, 'handle');
+    }
+
+    /**
+     * Returns the configured LDAP sync attributes.
+     *
+     * @return array
+     */
+    protected function getLdapSyncAttributes()
+    {
+        return Config::get('ldap_auth.sync_attributes', [
+            'email' => 'userprincipalname',
+            'name' => 'cn',
+        ]);
+    }
+
+    /**
+     * Returns the configured LDAP discovery username attribute.
+     *
+     * @return string
+     */
+    protected function getLdapDiscoveryUsername()
+    {
+        return Config::get('ldap_auth.usernames.ldap.discover', 'userprincipalname');
     }
 }

@@ -7,8 +7,8 @@ use Adldap\Auth\Guard;
 use Adldap\Auth\GuardInterface;
 use Adldap\Schemas\ActiveDirectory;
 use Adldap\Schemas\SchemaInterface;
-use Adldap\Models\Factory as ModelFactory;
 use Adldap\Query\Factory as SearchFactory;
+use Adldap\Models\Factory as ModelFactory;
 use Adldap\Configuration\DomainConfiguration;
 
 /**
@@ -53,11 +53,10 @@ class Provider implements ProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function __construct($configuration = [], ConnectionInterface $connection = null, SchemaInterface $schema = null)
+    public function __construct($configuration = [], ConnectionInterface $connection = null)
     {
         $this->setConfiguration($configuration)
-            ->setConnection($connection)
-            ->setSchema($schema);
+            ->setConnection($connection);
     }
 
     /**
@@ -86,6 +85,11 @@ class Provider implements ProviderInterface
 
         if ($configuration instanceof DomainConfiguration) {
             $this->configuration = $configuration;
+
+            $schema = $configuration->get('schema');
+
+            // We'll update our schema here when our configuration is set.
+            $this->setSchema(new $schema);
             
             return $this;
         }
@@ -110,7 +114,7 @@ class Provider implements ProviderInterface
 
         // Instantiate the LDAP connection.
         $this->connection->connect(
-            $this->configuration->get('domain_controllers'),
+            $this->configuration->get('hosts'),
             $this->configuration->get('port')
         );
 
@@ -187,7 +191,7 @@ class Provider implements ProviderInterface
     public function make()
     {
         return new ModelFactory(
-            $this->search()->getQuery()
+            $this->search()->newQuery()
         );
     }
 

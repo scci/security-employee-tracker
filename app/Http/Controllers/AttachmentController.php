@@ -6,7 +6,6 @@ use Illuminate\Contracts\Encryption\DecryptException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Storage;
-use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
 use SET\Training;
 use SET\User;
@@ -36,15 +35,11 @@ class AttachmentController extends Controller
             $model = User::findOrFail($data['id']);
             $encrypt = true;
         } else {
-            Notification::container()->success('Upload Failed');
-
-            return back();
+            return Redirect()->back()->with('status', 'Upload Failed');
         }
 
         Attachment::upload($model, $request->file('files'), $encrypt);
-        Notification::container()->success('Upload Complete');
-
-        return back();
+        return Redirect()->back()->with('status', 'Upload Complete');
     }
 
     /**

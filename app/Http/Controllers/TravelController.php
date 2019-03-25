@@ -5,7 +5,6 @@ namespace SET\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
-use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
 use SET\Http\Requests\TravelRequest;
 use SET\Travel;
@@ -33,9 +32,7 @@ class TravelController extends Controller
             Attachment::upload($travel, $request->file('files'), $data['encrypt']);
         }
 
-        Notification::container()->success('Travel successfully created');
-
-        return redirect()->action('UserController@show', $user->id);
+        return redirect()->action('UserController@show', $user->id)->with('status', 'Travel successfully created');
     }
 
     public function edit(User $user, Travel $travel)
@@ -55,9 +52,7 @@ class TravelController extends Controller
             Attachment::upload($travel, $request->file('files'), $data['encrypt']);
         }
 
-        Notification::container()->success('Travel successfully updated');
-
-        return redirect()->action('UserController@show', $user->id);
+        return redirect()->action('UserController@show', $user->id)->with('status', 'Travel successfully updated');
     }
 
     public function destroy($userID, $travelID)

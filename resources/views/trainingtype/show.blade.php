@@ -5,6 +5,11 @@
 @section('content')
     <div class="row">
         <div class="col s12 m8">
+            @if (session('status'))
+                <script>
+                    Materialize.toast("{{ @session('status') }}", 4000);
+                </script>
+            @endif
             <div class="card">
                 <div class="card-content">
                     <span class="card-title">

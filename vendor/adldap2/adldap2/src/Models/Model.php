@@ -12,6 +12,7 @@ use Adldap\Utilities;
 use Adldap\Query\Builder;
 use Adldap\Models\Attributes\Sid;
 use Adldap\Models\Attributes\Guid;
+use Adldap\Models\Attributes\MbString;
 use Adldap\Models\Attributes\DistinguishedName;
 use Adldap\Schemas\SchemaInterface;
 use Adldap\Models\Concerns\HasAttributes;
@@ -212,14 +213,12 @@ abstract class Model implements ArrayAccess, JsonSerializable
     {
         $attributes = $this->getAttributes();
 
-        $canDetect = extension_loaded('mbstring');
-
-        array_walk_recursive($attributes, function(&$val) use ($canDetect) {
-            if ($canDetect) {
+        array_walk_recursive($attributes, function(&$val) {
+            if (MbString::isLoaded()) {
                 // If we're able to detect the attribute
                 // encoding, we'll encode only the
                 // attributes that need to be.
-                if (! mb_detect_encoding($val, 'UTF-8', $strict = true)) {
+                if (! MbString::isUtf8($val)) {
                     $val = utf8_encode($val);
                 }
             } else {
@@ -691,6 +690,48 @@ abstract class Model implements ArrayAccess, JsonSerializable
     }
 
     /**
+     * Returns the distinguished name of the user who is assigned to manage this object.
+     *
+     * @return string|null
+     */
+    public function getManagedBy()
+    {
+        return $this->getFirstAttribute($this->schema->managedBy());
+    }
+
+    /**
+     * Returns the user model of the user who is assigned to manage this object.
+     *
+     * Returns false otherwise.
+     *
+     * @return User|bool
+     */
+    public function getManagedByUser()
+    {
+        if ($dn = $this->getManagedBy()) {
+            return $this->query->newInstance()->findByDn($dn);
+        }
+
+        return false;
+    }
+
+    /**
+     * Sets the user who is assigned to managed this object.
+     *
+     * @param Model|string $dn
+     *
+     * @return $this
+     */
+    public function setManagedBy($dn)
+    {
+        if ($dn instanceof Model) {
+            $dn = $dn->getDn();
+        }
+
+        return $this->setFirstAttribute($this->schema->managedBy(), $dn);
+    }
+
+    /**
      * Returns the model's max password age.
      *
      * @return string
@@ -750,7 +791,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Saves the changes to LDAP and returns the results.
      *
-     * @param array $attributes
+     * @param array $attributes The attributes to update or create for the current entry.
      *
      * @return bool
      */
@@ -762,7 +803,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Updates the model.
      *
-     * @param array $attributes
+     * @param array $attributes The attributes to update for the current entry.
      *
      * @return bool
      */
@@ -797,7 +838,7 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Creates the entry in LDAP.
      *
-     * @param array $attributes
+     * @param array $attributes The attributes for the new entry.
      *
      * @return bool
      */
@@ -806,15 +847,10 @@ abstract class Model implements ArrayAccess, JsonSerializable
         $this->fill($attributes);
 
         if (empty($this->getDn())) {
-            // If the model doesn't currently have a DN,
-            // we'll create a new one automatically.
-            $dn = $this->getDnBuilder();
-
-            // Then we'll add the entry's common name attribute.
-            $dn->addCn($this->getCommonName());
-
-            // Set the new DN.
-            $this->setDn($dn);
+            // If the model doesn't currently have a distinguished
+            // name set, we'll create one automatically using
+            // the current query builders base DN.
+            $this->setDn($this->getCreatableDn());
         }
 
         // Create the entry.
@@ -952,9 +988,9 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Moves the current model to a new RDN and new parent.
      *
-     * @param string      $rdn
-     * @param string|null $newParentDn
-     * @param bool|true   $deleteOldRdn
+     * @param string      $rdn          The models new relative distinguished name. Example: "cn=JohnDoe"
+     * @param string|null $newParentDn  The models new parent distinguished name (if moving). Leave this null if you are only renaming. Example: "ou=MovedUsers,dc=acme,dc=org"
+     * @param bool|true   $deleteOldRdn Whether to delete the old models relative distinguished name onced renamed / moved.
      *
      * @return bool
      */
@@ -978,13 +1014,23 @@ abstract class Model implements ArrayAccess, JsonSerializable
     /**
      * Alias for the move method.
      *
-     * @param string $rdn
+     * @param string $rdn The models new relative distinguished name. Example: "cn=JohnDoe"
      *
      * @return bool
      */
     public function rename($rdn)
     {
         return $this->move($rdn);
+    }
+
+    /**
+     * Constructs a new distinguished name that is creatable in the directory.
+     *
+     * @return DistinguishedName|string
+     */
+    protected function getCreatableDn()
+    {
+        return $this->getDnBuilder()->addCn($this->getCommonName());
     }
 
     /**

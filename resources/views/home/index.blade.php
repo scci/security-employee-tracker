@@ -14,6 +14,12 @@
 
     <div class="col s12 m12 l6">
 
+        @if (session('status'))
+            <script>
+                Materialize.toast("{{ @session('status') }}", 4000);
+            </script>
+        @endif
+
         @if ( Session::has('last_logon') )
             @include('home._last_login')
         @endif

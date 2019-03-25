@@ -12,7 +12,7 @@ class GetLogUsersTest extends TestCase
      * Note: This unit test executes all changes at the same machine time, so the cases
      *  must sort them before obtaining the record for comparison.
      */
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
-use Krucas\Notification\Facades\Notification;
 use Maatwebsite\Excel\Facades\Excel;
 use SET\Duty;
 use SET\Group;
@@ -273,11 +272,9 @@ class UserController extends Controller
         $importData = Excel::toCollection($importHandler, $uploadedFile);
         $importHandler->collection($importData[0]);
 
-        Notification::container()->success('Import Complete');
-
         File::delete($uploadedFile);
 
-        return redirect()->action('HomeController@index');
+        return redirect()->action('HomeController@index')->with('status', 'Import Complete');
     }
 
     /**

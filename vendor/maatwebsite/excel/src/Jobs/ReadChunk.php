@@ -4,13 +4,14 @@ namespace Maatwebsite\Excel\Jobs;
 
 use Maatwebsite\Excel\Sheet;
 use Illuminate\Bus\Queueable;
-use Illuminate\Support\Facades\DB;
 use PhpOffice\PhpSpreadsheet\Cell\Cell;
+use Maatwebsite\Excel\Files\TemporaryFile;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use PhpOffice\PhpSpreadsheet\Reader\IReader;
 use Maatwebsite\Excel\Filters\ChunkReadFilter;
 use Maatwebsite\Excel\Imports\HeadingRowExtractor;
 use Maatwebsite\Excel\Concerns\WithCustomValueBinder;
+use Maatwebsite\Excel\Transactions\TransactionHandler;
 
 class ReadChunk implements ShouldQueue
 {
@@ -22,9 +23,9 @@ class ReadChunk implements ShouldQueue
     private $reader;
 
     /**
-     * @var string
+     * @var TemporaryFile
      */
-    private $file;
+    private $temporaryFile;
 
     /**
      * @var string
@@ -47,27 +48,30 @@ class ReadChunk implements ShouldQueue
     private $chunkSize;
 
     /**
-     * @param IReader $reader
-     * @param string  $file
-     * @param string  $sheetName
-     * @param object  $sheetImport
-     * @param int     $startRow
-     * @param int     $chunkSize
+     * @param IReader       $reader
+     * @param TemporaryFile $temporaryFile
+     * @param string        $sheetName
+     * @param object        $sheetImport
+     * @param int           $startRow
+     * @param int           $chunkSize
      */
-    public function __construct(IReader $reader, string $file, string $sheetName, $sheetImport, int $startRow, int $chunkSize)
+    public function __construct(IReader $reader, TemporaryFile $temporaryFile, string $sheetName, $sheetImport, int $startRow, int $chunkSize)
     {
-        $this->reader      = $reader;
-        $this->file        = $file;
-        $this->sheetName   = $sheetName;
-        $this->sheetImport = $sheetImport;
-        $this->startRow    = $startRow;
-        $this->chunkSize   = $chunkSize;
+        $this->reader        = $reader;
+        $this->temporaryFile = $temporaryFile;
+        $this->sheetName     = $sheetName;
+        $this->sheetImport   = $sheetImport;
+        $this->startRow      = $startRow;
+        $this->chunkSize     = $chunkSize;
     }
 
     /**
+     * @param TransactionHandler $transaction
+     *
+     * @throws \Maatwebsite\Excel\Exceptions\SheetNotFoundException
      * @throws \PhpOffice\PhpSpreadsheet\Reader\Exception
      */
-    public function handle()
+    public function handle(TransactionHandler $transaction)
     {
         if ($this->sheetImport instanceof WithCustomValueBinder) {
             Cell::setValueBinder($this->sheetImport);
@@ -86,7 +90,9 @@ class ReadChunk implements ShouldQueue
         $this->reader->setReadDataOnly(true);
         $this->reader->setReadEmptyCells(false);
 
-        $spreadsheet = $this->reader->load($this->file);
+        $spreadsheet = $this->reader->load(
+            $this->temporaryFile->sync()->getLocalPath()
+        );
 
         $sheet = Sheet::byName(
             $spreadsheet,
@@ -99,7 +105,7 @@ class ReadChunk implements ShouldQueue
             return;
         }
 
-        DB::transaction(function () use ($sheet) {
+        $transaction(function () use ($sheet) {
             $sheet->import(
                 $this->sheetImport,
                 $this->startRow

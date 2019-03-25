@@ -11,8 +11,11 @@
     </div>
 
     <div class="col s12 m8">
-        @if($user->status != 'active')
-          @include('user._show_destoryed_date_block')
+
+        @if (session('status'))
+            <script>
+                Materialize.toast("{{ @session('status') }}", 4000);
+            </script>
         @endif
 
         <ul class="collapsible popout" data-collapsible="accordion">

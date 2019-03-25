@@ -34,7 +34,7 @@
             <a class="brand-logo" href="{{url("/")}}"> <img src="{{url("/img/logo-white.png")}}" alt="Security Employee Tracker" /> <span data-toggle="tooltip" data-placement="bottom" title="Security Employee Tracker">SET</span></a>
             <a href="#" data-activates="mobile-demo" class="button-collapse"><i class="material-icons">menu</i></a>
 
-            @if(config('auth.providers.users.driver') != 'adldap')
+            @if(config('auth.providers.users.driver') != 'ldap')
                 <ul class="right" id="nav-mobile">
                     <li><a href="{{url("register")}}">Register</a></li>
                 </ul>

@@ -12,7 +12,7 @@ class TrainingTypeControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->signIn();
@@ -254,7 +254,7 @@ class TrainingTypeControllerTest extends TestCase
         $this->actingAs($newuser);
         $response = $this->get("trainingtype/$createdTrainingTypeId");
         $response->assertStatus(403); // Forbidden status code
-        $response->assertSee('Whoops, looks like something went wrong.');
+        $response->assertSee('This action is unauthorized.');
         $this->assertFalse($response->isRedirection()); // Redirected
     }
 

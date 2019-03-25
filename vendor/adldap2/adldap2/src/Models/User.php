@@ -10,6 +10,8 @@ use Adldap\Models\Concerns\HasMemberOf;
 use Adldap\Models\Concerns\HasDescription;
 use Adldap\Models\Concerns\HasUserAccountControl;
 use Adldap\Models\Concerns\HasLastLogonAndLogOff;
+use Adldap\Models\Attributes\AccountControl;
+use Adldap\Models\Attributes\TSPropertyArray;
 use Illuminate\Contracts\Auth\Authenticatable;
 
 /**
@@ -592,7 +594,7 @@ class User extends Entry implements Authenticatable
     /**
      * Returns the users mail nickname.
      *
-     * @return string
+     * @return string|null
      */
     public function getMailNickname()
     {
@@ -788,6 +790,16 @@ class User extends Entry implements Authenticatable
     }
 
     /**
+     * Clears the accounts lockout time, unlocking the account.
+     *
+     * @return $this
+     */
+    public function setClearLockoutTime()
+    {
+        return $this->setFirstAttribute($this->schema->lockoutTime(), 0);
+    }
+
+    /**
      * Returns the users profile file path.
      *
      * @return string
@@ -832,6 +844,8 @@ class User extends Entry implements Authenticatable
     /**
      * Sets the users account expiry date.
      *
+     * If no expiry time is given, the account is set to never expire.
+     *
      * @link https://msdn.microsoft.com/en-us/library/ms675098(v=vs.85).aspx
      *
      * @param float $expiryTime
@@ -875,9 +889,7 @@ class User extends Entry implements Authenticatable
      */
     public function getThumbnailEncoded()
     {
-        $data = base64_decode($this->getThumbnail());
-
-        if ($data) {
+        if ($data = base64_decode($this->getThumbnail(), $strict = true)) {
             // In case we don't have the file info extension enabled,
             // we'll set the jpeg mime type as default.
             $mime = 'image/jpeg';
@@ -998,6 +1010,28 @@ class User extends Entry implements Authenticatable
     }
 
     /**
+     * Returns the employee type.
+     *
+     * @return string|null
+     */
+    public function getEmployeeType()
+    {
+        return $this->getFirstAttribute($this->schema->employeeType());
+    }
+
+    /**
+     * Sets the employee type.
+     *
+     * @param string $type
+     *
+     * @return $this
+     */
+    public function setEmployeeType($type)
+    {
+        return $this->setFirstAttribute($this->schema->employeeType(), $type);
+    }
+
+    /**
      * Returns the employee number.
      *
      * @return string
@@ -1064,6 +1098,28 @@ class User extends Entry implements Authenticatable
     }
 
     /**
+     * Return the user parameters.
+     *
+     * @return TSPropertyArray
+     */
+    public function getUserParameters()
+    {
+        return new TSPropertyArray($this->getFirstAttribute('userparameters'));
+    }
+
+    /**
+     * Sets the user parameters.
+     *
+     * @param TSPropertyArray $userParameters
+     *
+     * @return $this
+     */
+    public function setUserParameters(TSPropertyArray $userParameters)
+    {
+        return $this->setFirstAttribute('userparameters', $userParameters->toBinary());
+    }
+
+    /**
      * Retrieves the primary group of the current user.
      *
      * @return Model|bool
@@ -1088,13 +1144,27 @@ class User extends Entry implements Authenticatable
     {
         $this->validateSecureConnection();
 
-        $mod = $this->newBatchModification(
-            $this->schema->unicodePassword(),
-            LDAP_MODIFY_BATCH_REPLACE,
-            [Utilities::encodePassword($password)]
-        );
+        $encodedPassword = Utilities::encodePassword($password);
 
-        return $this->addModification($mod);
+        if ($this->exists) {
+            // If the record exists, we need to add a batch replace
+            // modification, otherwise we'll receive a "type or
+            // value" exists exception from our LDAP server.
+            return $this->addModification(
+                $this->newBatchModification(
+                    $this->schema->unicodePassword(),
+                    LDAP_MODIFY_BATCH_REPLACE,
+                    [$encodedPassword]
+                )
+            );
+        } else {
+            // Otherwise, we are creating a new record
+            // and we can set the attribute normally.
+            return $this->setFirstAttribute(
+                $this->schema->unicodePassword(),
+                $encodedPassword
+            );
+        }
     }
 
     /**
@@ -1204,6 +1274,9 @@ class User extends Entry implements Authenticatable
     {
         $accountExpiry = $this->getAccountExpiry();
 
+        // If the account expiry is zero or the expiry is equal to
+        // ActiveDirectory's 'never expire' value,
+        // then we'll return null here.
         if ($accountExpiry == 0 || $accountExpiry == $this->getSchema()->neverExpiresDate()) {
             return;
         }
@@ -1224,11 +1297,15 @@ class User extends Entry implements Authenticatable
      */
     public function isExpired(DateTime $date = null)
     {
-        $date = $date ?: new DateTime();
+        // Here we'll determine if the account expires by checking is expiration date.
+        if ($expirationDate = $this->expirationDate()) {
+            $date = $date ?: new DateTime();
 
-        $expirationDate = $this->expirationDate();
+            return $expirationDate <= $date;
+        }
 
-        return $expirationDate ? ($expirationDate <= $date) : false;
+        // The account has no expiry date.
+        return false;
     }
 
     /**
@@ -1248,6 +1325,12 @@ class User extends Entry implements Authenticatable
      */
     public function passwordExpired()
     {
+        // First we'll check the users userAccountControl to see if
+        // it contains the 'password does not expire' flag.
+        if ($this->getUserAccountControlObject()->has(AccountControl::DONT_EXPIRE_PASSWORD)) {
+            return false;
+        }
+
         $lastSet = (int) $this->getPasswordLastSet();
 
         if ($lastSet === 0) {

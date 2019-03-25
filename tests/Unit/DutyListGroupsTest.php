@@ -15,7 +15,7 @@ class DutyListGroupsTest extends TestCase
     protected $duty;
     protected $groups;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

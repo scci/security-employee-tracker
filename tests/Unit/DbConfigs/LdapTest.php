@@ -22,7 +22,7 @@ class LdapTest extends TestCase
     public function it_sets_adldap_settings_from_array()
     {
         $array = [
-            'auth.providers.users.driver'                                       => 'adldap',
+            'auth.providers.users.driver'                                       => 'ldap',
             'adldap.connections.default.connection_settings.domain_controllers' => ['123.123.123', '789.789.789'],
             'adldap.connections.default.connection_settings.admin_username'     => 'someaddress@email.com',
             'adldap.connections.default.connection_settings.admin_password'     => 'SomePassword',

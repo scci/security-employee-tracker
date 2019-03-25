@@ -46,7 +46,7 @@ class SendReminders extends Command
         $this->setTrainingUsers();
 
         foreach ($this->trainingUsers as $trainingUser) {
-            Event::fire(new TrainingAssigned($trainingUser));
+            Event::dispatch(new TrainingAssigned($trainingUser));
         }
 
         $this->emailSupervisor();

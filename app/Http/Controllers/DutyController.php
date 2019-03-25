@@ -29,6 +29,7 @@ class DutyController extends Controller
 
     public function store(DutyRequest $request)
     {
+        $this->authorize('edit');
         $data = $request->all();
         $duty = Duty::create($data);
 

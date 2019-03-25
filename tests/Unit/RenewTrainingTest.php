@@ -40,7 +40,7 @@ class RenewTrainingTest extends TestCase
     /** @test Test a True timeToRenew() call */
     public function it_renews_if_timeToRenew()
     {
-        $this->expectsEvents(TrainingAssigned::class);
+        Event::fake();
 
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
@@ -53,10 +53,12 @@ class RenewTrainingTest extends TestCase
         $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
 
         $trainingUser = (new RenewTraining())->handle()->getList();
+        Event::assertDispatched(TrainingAssigned::class);
         $this->assertCount(1, $trainingUser, 'Should be new user training');
         $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
 
         $trainingUser = (new RenewTraining())->handle()->getList();
+        Event::assertDispatched(TrainingAssigned::class);
         $this->assertCount(0, $trainingUser, 'No new user training');
         $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
     }
@@ -88,7 +90,7 @@ class RenewTrainingTest extends TestCase
     /** @test Test renewedAlready() method with a valid completed_date value*/
     public function it_renews_if_renewedAlready_has_completed_date()
     {
-        $this->expectsEvents(TrainingAssigned::class);
+        Event::fake();
 
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
@@ -101,10 +103,14 @@ class RenewTrainingTest extends TestCase
         $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
 
         $trainingUser = (new RenewTraining())->handle()->getList();
+        Event::assertDispatched(TrainingAssigned::class);
+
         $this->assertCount(1, $trainingUser, 'Should be new user training');
         $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
 
         $trainingUser = (new RenewTraining())->handle()->getList();
+        Event::assertDispatched(TrainingAssigned::class);
+
         $this->assertCount(0, $trainingUser, 'No new user training');
         $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
     }
@@ -112,7 +118,7 @@ class RenewTrainingTest extends TestCase
     /** @test Test renewedAlready() method with a past completed_date value*/
     public function it_renews_if_renewedAlready_past_completed_date_offset()
     {
-        $this->expectsEvents(TrainingAssigned::class);
+        Event::fake();
 
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
@@ -125,10 +131,12 @@ class RenewTrainingTest extends TestCase
         $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
 
         $trainingUser = (new RenewTraining())->handle()->getList();
+        Event::assertDispatched(TrainingAssigned::class);
         $this->assertCount(1, $trainingUser, 'Should be new user training');
         $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
 
         $trainingUser = (new RenewTraining())->handle()->getList();
+        Event::assertDispatched(TrainingAssigned::class);
         $this->assertCount(0, $trainingUser, 'No new user training');
         $this->assertCount(2, TrainingUser::all(), 'Should be two user trainings');
     }
@@ -160,7 +168,7 @@ class RenewTrainingTest extends TestCase
     /** @test */
     public function it_renews_training_when_it_is_time_to_renew()
     {
-        $this->expectsEvents(TrainingAssigned::class);
+        Event::fake();
 
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
@@ -173,6 +181,7 @@ class RenewTrainingTest extends TestCase
         $this->assertCount(1, TrainingUser::all(), 'Should only be one user training');
 
         $trainingUser = (new RenewTraining())->handle()->getList();
+        Event::assertDispatched(TrainingAssigned::class);
 
         $this->assertCount(1, $trainingUser);
         $this->assertCount(2, TrainingUser::all(), 'Should be a new second user training');
@@ -291,7 +300,7 @@ class RenewTrainingTest extends TestCase
      */
     public function it_does_not_renew_if_completed_with_stop_renewal_as_null()
     {
-        $this->expectsEvents(TrainingAssigned::class);
+        Event::fake();
 
         $training = factory(Training::class)->create(['renews_in' => 365]);
         $user = factory(User::class)->create();
@@ -307,11 +316,12 @@ class RenewTrainingTest extends TestCase
         // Create new renewal
         $this->assertCount(1, TrainingUser::all(), 'Should only be the initial user training.');
         $trainingUser = (new RenewTraining())->handle()->getList();
+        Event::assertDispatched(TrainingAssigned::class);
         $this->assertCount(1, $trainingUser, 'User training should be renewed.');
         $this->assertCount(2, TrainingUser::all(), 'Creates an additional user training.');
 
         // Now mimic user completing current course
-        $latestTrainingUser = TrainingUser::where('id', TrainingUser::count())->first();
+        $latestTrainingUser = TrainingUser::all()->last();
         $latestTrainingUser->completed_date = Carbon::today()->subWeek(1)->format('Y-m-d');
         $latestTrainingUser->stop_renewal = null; // Mimic problematic samples
         $latestTrainingUser->save();
@@ -322,6 +332,7 @@ class RenewTrainingTest extends TestCase
 
         // Subsequent RenewTraining should not create new training
         $trainingUser = (new RenewTraining())->handle()->getList();
+        Event::assertDispatched(TrainingAssigned::class);
         $this->assertCount(0, $trainingUser, 'User training should NOT be renewed.');
         $this->assertCount(2, TrainingUser::all(), 'No change in user training.');
     }

@@ -142,7 +142,7 @@ class RenewTraining extends Command
         $assignedTraining = $this->createRecord($trainingUser, $dueDate);
 
         //Email user of new training is due
-        Event::fire(new TrainingAssigned($assignedTraining));
+        Event::dispatch(new TrainingAssigned($assignedTraining));
         Log::info('User training renewal notification.', [
             'user_id'       => $assignedTraining->user_id,
             'user_name'     => $assignedTraining->user->userFullName,

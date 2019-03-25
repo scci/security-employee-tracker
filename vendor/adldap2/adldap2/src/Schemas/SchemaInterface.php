@@ -544,6 +544,15 @@ interface SchemaInterface
     public function manager();
 
     /**
+     * The distinguished name of the user that is assigned to manage this object.
+     *
+     * @link https://docs.microsoft.com/en-us/windows/desktop/adschema/a-managedby
+     *
+     * @return string
+     */
+    public function managedBy();
+
+    /**
      * The maximum amount of time, in 100-nanosecond intervals, a password is valid.
      *
      * This value is stored as a large integer that represents the number of
@@ -564,6 +573,20 @@ interface SchemaInterface
      * @return string
      */
     public function member();
+
+    /**
+     * The identifier of records that belong to a group.
+     *
+     * For example, in ActiveDirectory, the 'member' attribute on
+     * a group record contains a list of distinguished names,
+     * so `distinguishedname` would be the identifier.
+     *
+     * In other environments such as Sun Directory
+     * Server, this identifier would be `uid`.
+     *
+     * @return string
+     */
+    public function memberIdentifier();
 
     /**
      * The distinguished names of the groups to which this object belongs.
@@ -768,6 +791,13 @@ interface SchemaInterface
      * @return string
      */
     public function objectClassUser();
+
+    /**
+     * The object class model map.
+     *
+     * @return array
+     */
+    public function objectClassModelMap();
 
     /**
      * The unique identifier for an object.

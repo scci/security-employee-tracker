@@ -13,6 +13,11 @@
     @endcan
 
     <div class="card">
+        @if (session('status'))
+            <script>
+                Materialize.toast("{{ @session('status') }}", 4000);
+            </script>
+        @endif
         <div class="card-content">
             <span class="card-title">News</span>
             <table class="row-border hover">

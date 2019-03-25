@@ -180,8 +180,7 @@ class Group extends Entry
     }
 
     /**
-     * Retrieves group members by the specified model
-     * attribute using their distinguished name.
+     * Retrieves group members by the specified model attribute.
      *
      * @param $attribute
      *
@@ -191,11 +190,26 @@ class Group extends Entry
     {
         $members = [];
 
-        $dns = $this->getAttribute($attribute) ?: [];
+        $entries = $this->getAttribute($attribute) ?: [];
 
-        foreach ($dns as $dn) {
-            $member = $this->query->newInstance()->findByDn($dn);
+        $query = $this->query->newInstance();
 
+        // Retrieving the member identifier to allow
+        // compatibility with LDAP variants.
+        $identifier = $this->schema->memberIdentifier();
+
+        foreach ($entries as $entry) {
+            // If our identifier is a distinguished name, then we need to
+            // use an alternate query method, as we can't locate records
+            // by distinguished names using an LDAP filter.
+            if ($identifier == 'dn' || $identifier == 'distinguishedname') {
+                $member = $query->findByDn($entry);
+            } else {
+                $member = $query->findBy($identifier, $entry);
+            }
+
+            // We'll double check that we've received a model from
+            // our query before adding it into our results.
             if ($member instanceof Model) {
                 $members[] = $member;
             }
@@ -242,12 +256,14 @@ class Group extends Entry
             if($to === '*') {
                 return $members;
             }
+            
+            $range = $to - $matches[1][0];
 
             $from = $to + 1;
 
             // We'll determine the member range simply
-            // by doubling the selected from value.
-            $to = $from * 2;
+            // by adding $range to $from.
+            $to = $from + $range;
 
             // We'll need to query for the current model again but with
             // a new range to retrieve the other members.

@@ -5,7 +5,6 @@ namespace SET\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
-use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
 use SET\Http\Requests\NewsRequest;
 use SET\News;
@@ -57,9 +56,8 @@ class NewsController extends Controller
         }
 
         $news->emailNews();
-        Notification::container()->success('News Created');
 
-        return redirect()->action('NewsController@index');
+        return redirect()->action('NewsController@index')->with('status', 'News Created');
     }
 
     /**
@@ -110,9 +108,7 @@ class NewsController extends Controller
         }
         $news->emailNews();
 
-        Notification::container()->success('News Updated');
-
-        return redirect()->action('NewsController@index');
+        return redirect()->action('NewsController@index')->with('status', 'News Updated');
     }
 
     /**

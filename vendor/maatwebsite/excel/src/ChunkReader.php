@@ -5,8 +5,8 @@ namespace Maatwebsite\Excel;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Jobs\ReadChunk;
 use Maatwebsite\Excel\Jobs\QueueImport;
-use Illuminate\Contracts\Bus\Dispatcher;
 use Maatwebsite\Excel\Concerns\WithLimit;
+use Maatwebsite\Excel\Files\TemporaryFile;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use PhpOffice\PhpSpreadsheet\Reader\IReader;
 use Maatwebsite\Excel\Concerns\WithProgressBar;
@@ -19,13 +19,14 @@ class ChunkReader
     /**
      * @param WithChunkReading $import
      * @param IReader          $reader
-     * @param string           $file
+     * @param TemporaryFile    $temporaryFile
      *
      * @return \Illuminate\Foundation\Bus\PendingDispatch|null
      */
-    public function read(WithChunkReading $import, IReader $reader, string $file)
+    public function read(WithChunkReading $import, IReader $reader, TemporaryFile $temporaryFile)
     {
         $chunkSize  = $import->chunkSize();
+        $file       = $temporaryFile->getLocalPath();
         $totalRows  = $this->getTotalRows($reader, $file);
         $worksheets = $this->getWorksheets($import, $reader, $file);
 
@@ -41,7 +42,7 @@ class ChunkReader
             for ($currentRow = $startRow; $currentRow <= $totalRows[$name]; $currentRow += $chunkSize) {
                 $jobs->push(new ReadChunk(
                     $reader,
-                    $file,
+                    $temporaryFile,
                     $name,
                     $sheetImport,
                     $currentRow,
@@ -55,7 +56,7 @@ class ChunkReader
         }
 
         $jobs->each(function (ReadChunk $job) {
-            app(Dispatcher::class)->dispatchNow($job);
+            dispatch_now($job);
         });
 
         if ($import instanceof WithProgressBar) {

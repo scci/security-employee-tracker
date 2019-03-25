@@ -50,7 +50,7 @@ class AppServiceProvider extends ServiceProvider
 
     private function setupLdap()
     {
-        if (config('auth.providers.users.driver') == 'adldap') {
+        if (config('auth.providers.users.driver') == 'ldap') {
             $this->app->register('Adldap\Laravel\AdldapServiceProvider');
             $this->app->register('Adldap\Laravel\AdldapAuthServiceProvider');
         }

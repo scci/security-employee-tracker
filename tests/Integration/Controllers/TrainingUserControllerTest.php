@@ -11,7 +11,7 @@ use Tests\TestCase;
 
 class TrainingUserControllerTest extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->signIn();

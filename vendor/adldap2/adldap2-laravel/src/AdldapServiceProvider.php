@@ -6,15 +6,21 @@ use Adldap\Adldap;
 use Adldap\AdldapInterface;
 use Adldap\Auth\BindException;
 use Adldap\Connections\Provider;
-use Adldap\Schemas\SchemaInterface;
 use Adldap\Connections\ConnectionInterface;
-use Adldap\Laravel\Exceptions\ConfigurationMissingException;
 use Illuminate\Container\Container;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AdldapServiceProvider extends ServiceProvider
 {
+    /**
+     * We'll defer loading this service provider so our LDAP connection
+     * isn't instantiated unless requested to speed up our application.
+     *
+     * @var bool
+     */
+    protected $defer = true;
+
     /**
      * Run service provider boot operations.
      *
@@ -29,10 +35,8 @@ class AdldapServiceProvider extends ServiceProvider
         $config = __DIR__.'/Config/config.php';
 
         $this->publishes([
-            $config => config_path('adldap.php'),
-        ], 'adldap');
-
-        $this->mergeConfigFrom($config, 'adldap');
+            $config => config_path('ldap.php'),
+        ]);
     }
 
     /**
@@ -42,23 +46,20 @@ class AdldapServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        // Bind the Adldap instance to the IoC
-        $this->app->singleton('adldap', function (Container $app) {
-            $config = $app->make('config')->get('adldap');
+        // Bind the Adldap contract to the Adldap object
+        // in the IoC for dependency injection.
+        $this->app->singleton(AdldapInterface::class, function (Container $app) {
+            $config = $app->make('config')->get('ldap');
 
             // Verify configuration exists.
             if (is_null($config)) {
-                $message = 'Adldap configuration could not be found. Try re-publishing using `php artisan vendor:publish --tag="adldap"`.';
+                $message = 'Adldap configuration could not be found. Try re-publishing using `php artisan vendor:publish`.';
 
-                throw new ConfigurationMissingException($message);
+                throw new \RuntimeException($message);
             }
 
             return $this->addProviders($this->newAdldap(), $config['connections']);
         });
-
-        // Bind the Adldap contract to the Adldap object
-        // in the IoC for dependency injection.
-        $this->app->singleton(AdldapInterface::class, 'adldap');
     }
 
     /**
@@ -68,7 +69,9 @@ class AdldapServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return ['adldap'];
+        return [
+            AdldapInterface::class,
+        ];
     }
 
     /**
@@ -87,15 +90,14 @@ class AdldapServiceProvider extends ServiceProvider
     protected function addProviders(Adldap $adldap, array $connections = [])
     {
         // Go through each connection and construct a Provider.
-        foreach ($connections as $name => $settings) {
+        foreach ($connections as $name => $config) {
             // Create a new provider.
             $provider = $this->newProvider(
-                $settings['connection_settings'],
-                new $settings['connection'],
-                new $settings['schema']
+                $config['settings'],
+                new $config['connection']
             );
 
-            if ($this->shouldAutoConnect($settings)) {
+            if ($this->shouldAutoConnect($config)) {
                 try {
                     $provider->connect();
                 } catch (BindException $e) {
@@ -128,13 +130,12 @@ class AdldapServiceProvider extends ServiceProvider
      *
      * @param array                    $configuration
      * @param ConnectionInterface|null $connection
-     * @param SchemaInterface          $schema
      *
      * @return Provider
      */
-    protected function newProvider($configuration = [], ConnectionInterface $connection = null, SchemaInterface $schema = null)
+    protected function newProvider($configuration = [], ConnectionInterface $connection = null)
     {
-        return new Provider($configuration, $connection, $schema);
+        return new Provider($configuration, $connection);
     }
 
     /**

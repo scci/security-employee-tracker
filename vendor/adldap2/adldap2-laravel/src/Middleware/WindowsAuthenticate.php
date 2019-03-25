@@ -13,7 +13,6 @@ use Adldap\Laravel\Events\AuthenticatedWithWindows;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Config;
 
 class WindowsAuthenticate
@@ -112,7 +111,7 @@ class WindowsAuthenticate
      */
     protected function fireAuthenticatedEvent(User $user, $model = null)
     {
-        Event::fire(new AuthenticatedWithWindows($user, $model));
+        event(new AuthenticatedWithWindows($user, $model));
     }
 
     /**
@@ -197,7 +196,7 @@ class WindowsAuthenticate
      */
     protected function key()
     {
-        return Config::get('adldap_auth.usernames.windows.key', 'AUTH_USER');
+        return Config::get('ldap_auth.usernames.windows.key', 'AUTH_USER');
     }
 
     /**
@@ -207,6 +206,6 @@ class WindowsAuthenticate
      */
     protected function discover()
     {
-        return Config::get('adldap_auth.usernames.windows.discover', 'samaccountname');
+        return Config::get('ldap_auth.usernames.windows.discover', 'samaccountname');
     }
 }

@@ -11,7 +11,7 @@ class VisitControllerTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->signIn();
@@ -68,11 +68,11 @@ class VisitControllerTest extends TestCase
         // Logged in as admin - Can store the visit
         $userId = $this->user->id;
         $data = ['smo_code'         => 'A SMO Code',
-                 'visit_date'      => '2016-12-10',
-                 'expiration_date' => '2016-12-20',
-                 'poc'             => 'A point of contact',
-                 'phone'           => '12345',
-                 'comment'         => 'Comment on visit', ];
+                 'visit_date'       => '2016-12-10',
+                 'expiration_date'  => '2016-12-20',
+                 'poc'              => 'A point of contact',
+                 'phone'            => '12345',
+                 'comment'          => 'Comment on visit', ];
 
         $response = $this->post("/user/$userId/visit/", $data);
         $response->assertRedirect('user/'.$userId);

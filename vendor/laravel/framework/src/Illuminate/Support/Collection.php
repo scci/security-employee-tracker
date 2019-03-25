@@ -767,7 +767,7 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  mixed  $value
      * @return mixed
      */
-    public function firstWhere($key, $operator, $value = null)
+    public function firstWhere($key, $operator = null, $value = null)
     {
         return $this->first($this->operatorForWhere(...func_get_args()));
     }
@@ -985,6 +985,36 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     protected function useAsCallable($value)
     {
         return ! is_string($value) && is_callable($value);
+    }
+
+    /**
+     * Join all items from the collection using a string. The final items can use a separate glue string.
+     *
+     * @param  string  $glue
+     * @param  string  $finalGlue
+     * @return string
+     */
+    public function join($glue, $finalGlue = '')
+    {
+        if ($finalGlue === '') {
+            return $this->implode($glue);
+        }
+
+        $count = $this->count();
+
+        if ($count === 0) {
+            return '';
+        }
+
+        if ($count === 1) {
+            return $this->last();
+        }
+
+        $collection = new static($this->items);
+
+        $finalItem = $collection->pop();
+
+        return $collection->implode($glue).$finalGlue.$finalItem;
     }
 
     /**
@@ -1421,16 +1451,14 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
      * @param  callable|mixed  $callback
      * @return static
      */
-    public function reject($callback)
+    public function reject($callback = true)
     {
-        if ($this->useAsCallable($callback)) {
-            return $this->filter(function ($value, $key) use ($callback) {
-                return ! $callback($value, $key);
-            });
-        }
+        $useAsCallable = $this->useAsCallable($callback);
 
-        return $this->filter(function ($item) use ($callback) {
-            return $item != $callback;
+        return $this->filter(function ($value, $key) use ($callback, $useAsCallable) {
+            return $useAsCallable
+                ? ! $callback($value, $key)
+                : $value != $callback;
         });
     }
 
@@ -1890,6 +1918,38 @@ class Collection implements ArrayAccess, Arrayable, Countable, IteratorAggregate
     public function count()
     {
         return count($this->items);
+    }
+
+    /**
+     * Count the number of items in the collection using a given truth test.
+     *
+     * @param  callable|null  $callback
+     * @return static
+     */
+    public function countBy($callback = null)
+    {
+        if (is_null($callback)) {
+            $callback = function ($value) {
+                return $value;
+            };
+        }
+
+        return new static($this->groupBy($callback)->map(function ($value) {
+            return $value->count();
+        }));
+    }
+
+    /**
+     * Add an item to the collection.
+     *
+     * @param  mixed  $item
+     * @return $this
+     */
+    public function add($item)
+    {
+        $this->items[] = $item;
+
+        return $this;
     }
 
     /**

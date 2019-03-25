@@ -1,6 +1,6 @@
 @if(extension_loaded('ldap'))
     {!! Form::hidden('auth_driver', 'eloquent') !!}
-    {!! Form::checkbox('auth_driver', 'adldap', null, ['id' => 'auth_driver', 'class' => 'filled-in', (isset($settings['auth.providers.users.driver']) && $settings['auth.providers.users.driver'] == 'adldap') ? 'checked' : '' ]) !!}
+    {!! Form::checkbox('auth_driver', 'ldap', null, ['id' => 'auth_driver', 'class' => 'filled-in', (isset($settings['auth.providers.users.driver']) && $settings['auth.providers.users.driver'] == 'ldap') ? 'checked' : '' ]) !!}
     {!! Form::label('auth_driver', 'Enable AD/LDAP:') !!}
     <div class="row">
         <div class="col s12 m6 l4 input-field">

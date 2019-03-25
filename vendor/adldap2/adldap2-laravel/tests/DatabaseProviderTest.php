@@ -7,7 +7,7 @@ use Adldap\AdldapInterface;
 use Adldap\Laravel\Commands\Import;
 use Adldap\Laravel\Facades\Resolver;
 use Adldap\Laravel\Tests\Scopes\JohnDoeScope;
-use Adldap\Laravel\Tests\Models\User as EloquentUser;
+use Adldap\Laravel\Tests\Models\TestUser as EloquentUser;
 use Adldap\Laravel\Tests\Handlers\LdapAttributeHandler;
 use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Hash;
@@ -17,13 +17,13 @@ class DatabaseProviderTest extends DatabaseTestCase
 {
     /**
      * @test
-     * @expectedException \Adldap\Laravel\Exceptions\ConfigurationMissingException
+     * @expectedException \RuntimeException
      */
     public function configuration_not_found_exception_when_config_is_null()
     {
-        config(['adldap' => null]);
+        config(['ldap' => null]);
 
-        App::make('adldap');
+        App::make(AdldapInterface::class);
     }
 
     /** @test */
@@ -78,13 +78,9 @@ class DatabaseProviderTest extends DatabaseTestCase
     /** @test */
     public function config_scopes_are_applied()
     {
-        $scopes = config('adldap_auth.scopes', []);
+        config(['ldap_auth.scopes' => [JohnDoeScope::class]]);
 
-        $scopes[] = JohnDoeScope::class;
-
-        config(['adldap_auth.scopes' => $scopes]);
-
-        $expectedFilter = '(&(objectclass=\70\65\72\73\6f\6e)(objectcategory=\70\65\72\73\6f\6e)(userprincipalname=*)(cn=\4a\6f\68\6e\20\44\6f\65))';
+        $expectedFilter = '(&(objectclass=\75\73\65\72)(objectcategory=\70\65\72\73\6f\6e)(!(objectclass=\63\6f\6e\74\61\63\74))(cn=\4a\6f\68\6e\20\44\6f\65))';
 
         $this->assertEquals($expectedFilter, Resolver::query()->getQuery());
     }
@@ -92,9 +88,9 @@ class DatabaseProviderTest extends DatabaseTestCase
     /** @test */
     public function attribute_handlers_are_used()
     {
-        $default = config('adldap_auth.sync_attributes');
+        $default = config('ldap_auth.sync_attributes');
 
-        config(['adldap_auth.sync_attributes' => array_merge($default, [LdapAttributeHandler::class])]);
+        config(['ldap_auth.sync_attributes' => array_merge($default, [LdapAttributeHandler::class])]);
 
         $this->auth_passes();
 
@@ -108,7 +104,7 @@ class DatabaseProviderTest extends DatabaseTestCase
     {
         // Inserting an invalid attribute handler that
         // does not contain a `handle` method.
-        config(['adldap_auth.sync_attributes' => [\stdClass::class]]);
+        config(['ldap_auth.sync_attributes' => [\stdClass::class]]);
 
         $user = $this->makeLdapUser([
             'cn'    => 'John Doe',
@@ -121,14 +117,66 @@ class DatabaseProviderTest extends DatabaseTestCase
     }
 
     /** @test */
+    public function sync_attribute_as_string_will_return_null()
+    {
+        config([
+            'ldap_auth.sync_attributes' => [
+                'email' => 'userprincipalname',
+                'name' => 'cn',
+            ]
+        ]);
+
+        // LDAP user does not have common name.
+        $user = $this->makeLdapUser([
+            'userprincipalname'  => 'jdoe@email.com',
+        ]);
+
+        $importer = new Import($user, new EloquentUser());
+
+        $model = $importer->handle();
+
+        $this->assertInstanceOf(EloquentUser::class, $model);
+        $this->assertNull($model->name);
+    }
+
+    /** @test */
+    public function sync_attribute_as_int_boolean_or_array_will_be_used()
+    {
+        config([
+            'ldap_auth.sync_attributes' => [
+                'email' => 'userprincipalname',
+                'string' => 'not-an-LDAP-attribute',
+                'int' => 1,
+                'bool' => true,
+                'array' => ['one', 'two']
+            ]
+        ]);
+
+        // LDAP user does not have common name.
+        $user = $this->makeLdapUser([
+            'userprincipalname'  => 'jdoe@email.com',
+        ]);
+
+        $importer = new Import($user, new EloquentUser());
+
+        $model = $importer->handle();
+
+        $this->assertInstanceOf(EloquentUser::class, $model);
+        $this->assertNull($model->string);
+        $this->assertEquals($model->int, 1);
+        $this->assertEquals($model->bool, true);
+        $this->assertEquals($model->array, ['one', 'two']);
+    }
+
+    /** @test */
     public function auth_attempts_fallback_using_config_option()
     {
-        config(['adldap_auth.login_fallback' => true]);
+        config(['ldap_auth.login_fallback' => true]);
 
         EloquentUser::create([
             'email'    => 'jdoe@email.com',
             'name'     => 'John Doe',
-            'password' => bcrypt('Password123'),
+            'password' => Hash::make('Password123'),
         ]);
 
         $credentials = [
@@ -137,7 +185,7 @@ class DatabaseProviderTest extends DatabaseTestCase
         ];
 
         Resolver::shouldReceive('byCredentials')->times(3)->andReturn(null)
-            ->shouldReceive('byModel')->once()->andReturn(null);
+            ->shouldReceive('byModel')->times(2)->andReturn(null);
 
         $this->assertTrue(Auth::attempt($credentials));
 
@@ -145,7 +193,7 @@ class DatabaseProviderTest extends DatabaseTestCase
             array_replace($credentials, ['password' => 'Invalid'])
         ));
 
-        config(['adldap_auth.login_fallback' => false]);
+        config(['ldap_auth.login_fallback' => false]);
 
         $this->assertFalse(Auth::attempt($credentials));
     }
@@ -153,12 +201,12 @@ class DatabaseProviderTest extends DatabaseTestCase
     /** @test */
     public function auth_attempts_using_fallback_does_not_require_connection()
     {
-        config(['adldap_auth.login_fallback' => true]);
+        config(['ldap_auth.login_fallback' => true]);
 
         EloquentUser::create([
             'email'    => 'jdoe@email.com',
             'name'     => 'John Doe',
-            'password' => bcrypt('Password123'),
+            'password' => Hash::make('Password123'),
         ]);
 
         $credentials = [
@@ -170,14 +218,14 @@ class DatabaseProviderTest extends DatabaseTestCase
 
         $user = Auth::user();
 
-        $this->assertInstanceOf('Adldap\Laravel\Tests\Models\User', $user);
+        $this->assertInstanceOf('Adldap\Laravel\Tests\Models\TestUser', $user);
         $this->assertEquals('jdoe@email.com', $user->email);
     }
 
     /** @test */
     public function passwords_are_synced_when_enabled()
     {
-        config(['adldap_auth.passwords.sync' => true]);
+        config(['ldap_auth.passwords.sync' => true]);
 
         $credentials = [
             'email' => 'jdoe@email.com',
@@ -195,7 +243,7 @@ class DatabaseProviderTest extends DatabaseTestCase
     /** @test */
     public function passwords_are_not_synced_when_sync_is_disabled()
     {
-        config(['adldap_auth.passwords.sync' => false]);
+        config(['ldap_auth.passwords.sync' => false]);
 
         $credentials = [
             'email' => 'jdoe@email.com',
@@ -213,7 +261,7 @@ class DatabaseProviderTest extends DatabaseTestCase
     /** @test */
     public function passwords_are_not_updated_when_sync_is_disabled()
     {
-        config(['adldap_auth.passwords.sync' => false]);
+        config(['ldap_auth.passwords.sync' => false]);
 
         $credentials = [
             'email' => 'jdoe@email.com',
@@ -233,8 +281,8 @@ class DatabaseProviderTest extends DatabaseTestCase
     public function trashed_rule_prevents_deleted_users_from_logging_in()
     {
         config([
-            'adldap_auth.login_fallback' => false,
-            'adldap_auth.rules' => [\Adldap\Laravel\Validation\Rules\DenyTrashed::class],
+            'ldap_auth.login_fallback' => false,
+            'ldap_auth.rules' => [\Adldap\Laravel\Validation\Rules\DenyTrashed::class],
         ]);
 
         $credentials = [
@@ -259,8 +307,8 @@ class DatabaseProviderTest extends DatabaseTestCase
     public function only_imported_users_are_allowed_to_authenticate_when_rule_is_applied()
     {
         config([
-            'adldap_auth.login_fallback' => false,
-            'adldap_auth.rules' => [\Adldap\Laravel\Validation\Rules\OnlyImported::class],
+            'ldap_auth.login_fallback' => false,
+            'ldap_auth.rules' => [\Adldap\Laravel\Validation\Rules\OnlyImported::class],
         ]);
 
         $credentials = [
@@ -277,6 +325,6 @@ class DatabaseProviderTest extends DatabaseTestCase
     /** @test */
     public function method_calls_are_passed_to_fallback_provider()
     {
-        $this->assertEquals('Adldap\Laravel\Tests\Models\User', Auth::getProvider()->getModel());
+        $this->assertEquals('Adldap\Laravel\Tests\Models\TestUser', Auth::getProvider()->getModel());
     }
 }

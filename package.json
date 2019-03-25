@@ -2,7 +2,7 @@
   "private": true,
   "devDependencies": {
     "grunt": "^1.0.1",
-    "gulp": "^3.8.8",
+    "gulp": "^3.9.1",
     "gulp-notify": "^3.0.0",
     "gulp-phpunit": "^0.22.2",
     "laravel-elixir-stylelint": "^5.0.0-5",

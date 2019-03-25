@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Input;
-use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
 use SET\Events\TrainingAssigned;
 use SET\Group;
@@ -82,9 +81,7 @@ class TrainingController extends Controller
 
         $this->createTrainingNotes($data);
 
-        Notification::container()->success('Training Created');
-
-        return redirect()->action('TrainingController@index');
+        return redirect()->action('TrainingController@index')->with('status', 'Training Created');
     }
 
     /**
@@ -136,9 +133,7 @@ class TrainingController extends Controller
         $data['training_id'] = $training->id;
         $this->createTrainingNotes($data);
 
-        Notification::container()->success('Training Updated');
-
-        return redirect()->action('TrainingController@show', $training->id);
+        return redirect()->action('TrainingController@show', $training->id)->with('status', 'Training Updated');
     }
 
     /**
@@ -180,9 +175,7 @@ class TrainingController extends Controller
 
         $this->createTrainingNotes($data);
 
-        Notification::container()->success('Training was assigned to the user(s).');
-
-        return redirect()->action('TrainingController@show', $trainingID);
+        return redirect()->action('TrainingController@show', $trainingID)->with('status', 'Training was assigned to the user(s).');
     }
 
     /**
@@ -210,10 +203,9 @@ class TrainingController extends Controller
     public function sendReminder($trainingUserId)
     {
         $trainingUser = TrainingUser::with('user')->find($trainingUserId);
-        Event::fire(new TrainingAssigned($trainingUser));
-        Notification::container()->success('Reminder sent to '.$trainingUser->user->userFullName);
+        Event::dispatch(new TrainingAssigned($trainingUser));
 
-        return redirect()->back();
+        return redirect()->back()->with('status', 'Reminder sent to '.$trainingUser->user->userFullName);
     }
 
     /***************************/
@@ -252,7 +244,7 @@ class TrainingController extends Controller
         foreach (array_unique($users) as $user) {
             $data['user_id'] = $user;
             $note = TrainingUser::create($data);
-            Event::fire(new TrainingAssigned($note));
+            Event::dispatch(new TrainingAssigned($note));
         }
     }
 }

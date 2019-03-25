@@ -163,7 +163,7 @@ class GroupController extends Controller
                 $data['training_id'] = $trainingId;
                 $trainingUser = TrainingUser::create($data);
 
-                Event::fire(new TrainingAssigned($trainingUser));
+                Event::dispatch(new TrainingAssigned($trainingUser));
             }
         }
     }

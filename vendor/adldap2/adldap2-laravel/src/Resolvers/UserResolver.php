@@ -11,7 +11,6 @@ use Adldap\Laravel\Events\Authenticating;
 use Adldap\Laravel\Events\AuthenticationFailed;
 use Adldap\Laravel\Auth\NoDatabaseUserProvider;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -111,15 +110,15 @@ class UserResolver implements ResolverInterface
 
         $password = $this->getPasswordFromCredentials($credentials);
 
-        Event::fire(new Authenticating($user, $username));
+        event(new Authenticating($user, $username));
 
         if ($this->getLdapAuthProvider()->auth()->attempt($username, $password)) {
-            Event::fire(new Authenticated($user));
+            event(new Authenticated($user));
 
             return true;
         }
 
-        Event::fire(new AuthenticationFailed($user));
+        event(new AuthenticationFailed($user));
 
         return false;
     }
@@ -131,7 +130,7 @@ class UserResolver implements ResolverInterface
     {
         $query = $this->getLdapAuthProvider()->search()->users();
 
-        $scopes = Config::get('adldap_auth.scopes', []);
+        $scopes = Config::get('ldap_auth.scopes', []);
 
         if (is_array($scopes)) {
             foreach ($scopes as $scope) {
@@ -155,7 +154,7 @@ class UserResolver implements ResolverInterface
      */
     public function getLdapDiscoveryAttribute() : string
     {
-        return Config::get('adldap_auth.usernames.ldap.discover', 'userprincipalname');
+        return Config::get('ldap_auth.usernames.ldap.discover', 'userprincipalname');
     }
 
     /**
@@ -163,7 +162,7 @@ class UserResolver implements ResolverInterface
      */
     public function getLdapAuthAttribute() : string
     {
-        return Config::get('adldap_auth.usernames.ldap.authenticate', 'distinguishedname');
+        return Config::get('ldap_auth.usernames.ldap.authenticate', 'distinguishedname');
     }
 
     /**
@@ -171,7 +170,7 @@ class UserResolver implements ResolverInterface
      */
     public function getEloquentUsernameAttribute() : string
     {
-        return Config::get('adldap_auth.usernames.eloquent', 'email');
+        return Config::get('ldap_auth.usernames.eloquent', 'email');
     }
 
     /**
@@ -215,6 +214,6 @@ class UserResolver implements ResolverInterface
      */
     protected function getLdapAuthConnectionName()
     {
-        return Config::get('adldap_auth.connection', 'default');
+        return Config::get('ldap_auth.connection', 'default');
     }
 }

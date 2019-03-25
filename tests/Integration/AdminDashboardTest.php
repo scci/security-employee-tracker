@@ -15,7 +15,7 @@ class AdminDashboardTest extends TestCase
 {
     use DatabaseTransactions;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -114,13 +114,14 @@ class AdminDashboardTest extends TestCase
     /** @test */
     public function it_shows_when_changes_are_made_to_a_users_profile()
     {
-        $emp_num = $this->user->emp_num;
-        $response = $this->get('/user/'.$this->user->id);
+        $user = factory(User::class)->create();
+        $emp_num = $user->emp_num;
+        $response = $this->get('/user/'.$user->id);
         $response->assertSee("$emp_num");
 
-        $this->user->update(['emp_num' => 995]);
+        $user->update(['emp_num' => 995]);
 
-        $response = $this->get('/user/'.$this->user->id);
+        $response = $this->get('/user/'.$user->id);
         $response->assertSee('995');
     }
 }

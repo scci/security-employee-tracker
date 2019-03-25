@@ -7,4 +7,4 @@
     </div>
 @endif
 <!-- session/notifications -->
-@notification()
+<!-- @notification() -->

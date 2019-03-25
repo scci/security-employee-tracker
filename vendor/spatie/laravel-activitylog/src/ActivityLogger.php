@@ -2,6 +2,7 @@
 
 namespace Spatie\Activitylog;
 
+use Spatie\String\Str;
 use Illuminate\Support\Arr;
 use Illuminate\Auth\AuthManager;
 use Illuminate\Database\Eloquent\Model;
@@ -146,9 +147,11 @@ class ActivityLogger
             return $modelOrId;
         }
 
-        $model = $this->auth->guard($this->authDriver)->getProvider()->retrieveById($modelOrId);
+        $guard = $this->auth->guard($this->authDriver);
+        $provider = method_exists($guard, 'getProvider') ? $guard->getProvider() : null;
+        $model = method_exists($provider, 'retrieveById') ? $provider->retrieveById($modelOrId) : null;
 
-        if ($model) {
+        if ($model instanceof Model) {
             return $model;
         }
 
@@ -160,7 +163,7 @@ class ActivityLogger
         return preg_replace_callback('/:[a-z0-9._-]+/i', function ($match) use ($activity) {
             $match = $match[0];
 
-            $attribute = (string) string($match)->between(':', '.');
+            $attribute = (string) (new Str($match))->between(':', '.');
 
             if (! in_array($attribute, ['subject', 'causer', 'properties'])) {
                 return $match;

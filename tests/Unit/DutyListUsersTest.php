@@ -15,7 +15,7 @@ class DutyListUsersTest extends TestCase
     protected $users;
     protected $done;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

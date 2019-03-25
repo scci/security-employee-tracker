@@ -18,7 +18,7 @@ class Ldap extends ConfigAbstract
     public function setup()
     {
         $this->setConfigValues('auth.providers.users.driver');
-        if (config('auth.providers.users.driver') == 'adldap') {
+        if (config('auth.providers.users.driver') == 'ldap') {
             $this->implementAllowable();
         }
     }

@@ -2,16 +2,16 @@
 
 namespace Tests\Integration\Controllers;
 
-use Illuminate\Foundation\Testing\DatabaseTransactions;
+use Illuminate\Foundation\Testing\RefreshDatabase;
 use SET\Duty;
 use SET\User;
 use Tests\TestCase;
 
 class DutyControllerTest extends TestCase
 {
-    use DatabaseTransactions;
+    use RefreshDatabase;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
         $this->signIn();
@@ -67,13 +67,16 @@ class DutyControllerTest extends TestCase
     public function it_stores_the_duty_by_testing_each_user_role()
     {
         // Logged in as admin - Can store the duty
+
         $data = ['name'        => 'Some Duty',
                  'cycle'       => 'weekly',
                  'description' => 'A Description',
                  'users'       => [factory(User::class)->create()->id],
                  'has_groups'  => 0, ];
 
-        $response = $this->post('duty', $data);
+        $response = $this->post('/duty/', $data);
+
+
         $response->assertRedirect('duty');
 
         // Logged in as a regular user - Does not store the duty

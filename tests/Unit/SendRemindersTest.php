@@ -17,7 +17,7 @@ class SendRemindersTest extends TestCase
     protected $training;
     protected $user;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -31,7 +31,7 @@ class SendRemindersTest extends TestCase
     public function it_sends_reminders_to_users_and_supervisors_when_training_is_past_due()
     {
         Mail::fake();
-        $this->expectsEvents(TrainingAssigned::class);
+        Event::fake();
 
         $this->training->users()->attach($this->user, [
             'author_id'      => $this->user->first()->id,
@@ -40,6 +40,7 @@ class SendRemindersTest extends TestCase
         ]);
 
         (new SendReminders())->handle();
+        Event::assertDispatched(TrainingAssigned::class);
 
         Mail::assertQueued(EmailSupervisorReminder::class);
     }

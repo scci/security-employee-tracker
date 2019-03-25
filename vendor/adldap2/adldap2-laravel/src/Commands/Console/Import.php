@@ -3,6 +3,7 @@
 namespace Adldap\Laravel\Commands\Console;
 
 use Exception;
+use UnexpectedValueException;
 use Adldap\Models\User;
 use Adldap\Laravel\Events\Imported;
 use Adldap\Laravel\Facades\Resolver;
@@ -10,8 +11,7 @@ use Adldap\Laravel\Commands\SyncPassword;
 use Adldap\Laravel\Commands\Import as ImportUser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Model;
 
 class Import extends Command
@@ -39,6 +39,7 @@ class Import extends Command
      *
      * @return void
      *
+     * @throws \RuntimeException
      * @throws \Adldap\Models\ModelNotFoundException
      */
     public function handle()
@@ -47,17 +48,25 @@ class Import extends Command
 
         $count = count($users);
 
-        if ($count === 1) {
+        if ($count === 0) {
+            throw new \RuntimeException("There were no users found to import.");
+        } else if ($count === 1) {
             $this->info("Found user '{$users[0]->getCommonName()}'.");
         } else {
             $this->info("Found {$count} user(s).");
         }
 
-        if ($this->confirm('Would you like to display the user(s) to be imported / synchronized?', $default = false)) {
+        if (
+            $this->input->isInteractive() &&
+            $this->confirm('Would you like to display the user(s) to be imported / synchronized?', $default = false)
+        ) {
             $this->display($users);
         }
 
-        if ($this->confirm('Would you like these users to be imported / synchronized?', $default = true)) {
+        if (
+            ! $this->input->isInteractive() ||
+            $this->confirm('Would you like these users to be imported / synchronized?', $default = true)
+        ) {
             $imported = $this->import($users);
 
             $this->info("Successfully imported / synchronized {$imported} user(s).");
@@ -244,7 +253,7 @@ class Import extends Command
         if ($model->save() && $model->wasRecentlyCreated) {
             $imported = true;
 
-            Event::fire(new Imported($user, $model));
+            event(new Imported($user, $model));
 
             // Log the successful import.
             if ($this->isLogging()) {
@@ -320,7 +329,34 @@ class Import extends Command
      */
     protected function model() : Model
     {
-        return Auth::getProvider()->createModel();
+        $model = Config::get('ldap_auth.model') ?? $this->determineModel();
+
+        return new $model;
+    }
+
+    /**
+     * Retrieves the model by checking the configured LDAP authentication providers.
+     *
+     * @return string
+     *
+     * @throws UnexpectedValueException
+     */
+    protected function determineModel()
+    {
+        // Retrieve all of the configured authentication providers that
+        // use the LDAP driver and have a configured model.
+        $providers = array_where(Config::get('auth.providers'), function ($value, $key) {
+            return $value['driver'] == 'ldap' && array_key_exists('model', $value);
+        });
+
+        // Pull the first driver and return a new model instance.
+        if ($ldap = reset($providers)) {
+            return $ldap['model'];
+        }
+
+        throw new UnexpectedValueException(
+            'Unable to retrieve LDAP authentication driver. Did you forget to configure it?'
+        );
     }
 
     /**

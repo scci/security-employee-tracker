@@ -117,8 +117,8 @@ return [
     |
     */
 
-    'ldap_group' => env('ADLDAP_USER_GROUP', ''),
-    'limitation_filter' => env('ADLDAP_LIMITATION_FILTER', ''),
+    'ldap_group' => env('LDAP_USER_GROUP', ''),
+    'limitation_filter' => env('LDAP_LIMITATION_FILTER', ''),
 
     /*
     |--------------------------------------------------------------------------
@@ -170,7 +170,8 @@ return [
         SET\Providers\RouteServiceProvider::class,
         SET\Providers\AuthServiceProvider::class,
 
-        Adldap\Laravel\AdldapAuthServiceProvider::class,
+        Adldap\Laravel\AdldapServiceProvider::class,
+		Adldap\Laravel\AdldapAuthServiceProvider::class,
         Collective\Html\HtmlServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
         Krucas\Notification\NotificationServiceProvider::class,

@@ -2,7 +2,6 @@
 
 namespace Maatwebsite\Excel;
 
-use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Maatwebsite\Excel\Concerns\ToArray;
 use Maatwebsite\Excel\Concerns\ToModel;
@@ -33,6 +32,7 @@ use Maatwebsite\Excel\Concerns\ShouldAutoSize;
 use Maatwebsite\Excel\Concerns\WithMappedCells;
 use Maatwebsite\Excel\Concerns\WithProgressBar;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
+use Maatwebsite\Excel\Files\TemporaryFileFactory;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use Maatwebsite\Excel\Imports\HeadingRowExtractor;
 use Maatwebsite\Excel\Concerns\WithCustomChunkSize;
@@ -56,9 +56,9 @@ class Sheet
     protected $chunkSize;
 
     /**
-     * @var string
+     * @var TemporaryFileFactory
      */
-    protected $tmpPath;
+    protected $temporaryFileFactory;
 
     /**
      * @var object
@@ -75,9 +75,9 @@ class Sheet
      */
     public function __construct(Worksheet $worksheet)
     {
-        $this->worksheet = $worksheet;
-        $this->chunkSize = config('excel.exports.chunk_size', 100);
-        $this->tmpPath   = config('excel.exports.temp_path', sys_get_temp_dir());
+        $this->worksheet            = $worksheet;
+        $this->chunkSize            = config('excel.exports.chunk_size', 100);
+        $this->temporaryFileFactory = app(TemporaryFileFactory::class);
     }
 
     /**
@@ -162,7 +162,11 @@ class Sheet
                 $startCell = $sheetExport->startCell();
             }
 
-            $this->append([$sheetExport->headings()], $startCell ?? null, $this->hasStrictNullComparison($sheetExport));
+            $this->append(
+                ArrayHelper::ensureMultipleRows($sheetExport->headings()),
+                $startCell ?? null,
+                $this->hasStrictNullComparison($sheetExport)
+            );
         }
 
         if ($sheetExport instanceof WithCharts) {
@@ -336,8 +340,8 @@ class Sheet
      */
     public function fromView(FromView $sheetExport)
     {
-        $tempFile = $this->tempFile();
-        file_put_contents($tempFile, $sheetExport->view()->render());
+        $temporaryFile = $this->temporaryFileFactory->makeLocal();
+        $temporaryFile->put($sheetExport->view()->render());
 
         $spreadsheet = $this->worksheet->getParent();
 
@@ -346,7 +350,9 @@ class Sheet
 
         // Insert content into the last sheet
         $reader->setSheetIndex($spreadsheet->getSheetCount() - 1);
-        $reader->loadIntoExisting($tempFile, $spreadsheet);
+        $reader->loadIntoExisting($temporaryFile->getLocalPath(), $spreadsheet);
+
+        $temporaryFile->delete();
     }
 
     /**
@@ -491,7 +497,7 @@ class Sheet
                 $row = $sheetExport->map($row);
             }
 
-            return ArrayHelper::ensureMultiDimensional(
+            return ArrayHelper::ensureMultipleRows(
                 static::mapArraybleRow($row)
             );
         })->toArray();
@@ -559,14 +565,6 @@ class Sheet
         for ($i = $lower; $i !== $upper; $i++) {
             yield $i;
         }
-    }
-
-    /**
-     * @return string
-     */
-    protected function tempFile(): string
-    {
-        return $this->tmpPath . DIRECTORY_SEPARATOR . 'laravel-excel-' . Str::random(16);
     }
 
     /**

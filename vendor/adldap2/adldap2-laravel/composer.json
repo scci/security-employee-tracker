@@ -5,13 +5,13 @@
     "license": "MIT",
     "type": "project",
     "require": {
-        "php": ">=7.0",
-        "adldap2/adldap2": "^8.0"
+        "php": ">=7.1",
+        "adldap2/adldap2": "^9.0"
     },
     "require-dev": {
         "mockery/mockery": "~1.0",
-        "phpunit/phpunit": "~6.0",
-        "orchestra/testbench": "~3.2"
+        "phpunit/phpunit": "~7.0",
+        "orchestra/testbench": "~3.7"
     },
     "archive": {
         "exclude": ["/tests"]

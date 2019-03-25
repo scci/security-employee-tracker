@@ -2,7 +2,6 @@
 
 namespace SET\Http\Controllers;
 
-use Krucas\Notification\Facades\Notification;
 use SET\Http\Requests\StoreTrainingTypeRequest;
 use SET\TrainingType;
 
@@ -43,9 +42,8 @@ class TrainingTypeController extends Controller
     public function store(StoreTrainingTypeRequest $request)
     {
         $trainingtype = TrainingType::create($request->all());
-        Notification::container()->success('Training Type Created');
 
-        return redirect()->action('TrainingTypeController@index');
+        return redirect()->action('TrainingTypeController@index')->with('status', 'Training Type Created');
     }
 
     /**
@@ -91,9 +89,8 @@ class TrainingTypeController extends Controller
         $this->authorize('edit');
         $data = $request->all();
         $trainingtype->update($data);
-        Notification::container()->success('Training Type Updated');
 
-        return redirect()->action('TrainingTypeController@show', $trainingtype->id);
+        return redirect()->action('TrainingTypeController@show', $trainingtype->id)->with('status', 'Training Type Updated');
     }
 
     /**

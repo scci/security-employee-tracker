@@ -3,9 +3,8 @@
 namespace Adldap\Query;
 
 use Closure;
-use Illuminate\Support\Arr;
-use Illuminate\Support\Str;
 use InvalidArgumentException;
+use Illuminate\Support\Arr;
 use Adldap\Utilities;
 use Adldap\Models\Model;
 use Adldap\Schemas\SchemaInterface;
@@ -202,15 +201,15 @@ class Builder
 
     /**
      * Returns a new nested Query Builder instance.
-     * 
+     *
      * @param Closure|null $closure
-     * 
+     *
      * @return $this
      */
     public function newNestedInstance(Closure $closure = null)
     {
         $query = $this->newInstance()->nested();
-        
+
         if ($closure) {
             call_user_func($closure, $query);
         }
@@ -283,13 +282,13 @@ class Builder
     /**
      * Sets the DN to perform searches upon.
      *
-     * @param string|null $dn
+     * @param string|Model|null $dn
      *
      * @return Builder
      */
     public function setDn($dn = null)
     {
-        $this->dn = (string) $dn;
+        $this->dn = $dn instanceof Model ? $dn->getDn() : $dn;
 
         return $this;
     }
@@ -297,11 +296,11 @@ class Builder
     /**
      * Alias for setting the base DN of the query.
      *
-     * @param string $dn
+     * @param string|Model|null $dn
      *
      * @return Builder
      */
-    public function in($dn)
+    public function in($dn = null)
     {
         return $this->setDn($dn);
     }
@@ -393,6 +392,9 @@ class Builder
     {
         $results = $this->select($columns)->limit(1)->get();
 
+        // Since results may be returned inside an array if `raw()`
+        // is specified, then we'll use our array helper
+        // to retrieve the first result.
         return Arr::get($results, 0);
     }
 
@@ -405,7 +407,7 @@ class Builder
      *
      * @throws ModelNotFoundException
      *
-     * @return Model
+     * @return Model|array
      */
     public function firstOrFail($columns = [])
     {
@@ -426,11 +428,15 @@ class Builder
      * @param string       $value
      * @param array|string $columns
      *
-     * @return mixed
+     * @return Model|array|false
      */
     public function findBy($attribute, $value, $columns = [])
     {
-        return $this->whereEquals($attribute, $value)->first($columns);
+        try {
+            return $this->findByOrFail($attribute, $value, $columns);
+        } catch (ModelNotFoundException $e) {
+            return false;
+        }
     }
 
     /**
@@ -444,7 +450,7 @@ class Builder
      *
      * @throws ModelNotFoundException
      *
-     * @return mixed
+     * @return Model|array
      */
     public function findByOrFail($attribute, $value, $columns = [])
     {
@@ -454,31 +460,74 @@ class Builder
     /**
      * Finds a record using ambiguous name resolution.
      *
-     * @param string|array $anr
+     * @param string|array $value
      * @param array|string $columns
      *
-     * @return mixed
+     * @return Model|array|null
      */
-    public function find($anr, $columns = [])
+    public function find($value, $columns = [])
     {
-        if (is_array($anr)) {
-            return $this->findMany($anr, $columns);
+        if (is_array($value)) {
+            return $this->findMany($value, $columns);
         }
 
-        return $this->findBy($this->schema->anr(), $anr, $columns);
+        // If we're not using ActiveDirectory, we can't use ANR. We'll make our own query.
+        if (! is_a($this->schema, ActiveDirectory::class)) {
+            return $this->prepareAnrEquivalentQuery($value)->first($columns);
+        }
+
+        return $this->findBy($this->schema->anr(), $value, $columns);
     }
 
     /**
      * Finds multiple records using ambiguous name resolution.
      *
-     * @param array $anrs
+     * @param array $values
      * @param array $columns
      *
-     * @return mixed
+     * @return \Illuminate\Support\Collection|array
      */
-    public function findMany(array $anrs = [], $columns = [])
+    public function findMany(array $values = [], $columns = [])
     {
-        return $this->findManyBy($this->schema->anr(), $anrs, $columns);
+        $this->select($columns);
+
+        if (! is_a($this->schema, ActiveDirectory::class)) {
+            $query = $this;
+
+            foreach ($values as $value) {
+                $query->prepareAnrEquivalentQuery($value);
+            }
+
+            return $query->get();
+        }
+
+        return $this->findManyBy($this->schema->anr(), $values);
+    }
+
+    /**
+     * Creates an ANR equivalent query for LDAP distributions that do not support ANR.
+     *
+     * @param string $value
+     *
+     * @return Builder
+     */
+    protected function prepareAnrEquivalentQuery($value)
+    {
+        return $this->orFilter(function (Builder $query) use ($value) {
+            $locateBy = [
+                $this->schema->name(),
+                $this->schema->email(),
+                $this->schema->userId(),
+                $this->schema->lastName(),
+                $this->schema->firstName(),
+                $this->schema->commonName(),
+                $this->schema->displayName(),
+            ];
+
+            foreach ($locateBy as $attribute) {
+                $query->whereEquals($attribute, $value);
+            }
+        });
     }
 
     /**
@@ -488,7 +537,7 @@ class Builder
      * @param array  $values
      * @param array  $columns
      *
-     * @return mixed
+     * @return \Illuminate\Support\Collection|array
      */
     public function findManyBy($attribute, array $values = [], $columns = [])
     {
@@ -503,19 +552,19 @@ class Builder
 
     /**
      * Finds a record using ambiguous name resolution.
-     * 
+     *
      * If a record is not found, an exception is thrown.
      *
-     * @param string       $anr
+     * @param string       $value
      * @param array|string $columns
      *
      * @throws ModelNotFoundException
      *
-     * @return mixed
+     * @return Model|array
      */
-    public function findOrFail($anr, $columns = [])
+    public function findOrFail($value, $columns = [])
     {
-        $entry = $this->find($anr, $columns);
+        $entry = $this->find($value, $columns);
 
         // Make sure we check if the result is an entry or an array before
         // we throw an exception in case the user wants raw results.
@@ -537,11 +586,11 @@ class Builder
      */
     public function findByDn($dn, $columns = [])
     {
-        return $this
-            ->setDn($dn)
-            ->read()
-            ->whereHas($this->schema->objectClass())
-            ->first($columns);
+        try {
+            return $this->findByDnOrFail($dn, $columns);
+        } catch (ModelNotFoundException $e) {
+            return false;
+        }
     }
 
     /**
@@ -554,15 +603,24 @@ class Builder
      *
      * @throws ModelNotFoundException
      *
-     * @return Model
+     * @return Model|array
      */
     public function findByDnOrFail($dn, $columns = [])
     {
-        return $this
-            ->setDn($dn)
+        // Since we're setting our base DN to be able to retrieve a model
+        // by its distinguished name, we need to set it back to
+        // our configured base so it is not overwritten.
+        $base = $this->getDn();
+
+        $model = $this->setDn($dn)
             ->read()
             ->whereHas($this->schema->objectClass())
             ->firstOrFail($columns);
+
+        // Reset the models query builder.
+        $model->setQuery($this->in($base));
+
+        return $model;
     }
 
     /**
@@ -571,17 +629,15 @@ class Builder
      * @param string       $guid
      * @param array|string $columns
      *
-     * @return Model
+     * @return Model|array|false
      */
     public function findByGuid($guid, $columns = [])
     {
-        if ($this->schema->objectGuidRequiresConversion()) {
-            $guid = Utilities::stringGuidToHex($guid);
+        try {
+            return $this->findByGuidOrFail($guid, $columns);
+        } catch (ModelNotFoundException $e) {
+            return false;
         }
-
-        return $this->select($columns)->whereRaw([
-            $this->schema->objectGuid() => $guid
-        ])->first();
     }
 
     /**
@@ -594,7 +650,7 @@ class Builder
      *
      * @throws ModelNotFoundException
      *
-     * @return mixed
+     * @return Model|array
      */
     public function findByGuidOrFail($guid, $columns = [])
     {
@@ -613,11 +669,15 @@ class Builder
      * @param string       $sid
      * @param array|string $columns
      *
-     * @return mixed
+     * @return Model|array|false
      */
     public function findBySid($sid, $columns = [])
     {
-        return $this->findBy($this->schema->objectSid(), $sid, $columns);
+        try {
+            return $this->findBySidOrFail($sid, $columns);
+        } catch (ModelNotFoundException $e) {
+            return false;
+        }
     }
 
     /**
@@ -630,7 +690,7 @@ class Builder
      *
      * @throws ModelNotFoundException
      *
-     * @return mixed
+     * @return Model|array
      */
     public function findBySidOrFail($sid, $columns = [])
     {
@@ -1394,8 +1454,7 @@ class Builder
     }
 
     /**
-     * Handle dynamic method calls on the query builder
-     * object to be directed to the query processor.
+     * Handle dynamic method calls on the query builder object to be directed to the query processor.
      *
      * @param string $method
      * @param array  $parameters
@@ -1404,7 +1463,9 @@ class Builder
      */
     public function __call($method, $parameters)
     {
-        if (Str::startsWith($method, 'where')) {
+        // We'll check if the beginning of the method being called contains
+        // 'where'. If so, we'll assume it's a dynamic 'where' clause.
+        if (substr($method, 0, 5) === 'where') {
             return $this->dynamicWhere($method, $parameters);
         }
 
@@ -1497,12 +1558,11 @@ class Builder
      */
     protected function addDynamic($segment, $connector, $parameters, $index)
     {
-        // Once we have parsed out the columns and formatted the boolean operators we
-        // are ready to add it to this query as a where clause just like any other
-        // clause on the query. Then we'll increment the parameter index values.
+        // We'll format the 'where' boolean and field here to avoid casing issues.
         $bool = strtolower($connector);
+        $field = strtolower($segment);
 
-        $this->where(Str::snake($segment), '=', $parameters[$index], $bool);
+        $this->where($field, '=', $parameters[$index], $bool);
     }
 
     /**

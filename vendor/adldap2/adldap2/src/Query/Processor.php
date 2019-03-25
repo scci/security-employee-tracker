@@ -2,6 +2,7 @@
 
 namespace Adldap\Query;
 
+use InvalidArgumentException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Adldap\Models\Entry;
@@ -116,7 +117,7 @@ class Processor
             $classes = array_map('strtolower', $attributes[$objectClass]);
 
             // Retrieve the model mapping.
-            $models = $this->map();
+            $models = $this->schema->objectClassModelMap();
 
             // Retrieve the object class mappings (with strtolower keys).
             $mappings = array_map('strtolower', array_keys($models));
@@ -144,13 +145,19 @@ class Processor
      * @param array       $attributes
      * @param string|null $model
      *
+     * @throws InvalidArgumentException
+     *
      * @return mixed|Entry
      */
     public function newModel($attributes = [], $model = null)
     {
-        $model = (class_exists($model) ? $model : Entry::class);
+        $model = (class_exists($model) ? $model : $this->schema->entryModel());
 
-        return new $model($attributes, $this->builder);
+        if (!is_subclass_of($model, $base = Model::class)) {
+            throw new InvalidArgumentException("The given model class '{$model}' must extend the base model class '{$base}'");
+        }
+
+        return new $model($attributes, $this->builder->newInstance());
     }
 
     /**
@@ -178,24 +185,6 @@ class Processor
     public function newCollection(array $items = [])
     {
         return new Collection($items);
-    }
-
-    /**
-     * Returns the object class model class mapping.
-     *
-     * @return array
-     */
-    public function map()
-    {
-        return [
-            $this->schema->objectClassComputer()    => $this->schema->computerModel(),
-            $this->schema->objectClassContact()     => $this->schema->contactModel(),
-            $this->schema->objectClassPerson()      => $this->schema->userModel(),
-            $this->schema->objectClassGroup()       => $this->schema->groupModel(),
-            $this->schema->objectClassContainer()   => $this->schema->containerModel(),
-            $this->schema->objectClassPrinter()     => $this->schema->printerModel(),
-            $this->schema->objectClassOu()          => $this->schema->organizationalUnitModel(),
-        ];
     }
 
     /**

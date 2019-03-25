@@ -2,10 +2,12 @@
 
 namespace Maatwebsite\Excel\Jobs;
 
+use Closure;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Database\Connection;
+use Opis\Closure\SerializableClosure;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 
 class SerializedQuery
@@ -36,16 +38,16 @@ class SerializedQuery
     public $with = [];
 
     /**
-     * @param Builder|\Illuminate\Database\Eloquent\Builder $builder
+     * @param Builder|Relation|EloquentBuilder $builder
      */
     public function __construct($builder)
     {
         $this->query      = $builder->toSql();
         $this->bindings   = $builder->getBindings();
         $this->connection = $builder->getConnection()->getName();
-        $this->with       = method_exists($builder, 'getEagerLoads') ? array_keys($builder->getEagerLoads()) : [];
+        $this->with       = $this->serializeEagerLoads($builder);
 
-        if ($builder instanceof EloquentBuilder) {
+        if ($builder instanceof EloquentBuilder || $builder instanceof Relation) {
             $this->model = get_class($builder->getModel());
         }
     }
@@ -80,7 +82,7 @@ class SerializedQuery
         if (!empty($this->with)) {
             $instance
                 ->newQuery()
-                ->with($this->with)
+                ->setEagerLoads($this->eagerLoads())
                 ->eagerLoadRelations($models);
         }
 
@@ -102,5 +104,28 @@ class SerializedQuery
         $model->setConnection($this->connection);
 
         return $model;
+    }
+
+    /**
+     * @param Builder|\Illuminate\Database\Eloquent\Builder $builder
+     *
+     * @return array
+     */
+    private function serializeEagerLoads($builder): array
+    {
+        return collect(method_exists($builder, 'getEagerLoads') ? $builder->getEagerLoads() : [])
+            ->map(function (Closure $constraint) {
+                return new SerializableClosure($constraint);
+            })->toArray();
+    }
+
+    /**
+     * @return array
+     */
+    private function eagerLoads(): array
+    {
+        return collect($this->with)->map(function (SerializableClosure $closure) {
+            return $closure->getClosure();
+        })->toArray();
     }
 }

@@ -4,13 +4,14 @@ namespace Adldap\Laravel\Tests;
 
 use Adldap\Connections\Ldap;
 use Adldap\Schemas\ActiveDirectory;
-use Adldap\Laravel\Tests\Models\User;
+use Adldap\Laravel\Tests\Models\TestUser;
 use Adldap\Laravel\Auth\DatabaseUserProvider;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Schema;
 
 class DatabaseTestCase extends TestCase
 {
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -24,6 +25,8 @@ class DatabaseTestCase extends TestCase
             $table->timestamps();
             $table->softDeletes();
         });
+
+        Hash::setRounds(4);
     }
 
     /**
@@ -33,36 +36,42 @@ class DatabaseTestCase extends TestCase
      */
     protected function getEnvironmentSetup($app)
     {
+        $config = $app['config'];
+
         // Laravel database setup.
-        $app['config']->set('database.default', 'testbench');
-        $app['config']->set('database.connections.testbench', [
+        $config->set('database.default', 'testbench');
+        $config->set('database.connections.testbench', [
             'driver'   => 'sqlite',
             'database' => ':memory:',
             'prefix'   => '',
         ]);
 
-        // Adldap connection setup.
-        $app['config']->set('adldap.connections.default.auto_connect', false);
-        $app['config']->set('adldap.connections.default.connection', Ldap::class);
-        $app['config']->set('adldap.connections.default.schema', ActiveDirectory::class);
-        $app['config']->set('adldap.connections.default.connection_settings', [
-            'admin_username' => 'admin@email.com',
-            'admin_password' => 'password',
+        // Adldap connection set$configup.
+        $config->set('ldap.connections.default.auto_connect', false);
+        $config->set('ldap.connections.default.connection', Ldap::class);
+        $config->set('ldap.connections.default.settings', [
+            'username' => 'admin@email.com',
+            'password' => 'password',
+            'schema' => ActiveDirectory::class,
         ]);
 
         // Adldap auth setup.
-        $app['config']->set('adldap_auth.provider', DatabaseUserProvider::class);
+        $config->set('ldap_auth.provider', DatabaseUserProvider::class);
+        $config->set('ldap_auth.sync_attributes', [
+            'email' => 'userprincipalname',
+            'name' => 'cn',
+        ]);
 
         // Laravel auth setup.
-        $app['config']->set('auth.guards.web.provider', 'adldap');
-        $app['config']->set('auth.providers', [
-            'adldap' => [
-                'driver' => 'adldap',
-                'model'  => User::class,
+        $config->set('auth.guards.web.provider', 'ldap');
+        $config->set('auth.providers', [
+            'ldap' => [
+                'driver' => 'ldap',
+                'model'  => TestUser::class,
             ],
             'users'  => [
                 'driver' => 'eloquent',
-                'model'  => User::class,
+                'model'  => TestUser::class,
             ],
         ]);
     }

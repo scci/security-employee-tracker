@@ -47,17 +47,22 @@ class TrainingTypeTest extends TestCase
     {
 
       // Create Training Types
-        $type1 = factory(TrainingType::class)->create(['name' => 'Information Systems',
-          'sidebar'                                         => '1', 'status' => '1', 'description' => 'Type 1', ]);
-        $type2 = factory(TrainingType::class)->create(['name' => 'Security',
-          'sidebar'                                           => '2', 'status' => '1', 'description' => 'Type 2', ]);
-        $type3 = factory(TrainingType::class)->create(['name' => 'Tertiary Training',
-          'sidebar'                                           => '2', 'status' => '0', 'description' => 'Type 3', ]);
+        $type1 = factory(TrainingType::class)->create(
+                    ['name'     => 'Information Systems',
+                     'sidebar'  => '1', 'status' => '1', 'description' => 'Type 1', ]);
+        $type2 = factory(TrainingType::class)->create(
+                    ['name'     => 'Security',
+                     'sidebar'  => '2', 'status' => '1', 'description' => 'Type 2', ]);
+        $type3 = factory(TrainingType::class)->create(
+                    ['name'     => 'Tertiary Training',
+                     'sidebar'  => '2', 'status' => '0', 'description' => 'Type 3', ]);
         // Create Trainings
-        $training1 = factory(Training::class)->create(['name' => 'Training #1',
-          'description'                                     => 'Number 1', ]);
-        $training2 = factory(Training::class)->create(['name' => 'Training #2',
-          'description'                                       => 'Number 2', ]);
+        $training1 = factory(Training::class)->create(
+                        ['name'         => 'Training #1',
+                         'description'  => 'Number 1', ]);
+        $training2 = factory(Training::class)->create(
+                        ['name'         => 'Training #2',
+                         'description'  => 'Number 2', ]);
 
         // Check record
         $this->assertCount(3, TrainingType::all());

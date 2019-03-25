@@ -23,7 +23,7 @@
                 </div>
                 <button class="btn" type="submit">Sign in</button>
 
-                @if(config('auth.providers.users.driver') != 'adldap')
+                @if(config('auth.providers.users.driver') != 'ldap')
                     &nbsp; <small><a href="{{ url('/password/reset') }}">
                         Forgot Your Password?
                     </a></small>

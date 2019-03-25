@@ -5,7 +5,6 @@ namespace SET\Http\Controllers;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Request;
 use Illuminate\Support\Facades\Storage;
-use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
 use SET\Http\Requests\StoreNoteRequest;
 use SET\Http\Requests\UpdateNoteRequest;
@@ -33,9 +32,7 @@ class NoteController extends Controller
             Attachment::upload($note, Request::file('files'), $data['encrypt']);
         }
 
-        Notification::container()->success('Note successfully created');
-
-        return redirect()->action('UserController@show', $user->id);
+        return redirect()->action('UserController@show', $user->id)->with('status', 'Note successfully created');
     }
 
     public function edit(User $user, $noteID)
@@ -59,9 +56,7 @@ class NoteController extends Controller
             Attachment::upload($note, Request::file('files'), $data['encrypt']);
         }
 
-        Notification::container()->success('Note successfully updated');
-
-        return redirect()->action('UserController@show', $userID);
+        return redirect()->action('UserController@show', $userID)->with('status', 'Note successfully updated');
     }
 
     public function destroy($userID, Note $note)

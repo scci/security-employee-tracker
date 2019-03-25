@@ -44,7 +44,7 @@ class Kernel extends ConsoleKernel
         //clear activitylog entries
         $schedule->command('activitylog:clean')->daily();
 
-        if (config('auth.providers.users.driver') == 'adldap') {
+        if (config('auth.providers.users.driver') == 'ldap') {
             $schedule->command('users:sync')->withoutOverlapping()->hourly();
         }
     }

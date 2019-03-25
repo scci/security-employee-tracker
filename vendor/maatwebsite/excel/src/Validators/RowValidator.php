@@ -49,7 +49,8 @@ class RowValidator
                 $failures[] = new Failure(
                     $row,
                     $attributeName,
-                    str_replace($attribute, $attributeName, $messages)
+                    str_replace($attribute, $attributeName, $messages),
+                    $rows[$row]
                 );
             }
 
@@ -114,7 +115,7 @@ class RowValidator
     }
 
     /**
-     * @param string|array $rules
+     * @param string|object|callable|array $rules
      *
      * @return string|array
      */
@@ -126,6 +127,10 @@ class RowValidator
             }
 
             return $formatted ?? [];
+        }
+
+        if (is_object($rules) || is_callable($rules)) {
+            return $rules;
         }
 
         if (Str::contains($rules, 'required_if') && preg_match('/(.*):(.*),(.*)/', $rules, $matches)) {

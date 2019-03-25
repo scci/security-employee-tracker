@@ -13,8 +13,6 @@ use Adldap\AdldapException;
  */
 class Ldap implements ConnectionInterface
 {
-    use LdapFunctionSupportTrait;
-
     /**
      * The active LDAP connection.
      *
@@ -165,6 +163,26 @@ class Ldap implements ConnectionInterface
     public function getLastError()
     {
         return ldap_error($this->getConnection());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDetailedError()
+    {
+        // If the returned error number is zero, the last LDAP operation
+        // succeeded. We won't return a detailed error.
+        if ($errorNumber = $this->errNo()) {
+            $message = '';
+
+            if (defined('LDAP_OPT_DIAGNOSTIC_MESSAGE')) {
+                $message = ldap_get_option($this->getConnection(), LDAP_OPT_DIAGNOSTIC_MESSAGE, $err);
+            }
+
+            return new DetailedError($errorNumber, $this->err2Str($errorNumber), $message);
+        }
+
+        return false;
     }
 
     /**
@@ -338,13 +356,7 @@ class Ldap implements ConnectionInterface
      */
     public function controlPagedResult($pageSize = 1000, $isCritical = false, $cookie = '')
     {
-        if ($this->isPagingSupported()) {
-            return ldap_control_paged_result($this->getConnection(), $pageSize, $isCritical, $cookie);
-        }
-
-        throw new AdldapException(
-            'LDAP Pagination is not supported on your current PHP installation.'
-        );
+        return ldap_control_paged_result($this->getConnection(), $pageSize, $isCritical, $cookie);
     }
 
     /**
@@ -352,13 +364,7 @@ class Ldap implements ConnectionInterface
      */
     public function controlPagedResultResponse($result, &$cookie)
     {
-        if ($this->isPagingSupported()) {
-            return ldap_control_paged_result_response($this->getConnection(), $result, $cookie);
-        }
-
-        throw new AdldapException(
-            'LDAP Pagination is not supported on your current PHP installation.'
-        );
+        return ldap_control_paged_result_response($this->getConnection(), $result, $cookie);
     }
 
     /**

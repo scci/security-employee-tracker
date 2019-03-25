@@ -8,7 +8,6 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Storage;
-use Krucas\Notification\Facades\Notification;
 use SET\Attachment;
 use SET\Events\TrainingAssigned;
 use SET\Http\Requests\TrainingUserRequest;
@@ -42,11 +41,9 @@ class TrainingUserController extends Controller
             Attachment::upload($trainingUser, $request->file('files'), $data['encrypt']);
         }
 
-        Event::fire(new TrainingAssigned($trainingUser));
+        Event::dispatch(new TrainingAssigned($trainingUser));
 
-        Notification::container()->success('Training successfully assigned');
-
-        return redirect()->action('UserController@show', $user->id);
+        return redirect()->action('UserController@show', $user->id)->with('status', 'Training successfully assigned');
     }
 
     public function show(User $user, $trainingUserID)
@@ -87,9 +84,7 @@ class TrainingUserController extends Controller
             Attachment::upload($trainingUser, $request->file('files'), $data['encrypt']);
         }
 
-        Notification::container()->success('Training successfully updated');
-
-        return redirect()->action('UserController@show', $user->id);
+        return redirect()->action('UserController@show', $user->id)->with('status', 'Training successfully updated');
     }
 
     public function destroy($userID, $trainingUserID)

@@ -16,7 +16,7 @@ class UpdateDutyTest extends TestCase
     private $duty;
     private $users;
 
-    public function setUp()
+    public function setUp(): void
     {
         parent::setUp();
 

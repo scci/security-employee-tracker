@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Mail;
 use SET\Handlers\DateFormat;
 use SET\Mail\SendNewsEmail;
-use Illuminate\Support\Facades\Log;
 
 class News extends Model
 {

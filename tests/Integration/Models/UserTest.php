@@ -21,6 +21,7 @@ class UserTest extends TestCase
     {
         // Create a user(by default status should be active)
         $createdUser = factory(User::class)->create();
+        Setting::set('full_name_format', '');
 
         // Query the database using the scopeActive method in the user model and filter by the above created username
         $userFullName = $createdUser['last_name']
@@ -34,6 +35,8 @@ class UserTest extends TestCase
     public function get_user_full_name_without_nickname()
     {
         $createdUser = factory(User::class)->create(['nickname' => null]);
+        Setting::set('full_name_format', '');
+
         $userFullName = $createdUser['last_name'].', '.$createdUser['first_name'];
 
         $this->assertEquals($userFullName, $createdUser->userFullName);

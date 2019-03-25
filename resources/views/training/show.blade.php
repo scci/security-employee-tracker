@@ -21,6 +21,11 @@
             @include('training._sidebar')
         </div>
         <div class="col s12 m8">
+            @if (session('status'))
+                <script>
+                    Materialize.toast("{{ @session('status') }}", 4000);
+                </script>
+            @endif
 
             <div class="card">
                 <div class="card-content">
@@ -28,6 +33,7 @@
                         {{ $training->name }}
                         <a href="{{ url("/training/$training->id/edit") }}" class="btn-flat btn-sm"><i class="material-icons">mode_edit</i></a>
                     </span>
+
                     <table class="row-border hover data-table">
                         <thead>
                         <tr>
