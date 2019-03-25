@@ -76,7 +76,6 @@ class DutyControllerTest extends TestCase
 
         $response = $this->post('/duty/', $data);
 
-
         $response->assertRedirect('duty');
 
         // Logged in as a regular user - Does not store the duty

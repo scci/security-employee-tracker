@@ -68,7 +68,7 @@ class JpasImportHandler implements ToCollection, WithHeadingRow
 
             $row['name'] = preg_replace('/(,\s|\s)/', '_', $row['name']);
             if (!is_null($row['name']) && $row['name'] != '') { //we get a bunch of null records that we can ignore.
-                    $user = User::where('jpas_name',  $row['name'])->first(); //see if the record maps to a user
+                    $user = User::where('jpas_name', $row['name'])->first(); //see if the record maps to a user
                 if (is_null($user)) {
                     $this->unique->push($row); //if no results, we need to have the admin map this record to a user.
                 } else {
@@ -163,8 +163,8 @@ class JpasImportHandler implements ToCollection, WithHeadingRow
         foreach ($excel as $row) {
             $row['eligibility_date'] = $this->transformDateVal($row['eligibility_date']);
             $row['prev_inves'] = $this->transformDateVal($row['prev_inves']);
-            $row['name']  = preg_replace('/(,\s|\s)/', '_', $row['name']);
-            if ($row['name']  == $jpasName) {
+            $row['name'] = preg_replace('/(,\s|\s)/', '_', $row['name']);
+            if ($row['name'] == $jpasName) {
                 $this->updateAndLogUser($this->mapJpasToUser($user, $row));
             }
         }
@@ -188,7 +188,6 @@ class JpasImportHandler implements ToCollection, WithHeadingRow
 
     /**
      * Transform excel date values into a datetime string.
-     *
      */
     public function transformDateVal($value, $format = 'Y-m-d H:i:s')
     {

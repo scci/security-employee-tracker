@@ -39,6 +39,7 @@ class AttachmentController extends Controller
         }
 
         Attachment::upload($model, $request->file('files'), $encrypt);
+
         return Redirect()->back()->with('status', 'Upload Complete');
     }
 

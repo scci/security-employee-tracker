@@ -28,7 +28,7 @@ class SettingController extends Controller
             //$settings['summary_recipient'] = explode(',', $settings['summary_recipient']);
             $settings['summary_recipient'] = User::whereIn('id', $settings['summary_recipient'])->pluck('id')->all();
         } else {
-            $settings['summary_recipient'] = "";
+            $settings['summary_recipient'] = '';
         }
 
         $users = User::skipSystem()->active()->get()->sortBy('UserFullName');
