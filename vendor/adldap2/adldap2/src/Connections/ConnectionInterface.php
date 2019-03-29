@@ -1,7 +1,6 @@
 <?php
 
 namespace Adldap\Connections;
-use Adldap\AdldapError;
 
 /**
  * The Connection interface used for making connections. Implementing
@@ -41,34 +40,35 @@ interface ConnectionInterface
     const PORT = 389;
 
     /**
-     * Returns true / false if the
-     * current connection instance is using
-     * SSL.
+     * Constructor.
+     * 
+     * @param string|null $name The connection name.
+     */
+    public function __construct($name = null);
+
+    /**
+     * Returns true / false if the current connection instance is using SSL.
      *
      * @return bool
      */
     public function isUsingSSL();
 
     /**
-     * Returns true / false if the
-     * current connection instance is using
-     * TLS.
+     * Returns true / false if the current connection instance is using TLS.
      *
      * @return bool
      */
     public function isUsingTLS();
 
     /**
-     * Returns true / false if the current
-     * connection is able to modify passwords.
+     * Returns true / false if the current connection is able to modify passwords.
      *
      * @return bool
      */
     public function canChangePasswords();
 
     /**
-     * Returns true / false if the current
-     * connection is bound.
+     * Returns true / false if the current connection is bound.
      *
      * @return bool
      */
@@ -91,6 +91,22 @@ interface ConnectionInterface
      * @return ConnectionInterface
      */
     public function tls($enabled = true);
+
+    /**
+     * Returns the full LDAP host URL.
+     *
+     * Ex: ldap://192.168.1.1:386
+     *
+     * @return string|null
+     */
+    public function getHost();
+
+    /**
+     * Returns the connections name.
+     * 
+     * @return string|null
+     */
+    public function getName();
 
     /**
      * Get the current connection.
@@ -183,7 +199,7 @@ interface ConnectionInterface
      *
      * Returns DetailedError when there was an error.
      *
-     * @return bool|DetailedError
+     * @return DetailedError|null
      */
     public function getDetailedError();
 
@@ -261,6 +277,8 @@ interface ConnectionInterface
      * @param string $username
      * @param string $password
      * @param bool   $sasl
+     *
+     * @throws ConnectionException If connecting over TLS fails.
      *
      * @return bool
      */

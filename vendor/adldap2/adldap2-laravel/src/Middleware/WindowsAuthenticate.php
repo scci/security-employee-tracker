@@ -13,6 +13,7 @@ use Adldap\Laravel\Events\AuthenticatedWithWindows;
 use Illuminate\Http\Request;
 use Illuminate\Contracts\Auth\Guard;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Config;
 
 class WindowsAuthenticate
@@ -78,12 +79,10 @@ class WindowsAuthenticate
 
                 return $user;
             } elseif ($provider instanceof DatabaseUserProvider) {
-                $credentials = $this->makeCredentials($user);
-
                 // Here we'll import the LDAP user. If the user already exists in
                 // our local database, it will be returned from the importer.
                 $model = Bus::dispatch(
-                    new Import($user, $this->model(), $credentials)
+                    new Import($user, $this->model())
                 );
 
                 // We'll sync / set the users password after
@@ -106,12 +105,12 @@ class WindowsAuthenticate
      *
      * @param User       $user
      * @param mixed|null $model
-     * 
+     *
      * @return void
      */
     protected function fireAuthenticatedEvent(User $user, $model = null)
     {
-        event(new AuthenticatedWithWindows($user, $model));
+        Event::dispatch(new AuthenticatedWithWindows($user, $model));
     }
 
     /**
@@ -123,25 +122,7 @@ class WindowsAuthenticate
      */
     protected function resolveUserByUsername($username)
     {
-        return Resolver::query()
-            ->where([$this->discover() => $username])
-            ->first();
-    }
-
-    /**
-     * Returns a credentials array to be used in the import command.
-     *
-     * @param User $user
-     *
-     * @return array
-     */
-    protected function makeCredentials(User $user)
-    {
-        $field = Resolver::getEloquentUsernameAttribute();
-
-        $username = $user->getFirstAttribute(Resolver::getLdapDiscoveryAttribute());
-
-        return [$field => $username];
+        return Resolver::query()->whereEquals($this->discover(), $username)->first();
     }
 
     /**
@@ -196,7 +177,7 @@ class WindowsAuthenticate
      */
     protected function key()
     {
-        return Config::get('ldap_auth.usernames.windows.key', 'AUTH_USER');
+        return Config::get('ldap_auth.identifiers.windows.server_key', 'AUTH_USER');
     }
 
     /**
@@ -206,6 +187,6 @@ class WindowsAuthenticate
      */
     protected function discover()
     {
-        return Config::get('ldap_auth.usernames.windows.discover', 'samaccountname');
+        return Config::get('ldap_auth.identifiers.windows.locate_users_by', 'samaccountname');
     }
 }

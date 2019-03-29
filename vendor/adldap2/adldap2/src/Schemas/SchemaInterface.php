@@ -437,6 +437,15 @@ interface SchemaInterface
     public function instanceType();
 
     /**
+     * Specifies the TCP/IP address for the phone. Used by telephony.
+     * 
+     * @link https://msdn.microsoft.com/en-us/library/cc221092.aspx
+     * 
+     * @return string
+     */
+    public function ipPhone();
+
+    /**
      * If TRUE, the object hosting this attribute must be replicated during installation of a new replica.
      *
      * @link https://msdn.microsoft.com/en-us/library/ms676798(v=vs.85).aspx
@@ -1251,6 +1260,24 @@ interface SchemaInterface
     public function telephone();
 
     /**
+     * The primary mobile phone number.
+     * 
+     * @link https://docs.microsoft.com/en-us/windows/desktop/adschema/a-mobile
+     * 
+     * @return string
+     */
+    public function mobile();
+
+    /**
+     * The secondary mobile phone number.
+     * 
+     * @link https://docs.microsoft.com/en-us/windows/desktop/ADSchema/a-othermobile
+     * 
+     * @return string
+     */
+    public function otherMobile();
+
+    /**
      * The users thumbnail photo path.
      *
      * @return string
@@ -1340,6 +1367,13 @@ interface SchemaInterface
      * @return string
      */
     public function userModel();
+
+    /**
+     * The object classes that User models must be constructed with.
+     *
+     * @return array
+     */
+    public function userObjectClasses() : array;
 
     /**
      * This attribute contains the UPN that is an Internet-style login name for

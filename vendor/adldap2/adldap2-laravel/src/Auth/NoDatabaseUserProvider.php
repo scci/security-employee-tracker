@@ -3,14 +3,19 @@
 namespace Adldap\Laravel\Auth;
 
 use Adldap\Laravel\Facades\Resolver;
+use Adldap\Laravel\Traits\ValidatesUsers;
 use Adldap\Laravel\Events\AuthenticationRejected;
 use Adldap\Laravel\Events\AuthenticationSuccessful;
 use Adldap\Laravel\Events\DiscoveredWithCredentials;
 use Adldap\Laravel\Events\AuthenticatedWithCredentials;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
 
-class NoDatabaseUserProvider extends Provider
+class NoDatabaseUserProvider implements UserProvider
 {
+    use ValidatesUsers;
+
     /**
      *  {@inheritdoc}
      */
@@ -45,7 +50,7 @@ class NoDatabaseUserProvider extends Provider
     public function retrieveByCredentials(array $credentials)
     {
         if ($user = Resolver::byCredentials($credentials)) {
-            event(new DiscoveredWithCredentials($user));
+            Event::dispatch(new DiscoveredWithCredentials($user));
 
             return $user;
         }
@@ -57,15 +62,15 @@ class NoDatabaseUserProvider extends Provider
     public function validateCredentials(Authenticatable $user, array $credentials)
     {
         if (Resolver::authenticate($user, $credentials)) {
-            event(new AuthenticatedWithCredentials($user));
+            Event::dispatch(new AuthenticatedWithCredentials($user));
 
             if ($this->passesValidation($user)) {
-                event(new AuthenticationSuccessful($user));
+                Event::dispatch(new AuthenticationSuccessful($user));
 
                 return true;
             }
 
-            event(new AuthenticationRejected($user));
+            Event::dispatch(new AuthenticationRejected($user));
         }
 
         return false;

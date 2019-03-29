@@ -3,6 +3,7 @@
 namespace Adldap\Laravel\Commands\Console;
 
 use Exception;
+use RuntimeException;
 use UnexpectedValueException;
 use Adldap\Models\User;
 use Adldap\Laravel\Events\Imported;
@@ -11,6 +12,7 @@ use Adldap\Laravel\Commands\SyncPassword;
 use Adldap\Laravel\Commands\Import as ImportUser;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Bus;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Database\Eloquent\Model;
 
@@ -23,6 +25,7 @@ class Import extends Command
      */
     protected $signature = 'adldap:import {user? : The specific user to import.}
             {--f|filter= : The raw LDAP filter for limiting users imported.}
+            {--m|model= : The model to use for importing users.}
             {--d|delete : Soft-delete the users model if their LDAP account is disabled.}
             {--r|restore : Restores soft-deleted models if their LDAP account is enabled.}
             {--no-log : Disables logging successful and unsuccessful imports.}';
@@ -39,7 +42,7 @@ class Import extends Command
      *
      * @return void
      *
-     * @throws \RuntimeException
+     * @throws RuntimeException
      * @throws \Adldap\Models\ModelNotFoundException
      */
     public function handle()
@@ -49,7 +52,7 @@ class Import extends Command
         $count = count($users);
 
         if ($count === 0) {
-            throw new \RuntimeException("There were no users found to import.");
+            throw new RuntimeException("There were no users found to import.");
         } else if ($count === 1) {
             $this->info("Found user '{$users[0]->getCommonName()}'.");
         } else {
@@ -91,12 +94,9 @@ class Import extends Command
 
         foreach ($users as $user) {
             try {
-                // Get the users credentials array.
-                $credentials = $this->getUserCredentials($user);
-
                 // Import the user and retrieve it's model.
                 $model = Bus::dispatch(
-                    new ImportUser($user, $this->model(), $credentials)
+                    new ImportUser($user, $this->model())
                 );
 
                 // Set the users password.
@@ -221,24 +221,6 @@ class Import extends Command
     }
 
     /**
-     * Returns the specified users credentials array.
-     *
-     * @param User $user
-     *
-     * @return array
-     */
-    protected function getUserCredentials(User $user) : array
-    {
-        $resolver = Resolver::getFacadeRoot();
-
-        $username = $user->getFirstAttribute($resolver->getLdapDiscoveryAttribute());
-
-        return [
-            $resolver->getEloquentUsernameAttribute() => $username,
-        ];
-    }
-
-    /**
      * Saves the specified user with its model.
      *
      * @param User  $user
@@ -253,7 +235,7 @@ class Import extends Command
         if ($model->save() && $model->wasRecentlyCreated) {
             $imported = true;
 
-            event(new Imported($user, $model));
+            Event::dispatch(new Imported($user, $model));
 
             // Log the successful import.
             if ($this->isLogging()) {
@@ -323,13 +305,13 @@ class Import extends Command
     }
 
     /**
-     * Create a new instance of the configured authentication model.
+     * Create a new instance of the eloquent model to use.
      *
      * @return Model
      */
     protected function model() : Model
     {
-        $model = Config::get('ldap_auth.model') ?? $this->determineModel();
+        $model = $this->option('model') ?? Config::get('ldap_auth.model', $this->determineModel());
 
         return new $model;
     }

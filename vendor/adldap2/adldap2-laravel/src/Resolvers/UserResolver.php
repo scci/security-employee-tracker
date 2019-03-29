@@ -2,6 +2,7 @@
 
 namespace Adldap\Laravel\Resolvers;
 
+use RuntimeException;
 use Adldap\Models\User;
 use Adldap\Query\Builder;
 use Adldap\AdldapInterface;
@@ -11,6 +12,7 @@ use Adldap\Laravel\Events\Authenticating;
 use Adldap\Laravel\Events\AuthenticationFailed;
 use Adldap\Laravel\Auth\NoDatabaseUserProvider;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Contracts\Auth\UserProvider;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -54,7 +56,7 @@ class UserResolver implements ResolverInterface
      */
     public function byId($identifier)
     {
-        return $this->query()->findByGuid($identifier);
+        return $this->query()->findByGuid($identifier) ?? null;
     }
 
     /**
@@ -69,15 +71,18 @@ class UserResolver implements ResolverInterface
         // Depending on the configured user provider, the
         // username field will differ for retrieving
         // users by their credentials.
-        if ($this->getAppAuthProvider() instanceof NoDatabaseUserProvider) {
-            $username = $credentials[$this->getLdapDiscoveryAttribute()];
-        } else {
-            $username = $credentials[$this->getEloquentUsernameAttribute()];
+        $attribute = $this->getAppAuthProvider() instanceof NoDatabaseUserProvider ?
+            $this->getLdapDiscoveryAttribute() :
+            $this->getDatabaseUsernameColumn();
+
+        if (!array_key_exists($attribute, $credentials)) {
+            throw new RuntimeException("The '$attribute' key is missing from the given credentials array.");
         }
 
-        $field = $this->getLdapDiscoveryAttribute();
-
-        return $this->query()->whereEquals($field, $username)->first();
+        return $this->query()->whereEquals(
+            $this->getLdapDiscoveryAttribute(),
+            $credentials[$attribute]
+        )->first();
     }
 
     /**
@@ -85,11 +90,7 @@ class UserResolver implements ResolverInterface
      */
     public function byModel(Authenticatable $model)
     {
-        $field = $this->getLdapDiscoveryAttribute();
-
-        $username = $model->{$this->getEloquentUsernameAttribute()};
-
-        return $this->query()->whereEquals($field, $username)->first();
+        return $this->byId($model->{$this->getDatabaseIdColumn()});
     }
 
     /**
@@ -110,15 +111,15 @@ class UserResolver implements ResolverInterface
 
         $password = $this->getPasswordFromCredentials($credentials);
 
-        event(new Authenticating($user, $username));
+        Event::dispatch(new Authenticating($user, $username));
 
         if ($this->getLdapAuthProvider()->auth()->attempt($username, $password)) {
-            event(new Authenticated($user));
+            Event::dispatch(new Authenticated($user));
 
             return true;
         }
 
-        event(new AuthenticationFailed($user));
+        Event::dispatch(new AuthenticationFailed($user));
 
         return false;
     }
@@ -154,7 +155,7 @@ class UserResolver implements ResolverInterface
      */
     public function getLdapDiscoveryAttribute() : string
     {
-        return Config::get('ldap_auth.usernames.ldap.discover', 'userprincipalname');
+        return Config::get('ldap_auth.identifiers.ldap.locate_users_by', 'userprincipalname');
     }
 
     /**
@@ -162,15 +163,23 @@ class UserResolver implements ResolverInterface
      */
     public function getLdapAuthAttribute() : string
     {
-        return Config::get('ldap_auth.usernames.ldap.authenticate', 'distinguishedname');
+        return Config::get('ldap_auth.identifiers.ldap.bind_users_by', 'distinguishedname');
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getEloquentUsernameAttribute() : string
+    public function getDatabaseUsernameColumn() : string
     {
-        return Config::get('ldap_auth.usernames.eloquent', 'email');
+        return Config::get('ldap_auth.identifiers.database.username_column', 'email');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getDatabaseIdColumn() : string
+    {
+        return Config::get('ldap_auth.identifiers.database.guid_column', 'objectguid');
     }
 
     /**

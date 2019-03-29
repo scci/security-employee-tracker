@@ -2,6 +2,8 @@
 
 namespace Adldap\Models;
 
+use InvalidArgumentException;
+
 /**
  * Class BatchModification
  *
@@ -141,12 +143,16 @@ class BatchModification
     /**
      * Sets the type of the modification.
      *
-     * @param int $type
+     * @param int|null $type
      *
      * @return $this
      */
-    public function setType($type)
+    public function setType($type = null)
     {
+        if (!is_null($type) && !$this->isValidType($type)) {
+            throw new InvalidArgumentException("Given batch modification type is invalid.");
+        }
+
         $this->type = $type;
 
         return $this;
@@ -190,25 +196,25 @@ class BatchModification
             // If the original value is null, we'll assume
             // that the attribute doesn't exist yet.
             if (!empty($filtered)) {
-                // If the filtered array is not empty, we'll
-                // assume the developer is looking to
-                // add attributes to the model.
+                // If the filtered array is not empty, we can
+                // assume we're looking to add values
+                // to the current attribute.
                 $this->setType(LDAP_MODIFY_BATCH_ADD);
             }
 
             // If the filtered array is empty and there is no original
             // value, then we can ignore this attribute since
-            // we can't push null values to AD.
+            // we can't push null values to the server.
         } else {
             if (empty($filtered)) {
                 // If there's an original value and the array is
-                // empty then we can assume the developer is
-                // looking to completely remove all values
-                // of the specified attribute.
+                // empty then we can assume we are looking
+                // to completely remove all values
+                // of the current attribute.
                 $this->setType(LDAP_MODIFY_BATCH_REMOVE_ALL);
             } else {
-                // If the array isn't empty then we can assume the
-                // developer is trying to replace all attributes.
+                // If the array isn't empty then we can assume
+                // we're looking to replace all attributes.
                 $this->setType(LDAP_MODIFY_BATCH_REPLACE);
             }
         }
@@ -227,10 +233,14 @@ class BatchModification
             case LDAP_MODIFY_BATCH_REMOVE_ALL:
                 // A values key cannot be provided when
                 // a remove all type is selected.
-                return [static::KEY_ATTRIB => $this->attribute, static::KEY_MODTYPE => $this->type];
+                return [
+                    static::KEY_ATTRIB => $this->attribute,
+                    static::KEY_MODTYPE => $this->type
+                ];
             case LDAP_MODIFY_BATCH_REMOVE:
                 // Fallthrough.
             case LDAP_MODIFY_BATCH_ADD:
+                // Fallthrough.
             case LDAP_MODIFY_BATCH_REPLACE:
                 return [
                     static::KEY_ATTRIB => $this->attribute,
@@ -241,5 +251,22 @@ class BatchModification
                 // If the modtype isn't recognized, we'll return null.
                 return;
         }
+    }
+
+    /**
+     * Determines if the given modtype is valid.
+     *
+     * @param int $type
+     *
+     * @return bool
+     */
+    protected function isValidType($type)
+    {
+        return in_array($type, [
+            LDAP_MODIFY_BATCH_REMOVE_ALL,
+            LDAP_MODIFY_BATCH_REMOVE,
+            LDAP_MODIFY_BATCH_REPLACE,
+            LDAP_MODIFY_BATCH_ADD,
+        ]);
     }
 }

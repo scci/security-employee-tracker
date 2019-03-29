@@ -2,8 +2,6 @@
 
 namespace Adldap\Connections;
 
-use Adldap\AdldapException;
-
 /**
  * Class Ldap
  *
@@ -14,6 +12,20 @@ use Adldap\AdldapException;
 class Ldap implements ConnectionInterface
 {
     /**
+     * The connection name.
+     * 
+     * @var string|null
+     */
+    protected $name;
+
+    /**
+     * The LDAP host that is currently connected.
+     *
+     * @var string|null
+     */
+    protected $host;
+
+    /**
      * The active LDAP connection.
      *
      * @var resource
@@ -21,33 +33,33 @@ class Ldap implements ConnectionInterface
     protected $connection;
 
     /**
-     * Stores the bool whether or not
-     * the current connection is bound.
+     * The bound status of the connection.
      *
      * @var bool
      */
     protected $bound = false;
 
     /**
-     * Stores the bool to tell the connection
-     * whether or not to use SSL.
-     *
-     * To use SSL, your server must support LDAP over SSL.
-     * http://adldap.sourceforge.net/wiki/doku.php?id=ldap_over_ssl
+     * Whether the connection must be bound over SSL.
      *
      * @var bool
      */
     protected $useSSL = false;
 
     /**
-     * Stores the bool to tell the connection
-     * whether or not to use TLS.
-     *
-     * If you wish to use TLS you should ensure that $useSSL is set to false and vice-versa
+     * Whether the connection must be bound over TLS.
      *
      * @var bool
      */
     protected $useTLS = false;
+    
+    /**
+     * {@inheritdoc}
+     */
+    public function __construct($name = null)
+    {
+        $this->name = $name;
+    }
 
     /**
      * {@inheritdoc}
@@ -99,6 +111,22 @@ class Ldap implements ConnectionInterface
         $this->useTLS = $enabled;
 
         return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getHost()
+    {
+        return $this->host;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return $this->name;
     }
 
     /**
@@ -172,17 +200,13 @@ class Ldap implements ConnectionInterface
     {
         // If the returned error number is zero, the last LDAP operation
         // succeeded. We won't return a detailed error.
-        if ($errorNumber = $this->errNo()) {
-            $message = '';
+        if ($number = $this->errNo()) {
+            ldap_get_option($this->getConnection(), LDAP_OPT_DIAGNOSTIC_MESSAGE, $message);
 
-            if (defined('LDAP_OPT_DIAGNOSTIC_MESSAGE')) {
-                $message = ldap_get_option($this->getConnection(), LDAP_OPT_DIAGNOSTIC_MESSAGE, $err);
-            }
-
-            return new DetailedError($errorNumber, $this->err2Str($errorNumber), $message);
+            return new DetailedError($number, $this->err2Str($number), $message);
         }
 
-        return false;
+        return;
     }
 
     /**
@@ -232,9 +256,15 @@ class Ldap implements ConnectionInterface
      */
     public function connect($hosts = [], $port = '389')
     {
-        $connections = $this->getConnectionString($hosts, $this->getProtocol(), $port);
+        $this->host = $this->getConnectionString($hosts, $this->getProtocol(), $port);
+        
+        $this->connection = ldap_connect($this->host);
+        
+        if ($this->isUsingTLS() && $this->startTLS() === false) {
+            throw new ConnectionException("Unable to connect to LDAP server over TLS.");
+        }
 
-        return $this->connection = ldap_connect($connections);
+        return $this->connection;
     }
 
     /**
@@ -276,15 +306,15 @@ class Ldap implements ConnectionInterface
      */
     public function bind($username, $password, $sasl = false)
     {
-        if ($this->isUsingTLS()) {
-            $this->startTLS();
-        }
-
         if ($sasl) {
             return $this->bound = ldap_sasl_bind($this->getConnection(), null, null, 'GSSAPI');
         }
 
-        return $this->bound = ldap_bind($this->getConnection(), $username, $password);
+        return $this->bound = ldap_bind(
+            $this->getConnection(),
+            $username,
+            html_entity_decode($password)
+        );
     }
 
     /**
@@ -414,9 +444,9 @@ class Ldap implements ConnectionInterface
      */
     public function getDiagnosticMessage()
     {
-        ldap_get_option($this->getConnection(), LDAP_OPT_ERROR_STRING, $diagnosticMessage);
+        ldap_get_option($this->getConnection(), LDAP_OPT_ERROR_STRING, $message);
 
-        return $diagnosticMessage;
+        return $message;
     }
 
     /**
@@ -448,7 +478,7 @@ class Ldap implements ConnectionInterface
      *
      * @return string
      */
-    protected function getConnectionString($hosts = [], $protocol, $port)
+    protected function getConnectionString($hosts, $protocol, $port)
     {
         // Normalize hosts into an array.
         $hosts = is_array($hosts) ? $hosts : [$hosts];

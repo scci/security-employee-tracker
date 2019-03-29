@@ -2,8 +2,8 @@
 
 ## Introduction
 
-Adldap2 implements the ActiveRecord pattern. This means that each LDAP
-record in your directory is represented as it's own model instance.
+Adldap2 implements the [ActiveRecord](https://en.wikipedia.org/wiki/Active_record_pattern) pattern.
+This means that each LDAP record in your directory is represented as it's own model instance.
 
 ## Creating
 
@@ -21,7 +21,7 @@ Or you can chain all methods if you'd prefer:
 $user = $provider->make()->user();
 ```
 
-### Available Make Methods:
+### Available Make Methods
 
 When calling a make method, all of them accept an `$attributes` parameter
 to fill the model with your specified attributes.
@@ -75,15 +75,15 @@ if ($user->save()) {
 }
 ```
 
-> **Note**: When a model is saved successfully (whether created or updated),
-> the models attributes are re-synced in the background from your AD.
+> **Note**: When a model is saved successfully (whether created or updated), the
+> models attributes are re-synced in the background from your LDAP server.
 > 
 > This allows you to perform other operations during the same
 > request that require an existing model.
 
 ### Creating (Manually)
 
-If you are sure the model **does not exist** already inside your AD, you can use the `create()` method:
+If you are sure the model **does not exist** already inside your LDAP directory, you can use the `create()` method:
 
 ```php
 $user = $provider->make()->user([
@@ -103,7 +103,7 @@ if ($user->create()) {
 
 ### Updating (Manually)
 
-If you are sure the model **does exist** already inside your AD, you can use the `update()` method:
+If you are sure the model **does exist** already inside your LDAP directory, you can use the `update()` method:
 
 ```php
 $user = $provider->search()->whereEquals('cn', 'John Doe')->firstOrFail();
@@ -121,7 +121,7 @@ if ($user->update()) {
 
 If you need to check the existence of a model, use the property `exists`.
 
-How does it know if the model exists in AD? Well, when models are constructed from
+How does it know if the model exists in your LDAP directory? Well, when models are constructed from
 search results, the `exists` property on the model is set to `true`.
 
 ```php
@@ -130,9 +130,7 @@ $user = $provider->search()->find('jdoe');
 $user->exists; // Returns true.
 
 if ($user->delete()) {
-
     $user->exists; // Returns false.
-
 }
 ```
 
@@ -146,16 +144,53 @@ $user = $provider->make()->user([
 $user->exists; // Returns false.
 
 if ($user->save()) {
-    
     $user->exists; // Returns true.
-    
 }
 ```
 
 ## Attributes
 
-Since all models extend from the base class `Adldap\Models\Model`, there are many
-useful methods that you can utilize on every model.
+Due to LDAPs multi-valued nature, all LDAP attributes inside a model have their own array.
+
+For example, a models attributes may contain the following:
+
+```php
+var_dump($user->getAttributes());
+
+// Returns:
+/*
+[
+    'cn' => [
+        0 => 'John Doe',
+    ],
+    'sn' => [
+        0 => 'Doe',
+    ],
+    'givenname' => [
+        0 => 'John'
+    ],
+    'useraccountcontrol' => [
+        0 => 512
+    ],
+    'mail' => [
+        0 => 'jdoe@acme.org',
+        1 => 'john-doe@acme.org',
+    ],
+    'memberof' => [
+        0 => 'cn=Accountants,ou=Groups,dc=acme,dc=org',
+        1 => 'cn=Employees,ou=Groups,dc=acme,dc=org',
+        2 => 'cn=Users,ou=Groups,dc=acme,dc=org',
+    ],
+]
+*/
+```
+
+You can notice in the above dumped array that each attribute contains
+its own array with a value assigned to the first key.
+
+Since all models extend from the base class `Adldap\Models\Model`, there
+are many useful methods that you can use on every model to easily
+retrieve these attributes you're looking for.
 
 ### Getting Attributes
 
@@ -192,12 +227,6 @@ For example, to retrieve a users email address, use the method `getEmail()`:
 
 ```php
 $user->getEmail();
-```
-
-Or to retrieve all of a users email addresses, use the method `getEmails()`:
-
-```php
-$user->getEmails();
 ```
 
 ##### Other Methods
@@ -342,6 +371,23 @@ $user->fill([
 ]);
 ```
 
+#### Setting Boolean Attributes
+
+When setting boolean attribute values, you cannot use `0` / `1` / `true` / `false` as these
+are simply converted to integer values when saving and your LDAP server will
+likely return an error for doing so on certain attributes.
+
+You will need to use the string versions of the boolean (`'TRUE'` / `'FALSE'`) for the
+boolean attribute to be set properly on your LDAP server.
+
+Here's an example:
+
+```php
+$user->setFirstAttribute('msExchHideFromAddressLists', 'TRUE');
+
+$user->save();
+```
+
 ### Creating Attributes
 
 To create an attribute that does not exist on the model, you can set it like a regular property:
@@ -418,16 +464,12 @@ To see if a model contains an attribute, use the method `hasAttribute()`:
 ```php
 // Checking if a base attribute exists:
 if ($user->hasAttribute('mail')) {
-
     // This user contains an email address.
-
 }
 
 // Checking if a sub attribute exists, by key:
 if ($user->hasAttribute('mail', 1)) {
- 
     // This user contains a second email address.
- 
 }
 ```
 
@@ -467,9 +509,7 @@ To check if the model can be written to, use the method `isWritable()`:
 
 ```php
 if ($model->isWritable()) {
-
     // You can modify this model.
-    
 }
 ```
 
@@ -481,7 +521,7 @@ If you need to forcefully re-sync a models attributes, use the method `syncRaw()
 $user->syncRaw();
 ```
 
-> **Note**: This will query your AD server for the current model, and re-synchronize
+> **Note**: This will query your LDAP server for the current model, and re-synchronize
 > it's attributes. This is only recommended if your creating / updating / deleting
 > attributes manually through your LDAP connection.
 
@@ -598,7 +638,7 @@ $config = [
     'username' => 'admin',
     'password' => 'P@ssword',
     
-    'schema' => \MyApp\LdapSchema::class,
+    'schema' => MyApp\LdapSchema::class,
 ];
 
 $ad = new Adldap($config);

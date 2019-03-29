@@ -40,10 +40,7 @@ the members inside the group.
 $group = $provider->search()->groups()->first();
 
 foreach ($group->members as $member) {
-
-    // 'cn=John Doe,dc=corp,dc=acme,dc=org'
-    echo $member;
-
+    echo $member; // 'cn=John Doe,dc=corp,dc=acme,dc=org'
 }
 ```
 
@@ -55,30 +52,18 @@ This can be easily done with the `getMembers()` method on the group.
 $group = $provider->search()->groups()->first();
 
 foreach ($group->getMembers() as $member) {
+    echo get_class($member); // Instance of `Adldap\Models\Model`
 
-    // Will be an instance of a Adldap `Model`
-    $member->getCommonName();
-
+    echo $member->getCommonName();
 }
 ```
 
-You should be aware however, that calling the `getMembers()` method will
-query your `AD` server for **every** member contained in
-the group to retrieve its model.
+> **Note**: You should be aware however, that calling the `getMembers()` method will
+> query your `AD` server for **every** member contained in the group to retrieve
+> its model. For larger group sets it may be worth paginating them.
 
-Think of this example below as what is being called behind the scenes:
 
-```php
-$group = $provider->search()->groups()->first();
-
-foreach ($group->members as $member) {
-
-    $model = $provider->search()->findByDn($member);
-
-}
-```
-
-### Paginating Group members
+### Paginating Group Members
 
 The group you're looking for might contain hundreds / thousands of members.
 
@@ -94,19 +79,51 @@ foreach ($group->members as $member) {
 }
 ```
 
-Now, when we have the group instance, we'll only have the first `500` members inside this group. However, calling the `getMembers()` method will automatically retrieve the rest of the members for you:
+Now, when we have the group instance, we'll only have the first `500` members inside this group.
+However, calling the `getMembers()` method will automatically retrieve the rest of the members for you:
 
 ```php
 $group = $provider->search()->groups()->select('member;range=0-500')->first();
 
 foreach ($group->getMembers() as $member) {
-    
-    // Adldap will automatically retrieve the next 500 records until it's retrieved all records.
-    
+    // Adldap will automatically retrieve the next 500
+    // records until it's retrieved all records.
     $member->getCommonName();
-    
 }
 ```
+
+> **Note**: Groups containing large amounts of users (1000+) will require
+> more memory assigned to PHP. Your mileage will vary.
+
+#### Paginating large sets of Group Members
+
+When requesting group members from groups that contain a large amount of members
+(typically over 1000), you may receive PHP memory limit errors due to
+the large amount of the objects being created in the request.
+
+To resolve this, you will need to retrieve the members manually. However using
+this route you will only be able to retrieve the members distinguished names.
+
+```php
+$from = 0;
+$to = 500;
+$range = "member;range=$from-$to";
+
+// Retrieve the group.
+$group = $provider->search()->select($range)->raw()->find('Accounting');
+
+// Remove the count from the member array.
+unset($group[$range]['count']);
+
+// The array of group members distinguished names.
+$members = $group[$range];
+
+foreach ($members as $member) {
+    echo $member; // 'cn=John Doe,dc=acme,dc=org'
+}
+```
+
+You can then encapsulate the above example into a recursive function to retrieve the remaining group members.
 
 ## Getting only a groups member names
 
@@ -114,10 +131,8 @@ To retrieve only the names of the members contained in a group, call the `getMem
 
 ```php
 foreach ($group->getMemberNames() as $name) {
-
     // Returns 'John Doe' 
     echo $name;
-
 }
 ```
 
@@ -167,9 +182,7 @@ To add a single member to a group, use the `addMember()` method:
 $user = $provider->search()->users()->first();
 
 if ($group->addMember($user)) {
-
     // User was successfully added to the group!
-
 }
 
 // Or
@@ -217,9 +230,7 @@ $group = $provider->search()->groups()->first();
 $member = $group->getMembers()->first();
 
 if ($group->removeMember($member)) {
-
     // Member was successfully removed from the group!
-
 }
 
 // Or
@@ -237,8 +248,6 @@ To remove all members, use the `removeMembers()` method:
 
 ```php
 if ($group->removeMembers()) {
-
     // All members were successfully removed!
-
 }
 ```

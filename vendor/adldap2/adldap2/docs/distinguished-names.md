@@ -3,14 +3,14 @@
 Working with DN strings are a pain, but they're about to get easier. Adldap includes a DN builder for easily modifying and
 creating DN strings.
 
-> **Note**: All values inserted into DN methods are escaped. You don't need to escape **any** values before hand.
+> **Note**: All values inserted into DN methods are escaped. You do not need to escape **any** values before hand.
 
 #### Creating a New DN
 
-To create a new DN, construct a new `\Adldap\Models\Attributes\DistinguishedName` instance:
+To create a new DN, construct a new `Adldap\Models\Attributes\DistinguishedName` instance:
 
 ```php
-$dn = new \Adldap\Models\Attributes\DistinguishedName();
+$dn = new Adldap\Models\Attributes\DistinguishedName();
 ```
     
 You can also pass in a current DN string and start modifying it:
@@ -18,7 +18,7 @@ You can also pass in a current DN string and start modifying it:
 ```php
 $currentDn = 'cn=John Doe,ou=Accounting,dc=corp,dc=acme,dc=org';
 
-$dn = new \Adldap\Models\Attributes\DistinguishedName($currentDn);
+$dn = new Adldap\Models\Attributes\DistinguishedName($currentDn);
 ```
     
 #### Adding / Removing a Domain Component
@@ -63,7 +63,7 @@ $dn->setBase($base);
 
 #### Creating a DN From A Model
 
-When you're creating a new AD record, you'll need to create a distinguished name as well. Let's go through an example of
+When you're creating a new LDAP record, you'll need to create a distinguished name as well. Let's go through an example of
 creating a new user.
 
 ```php
@@ -114,4 +114,54 @@ $dn = $user->getDnBuilder();
 $dn->addOu('Users');
 
 $user->setDn($dn)->save();
+```
+
+#### Retrieving the RDN components
+
+To retrieve all of the RDN components of a Distinguished Name, call `getComponents()`:
+
+```php
+$dn = new Adldap\Models\Attributes\DistinguishedName(
+    'cn=John Doe,ou=Accounting,dc=corp,dc=acme,dc=org'
+);
+
+$components = $dn->getComponents();
+
+var_dump($components);
+
+// Output:
+// array:5 [▼
+//   "cn" => array:1 [▼
+//     0 => "John Doe"
+//   ]
+//   "uid" => []
+//   "ou" => array:1 [▼
+//     0 => "Accounting"
+//   ]
+//   "dc" => array:3 [▼
+//     0 => "corp"
+//     1 => "acme"
+//     2 => "org"
+//   ]
+//   "o" => []
+// ]
+```
+
+You can also specify a component you would like returned by supplying it as an argument:
+
+```php
+$dn = new Adldap\Models\Attributes\DistinguishedName(
+    'cn=John Doe,ou=Accounting,dc=corp,dc=acme,dc=org'
+);
+
+$dcs = $dn->getComponents('dc');
+
+var_dump($dcs);
+
+// Output:
+// array:3 [▼
+//   0 => "corp"
+//   1 => "acme"
+//   2 => "org"
+// ]
 ```

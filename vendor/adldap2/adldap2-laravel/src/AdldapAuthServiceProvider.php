@@ -31,18 +31,12 @@ class AdldapAuthServiceProvider extends ServiceProvider
             $config => config_path('ldap_auth.php'),
         ]);
 
-        $auth = Auth::getFacadeRoot();
+        // Register the lDAP auth provider.
+        Auth::provider('ldap', function ($app, array $config) {
+            return $this->makeUserProvider($app['hash'], $config);
+        });
 
-        if (method_exists($auth, 'provider')) {
-            $auth->provider('ldap', function ($app, array $config) {
-                return $this->makeUserProvider($app['hash'], $config);
-            });
-        } else {
-            $auth->extend('ldap', function ($app) {
-                return $this->makeUserProvider($app['hash'], $app['config']['auth']);
-            });
-        }
-
+        // Register the import command.
         $this->commands(Import::class);
     }
 
@@ -55,9 +49,9 @@ class AdldapAuthServiceProvider extends ServiceProvider
     {
         // Bind the user resolver instance into the IoC.
         $this->app->bind(ResolverInterface::class, function () {
-            $ad = $this->app->make(AdldapInterface::class);
-
-            return new UserResolver($ad);
+            return new UserResolver(
+                $this->app->make(AdldapInterface::class)
+            );
         });
 
         // Here we will register the event listener that will bind the users LDAP

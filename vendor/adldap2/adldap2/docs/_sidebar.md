@@ -1,3 +1,5 @@
+<!-- _sidebar.md -->
+
 * Getting Started
 
   * [Introduction](/)
@@ -8,15 +10,16 @@
 
   * [Searching](searching.md)
   * [Creating & Updating](models/model.md)
+  * [Events](events.md)
+  * [Logging](logging.md)
   * [Working With Distiguished Names](distinguished-names.md)
   * [Troubleshooting](troubleshooting.md)
 
 * Models
-
+  * [Model (Base)](models/model.md)
   * [Computer](models/computer.md)
   * [Contact](models/contact.md)
   * [Container](models/container.md)
-  * [Entry (Base Model)](models/entry.md)
   * [Group](models/group.md)
   * [Organizational Unit](models/ou.md)
   * [Printer](models/printer.md)

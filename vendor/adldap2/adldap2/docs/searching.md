@@ -58,7 +58,13 @@ if ($record) {
 }
 ```
 
-> **Note**: Using the `find()` method will search for LDAP records using ANR (ambiguous name resolution).
+> **Note**: Using the `find()` method will search for LDAP records using ANR
+> (ambiguous name resolution) and return the first result.
+>
+> Since ActiveDirectory is the only LDAP distribution that supports ANR,
+> an equivalent query will be created for other LDAP distributions
+> that are not compatible.
+>
 > For a more fine-tuned search, use the `findBy()` method below.
 
 ##### Finding a record (or failing)
@@ -71,7 +77,7 @@ try {
 
     $record = $search->findOrFail('John Doe');
     
-} catch (\Adldap\Models\ModelNotFoundException $e) {
+} catch (Adldap\Models\ModelNotFoundException $e) {
     // Record wasn't found!
 }
 ```
@@ -95,7 +101,7 @@ try {
 
     $record = $search->findByOrFail('samaccountname', 'jdoe');
     
-} catch (\Adldap\Models\ModelNotFoundException $e) {
+} catch (Adldap\Models\ModelNotFoundException $e) {
     // Record wasn't found!
 }
 ```
@@ -118,7 +124,7 @@ try {
 
     $record = $search->findByDnOrFail('cn=John Doe,dc=corp,dc=org');
     
-} catch (\Adldap\Models\ModelNotFoundException $e) {
+} catch (Adldap\Models\ModelNotFoundException $e) {
     // Record wasn't found!
 }
 ```
@@ -158,7 +164,7 @@ try {
 
     $record = $search->firstOrFail();
     
-} catch (\Adldap\Models\ModelNotFoundException $e) {
+} catch (Adldap\Models\ModelNotFoundException $e) {
     // Record wasn't found!
 }
 ```
@@ -326,7 +332,7 @@ $results = $search
         ->get();
 ```
 
-Now, we'll retrieve both John and Suzy's AD records, because the common name can equal either.
+Now, we'll retrieve both John and Suzy's LDAP records, because the common name can equal either.
 
 > **Note**: You can also use all `where` methods as an or where, for example:
 > `orWhereHas()`, `orWhereContains()`, `orWhereStartsWith()`, `orWhereEndsWith()`
@@ -385,7 +391,7 @@ The `andFilter` method accepts a closure which allows you to construct a query i
 $query = $provider->search()->newQuery();
 
 // Creates the filter: (&(givenname=John)(sn=Doe))
-$results = $query->andFilter(function (\Adldap\Query\Builder $q) {
+$results = $query->andFilter(function (Adldap\Query\Builder $q) {
 
     $q->where('givenname', '=', 'John')
       ->where('sn', '=', 'Doe');
@@ -404,7 +410,7 @@ $query = $provider->search()->newQuery();
 
 
 // Creates the filter: (|(givenname=John)(sn=Doe))
-$results = $query->orFilter(function (\Adldap\Query\Builder $q) {
+$results = $query->orFilter(function (Adldap\Query\Builder $q) {
 
     $q->where('givenname', '=', 'John')
       ->where('sn', '=', 'Doe');
@@ -422,7 +428,7 @@ The `notFilter` method accepts a closure which allows you to construct a query i
 $query = $provider->search()->newQuery();
 
 // Creates the filter: (!(givenname=John)(sn=Doe))
-$results = $query->notFilter(function (\Adldap\Query\Builder $q) {
+$results = $query->notFilter(function (Adldap\Query\Builder $q) {
 
     $q->where('givenname', '=', 'John')
       ->where('sn', '=', 'Doe');
@@ -440,12 +446,10 @@ as many times as you'd like for larger complex queries:
 ```php
 $query = $provider->search()->newQuery();
 
-$query = $query->orFilter(function (\Adldap\Query\Builder $q) {
-    $q->where('givenname', '=', 'John')
-        ->where('sn', '=', 'Doe');
-})->andFilter(function (\Adldap\Query\Builder $q) {
-    $q->where('department', '=', 'Accounting')
-        ->where('title', '=', 'Manager');
+$query = $query->orFilter(function (Adldap\Query\Builder $q) {
+    $q->where('givenname', '=', 'John')->where('sn', '=', 'Doe');
+})->andFilter(function (Adldap\Query\Builder $q) {
+    $q->where('department', '=', 'Accounting')->where('title', '=', 'Manager');
 })->getUnescapedQuery();
 
 echo $query; // Returns '(&(|(givenname=John)(sn=Doe))(&(department=Accounting)(title=Manager)))'
@@ -482,8 +486,8 @@ echo $query; // Returns (&(samaccountname=jdoe)(surname=Doe))
 
 ## Sorting
 
-Sorting is really useful when your displaying tabular AD results. You can
-easily perform sorts on any AD attribute by using the `sortBy()` method:
+Sorting is really useful when your displaying tabular LDAP results. You can
+easily perform sorts on any LDAP attribute by using the `sortBy()` method:
 
 ```php
 $results = $search->whereHas('cn')->sortBy('cn', 'asc')->get();
@@ -504,9 +508,14 @@ $results = $search->whereHas('cn')->sortBy('cn', 'asc')->paginate(25);
 Paginating your search results will allow you to return more results than
 your LDAP cap (usually 1000) and display your results in pages.
 
-> **Note**: Pagination will retrieve **all** records from your LDAP server.
-> The pagination object is simply a collection that allows you to
-> iterate through the resulting records easily and intuitively.
+> **Note**: Calling `paginate()` will retrieve **all** records from your LDAP server for the current query.
+>
+> This **does not** operate the same way pagination occurs in a database. Pagination of
+> an LDAP query simply allows you to return a larger result set than your
+> LDAP servers configured maximum (usually 1000).
+>
+> The pagination object is simply a collection that allows you to iterate
+> through all the resulting records easily and intuitively.
 
 To perform this, call the `paginate()` method instead of the `get()` method:
 
@@ -515,7 +524,7 @@ $recordsPerPage = 50;
 
 $currentPage = $_GET['page'];
 
-// This would retrieve all records from AD inside a new Adldap\Objects\Paginator instance.
+// This would retrieve all records from your LDAP server inside a new Adldap\Objects\Paginator instance.
 $paginator = $search->paginate($recordsPerPage, $currentPage);
 
 // Returns total number of pages, int
@@ -542,28 +551,33 @@ foreach($paginator as $result)
 
 ## Scopes
 
-Search scopes allow you to easily retrieve common models of a particular 'scope'. Here is how you utilize them:
+Search scopes allow you to easily retrieve common models of a particular 'scope'.
+
+Each scope simply applies the required filters to the search object
+that (when executed) will only return the relevant models.
+
+Here is a list of all available scopes:
 
 ```php
-// Retrieve all users.
+// Retrieve all users (Adldap\Models\User).
 $results = $search->users()->get();
 
-// Retrieve all printers.
+// Retrieve all printers (Adldap\Models\Printer).
 $results = $search->printers()->get();
 
-// Retrieve all organizational units.
+// Retrieve all organizational units (Adldap\Models\OrganizationalUnit).
 $results = $search->ous()->get();
 
-// Retrieve all groups.
+// Retrieve all groups (Adldap\Models\Group).
 $results = $search->groups()->get();
 
-// Retrieve all containers.
+// Retrieve all containers (Adldap\Models\Container).
 $results = $search->containers()->get();
 
-// Retrieve all contacts.
+// Retrieve all contacts (Adldap\Models\Contact).
 $results = $search->contacts()->get();
 
-// Retrieve all computers.
+// Retrieve all computers (Adldap\Models\Computer).
 $results = $search->computers()->get();
 ```
 
@@ -573,14 +587,10 @@ To set the base DN of your search you can use one of two methods:
 
 ```php
 // Using the `in()` method:
-$results = $provider->search()
-    ->in('ou=Accounting,dc=acme,dc=org')
-    ->get();
+$results = $provider->search()->in('ou=Accounting,dc=acme,dc=org')->get();
     
 // Using the `setDn()` method:
-$results = $provider->search()
-    ->setDn('ou=Accounting,dc=acme,dc=org')
-    ->get();
+$results = $provider->search()->setDn('ou=Accounting,dc=acme,dc=org')->get();
 ```
 
 Either option will return the same results. Use which ever method you prefer to be more readable.
@@ -596,7 +606,7 @@ If you'd like to disable recursive search and perform a single level search, use
 ```php
 $result = $provider->search()->listing()->get();
 ```
-    
+
 This would perform an `ldap_listing()` instead of an `ldap_search()`.
 
 #### Read

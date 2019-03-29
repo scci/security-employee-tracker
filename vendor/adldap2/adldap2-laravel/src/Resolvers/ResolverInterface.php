@@ -37,7 +37,7 @@ interface ResolverInterface
     /**
      * Retrieve a user by the given credentials.
      *
-     * @param array  $credentials The users credentials
+     * @param array $credentials The users credentials
      *
      * @return \Adldap\Models\User|null
      */
@@ -58,7 +58,7 @@ interface ResolverInterface
      * @param User  $user        The LDAP users model
      * @param array $credentials The LDAP users credentials
      *
-     * @return string|null
+     * @return boolean
      */
     public function authenticate(User $user, array $credentials = []);
 
@@ -84,9 +84,16 @@ interface ResolverInterface
     public function getLdapAuthAttribute() : string;
 
     /**
-     * Retrieves the configured eloquent users username attribute.
+     * Retrieves the configured database username attribute.
      *
      * @return string
      */
-    public function getEloquentUsernameAttribute() : string;
+    public function getDatabaseUsernameColumn() : string;
+
+    /**
+     * Retrieves the configured database identifier attribute.
+     *
+     * @return string
+     */
+    public function getDatabaseIdColumn() : string;
 }

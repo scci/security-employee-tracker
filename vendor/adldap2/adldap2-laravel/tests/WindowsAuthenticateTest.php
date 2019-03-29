@@ -19,19 +19,21 @@ class WindowsAuthenticateTest extends DatabaseTestCase
         $middleware = app(WindowsAuthenticate::class);
 
         $user = $this->makeLdapUser([
-            'cn' => 'John Doe',
-            'userprincipalname' => 'jdoe@email.com',
-            'samaccountname' => 'jdoe',
+            'objectguid'        => ['cc07cacc-5d9d-fa40-a9fb-3a4d50a172b0'],
+            'cn'                => ['John Doe'],
+            'userprincipalname' => ['jdoe@email.com'],
+            'samaccountname'    => ['jdoe'],
         ]);
 
         $query = m::mock(Builder::class);
 
         $query
-            ->shouldReceive('where')->once()->withArgs([['samaccountname' => 'jdoe']])->andReturn($query)
+            ->shouldReceive('whereEquals')->once()->withArgs(['samaccountname', 'jdoe'])->andReturn($query)
             ->shouldReceive('first')->once()->andReturn($user);
 
         Resolver::shouldReceive('query')->once()->andReturn($query)
-            ->shouldReceive('getEloquentUsernameAttribute')->once()->andReturn('email')
+            ->shouldReceive('getDatabaseIdColumn')->twice()->andReturn('objectguid')
+            ->shouldReceive('getDatabaseUsernameColumn')->once()->andReturn('email')
             ->shouldReceive('getLdapDiscoveryAttribute')->once()->andReturn('userprincipalname')
             ->shouldReceive('byModel')->once()->andReturn(($user));
 
@@ -57,7 +59,7 @@ class WindowsAuthenticateTest extends DatabaseTestCase
         $query = m::mock(Builder::class);
 
         $query
-            ->shouldReceive('where')->once()->withArgs([['samaccountname' => 'jdoe']])->andReturn($query)
+            ->shouldReceive('whereEquals')->once()->withArgs(['samaccountname', 'jdoe'])->andReturn($query)
             ->shouldReceive('first')->once()->andReturn(null);
 
         Resolver::shouldReceive('query')->once()->andReturn($query);

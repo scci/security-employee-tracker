@@ -585,6 +585,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
 
     public static $classMap = array (
         'AddAdministrativeToTrainingTable' => __DIR__ . '/../..' . '/database/migrations/2016_11_23_084814_add_administrative_to_training_table.php',
+        'AddObjectguidToUsersTable' => __DIR__ . '/../..' . '/database/migrations/2019_03_29_085522_add_objectguid_to_users_table.php',
         'AddStopRenewalToTrainingUserTable' => __DIR__ . '/../..' . '/database/migrations/2016_12_20_133047_add_stop_renewal_to_training_user_table.php',
         'AddTrainingTypeToTrainingsTable' => __DIR__ . '/../..' . '/database/migrations/2016_12_20_134929_add_training_type_to_trainings_table.php',
         'CreateActivityLogTable' => __DIR__ . '/../..' . '/database/migrations/2016_12_02_123356_create_activity_log_table.php',

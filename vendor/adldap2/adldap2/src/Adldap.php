@@ -3,6 +3,10 @@
 namespace Adldap;
 
 use InvalidArgumentException;
+use Adldap\Log\EventLogger;
+use Adldap\Log\LogsInformation;
+use Adldap\Events\DispatchesEvents;
+use Adldap\Connections\Ldap;
 use Adldap\Connections\Provider;
 use Adldap\Connections\ProviderInterface;
 use Adldap\Connections\ConnectionInterface;
@@ -10,6 +14,8 @@ use Adldap\Configuration\DomainConfiguration;
 
 class Adldap implements AdldapInterface
 {
+    use DispatchesEvents, LogsInformation;
+
     /**
      * The default provider name.
      *
@@ -36,15 +42,17 @@ class Adldap implements AdldapInterface
         if ($default = key($providers)) {
             $this->setDefaultProvider($default);
         }
+
+        $this->initEventLogger();
     }
 
     /**
      * {@inheritdoc}
      */
-    public function addProvider($config = [], $name = 'default', ConnectionInterface $connection = null)
+    public function addProvider($config, $name = 'default', ConnectionInterface $connection = null)
     {
         if ($this->isValidConfig($config)) {
-            $config = new Provider($config, $connection);
+            $config = new Provider($config, $connection ?? new Ldap($name));
         }
 
         if ($config instanceof ProviderInterface) {
@@ -142,5 +150,39 @@ class Adldap implements AdldapInterface
         }
 
         return call_user_func_array([$provider, $method], $parameters);
+    }
+
+    /**
+     * Initializes the event logger.
+     *
+     * @return void
+     */
+    public function initEventLogger()
+    {
+        $dispatcher = static::getEventDispatcher();
+
+        $logger = $this->newEventLogger();
+
+        $dispatcher->listen('Adldap\Auth\Events\*', function ($eventName, $events) use ($logger) {
+            foreach ($events as $event) {
+                $logger->auth($event);
+            }
+        });
+
+        $dispatcher->listen('Adldap\Models\Events\*', function ($eventName, $events) use ($logger) {
+            foreach ($events as $event) {
+                $logger->model($event);
+            }
+        });
+    }
+
+    /**
+     * Returns a new event logger instance.
+     *
+     * @return EventLogger
+     */
+    protected function newEventLogger()
+    {
+        return new EventLogger(static::getLogger());
     }
 }

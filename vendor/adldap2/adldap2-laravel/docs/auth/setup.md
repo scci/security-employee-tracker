@@ -4,7 +4,7 @@
 - [Provider](#provider)
 - [Rules](#rules)
 - [Scopes](#scopes)
-- [Usernames](#usernames)
+- [Identifiers](#identifiers)
 - [Passwords](#passwords)
 - [Login Fallback](#login-fallback)
 - [Synchronizing](#synchronizing)
@@ -25,6 +25,8 @@ There are two built in providers. Please view their documentation to see which o
 ### DatabaseUserProvider
 
 The `DatabaseUserProvider` allows you to synchronize LDAP users to your applications database.
+
+> **Note**: This provider requires that you add an `objectguid` database column to your `users` database table. [Read more here](#guid-column).
 
 To use it, insert it in your `config/ldap_auth.php` in the `provider` option:
 
@@ -93,7 +95,7 @@ Inside your `config/auth.php` file, you can remove the `model` key in your provi
 ```php
 'providers' => [
     'users' => [
-        'driver' => 'adldap',
+        'driver' => 'ldap',
     ],
 ],
 ```
@@ -269,23 +271,26 @@ All other users will be denied authentication, even if their credentials are val
 > **Note**: If you're caching your configuration files, make sure you
 > run `php artisan config:clear` to be able to use your new scope.
 
-## Usernames
+## Identifiers
 
-Inside your `config/ldap_auth.php` file there is a configuration option named `usernames`:
+Inside your `config/ldap_auth.php` file there is a configuration option named `identifiers`:
 
 ```php
-'usernames' => [
+'identifiers' => [
 
     'ldap' => [
-        'discover' => 'userprincipalname',
-        'authenticate' => 'distinguishedname',
+        'locate_users_by' => 'userprincipalname',
+        'bind_users_by' => 'distinguishedname',
     ],
     
-    'eloquent' => 'email',
+    'database' => [
+        'guid_column' => 'objectguid',
+        'username_column' => 'email',
+    ],
     
     'windows' => [
-        'discover' => 'samaccountname',
-        'key' => 'AUTH_USER',
+        'locate_users_by' => 'samaccountname',
+        'server_key' => 'AUTH_USER',
     ],
 
 ],
@@ -297,11 +302,11 @@ Let's go through each option with their meaning.
 
 The LDAP array contains two elements each with a key and value.
 
-The `discover` key contains the LDAP users attribute you would like your authenticating users to be located by.
+The `locate_users_by` key contains the LDAP users attribute you would like your authenticating users to be located by.
 
 > **Note**: If you're using the `NoDatabaseUserProvider` it is extremely important to know that this value is used as the key to retrieve the inputted username from the `Auth::attempt()` credentials array.
 >
-> For example, if you're executing an `Auth::attempt(['username' => 'jdoe..'])` and you have a `discover` value set to `userprincipalname` then the Adldap2-Laravel auth driver will try to retrieve your users username from the given credentials array with the key `userprincipalname`. This would generate an exception since this key does not exist in the above credentials array.
+> For example, if you're executing an `Auth::attempt(['username' => 'jdoe..'])` and you have a `locate_users_by` value set to `userprincipalname` then the Adldap2-Laravel auth driver will try to retrieve your users username from the given credentials array with the key `userprincipalname`. This would generate an exception since this key does not exist in the above credentials array.
 
 For example, executing the following:
 
@@ -311,9 +316,9 @@ Auth::attempt(['email' => 'jdoe@corp.com', 'password' => 'password'])
 
 Will perform an LDAP search for a user with the `userprincipalname` equal to `jdoe@corp.com`.
 
-If you change `Auth::attempt()` `email` key, you will need to change the `eloquent` key to match.
+If you change `Auth::attempt()` `email` key, you will need to change the `database.username_column` key to match.
 
-The `authenticate` key contains the LDAP users attriubte you would like to perform LDAP authentication on.
+The `authenticate` key contains the LDAP users attribute you would like to perform LDAP authentication on.
 
 For example, executing the following:
 
@@ -323,22 +328,93 @@ Auth::attempt(['email' => 'jdoe@corp.com', 'password' => 'password'])
 
 Will try to locate a user in your LDAP directory with a `userprincipalname` equal to `jdoe@corp.com`. Then, when an LDAP record of this user is located, their `disintinguishedname` will be retrieved from this record, an be passed into an `Adldap\Auth\Guard::attempt()` (ex `Guard::attempt('cn=John Doe,ou=Users,dc=corp,dc=com', 'password')`).
 
-> **Note**: It's **extremely** important to know that your configured `account_suffix` and `account_prefix` (located in your `config/ldap.php` file) will be appended or prepended *onto* this passed in username.
+> **Note**: It's **extremely** important to know that your configured `account_suffix` and `account_prefix` (located in your `config/ldap.php` file) will be appended or pre-pended *onto* this passed in username.
 
 You can ignore the `windows` configuration array, unless you're planning on using the included [middleware](auth/middleware.md) for single sign on authentication.
 
-### Eloquent
+### Database
 
-The eloquent key contains a value that should match the username column you have set up in your `users` database table.
+### GUID Column
+
+The GUID column is a new configuration option added in v6.0 that allows you to set the
+database column that will store users Object GUID (Globally Unique Identifier).
+
+The addition of this database column allows you to make username changes in your
+LDAP directory, and have them properly synchronize in your Laravel application.
+
+This is usually the scenario when someone changes their marital status, or changes their name.
+
+If you're upgrading from a previous Adldap2-Laravel version, simply create a new migration and add the `nullable` column to your `users` database table.
+
+Ex. `php artisan make:migration add_objectguid_column`
+
+```php
+Schema::table('users', function (Blueprint $table) {
+    $table->string('objectguid')->nullable()->after('id');
+});
+```
+
+Otherwise, if you're starting from scratch, simply add the column to your `create_users_table` migration:
+
+```php
+Schema::create('users', function (Blueprint $table) {
+    $table->increments('id');
+    $table->string('objectguid')->nullable(); // Added here.
+    $table->string('name');
+    $table->string('email')->unique();
+    $table->timestamp('email_verified_at')->nullable();
+    $table->string('password');
+    $table->rememberToken();
+    $table->timestamps();
+});
+```
+
+If you have user records already inside your database with a `null` `objectguid` value, then
+**it will be set automatically** if a user authenticates with the same username that
+is contained in your configured in your `username_column` option.
+
+For example, lets say we have a user in our database with the following information:
+```
++----+------------+---------------+
+| id | objectguid | email         |
++----+------------+---------------+
+| 1  | NULL       | jdoe@acme.org |
++----+------------+---------------+
+```
+
+When a user successfully authenticates with the username of `jdoe@acme.org`, then his `objectguid` column will automatically be set:
+```
++----+--------------------------------------+---------------+
+| id | objectguid                           | email         |
++----+--------------------------------------+---------------+
+| 1  | cc07cacc-5d9d-fa40-a9fb-3a4d50a172b0 | jdoe@acme.org |
++----+--------------------------------------+---------------+
+```
+
+The next time this user authenticates, the `objectguid` will queried for **first**, then `email`.
+This is done using a simple `or where` statement, so two queries are not executed for one login.
+
+> **Note**: If the users identifier changes (their email / username) prior to their
+> `objectguid` from being synchronized to your local database and they login to 
+> your application, a new user record will be created.
+>
+> This is due to not being able to locate a local user record with the users new username.
+>
+> It is recommended to keep your application in sync via scheduling the `adldap:import`
+> command so that all users have a synchronized `objectguid`.
+
+### Username Column
+
+The `username_column` contains a value that should match the username column you have set up in your `users` database table.
 
 For example, if you're using a `username` field instead of `email` in your application, you will need to change this option to `username`.
 
 > **Note**: If you're using the `DatabaseUserProvider` it is extremely important to know that this value is used as the key to retrieve the inputted username from the `Auth::attempt()` credentials array.
 >
-> For example, if you're executing an `Auth::attempt(['username' => 'jdoe..'])` and you have an `eloquent` value set to `email` then the Adldap2-Laravel auth driver will try to retrieve your users username from the given credentials array with the key `email`. This would generate an exception since this key does not exist in the above credentials array.
+> For example, if you're executing an `Auth::attempt(['username' => 'jdoe..'])` and you have an `username_column` value set to `email` then the Adldap2-Laravel auth driver will try to retrieve your users username from the given credentials array with the key `email`. This would generate an exception since this key does not exist in the above credentials array.
 
-> **Note**: Keep in mind you will also need to update your `database/migrations/2014_10_12_000000_create_users_table.php`
-> migration to use a username field instead of email, **as well as** your LoginController.
+> **Note**: Keep in mind you will also need to update your `create_users_table` migration to
+> use a username field instead of email, **as well as** your LoginController.
 
 For example, if you'd like to login users by their `samaccountname`:
 
@@ -346,11 +422,14 @@ For example, if you'd like to login users by their `samaccountname`:
 'usernames' => [
 
     'ldap' => [
-        'discover' => 'samaccountname', // Changed from `userprincipalname`
-        'authenticate' => 'distinguishedname',
+        'locate_users_by' => 'samaccountname', // Changed from `userprincipalname`
+        'bind_users_by' => 'distinguishedname',
     ],
     
-    'eloquent' => 'username', // Changed from `email`
+    'database' => [
+        'guid_column' => 'objectguid',
+        'username_column' => 'username', // Changed from `email`
+    ],
 
 ],
 ```
@@ -395,7 +474,7 @@ public function login(Request $request)
 
 ### Sync
 
-The password sync option allows you to automatically synchronize users LDAP passwords to your local database. These passwords are hashed natively by Laravel using the Hash::make() method.
+The password sync option allows you to automatically synchronize users LDAP passwords to your local database. These passwords are hashed natively by Laravel using the `Hash::make()` [method](https://laravel.com/docs/5.7/hashing#basic-usage).
 
 Enabling this option would also allow users to login to their accounts using the password last used when an LDAP connection was present.
 
@@ -413,11 +492,17 @@ Change this if your database column is different than `password` and you have en
 ## Login Fallback
 
 The login fallback option allows you to login as a local database user using the default Eloquent authentication
-driver if LDAP authentication fails. This option would be handy in environments where:
+driver if LDAP authentication fails. This option is handy in environments where:
 
-- You may have some active directory users and other users registering through
+- You may have some directory users and other users registering through
   the website itself (user does not exist in your LDAP directory).
-- Local development where your LDAP server may be unavailable
+- Your LDAP server goes down and may be unavailable
+
+> **Note**: If you would like users to be able to login if your LDAP server is unavailable, you must
+> also enable the above [Password Sync](#sync) option. Otherwise, users will fail authentication
+> because their password has not been synchronized, and therefore will be incorrect.
+>
+> Users must have logged in once prior to your LDAP server going down, as their account will not yet exist in the database.
 
 To enable it, simply set the option to true in your `config/ldap_auth.php` configuration file:
 
@@ -433,9 +518,7 @@ value is the active directory users attribute:
 
 ```php
 'sync_attributes' => [
-
     'email' => 'userprincipalname',
-
     'name' => 'cn',
 ],
 ```
@@ -496,7 +579,7 @@ class LdapAttributeHandler
 
 ## Logging
 
-The `logging` array contains a list of the events to be logged when certain [events](events.md) occur using Adldap2-Laravel.
+The `logging` array contains a list of the events to be logged when certain [events](auth/events.md) occur using Adldap2-Laravel.
 
 Each element in the array consists of the key (the occurring event) and the value (the listener that performs the logging of said event).
 

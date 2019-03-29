@@ -4,7 +4,7 @@
 
 Adldap2 is a PHP LDAP package that allows you to:
 
-1. Easily Manage multiple LDAP connections at once
+1. Easily manage multiple LDAP connections at once
 2. Perform authentication
 3. Search your LDAP directory with a fluent and easy to use query builder
 4. Create / Update / Delete LDAP entities with ease
@@ -31,7 +31,6 @@ Adldap2 allows you to easily manage the above problems without reinventing the w
 ## Implementations
 
 - [Laravel](https://github.com/Adldap2/Adldap2-Laravel)
-- [Kohana](https://github.com/Adldap2/Adldap2-Kohana)
 
 ## Quick Start
 

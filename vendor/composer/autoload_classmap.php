@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'AddAdministrativeToTrainingTable' => $baseDir . '/database/migrations/2016_11_23_084814_add_administrative_to_training_table.php',
+    'AddObjectguidToUsersTable' => $baseDir . '/database/migrations/2019_03_29_085522_add_objectguid_to_users_table.php',
     'AddStopRenewalToTrainingUserTable' => $baseDir . '/database/migrations/2016_12_20_133047_add_stop_renewal_to_training_user_table.php',
     'AddTrainingTypeToTrainingsTable' => $baseDir . '/database/migrations/2016_12_20_134929_add_training_type_to_trainings_table.php',
     'CreateActivityLogTable' => $baseDir . '/database/migrations/2016_12_02_123356_create_activity_log_table.php',
