@@ -90,6 +90,53 @@ php artisan adldap:import jdoe@email.com
 Found user 'John Doe'.
 ```
 
+## Import Scope
+
+> **Note**: This feature was added in v6.0.2.
+
+To customize the query that locates the LDAP users local database model, you may
+use the `useScope` method on the `Import` command in your `AppServiceProvider`:
+
+```php
+use App\Scopes\LdapUserImportScope;
+use Adldap\Laravel\Commands\Import;
+
+public function boot()
+{
+    Import::useScope(LdapUserImportScope::class);
+}
+```
+
+The custom scope:
+
+> **Note**: It's recommended that your custom scope extend the default `UserImportScope`.
+> Otherwise, it must implement the `Illuminate\Database\Eloquent\Scope` interface.
+
+```php
+namespace App\Scopes;
+
+use Adldap\Laravel\Facades\Resolver;
+use Adldap\Laravel\Commands\UserImportScope as BaseScope;
+
+class LdapUserImportScope extends BaseScope
+{
+    /**
+     * Apply the scope to a given Eloquent query builder.
+     *
+     * @param Builder $query
+     * @param Model   $model
+     *
+     * @return void
+     */
+    public function apply(Builder $query, Model $model)
+    {
+        $query
+            ->where(Resolver::getDatabaseIdColumn(), '=', $this->getGuid())
+            ->orWhere(Resolver::getDatabaseUsernameColumn(), '=', $this->getUsername());
+    }
+}
+```
+
 ## Command Options
 
 ### Filter
@@ -182,6 +229,6 @@ $schedule->command('adldap:import', ['--no-interaction', '--filter' => $filter])
   - `[2016-06-29 14:51:51] local.INFO: Imported user johndoe`
  - Unsuccessful imported users are also reported in your log files, with the message of the exception:
   - `[2016-06-29 14:51:51] local.ERROR: Unable to import user janedoe. SQLSTATE[23000]: Integrity constraint violation: 1048`
-  - Specifying a username uses ambiguous naming resolution, so you're able to specify attributes other than their username, such as their email (`php artisan adldap:import jdoe@mail.com`).
-  - If you have a password mutator (setter) on your User model, it will not override it. This way, you can hash the random 16 characters any way you please.
+ - Specifying a username uses ambiguous naming resolution, so you're able to specify attributes other than their username, such as their email (`php artisan adldap:import jdoe@mail.com`).
+ - If you have a password mutator (setter) on your User model, it will not override it. This way, you can hash the random 16 characters any way you please.
 

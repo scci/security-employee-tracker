@@ -2,6 +2,7 @@
 
 namespace Adldap\Laravel\Commands;
 
+use UnexpectedValueException;
 use Adldap\Models\User;
 use Adldap\Laravel\Facades\Resolver;
 use Adldap\Laravel\Events\Importing;
@@ -13,6 +14,13 @@ use Illuminate\Database\Eloquent\Model;
 
 class Import
 {
+    /**
+     * The scope to utilize for locating the LDAP user to synchronize.
+     *
+     * @var string
+     */
+    public static $scope = UserImportScope::class;
+
     /**
      * The LDAP user that is being imported.
      *
@@ -26,6 +34,16 @@ class Import
      * @var Model
      */
     protected $model;
+
+    /**
+     * Sets the scope to use for locating LDAP users.
+     *
+     * @param $scope
+     */
+    public static function useScope($scope)
+    {
+        static::$scope = $scope;
+    }
 
     /**
      * Constructor.
@@ -65,9 +83,11 @@ class Import
     }
 
     /**
-     * Retrieves an eloquent user by their credentials.
+     * Retrieves an eloquent user by their GUID or their username.
      *
      * @return Model|null
+     *
+     * @throws UnexpectedValueException
      */
     protected function findUser()
     {
@@ -80,17 +100,15 @@ class Import
             $query->withTrashed();
         }
 
-        // We'll try to locate the user by their object guid,
-        // otherwise we'll locate them by their username.
-        return $query->where(
-            Resolver::getDatabaseIdColumn(),
-            '=',
-            $this->user->getConvertedGuid()
-        )->orWhere(
-            Resolver::getDatabaseUsernameColumn(),
-            '=',
-            $this->user->getFirstAttribute(Resolver::getLdapDiscoveryAttribute())
-        )->first();
+        /** @var \Illuminate\Database\Eloquent\Scope $scope */
+        $scope = new static::$scope(
+            $this->getUserObjectGuid(),
+            $this->getUserUsername()
+        );
+
+        $scope->apply($query, $this->model);
+
+        return $query->first();
     }
 
     /**
@@ -104,7 +122,7 @@ class Import
     {
         // Set the users LDAP identifier.
         $model->setAttribute(
-            Resolver::getDatabaseIdColumn(), $this->user->getConvertedGuid()
+            Resolver::getDatabaseIdColumn(), $this->getUserObjectGuid()
         );
 
         foreach ($this->getLdapSyncAttributes() as $modelField => $ldapField) {
@@ -125,6 +143,50 @@ class Import
                 $model->{$modelField} = is_string($ldapField) ? $this->user->getFirstAttribute($ldapField) : $ldapField;
             }
         }
+    }
+
+    /**
+     * Returns the LDAP users configured username.
+     *
+     * @return string
+     *
+     * @throws UnexpectedValueException
+     */
+    protected function getUserUsername()
+    {
+        $attribute = Resolver::getLdapDiscoveryAttribute();
+
+        $username = $this->user->getFirstAttribute($attribute);
+
+        if (trim($username) == false) {
+            throw new UnexpectedValueException(
+                "Unable to locate a user without a {$attribute}"
+            );
+        }
+
+        return $username;
+    }
+
+    /**
+     * Returns the LDAP users object GUID.
+     *
+     * @return string
+     *
+     * @throws UnexpectedValueException
+     */
+    protected function getUserObjectGuid()
+    {
+        $guid = $this->user->getConvertedGuid();
+
+        if (trim($guid) == false) {
+            $attribute = $this->user->getSchema()->objectGuid();
+
+            throw new UnexpectedValueException(
+                "Unable to locate a user without a {$attribute}"
+            );
+        }
+
+        return $guid;
     }
 
     /**

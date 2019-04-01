@@ -40,6 +40,58 @@ class DatabaseImporterTest extends DatabaseTestCase
 
         $m2 = (new Import($secondUser, new TestUser()))->handle();
 
-        $this->assertEquals($m1->id, $m2->id);
+        $this->assertTrue($m1->is($m2));
+    }
+
+    /**
+     * @test
+     * @expectedException \UnexpectedValueException
+     */
+    public function exception_is_thrown_when_guid_is_null()
+    {
+        $u = $this->makeLdapUser([
+            'objectguid' => null
+        ]);
+
+        (new Import($u, new TestUser()))->handle();
+    }
+
+    /**
+     * @test
+     * @expectedException \UnexpectedValueException
+     */
+    public function exception_is_thrown_when_guid_is_empty()
+    {
+        $u = $this->makeLdapUser([
+            'objectguid' => ' '
+        ]);
+
+        (new Import($u, new TestUser()))->handle();
+    }
+
+    /**
+     * @test
+     * @expectedException \UnexpectedValueException
+     */
+    public function exception_is_thrown_when_username_is_null()
+    {
+        $u = $this->makeLdapUser([
+            'userprincipalname' => null,
+        ]);
+
+        (new Import($u, new TestUser()))->handle();
+    }
+
+    /**
+     * @test
+     * @expectedException \UnexpectedValueException
+     */
+    public function exception_is_thrown_when_username_is_empty()
+    {
+        $u = $this->makeLdapUser([
+            'userprincipalname' => ' ',
+        ]);
+
+        (new Import($u, new TestUser()))->handle();
     }
 }

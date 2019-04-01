@@ -25,19 +25,21 @@ class AdldapAuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $config = __DIR__.'/Config/auth.php';
-
-        $this->publishes([
-            $config => config_path('ldap_auth.php'),
-        ]);
-
         // Register the lDAP auth provider.
         Auth::provider('ldap', function ($app, array $config) {
             return $this->makeUserProvider($app['hash'], $config);
         });
 
-        // Register the import command.
-        $this->commands(Import::class);
+        if ($this->app->runningInConsole()) {
+            $config = __DIR__ . '/Config/auth.php';
+
+            $this->publishes([
+                $config => config_path('ldap_auth.php'),
+            ]);
+
+            // Register the import command.
+            $this->commands(Import::class);
+        }
     }
 
     /**
@@ -90,7 +92,7 @@ class AdldapAuthServiceProvider extends ServiceProvider
             // otherwise we will try to use the providers config array.
             $model = Config::get('ldap_auth.model') ?? array_get($config, 'model');
 
-            if (!$model) {
+            if (! $model) {
                 throw new RuntimeException(
                     "No model is configured. You must configure a model to use with the {$provider}."
                 );
