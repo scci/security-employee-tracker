@@ -66,7 +66,7 @@ class ActionItemsComposer
     private function getEligibilityRenewal()
     {
         $builtUser = new Collection();
-        $users = User::where('elig_date', '<=', Carbon::now())->active()->get();
+        $users = User::where('inv_close', '<=', Carbon::now())->active()->get();
 
         foreach ($users as $user) {
             $calculatedDays = $this->calculateDaysToRenewClearance($user);
@@ -87,15 +87,15 @@ class ActionItemsComposer
         $years = 100;
 
         if ($user->access_level == 'TS') {
-            $years = 5;
+            $years = 6;
         } elseif ($user->access_level == 'S' || $user->clearance == 'S') {
             $years = 10;
         } elseif ($user->clearance = 'TS') {
-            $years = 5;
+            $years = 6;
         }
 
         $calculatedDays = Carbon::now()->diffInDays(
-            Carbon::createFromFormat('Y-m-d', $user->elig_date)->addYears($years), false);
+            Carbon::createFromFormat('Y-m-d', $user->inv_close)->addYears($years), false);
 
         return $calculatedDays;
     }
