@@ -86,11 +86,11 @@ class ActionItemsComposer
     {
         $years = 100;
 
-        if ($user->access_level == 'TS') {
+        if ($user->access_level == 'TS' || $user->access_level == 'Int TS') {
             $years = 6;
         } elseif ($user->access_level == 'S' || $user->clearance == 'S') {
             $years = 10;
-        } elseif ($user->clearance = 'TS') {
+        } elseif ($user->clearance = 'TS' || $user->clearance = 'Int TS') {
             $years = 6;
         }
 

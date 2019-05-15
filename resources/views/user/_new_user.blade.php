@@ -57,7 +57,7 @@
     </div>
     <div class="col s12 m6 l4">
         <div class="input-field" id="clearance_field">
-            {!! Form::select('clearance', [null => 'None', 'Int S' => 'Interim Secret', 'S' => 'Secret', 'SCI' => 'SCI', 'TS' => 'Top Secret'], null, ['class' => 'validate']) !!}
+            {!! Form::select('clearance', [null => 'None', 'Int S' => 'Interim Secret', 'S' => 'Secret', 'SCI' => 'SCI', 'Int TS' => 'Interim Top Secret', 'TS' => 'Top Secret'], null, ['class' => 'validate']) !!}
             {!! Form::label('clearance', 'JPAS Clearance:') !!}
         </div>
     </div>

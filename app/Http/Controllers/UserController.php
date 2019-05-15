@@ -347,6 +347,9 @@ class UserController extends Controller
             case 'Int S':
                 $clearance = 'Interim Secret';
                 break;
+            case 'Int TS':
+                $clearance = 'Interim Top Secret';
+                break;
         }
 
         return $clearance;
