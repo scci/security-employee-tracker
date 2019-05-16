@@ -28,7 +28,7 @@ class TrainingControllerTest extends TestCase
         $this->action('GET', 'TrainingController@index');
 
         $this->call('GET', 'training');
-        $this->seeStatusCode(200); 
+        $this->seeStatusCode(200);
 
         // Logged in as a regular user - Cannot access the training page
         $newuser = factory(User::class)->create();
@@ -219,7 +219,7 @@ class TrainingControllerTest extends TestCase
         $this->seePageIs('/training/'.$createdTrainingId);
         $this->assertViewHas('notes');
         $this->assertViewHas('training');
-        $this->assertViewHas('showAll');        
+        $this->assertViewHas('showAll');
 
         //  Verify page components
         $this->see('Auto Renew'); // Block title
@@ -230,7 +230,6 @@ class TrainingControllerTest extends TestCase
         $this->see('Bulk Update Training');
         // When there are no training types (views\layouts\_new_training.blade.php)
         $this->dontSee('Training Type'); // Block title
-
 
         // MIMIC call when there are training types
         // Create trainingtype object
@@ -449,66 +448,64 @@ class TrainingControllerTest extends TestCase
     {
         $training = factory(Training::class)->create();
         $createdTrainingId = $training->id;
-        
+
         // Create multiple training users for the same training with completed_date null.
         $trainingUsers = factory(TrainingUser::class, 5)->create(
                             ['training_id'    => $createdTrainingId,
-                             'completed_date' => null]);
-        
+                             'completed_date' => null, ]);
+
         Storage::fake('local');
-        $data = ['users' => 
-                    array (
+        $data = ['users' => [
                       0 => $trainingUsers[0]->user_id,
                       1 => $trainingUsers[2]->user_id,
                       2 => $trainingUsers[3]->user_id,
-                    ),
+                    ],
                  'training_id'      => $createdTrainingId,
                  'completed_date'   => '2016-12-29',
                  'comment'          => 'Completed training offered by company',
                  'encrypt'          => '1',
                  'admin_only'       => '1',
-                 'files'            => 
-                    array (
+                 'files'            => [
                       0 => UploadedFile::fake()->create('document.pdf', 26112),
-                    ),
+                    ],
                 ];
-        $this->call('POST', "/training/$createdTrainingId/bulkupdate/", $data);       
+        $this->call('POST', "/training/$createdTrainingId/bulkupdate/", $data);
         $this->seeStatusCode(302); // Redirection status code
         $this->assertRedirectedTo("/training/$createdTrainingId");
-        
+
         // Tried to test notification message. But none of the following worked.
-        //It may be easier to test notifications if we moved to using 
+        //It may be easier to test notifications if we moved to using
         //https://laravel.com/docs/5.6/notifications instead of Krucas\Notification\Facades\Notification
         /*$this->see("Training was updated for the users.");
         $notifications= \Krucas\Notification\Facades\Notification::container()->all();
         $notifications = \Krucas\Notification\Facades\Notification($this->getSessionStore(), 'notifications');
         $notifications= \Krucas\Notification\Facades\Notification::container()->get('success')->first();
         Log::Info($notifications);*/
-        
-        // Retrieve the training user just updated             
+
+        // Retrieve the training user just updated
         $updatedTrainingUser = SET\TrainingUser::where('training_id', $createdTrainingId)->get();
         $this->assertEquals($updatedTrainingUser[0]->completed_date, $data['completed_date']);
         $this->assertEquals($updatedTrainingUser[0]->comment, $data['comment']);
-        
+
         $this->assertEquals($updatedTrainingUser[2]->completed_date, $data['completed_date']);
         $this->assertEquals($updatedTrainingUser[2]->comment, $data['comment']);
-        
+
         $this->assertEquals($updatedTrainingUser[3]->completed_date, $data['completed_date']);
         $this->assertEquals($updatedTrainingUser[3]->comment, $data['comment']);
-        
+
         $this->assertEquals($updatedTrainingUser[1]->completed_date, null);
         $this->assertEquals($updatedTrainingUser[4]->completed_date, null);
         $this->assertNotEquals($updatedTrainingUser[1]->completed_date, $data['completed_date']);
         $this->assertNotEquals($updatedTrainingUser[1]->comment, $data['comment']);
         $this->assertNotEquals($updatedTrainingUser[4]->completed_date, $data['completed_date']);
         $this->assertNotEquals($updatedTrainingUser[4]->comment, $data['comment']);
-        
-        // Retrieve the uploaded file for the created training             
+
+        // Retrieve the uploaded file for the created training
         // Assert the file was stored...
         $fileURL = Storage::url('local');
-        $this->assertEquals($fileURL."/".$data['files'][0]->name, "/storage/local/document.pdf");        
+        $this->assertEquals($fileURL.'/'.$data['files'][0]->name, '/storage/local/document.pdf');
     }
-    
+
     /**
      * @test
      */
@@ -516,17 +513,17 @@ class TrainingControllerTest extends TestCase
     {
         $training = factory(Training::class)->create();
         $createdTrainingId = $training->id;
-        
+
         // Error when no users are specified
-        $data1 = ['training_id'     => $createdTrainingId,                 
-                 'comment'          => 'Completed training offered by company',                 
+        $data1 = ['training_id'     => $createdTrainingId,
+                 'comment'          => 'Completed training offered by company',
                 ];
-        
+
         $this->call('POST', "/training/$createdTrainingId/bulkupdate/", $data1);
         $this->assertSessionHasErrors('users', 'The users field is required');
         $this->assertSessionHasErrors('completed_date', 'The completed_date field is required');
     }
-    
+
     /**
      * @test
      */
@@ -536,7 +533,7 @@ class TrainingControllerTest extends TestCase
         $trainingUserId = $trainingUser->id;
 
         $response = $this->call('GET', "training/reminder/$trainingUserId");
-        $this->expectsEvents(SET\Events\TrainingAssigned::class);        
+        $this->expectsEvents(SET\Events\TrainingAssigned::class);
         $this->assertFalse($response->isOk()); // Just check that you don't get a 200 OK response.
         $this->seeStatusCode(302); // Redirection status code
         $this->assertRedirectedTo('/'); // Only check that you're redirecting to a specific URI

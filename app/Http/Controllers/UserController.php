@@ -15,7 +15,6 @@ use SET\Handlers\Excel\JpasImport;
 use SET\Http\Requests\StoreUserRequest;
 use SET\Training;
 use SET\User;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class UserController.
@@ -24,13 +23,12 @@ class UserController extends Controller
 {
     /**
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
-     */    
+     */
     public function index($userStatus = null)
     {
         $this->authorize('view');
 
-        if ($userStatus)
-        {
+        if ($userStatus) {
             $users = User::with([
                 'assignedTrainings' => function ($q) {
                     $q->whereNull('completed_date')
@@ -40,7 +38,7 @@ class UserController extends Controller
             ])
                 ->skipSystem()
                 ->where('status', $userStatus)
-                ->orderBy('last_name')->get();   
+                ->orderBy('last_name')->get();
         } else {
             $users = User::with([
                 'assignedTrainings' => function ($q) {
@@ -144,7 +142,7 @@ class UserController extends Controller
         $this->authorize('edit');
 
         $data = Input::all();
-        
+
         //$data['destroyed_date'] = $user->getDestroyDate($data['status']);
 
         $user->update($data);
@@ -198,10 +196,10 @@ class UserController extends Controller
             $scheduledTrainings = $user->assignedTrainings()->with('author', 'training.attachments', 'attachments')
                                 ->whereNull('completed_date');
         }
-        
+
         // Now fetch the recently completed training records for the specified  user
         $recentCompletedTrainings = DB::table('training_user as t1')
-                                    ->where('id', function($query) use ($user) {
+                                    ->where('id', function ($query) use ($user) {
                                         $query->from('training_user as t2')
                                               ->selectRaw('t2.id')
                                               ->where('t2.user_id', '=', $user->id)

@@ -132,7 +132,7 @@ class NoteControllerTest extends TestCase
         $data = ['title'    => 'Test Note',
                  'comment'  => 'Description For Note',
                  'private'  => '1', ]; //,
-                 //'alert'   => 0, ];
+        //'alert'   => 0, ];
 
         $this->call('PATCH', "/user/$userId/note/$createdNoteId", $data);
 

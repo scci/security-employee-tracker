@@ -17,7 +17,7 @@ class Attachment extends Model
         return $this->morphTo();
     }
 
-    public static function upload($model, $files, $encrypted = false, $admin_only=false)
+    public static function upload($model, $files, $encrypted = false, $admin_only = false)
     {
         $modelName = strtolower(class_basename($model)).'_';
 
