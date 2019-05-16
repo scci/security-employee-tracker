@@ -2,8 +2,8 @@
 
 namespace SET\Http\Controllers;
 
-use SET\Http\Requests\DutySwapRequest;
 use SET\Handlers\Duty\DutyList;
+use SET\Http\Requests\DutySwapRequest;
 
 class DutySwapController extends Controller
 {

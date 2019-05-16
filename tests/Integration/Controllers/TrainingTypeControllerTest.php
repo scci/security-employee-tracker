@@ -331,14 +331,14 @@ class TrainingTypeControllerTest extends TestCase
         $this->assertEquals($createdTrainingType->sidebar, $data['sidebar']);
     }
 
-/**
- * @test
- */
-public function it_updates_the_trainingtype_if_edit_role()
-{
-    // Create a trainingtype object
+    /**
+     * @test
+     */
+    public function it_updates_the_trainingtype_if_edit_role()
+    {
+        // Create a trainingtype object
         $trainingTypeToCreate = factory(TrainingType::class)->create();
-    $createdTrainingTypeId = $trainingTypeToCreate->id;
+        $createdTrainingTypeId = $trainingTypeToCreate->id;
 
         // Logged in as admin - Can update the training
         $data = ['name'        => 'Sample Training Type',
@@ -347,26 +347,26 @@ public function it_updates_the_trainingtype_if_edit_role()
                  'description' => 'Sample Trainging Type Descripiton', ];
         // Logged in as a regular user - Cannot update the training
         $newuser = factory(User::class)->create();
-    $this->actingAs($newuser);
-    $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
-    $this->seeStatusCode(403); // Forbidden status code
+        $this->actingAs($newuser);
+        $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
+        $this->seeStatusCode(403); // Forbidden status code
 
         // Logged in as a user with role view - Cannot update the training
         $newuser = factory(User::class)->create(['role' => 'view']);
-    $this->actingAs($newuser);
-    $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
-    $this->seeStatusCode(403); // Forbidden status code
+        $this->actingAs($newuser);
+        $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
+        $this->seeStatusCode(403); // Forbidden status code
 
         // Logged in as a user with edit view - Can update the training
         $newuser = factory(User::class)->create(['role' => 'edit']);
-    $this->actingAs($newuser);
-    $response = $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
+        $this->actingAs($newuser);
+        $response = $this->call('PATCH', "trainingtype/$createdTrainingTypeId", $data);
 
-    $this->assertTrue($response->isRedirection()); // Make sure you've been redirected.
+        $this->assertTrue($response->isRedirection()); // Make sure you've been redirected.
         $this->assertFalse($response->isOk()); // Just check that you don't get a 200 OK response.
         $this->seeStatusCode(302); // Redirection status code
         $this->assertRedirectedTo('trainingtype/'.$createdTrainingTypeId); // Only check that you're redirecting to a specific URI
-}
+    }
 
     /**
      * @test

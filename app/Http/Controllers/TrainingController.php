@@ -186,22 +186,23 @@ class TrainingController extends Controller
     }
 
     /**
-     * Provide the form data to the bulk update a training form. 
-     * 
+     * Provide the form data to the bulk update a training form.
+     *
      * @param $trainingID
      *
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function updateForm($trainingID)
-    {        
+    {
         $this->authorize('edit');
-        $training = Training::findOrFail($trainingID);        
+        $training = Training::findOrFail($trainingID);
         $users = User::skipSystem()->active()->orderBy('last_name')->get()->pluck('UserFullName', 'id')->toArray();
-        
+
         $incompleteUsers = $training->users()->whereNull('training_user.completed_date')->get()->pluck('UserFullName', 'id')->toArray();
+
         return view('training.bulk_update', compact('users', 'training', 'incompleteUsers'));
     }
-    
+
     /**
      * Bulk update a training. Useful when FSO provides a training and needs to update
      * the training for all assigned users with the same completed date and attach the sign-in sheet.
@@ -214,11 +215,11 @@ class TrainingController extends Controller
     public function bulkupdate(BulkUpdateTrainingRequest $request, $trainingID)
     {
         $this->authorize('edit');
-        
-        $data = $request->all();        
+
+        $data = $request->all();
         $data['training_id'] = $trainingID;
         $data['author_id'] = Auth::user()->id;
-                
+
         if (array_key_exists('users', $data)) {
             $users = $data['users'];
 
@@ -230,18 +231,17 @@ class TrainingController extends Controller
                 // to extract out of the array.
                 $trainingUser = TrainingUser::whereTraining_id($trainingID)
                         ->where('user_id', $user)->whereNull('completed_date')->get()->first();
-                $trainingUser->update($data);           
+                $trainingUser->update($data);
             }
         }
-        
+
         $training = Training::findOrFail($trainingID);
         if ($request->hasFile('files')) {
-                        
             $encrypt = false;
             if (array_key_exists('encrypt', $data)) {
                 $encrypt = $data['encrypt'];
             }
-            
+
             $admin_only = false;
             if (array_key_exists('admin_only', $data)) {
                 $admin_only = $data['admin_only'];
@@ -253,7 +253,7 @@ class TrainingController extends Controller
 
         return redirect()->action('TrainingController@show', $trainingID);
     }
-    
+
     /**
      * Generate Excel file with user/training table with date of completion.
      *

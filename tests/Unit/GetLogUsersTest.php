@@ -64,7 +64,7 @@ class GetLogUsersTest extends TestCase
     public function test_first_log_entry_is_created()
     {
         usleep(1000000); // delay to allow update_at to differ
-      $user1 = User::where('username', 'ssample')->first();
+        $user1 = User::where('username', 'ssample')->first();
         $user1->inv = 'XYZ';
         $user1->save();
 
@@ -73,7 +73,7 @@ class GetLogUsersTest extends TestCase
         $obj = new SET\User();
         $changes = $obj->getUserLog($user1)->last();  // Sample first record
 
-      $this->assertStringStartsWith("created user 'Sample", $changes['comment']);
+        $this->assertStringStartsWith("created user 'Sample", $changes['comment']);
     }
 
     /**
@@ -84,7 +84,7 @@ class GetLogUsersTest extends TestCase
     public function test_last_log_entry_is_updated()
     {
         usleep(1000000); // delay to allow update_at to differ
-      $user1 = User::where('username', 'ssample')->first();
+        $user1 = User::where('username', 'ssample')->first();
         $user1->inv = 'XYZ';
         $user1->save();
 
@@ -93,8 +93,8 @@ class GetLogUsersTest extends TestCase
         $obj = new SET\User();
         $changes = $obj->getUserLog($user1)->first(); // Sample last entry for user
 
-      // Test against ssample investigation changes
-      $this->assertStringStartsWith('Sample, Susan', $changes['user_fullname']);
+        // Test against ssample investigation changes
+        $this->assertStringStartsWith('Sample, Susan', $changes['user_fullname']);
         $this->assertStringStartsWith("Inv updated from 'ABCD' to 'XYZ'.", $changes['comment']);
     }
 
@@ -106,15 +106,15 @@ class GetLogUsersTest extends TestCase
     public function test_method_without_passing_parameter()
     {
         usleep(1000000); // delay to allow update_at to differ
-      $user2 = User::where('username', 'ayahoo')->first();
+        $user2 = User::where('username', 'ayahoo')->first();
         $user2->access_level = 'Unclass';
         $user2->save();
 
         $obj = new SET\User();
         $changes = $obj->getUserLog()->first(); // Sample last entry
 
-      // Test against most recent eexample access level changes
-      $this->assertStringStartsWith('Yahoo, Apple', $changes['user_fullname']);
+        // Test against most recent eexample access level changes
+        $this->assertStringStartsWith('Yahoo, Apple', $changes['user_fullname']);
         $this->assertStringStartsWith("Access_level updated from 'S' to 'Unclass'.",
           $changes['comment']);
     }
@@ -127,13 +127,13 @@ class GetLogUsersTest extends TestCase
     public function test_deleted_action()
     {
         usleep(1000000); // delay to allow update_at to differ
-      User::where('username', 'ayahoo')->first()->delete();
+        User::where('username', 'ayahoo')->first()->delete();
 
         $obj = new SET\User();
         $changes = $obj->getUserLog()->first(); // Sample last entry
 
-      // Test against user ayahoo deletion
-      $this->assertStringStartsWith('Yahoo, Apple', $changes['user_fullname']);
+        // Test against user ayahoo deletion
+        $this->assertStringStartsWith('Yahoo, Apple', $changes['user_fullname']);
         $this->assertStringStartsWith("deleted user 'Yahoo, Apple'.", $changes['comment']);
     }
 
@@ -155,23 +155,23 @@ class GetLogUsersTest extends TestCase
         $user2 = User::where('username', 'ayahoo')->first();
         $obj = new SET\User();
 
-      // Test user logs are equal
-      $this->assertEquals(count($obj->getUserLog($user1)), 2);
+        // Test user logs are equal
+        $this->assertEquals(count($obj->getUserLog($user1)), 2);
         $this->assertEquals(count($obj->getUserLog($user2)), 2);
         $this->assertEquals(count($obj->getUserLog($user1)), count($obj->getUserLog($user2)));
 
-      // Test two changes are logged
-      $user1 = User::where('username', 'ssample')->first();
+        // Test two changes are logged
+        $user1 = User::where('username', 'ssample')->first();
         $user1->access_level = 'Conditional';
         $user1->save();
         $user1->nickname = 'Nicky';
         $user1->save();
 
-      // Test user logs are unequal
-      $this->assertEquals(count($obj->getUserLog($user1)), 4);
+        // Test user logs are unequal
+        $this->assertEquals(count($obj->getUserLog($user1)), 4);
         $this->assertGreaterThan(count($obj->getUserLog($user2)), count($obj->getUserLog($user1)));
 
-      // Test that all logs are greater than single user log
-      $this->assertGreaterThan(count($obj->getUserLog($user1)), count($obj->getUserLog()));
+        // Test that all logs are greater than single user log
+        $this->assertGreaterThan(count($obj->getUserLog($user1)), count($obj->getUserLog()));
     }
 }
