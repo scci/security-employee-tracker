@@ -25,6 +25,7 @@ class DutyHelper
     {
         $this->queryList()
             ->getLastWorked()
+            ->sortList()
             ->insertFromDutySwap()
             ->combineListWithDates();
     }
