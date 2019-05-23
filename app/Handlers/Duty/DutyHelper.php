@@ -48,7 +48,7 @@ class DutyHelper
                 $this->list->push($this->list->shift());
             }
         }
-        
+
         return $this;
     }
 

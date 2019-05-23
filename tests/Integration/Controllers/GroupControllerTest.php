@@ -293,7 +293,7 @@ class GroupControllerTest extends TestCase
         $groupController->assignTraining($group, $users);
         $this->assertEmpty($training->users()->get());
 
-         // Users attached to group
+        // Users attached to group
         $users = factory(User::class, 3)->create();
         $group->users()->attach($users);
 

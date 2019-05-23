@@ -69,6 +69,7 @@ class DutyController extends Controller
             : $duty->users()->sync($data['users']);
 
         (new DutyList($duty))->setLastWorkedDate();
+
         return redirect()->action('DutyController@index');
     }
 

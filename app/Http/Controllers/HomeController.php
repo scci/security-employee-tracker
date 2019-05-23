@@ -3,14 +3,14 @@
 namespace SET\Http\Controllers;
 
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Request;
 use SET\Duty;
-use Illuminate\Database\Eloquent\Collection;
-use SET\Handlers\Duty\DutyUsers;
-use SET\Handlers\Duty\DutyGroups;
 use SET\Handlers\Calendar\Calendar;
+use SET\Handlers\Duty\DutyGroups;
+use SET\Handlers\Duty\DutyUsers;
 use SET\Training;
 use SET\TrainingUser;
 use SET\User;
@@ -41,7 +41,7 @@ class HomeController extends Controller
         $calendar = (new Calendar())->getCalendar();
 
         $duties = $this->getDuties();
-        
+
         return view('home.index', compact('trainingUser', 'activityLog', 'calendar', 'duties'));
     }
 
@@ -73,35 +73,38 @@ class HomeController extends Controller
             ],
         ]);
     }
-    
+
     private function getDuties()
     {
         $newCollection = new Collection();
         $allDuties = Duty::all();
-        
-        foreach ($allDuties as $duty) {           
-           if ($duty->has_groups) {
-               $userList = (new DutyGroups($duty))->getList()->first()['group'];
-               $groupUsers = $this->getHtmlUserOutput($userList);
-               $newCollection->push([
+
+        foreach ($allDuties as $duty) {
+            if ($duty->has_groups) {
+                $userList = (new DutyGroups($duty))->getList()->first()['group'];
+                $groupUsers = $this->getHtmlUserOutput($userList);
+                $newCollection->push([
                     'duty'  => $duty->name,
-                    'user'=> implode('; ', $groupUsers)                    
+                    'user'  => implode('; ', $groupUsers),
                ]);
-           } else {
+            } else {
                 $user = (new DutyUsers($duty))->getList()->first()['user'];
                 $newCollection->push([
                     'duty'  => $duty->name,
-                    'user'  => "<a href='".url('user', $user->id)."'>".$user->userFullName.'</a>'   
-                ]);                
-           }           
+                    'user'  => "<a href='".url('user', $user->id)."'>".$user->userFullName.'</a>',
+                ]);
+            }
         }
+
         return $newCollection;
     }
-    
-    private function getHtmlUserOutput($userList) {
+
+    private function getHtmlUserOutput($userList)
+    {
         foreach ($userList as $user) {
-            $groupUsers[] = "<a href='".url('user', $user->id)."'>".$user->userFullName.'</a>';                   
+            $groupUsers[] = "<a href='".url('user', $user->id)."'>".$user->userFullName.'</a>';
         }
+
         return $groupUsers;
     }
 }

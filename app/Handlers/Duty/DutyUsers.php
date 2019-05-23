@@ -4,8 +4,8 @@ namespace SET\Handlers\Duty;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 use SET\Duty;
 use SET\DutySwap;
 
@@ -38,7 +38,7 @@ class DutyUsers extends DutyHelper
                 'date' => $entry['date'],
             ]);
         }
-        
+
         return $newCollection;
     }
 
@@ -90,7 +90,7 @@ class DutyUsers extends DutyHelper
     public function getLastWorked()
     {
         $this->lastWorkedUser = $this->duty->users()->orderBy('duty_user.last_worked', 'DESC')->orderBy('last_name')->first();
-        
+
         return $this;
     }
 
@@ -107,22 +107,21 @@ class DutyUsers extends DutyHelper
         // to the most recent weeks. This means that the last_worked dates for the other users
         // will need to move further down(depending on number of users added). Do not change the
         // last_worked date for the user for the current week.
-        if($newDutyUserID->isNotEmpty())
-        {
+        if ($newDutyUserID->isNotEmpty()) {
             $newDutyUsersCount = $newDutyUserID->count();
 
             DB::table('duty_user')
                 ->whereNotIn('user_id', [$this->lastWorkedUser->id, $newDutyUserID])
-                ->update(['last_worked' => DB::raw('DATE_SUB(last_worked, INTERVAL ' . $newDutyUsersCount.' WEEK)')]);
+                ->update(['last_worked' => DB::raw('DATE_SUB(last_worked, INTERVAL '.$newDutyUsersCount.' WEEK)')]);
 
             $lastWorkedDate = new Carbon($this->lastWorkedUser->pivot->last_worked);
 
             // Assign last_worked dates to the new users instead of null
-            foreach($newDutyUserID as $newUserID)
-            {
+            foreach ($newDutyUserID as $newUserID) {
                 $this->duty->users()->updateExistingPivot($newUserID, ['last_worked' => $lastWorkedDate->subDays($newDutyUsersCount--)]);
             }
         }
+
         return $this;
     }
 
@@ -134,23 +133,23 @@ class DutyUsers extends DutyHelper
     public function queryList()
     {
         $this->list = $this->duty->users()->active()->orderBy('duty_user.last_worked', 'ASC')->get();
-        
+
         return $this;
     }
 
-     /**
+    /**
      * Take our list of users and merge them with dates so that each user is assigned a duty date.
      *
      * @return DutyUsers
      */
     public function combineListWithDates()
     {
-        $dates = (new DutyDates($this->duty))->getDates();        
-        $newDatesList = array_values(array_diff($dates, $this->swapDates->toArray())); 
-        
+        $dates = (new DutyDates($this->duty))->getDates();
+        $newDatesList = array_values(array_diff($dates, $this->swapDates->toArray()));
+
         $count = $this->list->count();
         $dateCounter = 0;
-	
+
         for ($i = 0; $i < $count; $i++) {
             // Does list[i] already have date assigned? Is yes, skip assignment
             if (!empty($this->list[$i]['date'])) {
@@ -158,14 +157,15 @@ class DutyUsers extends DutyHelper
             } else {
                 $this->list[$i] = [
                     'date' => $newDatesList[$dateCounter++],
-                    'user' => $this->list[$i]['user']
-                ];             
+                    'user' => $this->list[$i]['user'],
+                ];
             }
         }
         $this->list = $this->list->sortBy('date');
+
         return $this;
     }
-    
+
     /**
      * Query a list of users who we swapped around and insert them into our current duty list of users.
      */
@@ -178,23 +178,24 @@ class DutyUsers extends DutyHelper
             ->get();
 
         $this->convertListToCollection();
-           
+
         $this->swapDates = new Collection();
         foreach ($dutySwaps as $swap) {
             $key = key($this->list->pluck('user')->where('id', $swap->imageable_id)->toArray());
-            if (! is_null($key)) {
+            if (!is_null($key)) {
                 $this->swapDates->push($swap->date);
                 $this->list[$key] = [
                         'date' => $swap->date,
-                        'user' => $swap->imageable()->first(),                        
+                        'user' => $swap->imageable()->first(),
                 ];
             }
         }
+
         return $this;
     }
-    
+
     /**
-     * Convert the list of users into a collection of date and users
+     * Convert the list of users into a collection of date and users.
      */
     private function convertListToCollection()
     {
