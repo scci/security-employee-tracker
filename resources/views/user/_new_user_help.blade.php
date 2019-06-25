@@ -7,8 +7,11 @@
 
 <ul class="browser-default">
     <li>Secret has a renewal of every 10 years.</li>
-    <li>Top Secret has a renewal of every 5 years.</li>
+    <li>Top Secret has a renewal of every 6 years.</li>
 </ul>
+
+<p>If Continuous Evaluation is set to Yes, a Continuous Evaluation Date field will be displayed and a date must be selected.</p>
+<p>If set, Continuous Evaluation Date will be used in the eligibility renewal value instead of the JPAS Investigation Date value.</p>
 
 <strong>JPAS Data</strong>
 <p>The following data are written when a JPAS import is performed: Clearance, Eligibility Date, Investigation, Investigation Date.</p>
