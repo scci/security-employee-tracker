@@ -76,6 +76,17 @@
         {!! Form::date('inv_close', null, ['class' => 'datepicker']) !!}
     </div>
     <div class="col s12 m6 l4">
+        <div class="input-field" id="cont_eval_field">
+            {!! Form::select('cont_eval', [false => 'No', true => 'Yes'], null, ['class' => 'validate']) !!}
+            {!! Form::label('cont_eval_label', 'Continuous Evaluation:') !!}
+        </div>
+    </div>
+    <div class="col s12 m6 l4" style="display:none" id="cont_eval_date_field">
+        {!! Form::label('cont_eval_date_label', 'Continuous Evaluation Date:') !!}
+        {!! Form::date('cont_eval_date', null, ['class' => 'datepicker']) !!}
+
+    </div>
+    <div class="col s12 m6 l4">
         <div class="input-field" id="groups_field">
             <select name='groups[]' id="_new_user_groups_field" multiple>
                 <option value="" disabled selected>Choose Group(s)</option>

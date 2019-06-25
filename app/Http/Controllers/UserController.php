@@ -6,13 +6,13 @@ use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
 use Krucas\Notification\Facades\Notification;
 use SET\Duty;
 use SET\Group;
 use SET\Handlers\Excel\JpasImport;
 use SET\Http\Requests\StoreUserRequest;
+use SET\Http\Requests\UpdateUserRequest;
 use SET\Training;
 use SET\User;
 
@@ -137,13 +137,16 @@ class UserController extends Controller
         return view('user.edit', compact('user', 'supervisors', 'groups'));
     }
 
-    public function update(User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
         $this->authorize('edit');
-
-        $data = Input::all();
+        $data = $request->all();
 
         //$data['destroyed_date'] = $user->getDestroyDate($data['status']);
+
+        // If continuous evaluation is false, there should be no date associated with it
+        if ($data['cont_eval'] == 0)
+            $data['cont_eval_date'] = null;
 
         $user->update($data);
 

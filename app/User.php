@@ -28,7 +28,7 @@ class User extends Authenticatable
      */
     protected $fillable = ['username', 'emp_num', 'first_name', 'nickname', 'last_name',
         'email', 'phone', 'status', 'clearance', 'elig_date', 'inv', 'inv_close', 'destroyed_date',
-        'supervisor_id', 'access_level', 'password', 'separated_date', ];
+        'supervisor_id', 'access_level', 'password', 'separated_date', 'cont_eval', 'cont_eval_date', ];
     /**
      * @var array
      */
@@ -41,7 +41,7 @@ class User extends Authenticatable
     protected static $logAttributes = ['username', 'emp_num', 'first_name', 'nickname',
          'last_name', 'email', 'phone', 'jpas_name', 'status', 'clearance',
          'elig_date', 'inv', 'inv_close', 'destroyed_date', 'role', 'supervisor_id', 'access_level',
-         'last_logon', 'ip', ];
+         'last_logon', 'ip', 'cont_eval', 'cont_eval_date', ];
 
     /**
      * make destroyed_date a Carbon instance.

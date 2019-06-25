@@ -94,8 +94,12 @@ class ActionItemsComposer
             $years = 6;
         }
 
-        $calculatedDays = Carbon::now()->diffInDays(
-            Carbon::createFromFormat('Y-m-d', $user->inv_close)->addYears($years), false);
+        if ($user->cont_eval)
+            $calculatedDays = Carbon::now()->diffInDays(
+                    Carbon::createFromFormat('Y-m-d', $user->cont_eval_date)->addYears($years), false);
+        else
+            $calculatedDays = Carbon::now()->diffInDays(
+                Carbon::createFromFormat('Y-m-d', $user->inv_close)->addYears($years), false);
 
         return $calculatedDays;
     }

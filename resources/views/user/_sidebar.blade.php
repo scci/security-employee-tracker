@@ -64,6 +64,14 @@
             <strong>Investigation Date:</strong>
             {{ $user->inv_close }}
         </div>
+        <div>
+            <strong>Continuous Evaluation:</strong>
+            {{ $user->cont_eval>0?'Yes':'No'}}
+        </div>
+        <div>
+            <strong>Continuous Eval Date:</strong>
+            {{ $user->cont_eval_date }}
+        </div>
 
         @if($user->groups->count())
             <div class="divider"></div>
