@@ -13,6 +13,7 @@ use SET\Group;
 use SET\Handlers\Excel\JpasImport;
 use SET\Http\Requests\StoreUserRequest;
 use SET\Http\Requests\UpdateUserRequest;
+use SET\Setting;
 use SET\Training;
 use SET\User;
 
@@ -315,8 +316,14 @@ class UserController extends Controller
      */
     private function previousAndNextUsers($user, &$previous, &$next)
     {
-        //Build the previous/next user that are in alphabetical order.
-        $users = User::skipSystem()->orderBy('last_name')->orderBy('first_name')->get();
+        //Build the previous/next user that are in alphabetical order, with respect to admin's preference
+        if(Setting::get('full_name_format') == 'first_last'){
+            $users = User::skipSystem()->orderBy('first_name')->orderBy('last_name')->get();
+        } else{
+            $users = User::skipSystem()->orderBy('last_name')->orderBy('first_name')->get();
+        }
+        
+        
         $previous = null; // set to null by default in case we are at the start of the list.
         while ($users->first()->id != $user->id) {
             $previous = $users->shift()->id;
