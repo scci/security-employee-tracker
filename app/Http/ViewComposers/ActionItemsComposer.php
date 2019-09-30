@@ -85,13 +85,10 @@ class ActionItemsComposer
     private function calculateDaysToRenewClearance($user)
     {
         $years = 100;
-
-        if ($user->access_level == 'TS' || $user->access_level == 'Int TS') {
+        if ($user->clearance == 'TS' || $user->clearance == 'Int TS') {
             $years = 6;
-        } elseif ($user->access_level == 'S' || $user->clearance == 'S') {
+        } elseif ($user->clearance == 'S' || $user->clearance == 'Int S') {
             $years = 10;
-        } elseif ($user->clearance = 'TS' || $user->clearance = 'Int TS') {
-            $years = 6;
         }
 
         if ($user->cont_eval)
