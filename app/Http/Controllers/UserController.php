@@ -29,6 +29,7 @@ class UserController extends Controller
     {
         $this->authorize('view');
 
+        session(['userStatus' => $userStatus]);
         if ($userStatus) {
             $users = User::with([
                 'assignedTrainings' => function ($q) {
@@ -114,7 +115,7 @@ class UserController extends Controller
         if (Gate::allows('view')) {
             $activityLog = $user->getUserLog($user);
         }
-
+        
         $this->previousAndNextUsers($user, $previous, $next);
 
         //This mess is just so that we can output the Security Check list or show none. Mainly just to show none.
@@ -315,12 +316,12 @@ class UserController extends Controller
      * @param $next
      */
     private function previousAndNextUsers($user, &$previous, &$next)
-    {
-        //Build the previous/next user that are in alphabetical order, with respect to admin's preference
+    {  
+          //Build the previous/next user that are in alphabetical order, with respect to admin's preference
         if(Setting::get('full_name_format') == 'first_last'){
-            $users = User::skipSystem()->orderBy('first_name')->orderBy('last_name')->get();
+            $users = User::skipSystem()->userStatus()->orderBy( 'first_name ')->orderBy( 'last_name' )->get();
         } else{
-            $users = User::skipSystem()->orderBy('last_name')->orderBy('first_name')->get();
+            $users = User::skipSystem()->userStatus()->orderBy( 'last_name' )->orderBy( 'first_name' )->get();
         }
         
         
