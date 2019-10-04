@@ -162,6 +162,13 @@ class User extends Authenticatable
         return $query->where('id', '>', 1);
     }
 
+    public function scopeUserStatus($query)
+    {
+        $query->when( session('userStatus'), function( $user ){ 
+            return $user->where( 'status', session('userStatus') );
+         });
+    }
+
     /**
      * Store empty values as null in the DB.
      *
