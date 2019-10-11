@@ -75,7 +75,7 @@
         <p>You may use the pencil/edit icon next to the user status.</p>
 
         <strong>Delete a Record</strong>
-        <p>To delete a record, click on the record so it expands. THen click the delete button.</p>
+        <p>To delete a record, click on the record so it expands. Then click the delete button.</p>
 
         <strong>Previous and Next User</strong>
         <p></p>
@@ -98,4 +98,7 @@
         <li>Separated (yellow): Account has been deactivated. Person is no longer employed. </li>
     </ul>
     </p>
+
+    <strong>Administrative</strong>
+    <p>Training flagged as Administrative (This option is available when creating or modifying a training) display in this section.</p>
 @stop

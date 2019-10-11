@@ -13,3 +13,6 @@
     <li>Due Date - Assign one or more people to complete this training on a specific date. If you select 
         a due date assignment, you MUST set a due date.</li>
 </ul>
+
+<strong>Administrative</strong>
+<p>When checked, training displays in the administrative section of the user's profile. As well, email notifications are not sent to assigned users.</p>
