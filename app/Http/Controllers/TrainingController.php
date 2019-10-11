@@ -198,7 +198,7 @@ class TrainingController extends Controller
         $training = Training::findOrFail($trainingID);
         $users = User::skipSystem()->active()->orderBy('last_name')->get()->pluck('UserFullName', 'id')->toArray();
 
-        $incompleteUsers = $training->users()->whereNull('training_user.completed_date')->get()->pluck('UserFullName', 'id')->toArray();
+        $incompleteUsers = $training->users()->active()->whereNull('training_user.completed_date')->get()->pluck('UserFullName', 'id')->toArray();
 
         return view('training.bulk_update', compact('users', 'training', 'incompleteUsers'));
     }
