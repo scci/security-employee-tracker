@@ -7,11 +7,11 @@
 <div class="row">
     <div class="col s12 m6 l4 input-field">
         {!! Form::label('mail.from.name', 'Send Emails As:') !!}
-        {!! Form::text('mail.from.name', $settings['mail.from.name'] ?? config('mail.from.name')) !!}
+        {!! Form::text('mail.from.name', $settings['mail_from_name'] ?? config('mail.from.name')) !!}
     </div>
     <div class="col s12 m6 l4 input-field">
         {!! Form::label('mail.from.address', 'Send Emails From:') !!}
-        {!! Form::text('mail.from.address', $settings['mail.from.address'] ?? config('mail.from.address')) !!}
+        {!! Form::text('mail.from.address', $settings['mail_from_address'] ?? config('mail.from.address')) !!}
     </div>
 </div>
 <div class="row">
