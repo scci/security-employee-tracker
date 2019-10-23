@@ -51,7 +51,7 @@ class EmailTraining implements ShouldQueue
     private function sendEmail($user, $training, $dueDate, $trainingUser)
     {
         $reportAddress = Setting::get('mail_from_address', 'set@yourcompany.com');
-
+        $reportName = Setting::get('mail_from_name', 'SET-yourcompany');
         Mail::send(
             'emails.training',
             [
@@ -60,8 +60,10 @@ class EmailTraining implements ShouldQueue
                 'due_date'      => $dueDate,
                 'trainingUser'  => $trainingUser,
                 'reportAddress' => $reportAddress,
+                'reportName'    => $reportName,
             ],
-            function ($m) use ($user, $training) {
+            function ($m) use ($user, $training, $reportAddress, $reportName) {
+                $m->from($reportAddress, $reportName);
                 $m->to($user->email, $user->userFullName)->subject($training->name.' was assigned to you.');
 
                 //ATTACH FILES
