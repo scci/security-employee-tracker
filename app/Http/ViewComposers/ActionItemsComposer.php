@@ -85,7 +85,7 @@ class ActionItemsComposer
     private function calculateDaysToRenewClearance($user)
     {
         $years = 100;
-        if ($user->clearance == 'TS' || $user->clearance == 'Int TS') {
+        if ($user->clearance == 'TS' || $user->clearance == 'Int TS' || $user->clearance == 'SCI') {
             $years = 6;
         } elseif ($user->clearance == 'S' || $user->clearance == 'Int S') {
             $years = 10;
