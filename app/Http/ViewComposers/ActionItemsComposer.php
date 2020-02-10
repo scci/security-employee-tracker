@@ -43,7 +43,6 @@ class ActionItemsComposer
                 //filter the training we get.
                 $q->ActiveUsers()
                     ->whereNull('completed_date')
-                    ->where('stop_renewal', '!=', 1)
                     ->where('due_date', '<=', Carbon::now());
             })
             ->get();
