@@ -411,11 +411,18 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
     );
 
     public static $classMap = array (
+        'AddAdminOnlyToAttachmentsTable' => __DIR__ . '/../..' . '/database/migrations/2018_02_23_084321_add_admin_only_to_attachments_table.php',
         'AddAdministrativeToTrainingTable' => __DIR__ . '/../..' . '/database/migrations/2016_11_23_084814_add_administrative_to_training_table.php',
+        'AddContEvalToUsersTable' => __DIR__ . '/../..' . '/database/migrations/2019_06_21_132428_add_cont_eval_to_users_table.php',
+        'AddSeparatedDateToUsersTable' => __DIR__ . '/../..' . '/database/migrations/2018_06_29_095322_add_separated_date_to_users_table.php',
         'AddStopRenewalToTrainingUserTable' => __DIR__ . '/../..' . '/database/migrations/2016_12_20_133047_add_stop_renewal_to_training_user_table.php',
         'AddTrainingTypeToTrainingsTable' => __DIR__ . '/../..' . '/database/migrations/2016_12_20_134929_add_training_type_to_trainings_table.php',
+        'AuthenticationCardTableSeeder' => __DIR__ . '/../..' . '/database/seeds/AuthenticationCardTableSeeder.php',
+        'ChangeEmpNumDatatypeInUsersTable' => __DIR__ . '/../..' . '/database/migrations/2019_06_21_083356_change_emp_num_datatype_in_users_table.php',
+        'CreateAccessTokensTable' => __DIR__ . '/../..' . '/database/migrations/2019_10_25_132623_create_access_tokens_table.php',
         'CreateActivityLogTable' => __DIR__ . '/../..' . '/database/migrations/2016_12_02_123356_create_activity_log_table.php',
         'CreateAttachmentsTable' => __DIR__ . '/../..' . '/database/migrations/2015_09_01_141321_create_attachments_table.php',
+        'CreateAuthorizationTokensTable' => __DIR__ . '/../..' . '/database/migrations/2019_10_21_113943_create_authorization_tokens_table.php',
         'CreateDutiesTable' => __DIR__ . '/../..' . '/database/migrations/2016_07_12_103819_create_duties_table.php',
         'CreateDutyGroupPivotTable' => __DIR__ . '/../..' . '/database/migrations/2016_07_19_144142_create_duty_group_pivot_table.php',
         'CreateDutySwapsTable' => __DIR__ . '/../..' . '/database/migrations/2016_07_21_133802_create_duty_swaps_table.php',
@@ -998,6 +1005,7 @@ class ComposerStaticInitbf1547b9938f81307729cb7ecbb00f25
         'SebastianBergmann\\RecursionContext\\InvalidArgumentException' => __DIR__ . '/..' . '/sebastian/recursion-context/src/InvalidArgumentException.php',
         'SebastianBergmann\\ResourceOperations\\ResourceOperations' => __DIR__ . '/..' . '/sebastian/resource-operations/src/ResourceOperations.php',
         'SebastianBergmann\\Version' => __DIR__ . '/..' . '/sebastian/version/src/Version.php',
+        'SettingsTableSeeder' => __DIR__ . '/../..' . '/database/seeds/SettingsTableSeeder.php',
         'TestCase' => __DIR__ . '/../..' . '/tests/TestCase.php',
         'Text_Template' => __DIR__ . '/..' . '/phpunit/php-text-template/src/Template.php',
     );

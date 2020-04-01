@@ -25,6 +25,8 @@ class UpdateUserRequest extends Request
     {
         return [
             'cont_eval_date' => 'required_if:cont_eval,1',
+            'accessTokens.cac_issue_date' => 'required_if:accessTokens.cac_issued,1',
+            'accessTokens.sipr_issue_date' => 'required_if:accessTokens.sipr_issued,1',
         ];
     }
 
@@ -32,6 +34,8 @@ class UpdateUserRequest extends Request
     {
         return [
             'cont_eval_date.required_if'  => 'You must select a continuous evaluation date if continuous evaluation is set to Yes',
+            'accessTokens.cac_issue_date.required_if'  => 'You must select an issued date if CAC Issued is set to Yes',
+            'accessTokens.sipr_issue_date.required_if'  => 'You must select an issued date if SIPR TOKEN Issued is set to Yes',
         ];
     }
 }
