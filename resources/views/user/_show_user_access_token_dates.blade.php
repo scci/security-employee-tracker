@@ -10,11 +10,11 @@
     </div>
     <div>
         <strong>CAC Return Date:</strong>
-        {{ $user->accessTokens->cac_return_date == '0000-00-00' ? '' : $user->accessTokens->cac_return_date }}
+        {{ $user->accessTokens->cac_return_date !== null ?  $user->accessTokens->cac_return_date : '' }}
     </div>
 @endif
 @if($user->accessTokens->sipr_issued && !$user->accessTokens->cac_issued)
-    <div class="divider" ></div>
+    <div class="divider"></div>
 @endif
 @if($user->accessTokens->sipr_issued)
     <div>
@@ -27,6 +27,6 @@
     </div>
     <div>
         <strong>SIPR TOKEN Return Date:</strong>
-            {{ $user->accessTokens->sipr_return_date == '0000-00-00' ? '' : $user->accessTokens->sipr_return_date }}
+            {{ $user->accessTokens->sipr_return_date !==  null ?  $user->accessTokens->sipr_return_date : ""}}
     </div>
 @endif
