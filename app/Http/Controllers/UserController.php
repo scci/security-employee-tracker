@@ -76,12 +76,6 @@ class UserController extends Controller
         $data = $request->all();
         $data['status'] = 'active';
         $user = User::create($data);
-        
-        if ($data['accessTokens']['cac_return_date'] = "") 
-        $data['accessTokens']['cac_return_date'] = null;
-        
-        if ($data['accessTokens']['sipr_return_date'] = "") 
-        $data['accessTokens']['sipr_return_date'] = null;
 
         $user->accessTokens()->create($data['accessTokens']);
 
@@ -158,12 +152,7 @@ class UserController extends Controller
         // If continuous evaluation is false, there should be no date associated with it
         if ($data['cont_eval'] == 0)
             $data['cont_eval_date'] = null;
-        
-        if ($data['accessTokens']['cac_return_date'] = "") 
-        $data['accessTokens']['cac_return_date'] = null;
-        
-        if ($data['accessTokens']['sipr_return_date'] = "") 
-        $data['accessTokens']['sipr_return_date'] = null;
+
 
         $user->update($data);
 
