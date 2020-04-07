@@ -77,8 +77,6 @@ class UserController extends Controller
         $data['status'] = 'active';
         $user = User::create($data);
 
-        $user->accessTokens()->create($data['accessTokens']);
-
         if (array_key_exists('groups', $data)) {
             settype($data['groups'], 'array');
             $user->groups()->sync($data['groups']);
@@ -99,8 +97,7 @@ class UserController extends Controller
         },
                             'groups', 'duties', 'attachments',
                             'visits', 'notes.author', 'notes.attachments',
-                            'travels.author', 'travels.attachments',
-                            'accessTokens'])
+                            'travels.author', 'travels.attachments', ])
                     ->findOrFail($userId);
 
         //Make sure the user can't access other people's pages.
@@ -153,7 +150,6 @@ class UserController extends Controller
         if ($data['cont_eval'] == 0)
             $data['cont_eval_date'] = null;
 
-
         $user->update($data);
 
         //Handle user groups
@@ -161,8 +157,6 @@ class UserController extends Controller
             $data['groups'] = [];
         }
         $user->groups()->sync($data['groups']);
-        
-        $user->accessTokens()->updateOrCreate(['user_id' => $user->id], $data['accessTokens']);
 
         //Handled closed area access (MUST come AFTER syncing groups).
         if (array_key_exists('access', $data)) {

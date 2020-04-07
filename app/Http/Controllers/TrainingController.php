@@ -281,7 +281,7 @@ class TrainingController extends Controller
     {
         $trainingUser = TrainingUser::with('user')->find($trainingUserId);
         Event::fire(new TrainingAssigned($trainingUser));
-        Notification::container()->success('Reminder sent to '.$trainingUser->user->userFullName);
+        //Notification::container()->success('Reminder sent to '.$trainingUser->user->userFullName);
 
         return redirect()->back();
     }

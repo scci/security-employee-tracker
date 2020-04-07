@@ -4,3 +4,4 @@ node_modules/
 storage/database.sqlite
 storage/installed
 _ide_helper.php
+/nbproject/private/

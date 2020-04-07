@@ -87,11 +87,6 @@ class User extends Authenticatable
     {
         return $this->hasMany('SET\TrainingUser', 'user_id');
     }
-    
-    public function accessTokens()
-    {
-        return $this->hasOne('SET\AccessToken', "user_id");
-    }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
@@ -167,12 +162,6 @@ class User extends Authenticatable
         return $query->where('id', '>', 1);
     }
 
-
-     /**
-     * @param string $query
-     *
-     * @return array 
-     */
     public function scopeUserStatus($query)
     {
         $query->when( session('userStatus'), function( $user ){ 

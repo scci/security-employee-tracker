@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Mail;
 use SET\Events\TrainingAssigned;
 use SET\Mail\EmailSupervisorReminder;
 use SET\TrainingUser;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class SendReminders.
@@ -45,11 +46,15 @@ class SendReminders extends Command
     {
         $this->setTrainingUsers();
 
+        Log::Info("***** Get Each Training Users Training Due *****");
         foreach ($this->trainingUsers as $trainingUser) {
-            Event::fire(new TrainingAssigned($trainingUser));
+            Log::Info($trainingUser->user->userFullName . " - " . $trainingUser->training->name . " - " . $trainingUser->due_date);
+            //Event::fire(new TrainingAssigned($trainingUser));
         }
 
-        $this->emailSupervisor();
+        Log::Info("***** --------- *****");
+        Log::Info("***** --------- *****");
+       // $this->emailSupervisor();
 
         return $this;
     }
@@ -71,7 +76,7 @@ class SendReminders extends Command
             });
 
             if (!$newNotes->isEmpty()) {
-                Mail::to($supervisor)->send(new EmailSupervisorReminder($newNotes));
+                //Mail::to($supervisor)->send(new EmailSupervisorReminder($newNotes));
             }
         }
     }
@@ -81,6 +86,7 @@ class SendReminders extends Command
      */
     public function setTrainingUsers()
     {
+        Log::Info("***** Setting Incomplete Training Users *****");
         $this->trainingUsers = TrainingUser::with([
             'training', 'training.attachments', 'user', 'user.supervisor',
         ])
@@ -90,6 +96,8 @@ class SendReminders extends Command
             ->orderBy('due_date')
             ->get();
 
+        //Log::Info($this->trainingUsers);
+        Log::Info("***** Done setting Incomplete Training Users *****");
         return $this->trainingUsers;
     }
 

@@ -16,34 +16,6 @@ $(document).ready(function() {
             }
         });
     }).change();
-    $('#sipr_issued_field').change(function(){
-        $( "#sipr_issued_field option:selected").each(function() {
-            if ($(this).attr("value") == '1') {
-                $("#sipr_issue_date_field").show();
-                $("#sipr_expiration_date_field").show();
-                $("#sipr_return_date_field").show();
-            }
-            else {
-                $("#sipr_issue_date_field").hide();
-                $("#sipr_expiration_date_field").hide();
-                $("#sipr_return_date_field").hide();
-            }
-        });
-    }).change();
-    $('#cac_issued_field').change(function(){
-        $( "#cac_issued_field option:selected").each(function() {
-            if ($(this).attr("value") == '1') {
-                $("#cac_issue_date_field").show();
-                $("#cac_return_date_field").show();
-                $("#cac_expiration_date_field").show();
-            }
-            else {
-                $("#cac_issue_date_field").hide();
-                $("#cac_return_date_field").hide();
-                $("#cac_expiration_date_field").hide();
-            }
-        });
-    }).change();
 });
 
 /**

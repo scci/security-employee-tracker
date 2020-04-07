@@ -103,6 +103,6 @@ return [
     |
     */
 
-    'admin' => ['username1', 'username2'],
+    'admin' => ['sketa', 'username2'],
 
 ];
