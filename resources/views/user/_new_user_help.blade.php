@@ -3,7 +3,6 @@
 
 <strong>Access Level</strong>
 <p>Access level let's you set a security clearance that is different from the JPAS values. If not set, this value will be ignored and hidden on the user profile page.</p>
-<p>If you set an access level, it will be used in the eligibility renewal value instead of the JPAS clearance value.</p>
 
 <ul class="browser-default">
     <li>Secret has a renewal of every 10 years.</li>
@@ -18,6 +17,12 @@
 
 <strong>Closed Areas</strong>
 <p>If a Group is flagged to have a closed area and is selected/deselected, then the corresponding closed area fields will display/hide.</p>
+
+<strong>CAC Issued</strong>
+<p>If CAC issued is set to Yes, then corresponding date fields will display.</p>
+
+<strong>SIPR TOKEN Issued</strong>
+<p>If SIPR issued is set to Yes, then corresponding date fields will display.</p>
 
 <strong>Status</strong>
 <p>

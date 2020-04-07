@@ -6,11 +6,18 @@ $vendorDir = dirname(dirname(__FILE__));
 $baseDir = dirname($vendorDir);
 
 return array(
+    'AddAdminOnlyToAttachmentsTable' => $baseDir . '/database/migrations/2018_02_23_084321_add_admin_only_to_attachments_table.php',
     'AddAdministrativeToTrainingTable' => $baseDir . '/database/migrations/2016_11_23_084814_add_administrative_to_training_table.php',
+    'AddContEvalToUsersTable' => $baseDir . '/database/migrations/2019_06_21_132428_add_cont_eval_to_users_table.php',
+    'AddSeparatedDateToUsersTable' => $baseDir . '/database/migrations/2018_06_29_095322_add_separated_date_to_users_table.php',
     'AddStopRenewalToTrainingUserTable' => $baseDir . '/database/migrations/2016_12_20_133047_add_stop_renewal_to_training_user_table.php',
     'AddTrainingTypeToTrainingsTable' => $baseDir . '/database/migrations/2016_12_20_134929_add_training_type_to_trainings_table.php',
+    'AuthenticationCardTableSeeder' => $baseDir . '/database/seeds/AuthenticationCardTableSeeder.php',
+    'ChangeEmpNumDatatypeInUsersTable' => $baseDir . '/database/migrations/2019_06_21_083356_change_emp_num_datatype_in_users_table.php',
+    'CreateAccessTokensTable' => $baseDir . '/database/migrations/2019_10_25_132623_create_access_tokens_table.php',
     'CreateActivityLogTable' => $baseDir . '/database/migrations/2016_12_02_123356_create_activity_log_table.php',
     'CreateAttachmentsTable' => $baseDir . '/database/migrations/2015_09_01_141321_create_attachments_table.php',
+    'CreateAuthorizationTokensTable' => $baseDir . '/database/migrations/2019_10_21_113943_create_authorization_tokens_table.php',
     'CreateDutiesTable' => $baseDir . '/database/migrations/2016_07_12_103819_create_duties_table.php',
     'CreateDutyGroupPivotTable' => $baseDir . '/database/migrations/2016_07_19_144142_create_duty_group_pivot_table.php',
     'CreateDutySwapsTable' => $baseDir . '/database/migrations/2016_07_21_133802_create_duty_swaps_table.php',
@@ -593,6 +600,7 @@ return array(
     'SebastianBergmann\\RecursionContext\\InvalidArgumentException' => $vendorDir . '/sebastian/recursion-context/src/InvalidArgumentException.php',
     'SebastianBergmann\\ResourceOperations\\ResourceOperations' => $vendorDir . '/sebastian/resource-operations/src/ResourceOperations.php',
     'SebastianBergmann\\Version' => $vendorDir . '/sebastian/version/src/Version.php',
+    'SettingsTableSeeder' => $baseDir . '/database/seeds/SettingsTableSeeder.php',
     'TestCase' => $baseDir . '/tests/TestCase.php',
     'Text_Template' => $vendorDir . '/phpunit/php-text-template/src/Template.php',
 );
