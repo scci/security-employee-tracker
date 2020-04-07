@@ -42,7 +42,7 @@ class DutyUpcoming extends Mailable implements ShouldQueue
     {
         $filename = $this->generateICS();
 
-        if ($this->duty->cycle == 'daily') {
+        if ($this->duty->cycle = 'daily') {
             $subject = 'You have '.$this->duty->name." security check on $this->date.";
         } else {
             $subject = 'You have '.$this->duty->name." security check starting $this->date.";

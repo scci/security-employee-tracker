@@ -8,13 +8,11 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use SET\Duty;
 use SET\DutySwap;
-use Illuminate\Support\Facades\Log;
 
 class DutyUsers extends DutyHelper
 {
     public function __construct(Duty $duty)
     {
-        //Log::Info("In DutyUser construct");
         parent::__construct($duty);
     }
 
@@ -25,7 +23,6 @@ class DutyUsers extends DutyHelper
      */
     public function htmlOutput()
     {
-        Log::Info("In DutyUser htmlOutput");
         $newCollection = new Collection();
 
         foreach ($this->list as $entry) {
@@ -52,7 +49,6 @@ class DutyUsers extends DutyHelper
      */
     public function emailOutput()
     {
-        Log::Info("In DutyUsers emailOutput");
         $collection = $this->list->map(function ($value) {
             return [
                 'users' => new Collection([$value['user']]),
@@ -70,7 +66,6 @@ class DutyUsers extends DutyHelper
      */
     public function getList()
     {
-        Log::Info("In DutyUser getList");
         return $this->list;
     }
 
@@ -79,12 +74,10 @@ class DutyUsers extends DutyHelper
      */
     public function recordNextEntry()
     {
-        Log::Info("In DutyUser recordNextEntry");
         if ($this->list->count() < 2) {
             return;
         }
 
-        //Log::Info($this->list);
         $nextUser = $this->list->toArray()[1]['user'];
         $this->duty->users()->updateExistingPivot($nextUser->id, ['last_worked' => Carbon::today()]);
     }
@@ -96,9 +89,7 @@ class DutyUsers extends DutyHelper
      */
     public function getLastWorked()
     {
-        Log::Info("In DutyUsers getLastWorked");
         $this->lastWorkedUser = $this->duty->users()->orderBy('duty_user.last_worked', 'DESC')->orderBy('last_name')->first();
-        Log::Info("Last Worked user is : " . $this->lastWorkedUser->first_name . $this->lastWorkedUser->last_name);
 
         return $this;
     }
@@ -109,7 +100,6 @@ class DutyUsers extends DutyHelper
      */
     public function setLastWorkedDate()
     {
-        Log::Info("In DutyUsers setLastWorkedDate");
         // Get the new duty_user just added
         $newDutyUserID = $this->duty->users()->whereNull('duty_user.last_worked')->orderBy('last_name', 'DESC')->pluck('id');
 
@@ -118,8 +108,6 @@ class DutyUsers extends DutyHelper
         // will need to move further down(depending on number of users added). Do not change the
         // last_worked date for the user for the current week.
         if ($newDutyUserID->isNotEmpty()) {
-            Log::Info("Adding New User :". $newDutyUserID);
-            
             $newDutyUsersCount = $newDutyUserID->count();
 
             DB::table('duty_user')
@@ -144,9 +132,7 @@ class DutyUsers extends DutyHelper
      */
     public function queryList()
     {
-        Log::Info("In DutyUsers queryList");
         $this->list = $this->duty->users()->active()->orderBy('duty_user.last_worked', 'ASC')->get();
-        //Log::Info($this->list);
 
         return $this;
     }
@@ -158,9 +144,7 @@ class DutyUsers extends DutyHelper
      */
     public function combineListWithDates()
     {
-        Log::Info("In DutyUsers combineListWithDates");
         $dates = (new DutyDates($this->duty))->getDates();
-        Log::Info($dates);
         $newDatesList = array_values(array_diff($dates, $this->swapDates->toArray()));
 
         $count = $this->list->count();
@@ -187,7 +171,6 @@ class DutyUsers extends DutyHelper
      */
     public function insertFromDutySwap()
     {
-        Log::Info("In DutyUsers insertFromDutySwap");
         $dutySwaps = DutySwap::where('duty_id', $this->duty->id)
             ->where('imageable_type', 'SET\User')
             ->where('date', '>=', Carbon::now()->subDays(6)) //Omit really old records.
@@ -200,15 +183,14 @@ class DutyUsers extends DutyHelper
         foreach ($dutySwaps as $swap) {
             $key = key($this->list->pluck('user')->where('id', $swap->imageable_id)->toArray());
             if (!is_null($key)) {
-                //if ($swap->date >= Carbon::today()) {
-                    $this->swapDates->push($swap->date);
-                    $this->list[$key] = [
-                            'date' => $swap->date,
-                            'user' => $swap->imageable()->first(),
-                    ];
-                //}
+                $this->swapDates->push($swap->date);
+                $this->list[$key] = [
+                        'date' => $swap->date,
+                        'user' => $swap->imageable()->first(),
+                ];
             }
         }
+
         return $this;
     }
 
@@ -217,7 +199,6 @@ class DutyUsers extends DutyHelper
      */
     private function convertListToCollection()
     {
-        Log::Info("In DutyUsers convertListToCollection");
         $count = $this->list->count();
         $newList = new Collection();
         for ($i = 0; $i < $count; $i++) {

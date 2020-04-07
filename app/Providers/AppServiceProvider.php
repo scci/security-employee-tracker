@@ -6,8 +6,6 @@ use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
 use SET\Handlers\DBConfigs\DBConfigs;
 use SET\Setting;
-use Illuminate\Support\Facades\File;
-use Illuminate\Support\Facades\DB;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -36,15 +34,6 @@ class AppServiceProvider extends ServiceProvider
         Setting::saving(function ($setting) {
             Cache::forever($setting->key, $setting->value);
         });
-
-        if(env('APP_DEBUG')) {
-            DB::listen(function($query) {
-                File::append(
-                    storage_path('/logs/query.log'),
-                    $query->sql . ' [' . implode(', ', $query->bindings) . ']' . PHP_EOL
-                );
-            });
-        }
     }
 
     /**

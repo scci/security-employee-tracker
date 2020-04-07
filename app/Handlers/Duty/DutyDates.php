@@ -4,7 +4,6 @@ namespace SET\Handlers\Duty;
 
 use Carbon\Carbon;
 use SET\Duty;
-use Illuminate\Support\Facades\Log;
 
 class DutyDates
 {
@@ -13,7 +12,6 @@ class DutyDates
     public function __construct(Duty $duty)
     {
         $this->duty = $duty;
-        //$this->duty->cycle = 'daily';
     }
 
     public function getDates()
@@ -38,8 +36,6 @@ class DutyDates
 
     private function getStartDate($cycle)
     {
-        Log::Info("In DutyDates - getStartDate");
-        Log::info($cycle);
         if ($cycle == 'monthly') {
             return Carbon::now()->startOfMonth();
         } elseif ($cycle == 'weekly') {

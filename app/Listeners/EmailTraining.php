@@ -7,7 +7,6 @@ use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Support\Facades\Mail;
 use SET\Events\TrainingAssigned;
 use SET\Setting;
-use Illuminate\Support\Facades\Log;
 
 /**
  * Class EmailTraining.
@@ -23,7 +22,6 @@ class EmailTraining implements ShouldQueue
      */
     public function handle(TrainingAssigned $event)
     {
-        //Log::Info("Handle EmailTraining");
         $trainingUser = $event->getTrainingUser();
         $user = $trainingUser->user;
         $training = $trainingUser->training;
@@ -52,34 +50,30 @@ class EmailTraining implements ShouldQueue
      */
     private function sendEmail($user, $training, $dueDate, $trainingUser)
     {
-        //Log::Info("EmailTraining - sendEmail");
-        //Log::Info("Training Users are :");
-        //Log::Info($trainingUser);
         $reportAddress = Setting::get('mail_from_address', 'set@yourcompany.com');
         $reportName = Setting::get('mail_from_name', 'SET-yourcompany');
+        Mail::send(
+            'emails.training',
+            [
+                'user'          => $user,
+                'training'      => $training,
+                'due_date'      => $dueDate,
+                'trainingUser'  => $trainingUser,
+                'reportAddress' => $reportAddress,
+                'reportName'    => $reportName,
+            ],
+            function ($m) use ($user, $training, $reportAddress, $reportName) {
+                $m->from($reportAddress, $reportName);
+                $m->to($user->email, $user->userFullName)->subject($training->name.' was assigned to you.');
 
-//        Mail::send(
-//            'emails.training',
-//            [
-//                'user'          => $user,
-//                'training'      => $training,
-//                'due_date'      => $dueDate,
-//                'trainingUser'  => $trainingUser,
-//                'reportAddress' => $reportAddress,
-//                'reportName'    => $reportName,
-//            ],
-//            function ($m) use ($user, $training, $reportAddress, $reportName) {
-//                $m->from($reportAddress, $reportName);
-//                $m->to($user->email, $user->userFullName)->subject($training->name.' was assigned to you.');
-//
-//                //ATTACH FILES
-//                foreach ($training->attachments as $file) {
-//                    if (!$file->admin_only) {
-//                        $path = 'app/training_'.$file->imageable_id.'/'.$file->filename;
-//                        $m->attach(storage_path($path), ['as' => $file->filename, 'mime' => $file->mime]);
-//                    }
-//                }
-//            } // end $m function
-//        );
+                //ATTACH FILES
+                foreach ($training->attachments as $file) {
+                    if (!$file->admin_only) {
+                        $path = 'app/training_'.$file->imageable_id.'/'.$file->filename;
+                        $m->attach(storage_path($path), ['as' => $file->filename, 'mime' => $file->mime]);
+                    }
+                }
+            } // end $m function
+        );
     }
 }

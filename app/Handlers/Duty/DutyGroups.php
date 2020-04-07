@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Support\Facades\Gate;
 use SET\Duty;
 use SET\DutySwap;
-use Illuminate\Support\Facades\Log;
 
 class DutyGroups extends DutyHelper
 {
@@ -57,7 +56,6 @@ class DutyGroups extends DutyHelper
 
     public function recordNextEntry()
     {
-        Log::Info("In DutyGroups recordNextEntry");
         if ($this->list->count() < 2) {
             return;
         }

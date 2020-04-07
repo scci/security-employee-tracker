@@ -7,8 +7,8 @@
         <div class="col m4 s12" id="stop_renewal_field">
             <p style="margin-top: 2em">
                 {!! Form::hidden('stop_renewal', false) !!}
-                <input type="checkbox" name="stop_renewal" value=1 class="filled-in" id="stop_renewal" />
-                <label for="stop_renewal">Don't Auto-renew.</label>
+                {!! Form::checkbox('stop_renewal', 1, null, ['id' => 'stop_renewal', 'class' => 'filled-in']) !!}
+                {!! Form::label('stop_renewal', 'Don\'t Auto-renew') !!}
             </p>
         </div>
     @endcan('edit')

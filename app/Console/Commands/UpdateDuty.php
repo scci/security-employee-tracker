@@ -51,7 +51,7 @@ class UpdateDuty extends Command
         foreach ($emailList as $usersDateArray) {
             if ($usersDateArray['date'] == Carbon::today()->format('Y-m-d')) {
                 foreach ($usersDateArray['users'] as $user) {
-                    //Mail::to($user)->send(new DutyToday($duty, $user));
+                    Mail::to($user)->send(new DutyToday($duty, $user));
                 }
             }
 
@@ -69,10 +69,8 @@ class UpdateDuty extends Command
      */
     private function isReadyForNotification($duty, $usersDateArray)
     {
-        //return ($duty->cycle == 'daily' && $usersDateArray['date'] == Carbon::today()->addWeeks(1)->format('Y-m-d'));
         return ($duty->cycle == 'weekly' && $usersDateArray['date'] == Carbon::today()->addWeeks(2)->format('Y-m-d'))
             || ($duty->cycle == 'daily' && $usersDateArray['date'] == Carbon::today()->addWeeks(1)->format('Y-m-d'));
-        
     }
 
     /**
@@ -84,7 +82,7 @@ class UpdateDuty extends Command
     private function sendUsersUpcomingEmailNotification($duty, $usersDateArray)
     {
         foreach ($usersDateArray['users'] as $user) {
-            //Mail::to($user)->send(new DutyUpcoming($duty, $user, $usersDateArray['date']));
+            Mail::to($user)->send(new DutyUpcoming($duty, $user, $usersDateArray['date']));
         }
 
         return $this;

@@ -4,7 +4,6 @@ namespace SET\Handlers\Duty;
 
 use SET\Duty;
 use SET\DutySwap;
-use Illuminate\Support\Facades\Log;
 
 class DutyList
 {
@@ -12,7 +11,6 @@ class DutyList
 
     public function __construct($duty)
     {
-        //Log::Info("In DutyList construct");
         if (is_int($duty)) {
             $duty = Duty::findOrFail($duty);
         }
@@ -21,7 +19,6 @@ class DutyList
 
     public function htmlOutput()
     {
-        Log::Info("In DutyList htmlOutput");
         return $this->processedList()->htmlOutput();
     }
 
@@ -35,7 +32,6 @@ class DutyList
 
     public function emailOutput()
     {
-        Log::Info("In DutyList emailOutput");
         $userGroup = $this->processedList();
 
         return $userGroup->emailOutput();
@@ -53,7 +49,6 @@ class DutyList
      */
     public function processSwapRequest(array $dateArray, array $IDArray, $type)
     {
-        Log::Info("In DutyList processSwapRequest");
         for ($i = 0; $i < 2; $i++) {
             $futureSwap = DutySwap::where('date', $dateArray[$i])
                 ->where('duty_id', $this->duty->id)->first();
@@ -70,7 +65,6 @@ class DutyList
 
     private function processedList()
     {
-        Log::Info("In DutyList processedList");
         if ($this->duty->has_groups) {
             return new DutyGroups($this->duty);
         } else {
