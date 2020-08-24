@@ -18,11 +18,9 @@
 <strong>Closed Areas</strong>
 <p>If a Group is flagged to have a closed area and is selected/deselected, then the corresponding closed area fields will display/hide.</p>
 
-<strong>CAC Issued</strong>
-<p>If CAC issued is set to Yes, then corresponding date fields will display.</p>
-
-<strong>SIPR TOKEN Issued</strong>
-<p>If SIPR issued is set to Yes, then corresponding date fields will display.</p>
+<strong>Add Access Token</strong>
+<p>Select the Access Token's name from the drop down menu, add an issued date, and expiration date. Click update to save.</p>
+<p>Note: if the Access Token you would like to add is not available in the drop down menu, go to Settings > User tab to add a new token to the system.</p>
 
 <strong>Status</strong>
 <p>

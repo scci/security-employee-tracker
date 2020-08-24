@@ -16,35 +16,54 @@ $(document).ready(function() {
             }
         });
     }).change();
-    $('#sipr_issued_field').change(function(){
-        $( "#sipr_issued_field option:selected").each(function() {
-            if ($(this).attr("value") == '1') {
-                $("#sipr_issue_date_field").show();
-                $("#sipr_expiration_date_field").show();
-                $("#sipr_return_date_field").show();
-            }
-            else {
-                $("#sipr_issue_date_field").hide();
-                $("#sipr_expiration_date_field").hide();
-                $("#sipr_return_date_field").hide();
-            }
-        });
-    }).change();
-    $('#cac_issued_field').change(function(){
-        $( "#cac_issued_field option:selected").each(function() {
-            if ($(this).attr("value") == '1') {
-                $("#cac_issue_date_field").show();
-                $("#cac_return_date_field").show();
-                $("#cac_expiration_date_field").show();
-            }
-            else {
-                $("#cac_issue_date_field").hide();
-                $("#cac_return_date_field").hide();
-                $("#cac_expiration_date_field").hide();
-            }
-        });
-    }).change();
 });
+
+/**
+ * Created by eprice on 8/20/2020.
+ * resources/views/user/_new_user.blade.php
+ * When a user clicks the add additional access token button, 
+ * then display the add additional access form elements
+ */
+$(document).ready(function() {
+    $('#js-adduserAccessToken').on('click', function(){
+        $('.js-addUserAccessTokenForm').show();
+        $('#js-adduserAccessToken').hide();
+
+    })
+});
+/**
+ * Created by eprice on 8/21/2020.
+ * resources\views\setting\_users.blade.php
+ * When a user clicks the add additional access token button, 
+ * then display the Enter Access Token Name Form
+ */
+$(document).ready(function() {
+    $('#js-openFormFieldForAddNewAccessToken').on('click', function(){
+        $('#js-addNewAccessTokenName').show();
+        $('#js-openFormFieldForAddNewAccessToken').hide();
+
+    })
+    // on select change show button
+
+    // click edit to show edit name field
+    $('#js-listOfAccessTokens').on('change', function(){
+        $('#js-showEditAccessTokenNameField').show();
+    })
+
+    $('#js-showEditAccessTokenNameField').on('click', function(){
+        $('#js-showEditAccessTokenNameField').hide();
+        $('#js-editAccessTokenFormField').show();
+        var editTokenId = $('#js-listOfAccessTokens').val();
+        var editTokenText = $('#js-listOfAccessTokens option:selected').text();
+        $('#editAccessToken[name]').val(editTokenText);
+        $('input[name="editAccessToken[name]"]').val(editTokenText);
+        $('input[name="editAccessToken[id]"]').val(editTokenId);
+    })
+
+
+});
+
+
 
 /**
  * Created by sdibble on 9/16/2016.

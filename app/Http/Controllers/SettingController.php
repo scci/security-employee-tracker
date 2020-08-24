@@ -5,6 +5,7 @@ namespace SET\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use SET\Setting;
+use SET\AccessToken;
 use SET\User;
 
 class SettingController extends Controller
@@ -31,8 +32,9 @@ class SettingController extends Controller
         $viewers = $users->where('role', 'view')->pluck('id')->all();
         $configAdmins = User::whereIn('username', Config::get('auth.admin'))
             ->get()->pluck('userFullName')->implode('; ');
+        $accessTokens = AccessToken::all();
 
-        return view('setting.index', compact('settings', 'userList', 'admins', 'configAdmins', 'viewers'));
+        return view('setting.index', compact('settings', 'userList', 'admins', 'configAdmins', 'viewers', 'accessTokens'));
     }
 
     /**
@@ -49,6 +51,12 @@ class SettingController extends Controller
         $data = $request->all();
         $data = $this->updateUserRoles($data);
         $data = $this->saveAdldapKeyFormat($data);
+        if(isset($data['newAccessToken']) && $data['newAccessToken'] !== '' ){
+            AccessToken::create(['name' => $data['newAccessToken']]);
+        }
+        if(isset($data['editAccessToken']) && $data['editAccessToken'] !== '' ){
+            AccessToken::where('id', $data['editAccessToken']['id'])->update(['name' => $data['editAccessToken']['name']]);
+        }
 
         unset($data['_method']);
         unset($data['_token']);

@@ -13,19 +13,11 @@ class CreateAccessTokensTable extends Migration
      */
     public function up()
     {
-        Schema::create('access_tokens', function (Blueprint $table) {
-            $table->increments('id');
-            $table->timestamps();
-            $table->integer('user_id')->unsigned();
-            $table->boolean('sipr_issued')->default(false);
-            $table->date('sipr_issue_date')->nullable();
-            $table->date('sipr_expiration_date')->nullable();
-            $table->date('sipr_return_date')->nullable();
-            $table->boolean('cac_issued')->default(false);
-            $table->date('cac_issue_date')->nullable();
-            $table->date('cac_expiration_date')->nullable();
-            $table->date('cac_return_date')->nullable();
-        });
+        Schema::create('access_tokens', function(Blueprint $table) {
+			$table->bigIncrements('id');
+			$table->timestamps();
+			$table->string('name')->unique();
+		});
     }
 
     /**

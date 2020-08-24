@@ -88,9 +88,88 @@ class User extends Authenticatable
         return $this->hasMany('SET\TrainingUser', 'user_id');
     }
     
-    public function accessTokens()
+    public function userAccessTokens()
     {
-        return $this->hasOne('SET\AccessToken', "user_id");
+        return $this->hasMany('SET\UserAccessToken', "user_id");
+    }
+
+    public function addOrUpdateUserAccessTokens($userId, $newAccessToken, $data)
+    {
+        if (isset($data['userAccessTokens'])){
+            $userAccessTokens = $data['userAccessTokens'];
+        }
+
+        $user = $this->findOrFail($userId);
+        if(isset($newAccessToken['token_id'])){
+
+            $user->userAccessTokens()->updateOrCreate([
+                'user_id' => $userId,
+                'token_id' => $newAccessToken['token_id'],
+                'token_issue_date' => $newAccessToken['token_issue_date'],
+                'token_expiration_date' => $newAccessToken['token_expiration_date'],
+                'token_return_date' => $newAccessToken['token_return_date'],
+                ]);
+        }
+        
+        if (isset($userAccessTokens)) {
+            foreach ($userAccessTokens as $key => $token) {
+                $user->userAccessTokens()->updateOrCreate([
+                    'user_id' => $userId,
+                    'token_id' => $key],
+                    [
+                    'token_issue_date' => $token['token_issue_date'],
+                    'token_expiration_date' => $token['token_expiration_date'],
+                    'token_return_date' => $token['token_return_date'],
+                ]);
+            }
+        }
+        return;
+    }
+
+     /**
+     * Sort userAccess Tokens so CAC is first and SIPR TOKEN is second
+     * 
+     */
+
+    public function sortedUserAccessTokenCollection()
+    {
+        $accessTokens = AccessToken::all();
+        if($accessTokens->isEmpty() ){ // if Access Tokens have not been created yet then return
+            return $this->userAccessTokens();
+        }
+        if($accessTokens->where('name', 'SIPR TOKEN')->isEmpty() && $accessTokens->where('name', 'CAC')->isEmpty()){ // if CAC and SIPR TOKEN access tokens are not created 
+            $userAccessTokens = $this->userAccessTokens()->sortBy('name');
+           
+        } elseif($accessTokens->where('name', 'CAC')->isNotEmpty() && $accessTokens->where('name', 'SIPR TOKEN')->isEmpty()){ // if CAC access token has been created
+           
+            $userAccessTokens = $this->userAccessTokens()->where('token_id', '!=', $accessTokens->where('name', 'CAC')->pluck('id'))->get()->sortBy('name');
+           
+        } elseif($accessTokens->where('name', 'SIPR TOKEN')->isNotEmpty() && $accessTokens->where('name', 'CAC')->isEmpty() ){ // if SIPR TOKEN access token has been created
+            
+            $userAccessTokens = $this->userAccessTokens()->where('token_id', '!=', $accessTokens->where('name', 'SIPR TOKEN')->pluck('id'))->get()->sortBy('name');
+            
+        } elseif($accessTokens->where('name', 'SIPR TOKEN')->isNotEmpty() && $accessTokens->where('name', 'CAC')->isNotEmpty()){
+
+            // These else if statments could be replaced with the following variable if it were assumed that CAC and SIPR token would exist in the system 100% of the time
+            $userAccessTokens = $this->userAccessTokens()->where([['token_id', '!=', $accessTokens->where('name', 'SIPR TOKEN')->pluck('id')],
+            ['token_id', '!=', $accessTokens->where('name', 'CAC')->pluck('id')]])->get()->sortBy('name');
+        }
+        // if sipr token has been created and has been assigned to user
+        if($accessTokens->where('name', 'SIPR TOKEN')->isNotEmpty() &&
+         $this->userAccessTokens()->where('token_id', $accessTokens->where('name', 'SIPR TOKEN')->pluck('id'))->first() != null){
+       
+            $siprTokenAccessToken = $this->userAccessTokens()->where('token_id', $accessTokens->where('name', 'SIPR TOKEN')->pluck('id'))->first();
+            $userAccessTokens->prepend($siprTokenAccessToken);
+        }
+        // if cac access token has been created and has been assigned to user
+        if($accessTokens->where('name', 'CAC')->isNotEmpty() &&
+         $this->userAccessTokens()->where('token_id', $accessTokens->where('name', 'CAC')->pluck('id'))->first() != null){
+            
+            $cacAccessToken = $this->userAccessTokens()->where('token_id', $accessTokens->where('name', 'CAC')->pluck('id'))->first();
+            $userAccessTokens->prepend($cacAccessToken);
+        }
+
+        return $userAccessTokens;
     }
 
     /**

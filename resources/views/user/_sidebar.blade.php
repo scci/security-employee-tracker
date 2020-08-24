@@ -73,7 +73,7 @@
             {{ $user->cont_eval_date }}
         </div>
 
-        @if(isset($user->accessTokens->cac_issued) || isset($user->accessTokens->cac_issued) )
+        @if(count($user->userAccessTokens()->get()) > 0 )
             @include('user._show_user_access_token_dates')
         @endif
 

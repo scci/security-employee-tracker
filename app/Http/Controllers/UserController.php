@@ -9,6 +9,8 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Storage;
 use Krucas\Notification\Facades\Notification;
 use SET\Duty;
+use SET\AccessToken;
+use SET\UserAccessToken;
 use SET\Group;
 use SET\Handlers\Excel\JpasImport;
 use SET\Http\Requests\StoreUserRequest;
@@ -99,8 +101,8 @@ class UserController extends Controller
         },
                             'groups', 'duties', 'attachments',
                             'visits', 'notes.author', 'notes.attachments',
-                            'travels.author', 'travels.attachments',
-                            'accessTokens'])
+                            'travels.author', 'travels.attachments'
+                            ])
                     ->findOrFail($userId);
 
         //Make sure the user can't access other people's pages.
@@ -138,8 +140,11 @@ class UserController extends Controller
 
         $supervisors = User::skipSystem()->active()->orderBy('last_name')->get()->pluck('userFullName', 'id')->toArray();
         $groups = Group::all();
+        $accessTokens = AccessToken::all();
+        $userAccessTokens = $user->userAccessTokens()->get();
+        $accessTokens = $accessTokens->except($userAccessTokens->pluck('token_id')->toArray());
 
-        return view('user.edit', compact('user', 'supervisors', 'groups'));
+        return view('user.edit', compact('user', 'supervisors', 'groups', 'accessTokens'));
     }
 
     public function update(UpdateUserRequest $request, User $user)
@@ -161,8 +166,7 @@ class UserController extends Controller
             $data['groups'] = [];
         }
         $user->groups()->sync($data['groups']);
-        
-        $user->accessTokens()->updateOrCreate(['user_id' => $user->id], $data['accessTokens']);
+        $user->addOrUpdateUserAccessTokens($user->id, $data['newAccessToken'], $data );
 
         //Handled closed area access (MUST come AFTER syncing groups).
         if (array_key_exists('access', $data)) {

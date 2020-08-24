@@ -41,6 +41,9 @@
     <strong>Admins & Viewers</strong>
     <p>Admins allow you to make any changes in the system. A user can also be made an admin by updating the <code>config/auth.php</code> file.</p>
     <p>Viewers allows you to see any pages in the system, but not change any data.</p>
+    
+    <Strong>Access Tokens</Strong>
+    <p>Add new Access Tokens to SET under the USERS tab. After a new token is created, it will be available to assign to users via their profile</p>
     <p>Note: A user can either be an admin or a viewer, not both. If a user is assigned to both, the system will remove their admin status and make them a viewer.</p>
 
 @stop
