@@ -89,7 +89,7 @@ class DutyUsers extends DutyHelper
      */
     public function getLastWorked()
     {
-        $this->lastWorkedUser = $this->duty->users()->orderBy('duty_user.last_worked', 'DESC')->orderBy('last_name')->first();
+        $this->lastWorkedUser = $this->duty->users()->orderBy('duty_user.last_worked', 'ASC')->orderBy('last_name')->first();
 
         return $this;
     }
