@@ -105,4 +105,17 @@ return [
 
     'admin' => ['username1', 'username2'],
 
+    /*
+    |--------------------------------------------------------------------------
+    | FSO and AFSO User
+    |--------------------------------------------------------------------------
+    |
+    | Here you may set the FSO and AFSO users. This cannot be removed within the interface.
+    |
+    | This should be an array of usernames.
+    |
+    */
+
+    'FSO' => ['username1', 'username2'],
+
 ];

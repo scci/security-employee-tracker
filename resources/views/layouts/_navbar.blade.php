@@ -68,6 +68,9 @@
         <li><a class="waves-effect waves-light modal-trigger" href="#jpas-form">JPAS Import</a></li>
         <li><a href="{{url("settings")}}">Administration</a></li>
     @endcan
+    @if(in_array(Auth::user()->username, Config::get('auth.FSO')))
+        <li><a href="{{url("inventory")}}">Inventory List</a></li>
+    @endif
     <li><a href="{{url("user", Auth::user()->id)}}">My Profile</a></li>
     <li><a href="{{url("logout")}}">Logout</a></li>
 </ul>

@@ -54,5 +54,6 @@ Route::group(['middleware' => 'auth'], function () {
     Route::resource('duty', 'DutyController');
     Route::resource('duty-swap', 'DutySwapController');
     Route::resource('news', 'NewsController');
+    Route::resource('inventory', 'InventoryController');
     Route::get('logout', 'Auth\LoginController@logout');
 });
