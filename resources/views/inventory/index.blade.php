@@ -13,6 +13,7 @@
     <div class="card">
         <div class="card-content">
             <span class="card-title">Inventory List</span>
+            @include('inventory._item_changes_success_banner')
                 <table class="row-border hover data-table">
                     <thead>
                         <tr>
@@ -39,8 +40,8 @@
                                 <td>
                                     {{ isset($item->type) ? $item->type->name : '' }}
                                 </td>
-                                <td>{{ $item->serial_number }}</td>
                                 <td>{{ $item->description }}</td>
+                                <td>{{ $item->serial_number }}</td>
                                 <td>{{ isset($item->classification) ? $item->classification->name : ''}}</td>
                                 <td class="no-wrap">
                                     <div class="action-buttons">

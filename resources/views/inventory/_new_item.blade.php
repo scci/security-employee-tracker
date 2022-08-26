@@ -16,9 +16,9 @@
             @if($submit == 'Update')
                 {!! Form::select('classification_id', $classificationTypes, null, ['class' => 'validate', 'required']) !!}
             @else
-                {!! Form::select('classification_id', $classificationTypes, 0, ['class' => 'validate', 'required']) !!}
+                {!! Form::select('classification_id', $classificationTypes, array_search('Unclassified', $classificationTypes),
+                 ['class' => 'validate', 'required']) !!}
             @endif
-
             {!! Form::label('classfication_id', '*Classification:') !!}
         </div>
     </div>
@@ -65,7 +65,11 @@
     <div class="col s12 m6 l4">
         <div class="input-field" id="received_from_field">
             {!! Form::label('received_from', '*Received From:') !!}
-            {!! Form::text('received_from', null, ['class' => 'validate', 'required']) !!}
+            @if($submit == 'Update')
+                {!! Form::text('received_from', null, ['class' => 'validate', 'required']) !!}
+            @else
+                {!! Form::text('received_from', 'Locally Created', ['class' => 'validate', 'required']) !!}
+            @endif
         </div>
     </div>
     <div class="col s12 m6 l4">
@@ -110,16 +114,18 @@
             {!! Form::text('machine_designation', null, ['class' => 'validate']) !!}
         </div>
     </div>
-    <div class="col s12 m6 l4">
-        <div class="input-field" id="disposition_field">
-            {!! Form::label('disposition', 'Disposition:') !!}
-            {!! Form::text('disposition', null, ['class' => 'validate']) !!}
+    @if($submit == 'Update')
+        <div class="col s12 m6 l4">
+            <div class="input-field" id="disposition_field">
+                {!! Form::label('disposition', 'Disposition:') !!}
+                {!! Form::text('disposition', null, ['class' => 'validate']) !!}
+            </div>
         </div>
-    </div>
-    <div class="col s12 m6 l4" id="disposition_date_field">
-        {!! Form::label('disposition_date', 'Disposition Date:') !!}
-        {!! Form::date('disposition_date', null, ['class' => 'datepicker']) !!}
-    </div>
+        <div class="col s12 m6 l4" id="disposition_date_field">
+            {!! Form::label('disposition_date', 'Disposition Date:') !!}
+            {!! Form::date('disposition_date', null, ['class' => 'datepicker']) !!}
+        </div>
+    @endif
     <div class="col s12 m6 l4">
         <div class="input-field" id="last_inventory_date_and_initials_field">
             {!! Form::label('last_inventory_date_and_initials', 'Date Last Inventoried / By:') !!}
@@ -129,7 +135,7 @@
     <div class="col s12 m6 l4">
         <div class="input-field" id="copy_number_field">
             {!! Form::label('copy_number', 'Copy Number:') !!}
-            {!! Form::text('copy_number', null, ['class' => 'validate']) !!}
+            {!! Form::number('copy_number', null, ['class' => 'validate']) !!}
         </div>
     </div>
     <div class="col s12 m6 l4">
@@ -147,10 +153,10 @@
 </div>
 <div class="row">
     <div class="col s12 right-align">
-        @if(isset($inventoryItem) && $inventoryItem->trashed())
+
             <a class="btn-flat waves-effect waves-indigo" href="{{url("inventory")}}">Back to Inventory</a>
-        @else
+
             {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
-        @endif
+
     </div>
 </div>

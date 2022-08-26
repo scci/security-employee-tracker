@@ -2,6 +2,7 @@
 
 namespace SET\Http\Controllers;
 
+use Illuminate\Support\Facades\Session;
 use SET\Http\Controllers\Controller;
 use SET\Http\Requests\InventoryRequest;
 use SET\Http\Requests\StoreUpdateInventoryRequest;
@@ -34,12 +35,12 @@ class InventoryController extends Controller
      */
     public function create(InventoryRequest $request)
     {
-        $received_methods = InventoryReceiveMethod::all()->pluck('name', 'id')->toArray();
-        $classificationTypes = InventoryClassification::all()->pluck('name', 'id')->toArray();
-        $types = InventoryType::all()->pluck('name', 'id')->toArray();
-        $rooms = InventoryRoom::all()->pluck('name', 'id')->toArray();
-        $safes = InventorySafe::all()->pluck('name', 'id')->toArray();
-        $drawers = InventoryDrawer::all()->pluck('name', 'id')->toArray();
+        $received_methods = InventoryReceiveMethod::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $classificationTypes = InventoryClassification::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $types = InventoryType::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $rooms = InventoryRoom::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $safes = InventorySafe::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $drawers = InventoryDrawer::orderBy('name')->get()->pluck('name', 'id')->toArray();
 
         return view('inventory.create', compact('received_methods','classificationTypes',
             'types', 'rooms', 'safes', 'drawers'));
@@ -54,6 +55,8 @@ class InventoryController extends Controller
     public function store(StoreUpdateInventoryRequest $request)
     {
         Inventory::create($request->all());
+        Session::flash('created', $request->material_control_number);
+
 
         return redirect()->action('InventoryController@index');
     }
@@ -78,12 +81,12 @@ class InventoryController extends Controller
     public function edit(InventoryRequest $request, $id)
     {
         $inventoryItem = Inventory::withTrashed()->find($id);
-        $received_methods = InventoryReceiveMethod::all()->pluck('name', 'id')->toArray();
-        $classificationTypes = InventoryClassification::all()->pluck('name', 'id')->toArray();
-        $types = InventoryType::all()->pluck('name', 'id')->toArray();
-        $rooms = InventoryRoom::all()->pluck('name', 'id')->toArray();
-        $safes = InventorySafe::all()->pluck('name', 'id')->toArray();
-        $drawers = InventoryDrawer::all()->pluck('name', 'id')->toArray();
+        $received_methods = InventoryReceiveMethod::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $classificationTypes = InventoryClassification::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $types = InventoryType::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $rooms = InventoryRoom::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $safes = InventorySafe::orderBy('name')->get()->pluck('name', 'id')->toArray();
+        $drawers = InventoryDrawer::orderBy('name')->get()->pluck('name', 'id')->toArray();
 
         return view('inventory.edit', compact('inventoryItem', 'received_methods',
             'classificationTypes', 'types', 'rooms', 'safes', 'drawers'));
@@ -101,7 +104,13 @@ class InventoryController extends Controller
         $item = Inventory::withTrashed()->find($id);
         if($item->trashed()) redirect()->action('InventoryController@index');
         $item->update($request->all());
-        return redirect()->action('InventoryController@edit', $id);
+        Session::flash('updated', $item->material_control_number);
+
+        if($request->disposition !== '' && $request->disposition_date !== null){
+            return redirect()->action('InventoryController@edit', $id);
+        }
+
+        return redirect()->action('InventoryController@index');
     }
 
     /**
@@ -116,6 +125,8 @@ class InventoryController extends Controller
         if(!$itemToDestory->trashed()) {
             $itemToDestory->delete();
         }
+        Session::flash('destroyed', $itemToDestory->material_control_number);
+
         return redirect()->action('InventoryController@index');
     }
 }
