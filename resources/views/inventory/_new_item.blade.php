@@ -153,10 +153,9 @@
 </div>
 <div class="row">
     <div class="col s12 right-align">
-
-            <a class="btn-flat waves-effect waves-indigo" href="{{url("inventory")}}">Back to Inventory</a>
-
+        <a class="btn-flat waves-effect waves-indigo" href="{{url("inventory")}}">Back to Inventory</a>
+        @if(!isset($inventoryItem) || (isset($inventoryItem) && !$inventoryItem->trashed()))
             {!! Form::submit($submit, array('class' => 'btn-flat waves-effect waves-indigo')) !!}
-
+        @endif
     </div>
 </div>

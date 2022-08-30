@@ -102,7 +102,7 @@ class InventoryController extends Controller
     public function update(StoreUpdateInventoryRequest $request, $id)
     {
         $item = Inventory::withTrashed()->find($id);
-        if($item->trashed()) redirect()->action('InventoryController@index');
+        if($item->trashed()) return redirect()->action('InventoryController@index');
         $item->update($request->all());
         Session::flash('updated', $item->material_control_number);
 
